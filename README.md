@@ -30,9 +30,14 @@ read the Drop-off Detective, go again.
   INVITATION (wording and click through appeal), QUESTIONNAIRE
   (length, complexity, answerability). Every action belongs to one.
 - **Two budgets.** Goodwill, the audience's patience with you, shown
-  as a breaker panel. Credits, 120 per round, spent across list
-  preparation and execution. You cannot afford everything; that is
-  the game.
+  as a breaker panel. Credits, one pool of 120 per level shared
+  across all your attempts, spent across list preparation and
+  execution. You cannot afford everything; that is the game.
+- **Two ways forward.** After a round: TRY AGAIN and continue the
+  level on the credits you have left, improving the process until
+  you win or the money runs out, or NEW GAME for a fresh random
+  questionnaire. It sounds like a cabinet too: original chiptune
+  BGM and event effects, all synthesized inside the file.
 - **A funnel you can watch.** Forty persona sprites walk SENT,
   DELIVERED, OPENED, STARTED, FINISH. They bounce, wander off, stall
   on questions they cannot answer, or jump at the finish line.

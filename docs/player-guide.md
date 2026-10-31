@@ -35,7 +35,8 @@ reminders, and unanswerable questions spend it. Short surveys, an
 honest time ask, a why me line, and closing the loop earn it back.
 At zero the breaker trips and the segment stops responding.
 
-**Credits (120 per round).** Prices:
+**Credits (120 per level, one pool across all your attempts).**
+Prices:
 
 | Action | Cost |
 | --- | --- |
@@ -60,6 +61,33 @@ you build refunds the difference.
 
 A maxed out plan costs about 103. You will choose what to skip.
 That choice is the lesson.
+
+## After a round: Try Again or New Game
+
+- **Try Again (continue).** Your level budget is one pool for the
+  whole level, not a refill. You return to setup with the credits
+  you have left, your prep purchases and your edited questionnaire
+  intact, and goodwill where you left it. Each new send costs its
+  send price again, new edits cost their action prices, and
+  re-sending costs 4 goodwill: the audience remembers. Improve the
+  process until an attempt beats the target, or the money runs
+  out. If the remaining budget cannot cover another send and the
+  target is unmet, the level is failed.
+- **New Game.** A fresh start on the level with a new random
+  questionnaire: new draw of questions, new traps, same segment and
+  target. The instrument's seed code is shown on the setup screen,
+  so a draw can be replayed or shared. From the start screen, New
+  Game starts a whole fresh campaign.
+
+## Sound
+
+The cabinet has a soundtrack: an original chiptune loop that
+swells during a run, plus effects wired to what happens (spending,
+scanning, bounces, finishes, the breaker). The SOUND panel on the
+start screen has music and effects toggles, volumes, and preview
+buttons; the speaker button in the header and the M key mute
+everything. Your settings are remembered on the device. Audio
+starts after your first click, as browsers require.
 
 ## Personas
 

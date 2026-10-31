@@ -59,6 +59,54 @@ reach versus hygiene versus polish, priced in the open.
 - Overspend is impossible: choices grey out when the budget cannot
   cover them, and the bar shows what blocked them.
 
+## 2b. Attempt economy: Try Again and New Game (v1.3, Fabio 2026-10-31)
+
+The report screen offers exactly two ways forward:
+
+1. **TRY AGAIN (continue).** The level budget is a single pool for
+   the whole level (120 credits, 150 on Level 6), not a per attempt
+   refill. Try Again returns to setup with the remaining credits,
+   and the player improves the process with what is left.
+2. **NEW GAME.** A fresh start on the level with a new random
+   questionnaire (section 2c). From the start screen, New Game
+   starts a fresh campaign the same way.
+
+How continuation works:
+
+- **Persistent across attempts:** list prep already bought
+  (validation level, dedupe, suppression, localization review),
+  instrument state (kept, simplified, cut, added questions), the
+  segment's goodwill, and Sender Reputation. You never rebuy
+  validation for the same list.
+- **Priced per attempt:** the send itself (30 or 45, every attempt
+  mails again), the invite (changing variant costs the new
+  variant's price; the old copy work is spent), reminders for the
+  new send, and every NEW edit action (each newly simplified or cut
+  or added question at the table prices; restoring a cut question
+  costs 1 edit credit; upgrading validation costs the difference).
+- **Re-send fatigue:** launching attempt 2 or later costs 4 goodwill
+  at launch. The audience remembers being asked again.
+- **Win:** any attempt that beats the rate target with quality at
+  60 or higher wins the level. Leftover budget is shown on the
+  campaign screen as a budget bonus.
+- **Lose:** if, after a report, the remaining budget cannot cover
+  another send (under 30 credits) and the target is still unmet,
+  the level is FAILED. The failed screen offers New Game or the
+  level select. A breaker trip on the last affordable attempt fails
+  the level the same way.
+
+## 2c. Random questionnaires (New Game)
+
+- Each level's instrument is generated from a question bank (18 or
+  more questions): draw 12, shuffle the order, reassign the trap
+  types (unanswerable for a persona, heavy grid, double barreled)
+  among eligible questions, and jitter time costs inside their
+  ranges.
+- Every generated instrument carries a visible seed code (for
+  example INSTRUMENT #A3F9). The same seed always generates the
+  same questionnaire, so a draw stays reproducible and discussable
+  in a workshop, and a New Game draw is a genuinely new puzzle.
+
 ## 3. List health and bounces (AUDIENCE lever)
 
 Each segment card gains a List Health line: the share of addresses

@@ -1,5 +1,23 @@
 # Changelog
 
+## v1.3 - 2026-10-31 - Two option flow and soundtrack
+
+- Two options after every round: TRY AGAIN continues the level on
+  a shared, non refilling credit pool (prep purchases, instrument
+  edits, goodwill, and reputation persist; each new send, per send
+  invite, reminders, and new edits are charged again; re-sends cost
+  4 goodwill; segment locked mid chain), or NEW GAME restarts with
+  a new random questionnaire.
+- Random questionnaires: 18 question bank, draw 12, traps
+  reassigned, times jittered, reproducible INSTRUMENT #XXXX seed
+  in setup. Level 1 keeps its hand tuned instrument for first play.
+- Budget under 30 credits with the target unmet ends the level as
+  FAILED; won levels record a budget bonus.
+- Original procedural chiptune BGM (title, setup, run variants of
+  one motif, Level 6 harmony) and a full event wired effects set,
+  with a SOUND panel, M key mute, saved preferences, and preview
+  buttons. All audio synthesized in the single file.
+
 ## v1.2 - 2026-10-31 - Full campaign, deployment ready
 
 - Six level campaign: First Send, The Split (A/B test move), The
