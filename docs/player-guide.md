@@ -26,14 +26,16 @@ progress or spends the campaign's credits.
 2. **Prepare the list.** Buy preparation with credits: email
    validation (BrightVerify) at skip, partial, or full; dedupe;
    suppression scrub (opt outs and recently surveyed); localization
-   review.
+   review. These are simulated preparation choices, not live service integrations.
 3. **INVITATION.** Pick a variant and a reminder count. Generic is
-   free and weak. Honest Ask states the real minutes and carries a
-   why me line. Known Name opens best and costs coordination.
-4. **QUESTIONNAIRE.** The instrument starts at 12 questions. Keep,
-   simplify, or cut each flagged question. Watch the estimated
+   free and weak. Honest Ask promises five minutes and explains why
+   the recipient was selected; keep the questionnaire within that
+   promise. Known Name opens best and costs coordination.
+4. **QUESTIONNAIRE.** The fixed starting instrument has 12 questions;
+   New Game deals 9 to 16. Keep, apply the card's class-specific repair,
+   or cut each question. Watch the estimated
    minutes against each persona's patience. Add escapes (Don't know
-   / Not applicable) to stop guessing.
+   / Not applicable) to allow item nonresponse instead of forced answers.
 5. **LAUNCH.** Countdown, then up to 40 sprites run the funnel:
    SENT, DELIVERED, OPENED, STARTED, FINISH. A breaker trip stops
    new sends and interrupts anyone still in the funnel. Only
@@ -43,7 +45,8 @@ progress or spends the campaign's credits.
 6. **REPORT.** The Drop-off Detective shows the funnel, the three
    biggest leaks with causes and fixing levers, the goodwill and
    credit ledgers, deliverability and data quality, and one fix
-   quest. Then PLAY AGAIN or take the next level.
+   quest. Then TRY AGAIN if credits permit, open LEVEL SELECT, or
+   choose NEXT LEVEL after a win. Level 6 offers SEASON RESULTS.
 
 ## The two budgets
 
@@ -61,25 +64,24 @@ Prices:
 | --- | --- |
 | Send: Fresh or Stale segment | 30 |
 | Send: Executive Blast | 45 |
-| Validation (BrightVerify): partial / full | 6 / 12 (18 on Blast) |
+| Validation (BrightVerify): partial / full | 6 / 12 (full is 18 on Blast) |
 | Dedupe | 4 |
 | Suppression scrub | 4 |
 | Localization review | 8 |
 | Invite: Generic / Honest Ask / Known Name | 0 / 4 / 10 |
 | Reminder, each | 8 |
-| Simplify a question, each | 2 |
+| SPLIT a double-barreled item or BREAK UP a grid | 3 |
+| Other class-specific repairs, each | 2 |
 | Cut a question, each | 1 |
 | Add a question from the optional bank, each | 3 |
 | Add escapes | 2 |
 | A/B test setup (Level 2) | 6 |
 
-Every activity costs credit. Doing nothing is the only free move:
-keeping a question as is, or sending the generic invite. Prices
-apply to your final setup at launch, so changing your mind while
-you build refunds the difference.
-
-A maxed out plan costs about 103. You will choose what to skip.
-That choice is the lesson.
+The invitation batch always costs credits. Keeping an item unchanged
+and selecting Generic add no extra charge. Before the first launch,
+prices apply to the final setup, so undoing a purchase refunds it.
+Owned preparation is not refunded or charged again on a retry.
+An over-budget setup cannot launch; reduce costs before sending.
 
 ## After a round: Try Again or New Game
 
@@ -92,10 +94,14 @@ That choice is the lesson.
   process until an attempt beats the target, or the money runs
   out. If the remaining budget cannot cover another send and the
   target is unmet, the level is failed.
+  The minimum batch costs 30 credits, or 45 for Executive Blast.
+  Cost-reducing choices remain available even when you need several
+  reductions to make the inherited setup affordable. Owning preparation
+  does not pay for a new batch, invitation, or reminders.
 - **New Game.** A fresh start on the level with a new random
-  questionnaire: new draw of questions, new traps, same segment and
-  target. The instrument's seed code is shown on the setup screen,
-  so a draw can be replayed or shared. From the start screen, New
+  questionnaire: new draw of questions, new traps, the level's default
+  segment and the same target. The instrument's seed code identifies
+  the draw; there is no player-facing seed-entry control. From the start screen, New
   Game starts a whole fresh campaign.
 
 ## Stakeholder encounters
@@ -126,7 +132,9 @@ starts after your first click, as browsers require.
 ## Question defects and their fixes
 
 Every defective question has one named defect, and the fix button
-names the real repair. Simplifying does not fix everything:
+names its in-game repair. Real questionnaire revisions also depend on
+the construct, routing, respondent population, and pretesting.
+Simplifying does not fix everything:
 
 - **Double-barreled** (two judgments, one answer): SPLIT it, or
   cut one half.
@@ -140,7 +148,8 @@ names the real repair. Simplifying does not fix everything:
 - **Double negative**: REWORD it positive.
 - **Broken options** (overlap, or no fit): FIX the options.
 - **Grid burden** (long matrix): BREAK IT UP, or cut rows.
-- **Sensitive, no assurance**: ADD a privacy line.
+- **Sensitive, no assurance**: ADD a privacy line only if the stated
+  protections actually exist.
 - **Wordy stem**: SIMPLIFY it.
 
 The Detective only blames a defect for damage it actually saw in
@@ -151,11 +160,11 @@ your run; the rest are flagged as risks. The full field guide is
 
 Each level brief lists an agenda: the business topics the survey
 exists to answer. Insight Value (0-100) credits a topic only when
-its question is in your final survey, sound (clean, or fixed the
-right way), answerable by the audience you sent, and answered by
-finishers from the personas the topic is about. Stupid questions
+its question is in your final survey, with credit adjusted for observed
+measurement risks, answerability, and the mix of completing respondent
+groups. Low-value items
 earn nothing and cost Insight and goodwill. Winning takes all
-three gates: rate at target, quality 60+, Insight 60+ (70+ in the
+three gates: rate strictly above target, quality 60+, Insight 60+ (70+ in the
 finale). Pass the first two and fail Insight and the run is
 stamped FAST AND USELESS: plenty of answers, nothing learned.
 
@@ -185,8 +194,10 @@ the BRD changes with the level; consulting it does not change your choices.
 | End user | 5 min | Own workflow | Org decisions, budgets |
 
 A question a persona cannot answer produces an abandonment, an
-escape, or a guess. Guesses are the worst outcome: they complete
-and poison the data.
+escape, or a guess. Forced guesses can conceal measurement error
+in completed questionnaires.
+DK/NA allows item nonresponse; it does not establish validity or remove
+the burden of an irrelevant item.
 
 ## Deliverability, in 20 seconds
 
@@ -199,28 +210,47 @@ verified.
 
 ## Scoring and winning
 
-- **Response score:** completions as a share of invites, against
-  the level target.
+- **Response rate:** completed questionnaires divided by invitations
+  actually sent, including bounces. This simplified game measure is
+  not an AAPOR response rate; eligibility and full case dispositions
+  are not modeled. Response score scales that rate to a 20% stretch goal.
 - **Data quality score:** starts at 100. Guesses, speeders, straight
   liners, duplicates, forwarded responses, and missing core
   questions subtract. Escapes used add a small bonus.
-- **Win:** beat the rate target AND hold quality at 60 or higher.
+- **Insight Value:** agenda coverage adjusted for simulated measurement
+  risks, answerability, and the completing respondent groups.
+- **Win:** beat the rate target AND hold quality at 60 or higher
+  AND Insight at 60 or higher (70 in Level 6). Level 4 also requires
+  ending goodwill of at least 35.
   Cutting the survey to almost nothing can post a huge rate and
   still fail. Grades run S, A, B, C, TRY AGAIN.
 
-## Levels
+Data quality and Insight Value are game indices, not validated research
+metrics. Neither a high rate nor a winning score establishes construct
+validity, population representativeness, or low nonresponse bias.
 
-1. **First Send.** One clean segment, one trap question.
-2. **The Split.** The A/B test move unlocks: two invite variants,
-   one variable, read both funnels, accept "too close to call."
-3. **The Stakeholder.** Mid build, a stakeholder demands 8 more
+The same instrument and choices produce identical outcomes from the same
+starting state. A retry changes credits, goodwill, reputation, and owned prep.
+
+## Levels and difficulty
+
+1. **First Send - Easy.** Learn audience selection, list preparation,
+   invitation design, and questionnaire repair.
+2. **The Split - Easy.** Optional randomized A/B invitation comparison.
+   Interpret uncertainty; the verdict buttons do not change scores.
+3. **The Stakeholder - Medium.** Mid build, a stakeholder demands 8 more
    questions. Accept, push back, or rotate modules.
-4. **The Tired List.** A fatigued segment at low goodwill. Win it
+4. **The Tired List - Hard.** A fatigued segment at low goodwill. Win it
    back with a short instrument and visible closing of the loop.
-5. **45 Languages.** The biggest leak is localization. Read the
-   funnel by language to find it.
-6. **The Big Quarter.** Mixed segments, compounded traps, season
-   scoring.
+5. **Global Fieldwork - Medium.** Five simulated language groups.
+   Review invitation language, localization, and language-specific nonresponse.
+6. **The Big Quarter - Hard.** Executive Blast, stakeholder burden,
+   and the higher Insight gate.
+
+These labels describe scenario complexity, not automatic wins or separate
+difficulty modes. Every fixed start and the 64 checked seeded draws per
+level have a winning strategy within the initial budget. The random check
+is a sample, not a guarantee for every possible seed.
 
 ## Tips from the Detective
 
@@ -230,5 +260,5 @@ verified.
   credits is a decision, not a default.
 - If technicians quit at one question, the question is wrong for
   them, not the technicians.
-- A high rate from the wrong people loses on Sample Fit. Tight
+- A high rate from the wrong people loses Insight Value. Tight
   targeting beats a heroic blast.

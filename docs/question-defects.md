@@ -1,9 +1,9 @@
 # Question Defects: Field Guide
 
 The questionnaire in Dear Valued Customer is a teaching instrument.
-Every defective question carries one named defect from survey
-design practice, produces the symptom that defect produces in real
-data, and accepts the fix a methodologist would actually apply.
+Each repairable question carries one primary defect from questionnaire
+design practice and an in-game repair. The simulation models associated
+measurement risks; it does not establish a unique cause for real survey data.
 This guide is the contract between the game's questions, its
 Drop-off Detective diagnostics, and its fix buttons.
 
@@ -23,9 +23,10 @@ Drop-off Detective diagnostics, and its fix buttons.
 | 10 | Sensitive, no assurance | Performance or security question, no confidentiality line | Refusals, socially desirable answers | ADD a privacy line (2) |
 | 11 | Wordy stem | A paragraph where a sentence would do | Reading fatigue, satisficing | SIMPLIFY (2) |
 
-Some questions are clean controls: no defect, only an honest time
-cost. Not everything is broken, and cutting a clean question is a
-pure length trade, never a quality fix.
+Some questions are clean controls. They still impose respondent burden,
+and cutting a core item can reduce coverage and the game's quality score.
+Low-value items are a separate gameplay tier, not a claim that their
+wording is methodologically sound.
 
 ## Rules the game enforces
 
@@ -33,6 +34,13 @@ pure length trade, never a quality fix.
   double-barreled question does not un-barrel it; simplifying a
   beyond-knowledge question does not give the respondent knowledge.
   The trim screen labels every fix button with the correct verb.
+- The repair buttons are deliberately constrained teaching actions.
+  Real revisions can combine wording changes, routing, response-option
+  design, and pretesting. DK and NA permit different forms of item
+  nonresponse; they do not validate answers.
+- A confidentiality or privacy statement must describe actual
+  protections. The game's example privacy lines are conditional, not
+  promises that a researcher can insert without checking.
 - Diagnostics stay honest. The Detective links a defect to a
   symptom only when the run produced that symptom (counts shown).
   A defect with no observed symptom is reported as a latent

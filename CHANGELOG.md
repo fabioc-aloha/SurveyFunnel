@@ -1,5 +1,40 @@
 # Changelog
 
+## 2026-10-31 - UAT fixes, difficulty and terminology (local only)
+
+- Fixed missing post-win navigation, multi-control retry budget recovery,
+  and Executive Blast retries offered below its 45-credit batch cost.
+- MPOR and BRD now keep keyboard focus inside the active dialog, make
+  background controls inert, and restore opener focus on close.
+- Affordability and warning labels refresh when other controls change
+  costs; owned preparation and attempt-chain audience locks remain.
+  Reminder listeners are registered once rather than during rendering.
+- Added approved Easy labels to Levels 1/2, Medium to 3/5, and Hard to 4/6.
+  Cards, HUD, BRD, and campaign summary agree. The finale HUD shows its
+  actual Insight 70+ gate.
+- Renamed Level 5 Global Fieldwork and described its five modeled language
+  groups. Corrected renewal and self-service item wording, kept deliberate
+  questionnaire defects, and replaced player-facing "stupid" tier labels
+  with low-value terminology without changing their scoring.
+- Clarified item nonresponse, the simplified response-rate denominator,
+  teaching-game indices, deterministic replay, conditional privacy lines,
+  and the unscored A/B verdict. Updated current player guidance and
+  marked historical bank-design notes as design rather than current rules.
+- Goodwill ledger separates report-back restoration, invitation rewards,
+  and stakeholder penalties. The collapsed QR icon has no outer border;
+  the expanded panel keeps its frame.
+- All 38 tests pass, including 390 winning setups through actual launch
+  and report scoring: six fixed starts and 384 seeded draws. Every witness
+  fits the initial budget; Level 4 retains Tired and Level 6 Executive Blast.
+  No simulation rates, costs, or acceptance gates were weakened.
+- Browser checks passed the uninterrupted six-level campaign through
+  Season Results, actual 35-credit retry recovery, the finale's
+  35-credit/no-retry case, dialog keyboard behavior, and computed QR/layout
+  checks at 390px and 1440px. The desktop title capture was inspected.
+- Commit, push, and deployment are now explicitly authorized; publication
+  is pending verification. Human audio, physical-phone,
+  cross-browser, and screen-reader checks remain in [TODO.md](TODO.md).
+
 ## 2026-10-31 - Gameplay release
 
 - Gameplay commit `3df78b8` deployed successfully in
@@ -12,6 +47,38 @@
   repaired 40-credit challenge win. A desktop screenshot was inspected.
 - Human audio listening and approval for a tracked browser suite remain
   open in [TODO.md](TODO.md).
+
+### 2026-10-31 - Continuity reconciliation
+
+- Preserved the previous handoff's release evidence here before pruning it.
+  Gameplay commit `3df78b8` was followed by documentation commit `58af2ed`;
+  [run 41232048723](https://github.com/fabioc-aloha/SurveyFunnel/actions/runs/41232048723)
+  succeeded without changing the game package. These are prior observations,
+  not a new live-deployment check.
+- The earlier release's ten campaign setups matched committed budgets and
+  simulation results apart from question-ID event metadata. Local checks
+  covered all three challenge wins, cut/restore, retry/next/back, campaign
+  isolation, reactions, skipped/full animation, stakeholder choices,
+  reduced-motion play, and 390px/1440px layouts.
+- Prior live checks matched package bytes and headers, unpublished docs
+  returned 404, and QR keyboard/mouse behavior and MPOR/BRD focus passed.
+  A live repaired challenge used 40 credits with 17.5% response, quality 94,
+  and Insight 100. Human audio listening was not verified.
+- Default Git authentication failed during that release. A command-scoped
+  GitHub CLI credential helper succeeded without changing Git configuration;
+  do not assume the default helper is repaired.
+- The balance audit initially found no witness for 13 Level 4 draws because
+  its candidate plans kept unanswerable core items. Expanding the strategies
+  found wins on the intended Tired list without weakening gates. The
+  persisted 390-witness tests now check actual launch/report outcomes;
+  failure of a fixed witness is not proof that no other strategy can win.
+- Repeated browser probes encountered a stale or reset page. The pending
+  browser-suite proposal now includes fresh-page assertions and actual
+  campaign navigation, retry recovery, and modal keyboard behavior.
+  Existing Node tests do not emulate browser focus or event wiring.
+- No new skill or behavioral rule was justified. Retained the existing
+  browser-suite approval decision and all publication/human-check tasks;
+  no capability, episodic record, or native memory was created.
 
 ### 2026-10-31 - Release authorization and continuity
 

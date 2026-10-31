@@ -1,10 +1,15 @@
 # Question Bank and Insight Value (v1.5 design)
 
+These are design notes, not the current scoring specification.
+See the [player guide](player-guide.md) for current rules and
+[development notes](development.md) for tested balance and implementation limits.
+
 Fabio's direction, 2026-10-31: the survey structure stays similar
 from game to game, but the question bank behind it must be very
-large, so no two games deal the same instrument. The bank mixes
+large enough to vary the dealt instrument. Repeated seeds can repeat a draw.
+The bank mixes
 well-designed questions, methodologically incorrect questions, and
-stupid questions that turn respondents off. The starting length of
+low-value questions that turn respondents off. The starting length of
 the survey is a variable. And the goal is twofold: the response
 rate AND business-valuable insight. A fast survey full of junk
 questions is a loss with good response numbers.
@@ -15,17 +20,17 @@ Every bank question carries metadata:
 
 - **Topic**: the business question it informs (see the agenda).
 - **Tier**: WELL-DESIGNED, DEFECTIVE (one of the 11 defect classes
-  in `question-defects.md`), STUPID, or FILLER.
+  in `question-defects.md`), LOW-VALUE, or FILLER.
 - **Answerable by**: which personas can actually answer it.
 - **Time**: seconds of respondent burden.
 - **Redundancy group**: questions that ask the same thing twice.
 
 Tier mix (approximate): 40% well-designed, 35% defective, 15%
-stupid, 10% filler.
+low-value, 10% filler.
 
-**Stupid questions** are their own tier, distinct from defective.
-They are grammatically fine and methodologically unanswerable in
-spirit: vanity items ("How awesome are we, 1 to 10?"), blame items
+**Low-value questions** are a gameplay tier (internal key `stupid`).
+They contribute no agenda insight. Some also have leading wording or
+unsupported assumptions: vanity items ("How awesome are we, 1 to 10?"), blame items
 ("Why did you fail to read the manual?"), nosy irrelevancies
 (income for a support survey), trivia the respondent never sees,
 and exact duplicates of an earlier question. They carry zero
@@ -64,10 +69,13 @@ only when a question covering it is:
 
 Duplicates of a topic add a small increment the second time and
 near zero the third. Non-required topics add small bonus credit.
-Stupid questions add none and can subtract.
+Low-value questions add none and can subtract.
 
-**Win condition (v1.5):** response rate at or above target AND
-Data Quality at 60+ AND Insight Value at 60+ (level-tunable).
+**Current win condition:** response strictly above target AND
+Data Quality at 60+ AND Insight Value at 60+ (70+ in Level 6).
+Level 4 also requires ending goodwill 35+.
+These are game indices, not validated research metrics; response rate
+uses completes/sent rather than AAPOR eligibility dispositions.
 The report gains a VALUE panel: for every required topic,
 ANSWERED CREDIBLY, ANSWERED WITH SUSPECT DATA, or LOST, with the
 reason. "Fast and useless" becomes a named outcome: the run can

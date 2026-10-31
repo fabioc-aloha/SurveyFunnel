@@ -21,16 +21,16 @@ cookies or store survey responses.
 
 ## The simulation model
 
-Deterministic by design. Given the same level and the same choices,
-a round replays to the same funnel (with tiny jitter that never
-flips an outcome). That property is load bearing: it makes rounds
-comparable, workshops discussable, and balance testable.
+Deterministic by design. Given the same instrument, choices, and
+starting state, a round replays to the same funnel. Credits, goodwill,
+reputation, and owned preparation change on retry, so a retry is not
+the same starting state.
 
 Per round, the model runs in this order:
 
 1. **Delivery.** Segment invalid rate, reduced by validation
-   (full removes about 90% of invalids, partial about half, a
-   catch all remainder always survives). Remainder splits into hard
+   (full removes 85% of invalids, partial 55%, with a modeled
+   unverifiable remainder). Remainder splits into hard
    and soft bounces. Hard bounce rate drives Sender Reputation.
 2. **Opens.** Base open propensity by segment relevance and invite
    variant, adjusted by reputation (spam folder effect), sender,
@@ -47,9 +47,9 @@ Per round, the model runs in this order:
    `mechanics-update-v1.1.md`. If goodwill reaches zero, the breaker
    stops new invitations and ends the run for anyone still in the
    funnel. Only completions before the trip count.
-6. **Scoring.** Response score against the level target, data
+6. **Scoring.** Response score scaled to a 20% stretch goal, data
    quality from the deduction table, and Insight Value from agenda
-   coverage. Winning requires the response target, quality 60+,
+   coverage. Winning requires response strictly above the level target, quality 60+,
    and Insight 60+ (70+ in Level 6); Level 4 also requires ending
    goodwill 35+.
 
@@ -60,11 +60,53 @@ Per round, the model runs in this order:
    clear miss, not a near miss.
 2. Prepared mid budget run (validation, dedupe, Honest Ask, trim):
    wins inside 120 credits.
-3. Executive Blast with no validation: worst run on the board.
-4. Gutted survey (below the 6 question core): high rate, quality
-   fail, no win.
+3. Unprepared Executive Blast loses, with expensive sends, hard bounces,
+   and goodwill loss. It is not uniformly worst on every score.
+4. Gutted survey (only Q9 kept): quality and Insight fail, no win.
+   Fewer than six questions is not itself a loss condition.
 5. Validation alone, bad questionnaire kept: still loses.
 6. Identical choices replay identically.
+
+## Initial-budget winnability and difficulty
+
+The regression suite launches and scores 390 winning setups through the
+actual game: the fixed instrument plus seeds `0000` through `003F` for
+each of the six levels. Fixtures are in
+[`scripts/fixtures/winning-setups.json`](../scripts/fixtures/winning-setups.json).
+Each starts at attempt 1 with zero previous spend, uses only dealt cards
+and the level's available bank, and must pass all scoring gates within
+the initial budget. Level 4 uses the intended Tired audience, not a swap
+to avoid the goodwill constraint; Level 6 uses Executive Blast.
+
+| Level | Difficulty | Fixed winning cost | Highest winning cost in checked draws | Initial pool |
+| --- | --- | --- | --- | --- |
+| 1 - First Send | Easy | 57 | 80 | 120 |
+| 2 - The Split | Easy | 67 | 80 | 120 |
+| 3 - The Stakeholder | Medium | 60 | 74 | 120 |
+| 4 - The Tired List | Hard | 63 | 76 | 120 |
+| 5 - Global Fieldwork | Medium | 70 | 85 | 120 |
+| 6 - The Big Quarter | Hard | 89 | 103 | 150 |
+
+These are verified strategies, not global minimum costs. The search tried
+short agenda-preserving plans, clean or repaired items, and combinations
+of invitation, reminders, and DK/NA. It excluded role-restricted items
+without a repair: keeping them unnecessarily depleted Level 4 goodwill.
+Dropping an unanswerable core item can be preferable to retaining it;
+the quality penalty must still leave the score above its gate.
+All witnesses were replayed through `startRun()` and `showReport()`.
+No cost, persona, simulation, or acceptance threshold was weakened.
+
+Difficulty describes decision complexity: introductory levers and optional
+A/B comparison are Easy; added burden or multilingual fieldwork is Medium;
+low starting goodwill or Executive Blast plus the higher Insight gate is
+Hard. Labels appear in level cards, HUD, campaign summary, and BRD.
+They are not selectable modes or promises that untouched defaults win.
+The seed sample is not an exhaustive guarantee over the random generator.
+
+Response rate is completes/sent, including bounced invitations, not an
+AAPOR response rate. Quality and Insight are teaching-game indices.
+DK/NA represents item nonresponse, not proof of clean or valid data.
+The A/B verdict changes feedback only, not scores.
 
 ## Tuning
 
@@ -107,6 +149,18 @@ The setup BRD dialog derives study topics and required personas from
 and `insightGate()`. It includes level constraints and the Quick Challenge
 repair requirement without modifying campaign or setup state. Keep its
 criteria aligned with scoring when adding or changing a level.
+
+MPOR and BRD share modal focus management: background controls are inert,
+Tab and Shift-Tab stay inside the active dialog, Escape closes it, and
+closing restores focus to the opener. Browser checks remain necessary
+because the Node DOM facade does not emulate keyboard navigation.
+
+Budget-recovery controls allow equal-cost or cheaper choices while a
+retry is over budget. Cost increases beyond the pool remain blocked;
+owned preparation and the attempt-chain audience lock remain enforced.
+Affordability and warning text refresh after other controls change costs.
+Retry requires the locked audience's batch cost (45 for Executive Blast),
+not an assumed 30-credit minimum. Winning reports always offer navigation.
 
 ## Mobile QR
 

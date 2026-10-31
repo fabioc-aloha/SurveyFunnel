@@ -299,10 +299,10 @@
   .marquee small{ display:block; font-size:10px; color:var(--teal); letter-spacing:2px; margin-bottom:14px; text-shadow:none; }
   .title-stage{display:flex;justify-content:center;align-items:center;gap:32px;margin-bottom:16px}
   .mobile-portal-wrap{flex:none;display:grid;justify-items:center;gap:10px}
-  .mobile-portal{display:grid;justify-items:center;gap:10px;padding:8px;background:var(--panel);border:3px solid var(--teal);box-shadow:6px 6px 0 #0a0d18,inset 0 0 0 3px var(--panel2);color:var(--gold);font-family:"Press Start 2P",monospace;font-size:9px;line-height:1.6;cursor:pointer}
+  .mobile-portal{display:grid;justify-items:center;gap:10px;padding:8px;background:var(--panel);border:0;box-shadow:6px 6px 0 #0a0d18,inset 0 0 0 3px var(--panel2);color:var(--gold);font-family:"Press Start 2P",monospace;font-size:9px;line-height:1.6;cursor:pointer}
   .mobile-portal img{display:block;width:49px;height:49px;border:3px solid var(--gold);box-sizing:content-box}
   .mobile-portal span{display:none}
-  .mobile-portal[aria-expanded="true"]{padding:14px}
+  .mobile-portal[aria-expanded="true"]{padding:14px;border:3px solid var(--teal)}
   .mobile-portal[aria-expanded="true"] img{width:196px;height:196px}
   .mobile-portal[aria-expanded="true"] span{display:block}
   #mobileQRLink{color:var(--teal);font-size:13px}
@@ -409,7 +409,7 @@
 </head>
 <body>
 <div class="wrap">
-  <div class="topbar">
+  <div class="topbar" id="topbar">
     <div>
       <div class="logo" style="font-size:clamp(15px,3.2vw,24px);line-height:1.3;">DEAR VALUED CUSTOMER</div>
     </div>
@@ -423,7 +423,7 @@
     <div class="hud">
       <span class="chip" id="hudLevel">LEVEL 1 · <b>FIRST SEND</b></span>
       <span class="chip target" id="hudTarget">TARGET RESPONSE RATE <b>&gt; 12%</b></span>
-      <span class="chip">WIN NEEDS QUALITY <b>60+</b> · INSIGHT <b>60+</b></span>
+      <span class="chip" id="hudGates">WIN NEEDS QUALITY <b>60+</b> · INSIGHT <b>60+</b></span>
     </div>
 
     <!-- ================= START SCREEN ================= -->
@@ -505,7 +505,7 @@
               <span class="lever-sub">Trim the instrument below. Every defective card names its defect class, the symptom it risks, and the one fix that actually works on that class.</span>
             </div>
             <div class="escrow" style="margin-top:0;">
-              <div class="txt"><b>ADD ESCAPES (Don't know / Not applicable).</b> Costs +0.5 min. Respondents who hit a question they cannot answer take the side exit and still finish with clean data, instead of guessing or quitting.</div>
+              <div class="txt"><b>ADD ESCAPES (Don't know / Not applicable).</b> Costs +0.5 min. Respondents can continue with item nonresponse instead of giving a forced answer or abandoning the questionnaire. DK and NA represent different reasons for a missing substantive answer.</div>
               <button class="bigswitch" id="escBtn">ESCAPES: OFF</button>
             </div>
             <div id="patienceWarn" role="status"></div>
@@ -521,7 +521,7 @@
       <section class="lever" aria-label="Question cards">
         <div class="lever-head">
           <span class="lever-title" style="font-size:12px;">THE INSTRUMENT · AS DEALT INTO THE SKELETON</span>
-          <span class="lever-sub" id="instrumentHelp">KEEP, apply the class-correct fix on the card (SPLIT, NEUTRALIZE, DEFINE, ANCHOR and the rest, each at its price), or CUT for 1 credit. A generic simplify only fixes a WORDY STEM. Stupid turn-off items earn zero insight: CUT is their only fix. Sections run A outcome core, B drivers, C diagnostics, D sensitive, E open-text closer, F demographics last.</span>
+          <span class="lever-sub" id="instrumentHelp">KEEP, apply the class-correct repair on the card (SPLIT, NEUTRALIZE, DEFINE, ANCHOR and the rest, each at its price), or CUT for 1 credit. SIMPLIFY repairs a WORDY STEM. Low-value items contribute no agenda insight: CUT removes their burden. Sections run A outcome core, B drivers, C diagnostics, D sensitive, E open-text closer, F demographics last.</span>
         </div>
         <div class="qgrid" id="qGrid"></div><div id="cutTray"></div><div id="bankPanel"></div>
       </section>
@@ -596,21 +596,23 @@
         <li>Browsers start audio after your first click. Preferences save on this device.</li>
       </ul>
       <h3>SIMULATION AND PRIVACY</h3>
-      <p>All outcomes are simulated from your choices. The game sends no email and uses no real customer data. Repeating the same choices produces near-identical results.</p>
+      <p>All outcomes are simulated from your choices. The game sends no email and uses no real customer data. The same instrument and choices produce identical results from the same starting state. A retry changes that state: credits, goodwill, reputation, and owned preparation carry over.</p>
       <h3>THE THREE SCORES</h3>
       <ul>
-        <li><b>Response rate:</b> of the invitations actually sent, how many people finished. Reach, mostly: the right list, an honest invite, a survey short enough to finish.</li>
-        <li><b>Data quality:</b> of the answers you got, how many you can defend. Guessed, rushed, or straight-lined answers lower it.</li>
+        <li><b>Response rate:</b> completed questionnaires divided by invitations actually sent, including bounced invitations. This is the game's simplified measure, not an AAPOR response rate: eligibility and full case dispositions are not modeled. A higher rate does not establish lower nonresponse bias.</li>
+        <li><b>Data quality:</b> a 0-100 game index of simulated measurement risks. Guesses, speeding, straightlining, and missing core items lower it. It is not a percentage of valid answers.</li>
         <li><b>Insight Value:</b> did the business topics this survey exists for (the agenda) come back answered, by the people those topics are about? A fast survey that answers nothing scores zero here, and zero here loses the level.</li>
       </ul>
+      <p>Data quality and Insight Value are teaching-game indices, not validated research metrics. Insight Value represents agenda coverage and respondent-group fit, not proof of construct validity or population representativeness.</p>
       <h3>GOODWILL AND REPUTATION</h3>
       <ul>
         <li><b>Goodwill:</b> how much patience a list has left for you. Long surveys, reminders, and questions people cannot answer spend it. At zero, the breaker stops new sends and ends the run for anyone still in the funnel. Only completions before the trip count.</li>
         <li><b>Sender reputation:</b> whether mail systems trust your domain. Dead addresses (hard bounces) damage it; damaged reputation means spam folders eat your opens.</li>
-        <li><b>DK/NA escapes:</b> "Don't know / Not applicable" exits on a question. They let a respondent who cannot answer stay in the survey with clean data instead of guessing or quitting.</li>
+        <li><b>DK/NA escapes:</b> "Don't know / Not applicable" options let respondents continue with item nonresponse instead of a forced answer. They do not make the remaining answers valid or remove the burden of an irrelevant question.</li>
         <li><b>Satisficing:</b> what tired respondents do instead of thinking: rushing, picking the same answer down a grid, parking in the middle. Length and burden cause it.</li>
       </ul>
-      <h3>THE 11 DEFECT CLASSES AND THEIR ONE TRUE FIX</h3>
+      <h3>THE 11 DEFECT CLASSES AND THEIR IN-GAME REPAIRS</h3>
+      <p>Each class has one repair button in this game. In practice, revisions, routing, response options, and pretesting depend on the construct and target population. A privacy statement must describe protections that actually exist.</p>
       <ul>
         <li><b>DOUBLE-BARRELED</b> (two questions in one item): fix is <b>SPLIT</b>.</li>
         <li><b>LEADING</b> (wording pushes a happy answer): fix is <b>NEUTRALIZE</b>.</li>
@@ -624,9 +626,9 @@
         <li><b>SENSITIVE, NO ASSURANCE</b> (a risky question with no privacy promise): fix is <b>ADD PRIVACY LINE</b>.</li>
         <li><b>WORDY STEM</b> (a paragraph where a sentence would do): fix is <b>SIMPLIFY</b>. It is the only class Simplify fixes.</li>
       </ul>
-      <h3>TWO TIERS THAT ARE NOT DEFECTS</h3>
+      <h3>QUESTION VALUE AND BURDEN</h3>
       <ul>
-        <li><b>STUPID (TURN-OFF RISK):</b> vanity, blame, nosy, trivia, and duplicate questions. Worded fine, worthless anyway. They earn zero insight, cost goodwill, and the fix is <b>CUT</b>.</li>
+        <li><b>LOW-VALUE (TURN-OFF RISK):</b> vanity, blame, irrelevant personal questions, trivia, and duplicates contribute no agenda insight. Some also contain leading wording or unsupported assumptions. In this game they earn zero insight, cost goodwill, and can only be <b>CUT</b>.</li>
         <li><b>FILLER (LOW VALUE):</b> harmless but empty. Full time cost, half insight credit at best. Cut when the agenda needs the room.</li>
       </ul>
       <h3>WIN GATES</h3>
@@ -665,7 +667,7 @@ var SEGMENTS = [
     timing:"Recent case, but surveyed 3 times this quarter", history:"Surveyed 3 times this quarter · fatigued",
     mix:{ tech:.30, end:.32, admin:.16, itdm:.12, exec:.10 },
     blurb:"Fatigued segment for Level 4. Decent relevance, goodwill at 25. Only a short, respectful send that reports back what changed can restore it." },
-  { id:"multi", name:"Global · 45 Languages", n:15000, goodwill:68, relevance:1.0, relevanceTxt:"Good", sendCost:30, invalidPct:0.06, lastCleaned:"Cleaned last quarter",
+  { id:"multi", name:"Global · Five Language Groups", n:15000, goodwill:68, relevance:1.0, relevanceTxt:"Good", sendCost:30, invalidPct:0.06, lastCleaned:"Cleaned last quarter",
     timing:"7 days after a closed case, across regions", history:"Last surveyed 8 weeks ago",
     mix:{ tech:.28, end:.34, admin:.16, itdm:.12, exec:.10 },
     blurb:"Multi-language segment for Level 5. English is only 40% of this list. English-only sends leak everywhere else." }
@@ -760,12 +762,12 @@ var QUESTIONS = [
   { id:4,  text:"Did the fix still hold 48 hours later?", min:0.5, know:"Whoever lived the case", who:"all", cx:"Low", val:"Medium", core:true, answerBy:null, defect:"CLEAN", topic:"product reliability", tier:"clean" },
   { id:5,  text:"What is the annual contract value of the agreement tied to this case?", min:1.0, know:"Partner Admin only", who:"admin", cx:"High", val:"Medium", core:false, answerBy:["admin"], flag:"knowledge", defect:"BEYOND KNOWLEDGE", topic:"billing clarity", tier:"defective",
     flagTxt:"BEYOND KNOWLEDGE. Contract values sit in a system only a Partner Admin can see. No wording fix: this audience cannot know this. Technicians, end users and executives will guess or quit here." },
-  { id:6,  text:"How likely are you to recommend this support experience to a colleague? (0-10)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"renewal risk", tier:"clean" },
+  { id:6,  text:"Based on this support experience, how likely are you to recommend that your organisation renew this product? (0-10)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"renewal risk", tier:"clean" },
   { id:7,  text:"Grid: rate 12 product features across 5 scales each", min:2.5, know:"Everyone, slowly", who:"all", cx:"High", val:"Medium", core:false, answerBy:null, flag:"mobile", defect:"GRID BURDEN", topic:"product reliability", tier:"defective",
     flagTxt:"GRID BURDEN. A 12-row grid on a phone means pinch, scroll, mis-tap, and straight-lined rows. Half the list answers on a phone between other jobs." },
   { id:8,  text:"How satisfied are you with the speed and knowledge of the support you received?", min:1.0, know:"Everyone", who:"all", cx:"High", val:"Low", core:false, answerBy:null, defect:"DOUBLE-BARRELED", topic:"agent knowledge", tier:"defective",
     flagTxt:"DOUBLE-BARRELED. Speed and knowledge are two judgments sharing one answer. A fast-but-wrong case and a slow-but-right case land in the same box. SIMPLIFY cannot fix this: only SPLIT can." },
-  { id:9,  text:"Which channel did you use first: chat, phone, or portal?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:true, answerBy:null, defect:"CLEAN", topic:"self-service gap", tier:"clean" },
+  { id:9,  text:"Before contacting support for this case, did a help article resolve your problem? (yes / partly / no / did not use a help article)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:true, answerBy:null, defect:"CLEAN", topic:"self-service gap", tier:"clean" },
   { id:10, text:"How excellent was the quality of the documentation you were sent?", min:0.75, know:"Whoever read it", who:"all", cx:"Medium", val:"Medium", core:false, answerBy:null, defect:"LEADING", topic:"self-service gap", tier:"defective",
     flagTxt:"LEADING. 'How excellent' presumes the answer. Expect inflated top-box scores that flatter the documentation and measure nothing." },
   { id:11, text:"Thinking about everything that happened from the moment you first noticed the problem, through every chat, call, portal update, handoff and follow-up, and considering how all of those pieces fit together as one overall experience, in your own words: what is the one thing we should fix first?", min:1.5, know:"Everyone", who:"all", cx:"Medium", val:"High", core:false, answerBy:null, defect:"WORDY STEM", topic:"resolution quality", tier:"defective",
@@ -775,7 +777,7 @@ var QUESTIONS = [
 ];
 var CORE_TOTAL = QUESTIONS.filter(function(q){ return q.core; }).length; /* 6 */
 var OPTIONAL_QUESTIONS=[
- {id:13,text:"OPTIONAL · In your own words, what would make you recommend us?",min:1.0,know:"Everyone",who:"all",cx:"Medium",val:"High",core:false,answerBy:null,defect:"CLEAN", topic:"renewal risk", tier:"clean"},
+ {id:13,text:"OPTIONAL · What, if anything, would make you advise against renewing this product?",min:1.0,know:"Everyone",who:"all",cx:"Medium",val:"High",core:false,answerBy:null,defect:"CLEAN", topic:"renewal risk", tier:"clean"},
  {id:14,text:"OPTIONAL · Rank these 4 features by importance to your team",min:1.0,know:"Everyone",who:"all",cx:"Medium",val:"Medium",core:false,answerBy:null,defect:"CLEAN", topic:"product reliability", tier:"clean"},
  {id:15,text:"OPTIONAL · How many people are in your organisation? (under 100 / 100-500 / 500-1,000 / over 500 / Other)",min:0.5,know:"Everyone",who:"all",cx:"Low",val:"Medium",core:false,answerBy:null,defect:"BROKEN OPTIONS", topic:"onboarding", tier:"defective",flagTxt:"BROKEN OPTIONS. The ranges overlap at 500, and anyone unsure lands in Other. The Other box will collect junk, not company sizes."}
 ];
@@ -816,7 +818,7 @@ var QUESTION_BANK = QUESTIONS.concat([
  { id:40, text:"Which best describes your role? (frontline / admin / manager / executive / other)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"onboarding", tier:"clean", sec:"F" },
  { id:41, text:"How long have you used the product? (under 3 months / 3-12 months / 1-3 years / over 3 years)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"onboarding", tier:"clean", sec:"F" },
  { id:42, text:"Did you complete the guided setup when your team started? (yes / no / it was not offered)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"onboarding", tier:"clean", sec:"B" },
- { id:43, text:"If a similar problem happened tomorrow, how confident are you that support would resolve it? (1-5)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:false, answerBy:null, defect:"CLEAN", topic:"renewal risk", tier:"clean", sec:"B" },
+ { id:43, text:"Based on this support case, would you advise your organisation to renew this product? (yes / no / not sure)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:false, answerBy:null, defect:"CLEAN", topic:"renewal risk", tier:"clean", sec:"B" },
  { id:44, text:"Overall, how easy was this support experience from first contact to close? (1-5)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"customer effort", tier:"clean", sec:"A" },
  { id:45, text:"While the case was open, did you receive a progress update at least every two days? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"support speed", tier:"clean", sec:"B" },
  { id:46, text:"Before this case, was there a help article about this problem? (yes / no / did not look)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"self-service gap", tier:"clean", sec:"C" },
@@ -842,25 +844,25 @@ var QUESTION_BANK = QUESTIONS.concat([
  /* STUPID tier: worded fine, worthless anyway. Zero insight, +2 goodwill
     resentment each while kept, and CUT is the only sensible verb. */
  { id:57, text:"How awesome are we, on a scale of 1 to 10?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"overall satisfaction", tier:"stupid", sec:"B", rg:"vanity",
-   flagTxt:"STUPID · VANITY. A compliment fishing trip wearing a scale. It measures nothing the business can act on, and respondents know it." },
+   flagTxt:"LOW-VALUE · VANITY. The wording solicits praise rather than evidence for a study decision." },
  { id:58, text:"Why did you not read the manual before calling us?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"self-service gap", tier:"stupid", sec:"B", rg:"blame",
-   flagTxt:"STUPID · BLAME. The question accuses the respondent of causing their own ticket. Expect resentment, not self-service insight." },
+   flagTxt:"LOW-VALUE · BLAME. The question assumes the respondent caused their own ticket. Expect defensive answers, not self-service insight." },
  { id:59, text:"Which mistake by your team caused this problem?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"resolution quality", tier:"stupid", sec:"B", rg:"blame",
-   flagTxt:"STUPID · BLAME. Presumes the customer was at fault. People do not finish surveys that insult them." },
+   flagTxt:"LOW-VALUE · BLAME. Presumes the customer was at fault. The unsupported assumption risks defensive answers and abandonment." },
  { id:60, text:"What is your household income?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"onboarding", tier:"stupid", sec:"F", rg:"nosy",
-   flagTxt:"STUPID · NOSY. Household income has no bearing on a support case. Irrelevant personal questions read as data harvesting." },
+   flagTxt:"LOW-VALUE · IRRELEVANT. Household income has no bearing on a support case. The item requests personal data without a study purpose." },
  { id:61, text:"How many children do you have?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"onboarding", tier:"stupid", sec:"F", rg:"nosy",
-   flagTxt:"STUPID · NOSY. Nothing in the support workflow turns on this. It only tells respondents their time is not respected." },
+   flagTxt:"LOW-VALUE · IRRELEVANT. Family composition does not inform this support study. The item adds burden without decision value." },
  { id:62, text:"What do you think of our internal codename for this product, 'Project Falcon'?", min:0.5, know:"Nobody outside the building", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"product reliability", tier:"stupid", sec:"B", rg:"trivia",
-   flagTxt:"STUPID · TRIVIA. Respondents have never seen the internal codename. There is no answer they can give that means anything." },
+   flagTxt:"LOW-VALUE · TRIVIA. An internal codename does not inform the support-study agenda." },
  { id:63, text:"What was the agent's internal team code for this case? (It appears nowhere in your case.)", min:0.5, know:"Nobody on this list", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"agent knowledge", tier:"stupid", sec:"C", rg:"trivia",
-   flagTxt:"STUPID · TRIVIA. The question itself admits the answer is unknowable. Asking it anyway is the insult." },
+   flagTxt:"LOW-VALUE · TRIVIA. The team code is unavailable to respondents and contributes no agenda insight." },
  { id:64, text:"Overall, how satisfied are you with your support experience?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"overall satisfaction", tier:"stupid", sec:"A", rg:"dup-overall", dup:true,
-   flagTxt:"STUPID · DUPLICATE. This is Q1 again, word for word. Asking twice doubles the burden and adds zero information." },
- { id:65, text:"Which channel did you use first: chat, phone, or portal?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"self-service gap", tier:"stupid", sec:"B", rg:"dup-channel", dup:true,
-   flagTxt:"STUPID · DUPLICATE. This repeats the channel question already in the instrument. Same answer, second time, for free resentment." },
+   flagTxt:"LOW-VALUE · DUPLICATE. This repeats Q1 word for word. It adds burden without new information." },
+ { id:65, text:"Before contacting support for this case, did a help article resolve your problem? (yes / partly / no / did not use a help article)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"self-service gap", tier:"stupid", sec:"B", rg:"dup-channel", dup:true,
+   flagTxt:"LOW-VALUE · DUPLICATE. This repeats the self-service question already in the instrument. It adds burden without new information." },
  { id:66, text:"Don't you agree our support is the best in the industry?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"renewal risk", tier:"stupid", sec:"B", rg:"vanity",
-   flagTxt:"STUPID · VANITY. A cheer, not a question. Renewal decisions will never be made from answers to this." },
+   flagTxt:"LOW-VALUE · VANITY. The leading wording solicits agreement but does not address renewal intentions." },
  /* FILLER tier: harmless, wordy or low value. Full time cost, half insight
     credit and only when their topic is on the agenda. */
  { id:67, text:"How did you first hear about this survey?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"onboarding", tier:"filler", sec:"F" },
@@ -950,12 +952,12 @@ var state = {
   quickChallenge: null
 };
 var LEVELS=[
- {id:1,name:"FIRST SEND",target:0.12,budget:120,desc:"Learn the three levers. Beat 12%, quality 60+, Insight 60+."},
- {id:2,name:"THE SPLIT",target:0.12,budget:120,desc:"Unlock A/B testing. Two invites, split send, honest verdict."},
- {id:3,name:"THE STAKEHOLDER",target:0.12,budget:120,desc:"Eight extra questions arrive mid-build. Accept, push back, or rotate."},
- {id:4,name:"THE TIRED LIST",target:0.10,budget:120,desc:"Goodwill starts at 25. Win at 10%+ and end goodwill at 35+."},
- {id:5,name:"45 LANGUAGES",target:0.12,budget:120,desc:"English is 40% of the list. Localize or leak."},
- {id:6,name:"THE BIG QUARTER",target:0.12,budget:150,desc:"Finale: Executive Blast, full traps, stakeholder event, 150 credits."}
+ {id:1,name:"FIRST SEND",difficulty:"EASY",target:0.12,budget:120,desc:"Learn the three levers. Beat 12%, quality 60+, Insight 60+."},
+ {id:2,name:"THE SPLIT",difficulty:"EASY",target:0.12,budget:120,desc:"Compare invitation variants with an optional randomized A/B send."},
+ {id:3,name:"THE STAKEHOLDER",difficulty:"MEDIUM",target:0.12,budget:120,desc:"Eight extra questions arrive mid-build. Accept, push back, or rotate modules."},
+ {id:4,name:"THE TIRED LIST",difficulty:"HARD",target:0.10,budget:120,desc:"Goodwill starts at 25. Beat 10% response and end with goodwill 35+."},
+ {id:5,name:"GLOBAL FIELDWORK",difficulty:"MEDIUM",target:0.12,budget:120,desc:"Five language groups; English is 40% of the list. Review localization and invitation language."},
+ {id:6,name:"THE BIG QUARTER",difficulty:"HARD",target:0.12,budget:150,desc:"Executive Blast, stakeholder burden, Insight 70+, and 150 credits."}
 ];
 var BUDGET_TOTAL = 120;
 var QUICK_CHALLENGES = [
@@ -1280,6 +1282,14 @@ function budgetMath(ov){
   return { prep:prep, exec:exec, attemptCost:attemptCost, spentBefore:state.spentBefore,
            total:total, remaining:BUDGET_TOTAL-total, prepItems:prepItems, execItems:execItems };
 }
+function budgetChangeBlocked(overrides){
+  var current = budgetMath().total, proposed = budgetMath(overrides).total;
+  return proposed > BUDGET_TOTAL && proposed > current;
+}
+function minimumSendCost(){
+  var segments = state.chainActive ? [state.seg] : visibleSegments();
+  return Math.min.apply(null, segments.map(function(seg){ return seg.sendCost; }));
+}
 function renderBudget(){
   var el = $("budgetPanel"); if (!el) return;
   var b = budgetMath();
@@ -1305,12 +1315,12 @@ function renderPrep(){
   var valRank = { skip:0, partial:1, full:2 };
   function tog(key, on, cost, title, effect){
     var hyp = {}; hyp[key] = !on;
-    var cant = !on && budgetMath(hyp).total > BUDGET_TOTAL;
+    var cant = !on && budgetChangeBlocked(hyp);
     var owned = !!base[key];
-    return '<div class="prow"><span class="pt">' + title + (owned ? ' · OWNED' : ' · ' + cost + ' cr') + '</span> <button class="segbtn' + (on ? " sel" : "") + '" data-prep="' + key + '"' + (owned || cant ? " disabled title=\"" + (owned ? "Owned from an earlier attempt: never charged again" : "Not enough budget in the remaining pool") + "\"" : "") + ' style="float:right">' + (owned ? "OWNED" : on ? "ON" : "OFF") + '</button><div class="pe">' + effect + (owned ? ' <b style="color:var(--teal)">Owned: bought in an earlier attempt, no charge this attempt.</b>' : cant ? ' <b style="color:var(--red)">Not enough budget in the remaining pool.</b>' : "") + '</div></div>';
+    return '<div class="prow"><span class="pt">' + title + (owned ? ' · OWNED' : ' · ' + cost + ' cr') + '</span> <button class="segbtn' + (on ? " sel" : "") + '" data-prep="' + key + '"' + (owned || cant ? " disabled title=\"" + (owned ? "Owned from an earlier attempt: never charged again" : "Not enough budget in the remaining pool") + "\"" : "") + ' style="float:right">' + (owned ? "OWNED" : on ? "ON" : "OFF") + '</button><div class="pe">' + effect + (owned ? ' <b style="color:var(--teal)">Owned: bought in an earlier attempt, no charge this attempt.</b>' : "") + '<b class="budget-warning" style="color:var(--red)"'+(cant ? "" : " hidden")+'> Not enough budget in the remaining pool.</b></div></div>';
   }
   var valBtns = [["skip","SKIP",0],["partial","PARTIAL",6],["full","FULL",validationCostFor(state.seg,"full")]].map(function(v){
-    var cant = state.validation !== v[0] && budgetMath({validation:v[0]}).total > BUDGET_TOTAL;
+    var cant = state.validation !== v[0] && budgetChangeBlocked({validation:v[0]});
     var belowOwned = valRank[v[0]] < valRank[base.validation];
     var ownedTier = base.validation !== "skip" && v[0] === base.validation;
     var label = ownedTier ? "OWNED" : (valRank[v[0]] > valRank[base.validation] && base.validation !== "skip" ? (v[2] - validationCostFor(state.seg, base.validation)) + " CR UPGRADE" : v[2] + " CR");
@@ -1333,15 +1343,16 @@ function renderPrep(){
 function curLevel(){ return state.quickChallenge ? { id:1, name:state.quickChallenge.name, target:0.12, budget:40, desc:"Repair all three cards. One send." } : LEVELS[state.level-1]; }
 function renderLevelUI(){
   var L=curLevel();
-  var hl=$("hudLevel"); if(hl) hl.innerHTML="LEVEL "+L.id+" · <b>"+L.name+"</b> · ATTEMPT "+state.attempt+" · INSTRUMENT #"+state.instrumentSeed;
+  var hl=$("hudLevel"); if(hl) hl.innerHTML="LEVEL "+L.id+" · "+L.difficulty+" · <b>"+L.name+"</b> · ATTEMPT "+state.attempt+" · INSTRUMENT #"+state.instrumentSeed;
   var ht=$("hudTarget"); if(ht) ht.innerHTML="TARGET RESPONSE RATE <b>&gt; "+Math.round(L.target*100)+"%</b>"+(L.id===4?" · END GOODWILL 35+":"");
+  $("hudGates").innerHTML="WIN NEEDS QUALITY <b>60+</b> · INSIGHT <b>"+insightGate()+"+</b>";
   var lb=$("levelBanner"); if(lb) lb.innerHTML='<div class="lever" style="border-color:var(--gold)"><div class="lever-head"><span class="lever-no">LEVEL '+L.id+'</span><span class="lever-title">'+L.name+'</span><span class="lever-sub">'+L.desc+' Budget '+L.budget+' credits. The field office draft runs <b style="color:var(--ink)">'+activeQuestions().length+' questions</b> (dealt 9-16 into the A-F skeleton). <b style="color:var(--ink)">AGENDA:</b> '+agendaTopics().join(" · ")+'</span></div></div>';
   if (state.quickChallenge){
     hl.textContent = "QUICK CHALLENGE · " + L.name;
     lb.innerHTML = '<div class="lever"><h2>' + L.name + '</h2><p>Repair all three cards for the prepared Fresh audience and Honest Ask invitation. Also reach response above 12%, quality 60+, and Insight 60+.</p><p><b>AGENDA:</b> ' + agendaTopics().join(" · ") + '</p></div>';
   }
   // level grid
-  var grid=$("levelGrid"); if(grid){ grid.innerHTML=LEVELS.map(function(lv){ var locked=lv.id>state.unlocked; var best=state.campaignBest[lv.id]; return '<button class="lvlcard'+(locked?" locked":"")+(lv.id===state.level?" sel":"")+'" data-level="'+lv.id+'" '+(locked?"disabled":"")+'>'+'<div class="ln">LEVEL '+lv.id+(locked?" · 🔒 LOCKED":"")+'</div><h3>'+lv.name+'</h3><p>'+lv.desc+'</p>'+(best?'<div class="best">BEST: '+best+'</div>':"")+'</button>';}).join("");
+  var grid=$("levelGrid"); if(grid){ grid.innerHTML=LEVELS.map(function(lv){ var locked=lv.id>state.unlocked; var best=state.campaignBest[lv.id]; return '<button class="lvlcard'+(locked?" locked":"")+(lv.id===state.level?" sel":"")+'" data-level="'+lv.id+'" '+(locked?"disabled":"")+'>'+'<div class="ln">LEVEL '+lv.id+' · '+lv.difficulty+(locked?" · 🔒 LOCKED":"")+'</div><h3>'+lv.name+'</h3><p>'+lv.desc+'</p>'+(best?'<div class="best">BEST: '+best+'</div>':"")+'</button>';}).join("");
     Array.prototype.forEach.call(grid.querySelectorAll("[data-level]"),function(b){ b.addEventListener("click",function(){ selectLevel(parseInt(b.getAttribute("data-level"),10),false); }); });
   }
   var sl=$("seasonLine"); if(sl){ var won=Object.keys(state.campaignWon).filter(function(k){return state.campaignWon[k];}).length; sl.textContent="SEASON: "+won+" / 6 LEVELS WON"; }
@@ -1353,7 +1364,7 @@ function renderStakeholder(){
   var current = stakeholderImpact();
   el.innerHTML='<div class="eventpanel"><h3>STAKEHOLDER ENCOUNTER · THE LAST-MINUTE REQUEST</h3><div class="dialogue"><b>STAKEHOLDER:</b> "While we are asking anyway, can you add eight questions for my team?"</div><p>Choose your response. Extra topics are modeled as burden, not new scored agenda topics.</p><div class="choicegrid">'+Object.keys(STAKE_CHOICES).map(function(key){
     var option = STAKE_CHOICES[key], projected = budgetMath({stakeholder:key}).total;
-    var cant = projected > BUDGET_TOTAL;
+    var cant = budgetChangeBlocked({stakeholder:key});
     return '<button class="choicebtn'+(state.stakeholder===key?" sel":"")+'" data-stake="'+key+'"'+(cant?' disabled title="Not enough credits for this response"':"")+'><b>'+option.title+' · '+option.cost+' CR</b><span>'+option.reply+'</span><span>Forecast: '+fmtMin(estMinutes(key))+' min · ending goodwill '+Math.max(0,goodwillMath(key).ending)+' · '+projected+' total credits'+(cant?' · OVER BUDGET':"")+'</span></button>';
   }).join("")+'</div><div class="dialogue" role="status">'+(state.stakeholder?'<b>YOU:</b> '+current.reply+'<br><b>STAKEHOLDER:</b> '+current.response:'No choice yet. SHOW THE EVIDENCE is the default at launch.')+'</div></div>';
   Array.prototype.forEach.call(el.querySelectorAll("[data-stake]"),function(b){b.addEventListener("click",function(){chooseStakeholder(b.getAttribute("data-stake"));});});
@@ -1361,9 +1372,9 @@ function renderStakeholder(){
 function chooseStakeholder(choice){
   if (Object.keys(STAKE_CHOICES).indexOf(choice) < 0) throw new Error("Unknown stakeholder response: " + choice);
   if (state.level !== 3 && state.level !== 6) throw new Error("No stakeholder encounter on this level.");
-  var before = state.stakeholder;
+  var before = state.stakeholder, blocked = budgetChangeBlocked({stakeholder:choice});
   state.stakeholder = choice;
-  if (budgetMath().total > BUDGET_TOTAL){
+  if (blocked){
     state.stakeholder = before;
     sndError(); logLine("Not enough credits for that stakeholder response."); return false;
   }
@@ -1472,8 +1483,8 @@ function renderSegments(){
     }).join("");
     var gwCls = sg.goodwill >= 65 ? "" : (sg.goodwill >= 55 ? "low" : "crit");
     var lockedSeg = state.chainActive && state.seg.id !== sg.id;
-    var cantSeg = lockedSeg || (state.seg.id !== sg.id && budgetMath({seg: sg}).total > BUDGET_TOTAL);
-    return '<button class="card' + (state.seg.id === sg.id ? " sel" : "") + '" data-seg="' + sg.id + '"' + (cantSeg ? " disabled title=\"" + (lockedSeg ? "Segment locked during an attempt chain. Start a New Game to change segment." : "Not enough budget in the remaining pool for this send") + "\"" : "") + '>' + (lockedSeg ? '<div style="font-size:12px;color:var(--gold);font-weight:700">LOCKED · ATTEMPT CHAIN IN PROGRESS</div>' : cantSeg ? '<div style="font-size:12px;color:var(--red);font-weight:700">NOT ENOUGH BUDGET FOR THIS SEND</div>' : "") +
+    var cantSeg = lockedSeg || (state.seg.id !== sg.id && budgetChangeBlocked({seg: sg}));
+    return '<button class="card' + (state.seg.id === sg.id ? " sel" : "") + '" data-seg="' + sg.id + '"' + (cantSeg ? " disabled title=\"" + (lockedSeg ? "Segment locked during an attempt chain. Start a New Game to change segment." : "Not enough budget in the remaining pool for this send") + "\"" : "") + '>' + (lockedSeg ? '<div style="font-size:12px;color:var(--gold);font-weight:700">LOCKED · ATTEMPT CHAIN IN PROGRESS</div>' : "") + '<div class="budget-warning" style="font-size:12px;color:var(--red);font-weight:700"'+(!lockedSeg && cantSeg ? "" : " hidden")+'>NOT ENOUGH BUDGET FOR THIS SEND</div>' +
       '<div class="pxname">' + sg.name.toUpperCase() + (sg.trap ? '<span class="trap">RISK</span>' : "") + '</div>' +
       "<p>" + sg.blurb + "</p>" +
       '<div class="rows">' +
@@ -1498,9 +1509,9 @@ function renderSegments(){
 }
 function renderInvites(){
   $("invGrid").innerHTML = INVITES.map(function(iv){
-    var cantInv = state.invite.id !== iv.id && budgetMath({invite: iv}).total > BUDGET_TOTAL;
+    var cantInv = state.invite.id !== iv.id && budgetChangeBlocked({invite: iv});
     return '<button class="card' + (state.invite.id === iv.id ? " sel" : "") + '" data-inv="' + iv.id + '"' + (cantInv ? " disabled title=\"Not enough budget\"" : "") + '>' +
-      '<div class="pxname">' + iv.name.toUpperCase() + ' · ' + iv.cost + ' CR</div>' + (cantInv ? '<div style="font-size:12px;color:var(--red);font-weight:700">NOT ENOUGH BUDGET</div>' : "") +
+      '<div class="pxname">' + iv.name.toUpperCase() + ' · ' + iv.cost + ' CR</div><div class="budget-warning" style="font-size:12px;color:var(--red);font-weight:700"'+(cantInv ? "" : " hidden")+'>NOT ENOUGH BUDGET</div>' +
       '<div class="rows"><span>' + iv.sender + '</span><span>' + iv.subject + "</span></div>" +
       "<p style='margin-top:6px'>" + iv.lines.join(" ") + "</p>" +
       '<div class="rows"><span>' + iv.note + "</span></div></button>";
@@ -1514,15 +1525,51 @@ function renderInvites(){
       renderInvites(); renderSegments(); renderABPanel(); renderReadout();
     });
   });
+}
+Array.prototype.forEach.call(document.querySelectorAll("[data-rem]"), function(b){
+  b.addEventListener("click", function(){
+    if (b.disabled) return;
+    state.reminders = parseInt(b.getAttribute("data-rem"), 10); sndClick();
+    renderInvites(); renderReadout();
+  });
+});
+function updateAffordability(){
+  function availability(b, disabled, title, budgetBlocked){
+    b.disabled = disabled; b.title = disabled ? title : "";
+    var warning = b.querySelector(".budget-warning") || (b.parentElement && b.parentElement.querySelector(".budget-warning"));
+    if (warning) warning.hidden = !budgetBlocked;
+  }
+  Array.prototype.forEach.call(document.querySelectorAll("[data-inv]"), function(b){
+    var invite = INVITES.filter(function(iv){ return iv.id === b.getAttribute("data-inv"); })[0];
+    var blocked = budgetChangeBlocked({invite:invite});
+    availability(b, blocked, "Not enough budget", blocked);
+    b.classList.toggle("sel", invite.id === state.invite.id);
+  });
   Array.prototype.forEach.call(document.querySelectorAll("[data-rem]"), function(b){
-    if (parseInt(b.getAttribute("data-rem"), 10) === state.reminders) b.classList.add("sel");
-    var rv = parseInt(b.getAttribute("data-rem"), 10);
-    if (rv !== state.reminders && budgetMath({reminders: rv}).total > BUDGET_TOTAL){ b.disabled = true; b.title = "Not enough budget"; }
-    b.addEventListener("click", function(){
-      state.reminders = parseInt(b.getAttribute("data-rem"), 10); sndClick();
-      Array.prototype.forEach.call(document.querySelectorAll("[data-rem]"), function(x){ x.classList.remove("sel"); });
-      b.classList.add("sel"); renderReadout();
-    });
+    var reminders = parseInt(b.getAttribute("data-rem"), 10);
+    b.disabled = budgetChangeBlocked({reminders:reminders});
+    b.title = b.disabled ? "Not enough budget" : "";
+    b.classList.toggle("sel", reminders === state.reminders);
+  });
+  var base = state.baseline || pristineBaseline(), rank = {skip:0, partial:1, full:2};
+  Array.prototype.forEach.call(document.querySelectorAll("[data-val]"), function(b){
+    var validation = b.getAttribute("data-val"), owned = rank[validation] < rank[base.validation];
+    var blocked = budgetChangeBlocked({validation:validation});
+    availability(b, owned || blocked, owned ? "A higher tier is already owned" : "Not enough budget", !owned && blocked);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-prep]"), function(b){
+    var key = b.getAttribute("data-prep"), overrides = {}; overrides[key] = !state[key];
+    var owned = !!base[key], blocked = !state[key] && budgetChangeBlocked(overrides);
+    availability(b, owned || blocked, owned ? "Owned from an earlier attempt: never charged again" : "Not enough budget", !owned && blocked);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-seg]"), function(b){
+    var segment = SEGMENTS.filter(function(seg){return seg.id === b.getAttribute("data-seg");})[0];
+    var locked = state.chainActive && state.seg.id !== segment.id, blocked = budgetChangeBlocked({seg:segment});
+    availability(b, locked || blocked, locked ? "Segment locked during an attempt chain. Start a New Game to change segment." : "Not enough budget", !locked && blocked);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("[data-add]"), function(b){
+    var added = state.added[b.getAttribute("data-add")], blocked = !added && budgetMath().total + 3 > BUDGET_TOTAL;
+    availability(b, blocked, "Not enough budget", blocked);
   });
 }
 function renderCutTrayAndBank(){
@@ -1531,7 +1578,7 @@ function renderCutTrayAndBank(){
     Array.prototype.forEach.call(tray.querySelectorAll("[data-restore]"),function(b){b.addEventListener("click",function(){state.qstate[parseInt(b.getAttribute("data-restore"),10)]="keep";sndClick();renderQuestions();renderReadout();});});
   }
   var bank=$("bankPanel"); if(bank){
-    bank.innerHTML='<div style="margin-top:12px;background:var(--panel);border:3px solid var(--gold);border-radius:8px;padding:11px"><div style="font-family:\'Press Start 2P\',monospace;font-size:10px;color:var(--gold);line-height:1.6">QUESTION BANK · ADD = 3 CR EACH · DEALT FOR THIS LEVEL</div><div style="font-size:13px;color:var(--dim);margin-top:4px">Eight bank questions dealt for this level, favouring agenda topics your instrument does not cover yet. Adding one is how a lost topic gets repaired on TRY AGAIN.</div>'+addBankQuestions().map(function(q){var on=!!state.added[q.id]; var cant=!on && budgetMath().total+3>BUDGET_TOTAL; var tierTag = tierOf(q)==="stupid" ? ' · <b style="color:var(--orange)">TURN-OFF RISK</b>' : tierOf(q)==="filler" ? ' · <b style="color:var(--gold)">LOW VALUE</b>' : ""; return '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:9px;font-size:14px;color:var(--dim)"><span><b style="color:var(--ink)">'+q.text+'</b><br>'+q.min+' min · Topic: <b style="color:var(--ink)">'+q.topic+'</b> · Who can answer: '+q.know+' · Decision value: '+q.val+' · '+(defectOf(q)==='CLEAN'?'Clean control':'DEFECT: '+defectOf(q)+' · Fix: '+(fixVerbFor(q)?fixVerbFor(q)+' ('+fixCostFor(q)+' cr)':'none, CUT or escapes'))+tierTag+'</span><button class="segbtn'+(on?" sel":"")+'" data-add="'+q.id+'"'+(cant?' disabled title="Not enough budget"':"")+'>'+(on?"ADDED · 3 CR":"ADD · 3 CR")+'</button></div>';}).join("")+"</div>";
+    bank.innerHTML='<div style="margin-top:12px;background:var(--panel);border:3px solid var(--gold);border-radius:8px;padding:11px"><div style="font-family:\'Press Start 2P\',monospace;font-size:10px;color:var(--gold);line-height:1.6">QUESTION BANK · ADD = 3 CR EACH · DEALT FOR THIS LEVEL</div><div style="font-size:13px;color:var(--dim);margin-top:4px">Eight bank questions dealt for this level, favouring agenda topics your instrument does not cover yet. Adding one can restore a lost topic on TRY AGAIN.</div>'+addBankQuestions().map(function(q){var on=!!state.added[q.id]; var cant=!on && budgetMath().total+3>BUDGET_TOTAL; var tierTag = tierOf(q)==="stupid" ? ' · <b style="color:var(--orange)">TURN-OFF RISK</b>' : tierOf(q)==="filler" ? ' · <b style="color:var(--gold)">LOW VALUE</b>' : ""; return '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:9px;font-size:14px;color:var(--dim)"><span><b style="color:var(--ink)">'+q.text+'</b><br>'+fmtMin(q.min)+' min · Topic: <b style="color:var(--ink)">'+q.topic+'</b> · Who can answer: '+q.know+' · Decision value: '+q.val+' · '+(tierOf(q)==='stupid'?'Low-value item':tierOf(q)==='filler'?'Filler item':defectOf(q)==='CLEAN'?'Clean control':'DEFECT: '+defectOf(q)+' · Fix: '+(fixVerbFor(q)?fixVerbFor(q)+' ('+fixCostFor(q)+' cr)':'none, CUT or escapes'))+tierTag+'</span><button class="segbtn'+(on?" sel":"")+'" data-add="'+q.id+'"'+(cant?' disabled title="Not enough budget"':"")+'>'+(on?"ADDED · 3 CR":"ADD · 3 CR")+'</button></div>';}).join("")+"</div>";
     Array.prototype.forEach.call(bank.querySelectorAll("[data-add]"),function(b){b.addEventListener("click",function(){var id=parseInt(b.getAttribute("data-add"),10); state.added[id]=!state.added[id]; if(state.added[id]) sndSpend(); else sndRefund(); renderQuestions(); renderReadout();});});
   }
 }
@@ -1543,7 +1590,7 @@ function renderAgenda(){
     var qs = kept.filter(function(q){ return q.topic === topic; });
     var creditable = qs.filter(function(q){ return tierOf(q) !== "stupid"; });
     var status = creditable.length ? '<span class="ok">COVERED · Q' + creditable.map(function(q){ return q.id; }).join(", Q") + '</span>'
-      : (qs.length ? '<span class="miss">ONLY A STUPID QUESTION · EARNS 0</span>' : '<span class="miss">NOT COVERED</span>');
+      : (qs.length ? '<span class="miss">ONLY LOW-VALUE ITEMS · EARNS 0</span>' : '<span class="miss">NOT COVERED</span>');
     return '<div class="arow"><b>' + topic + '</b>' + status + '</div>';
   }).join("");
   el.innerHTML = '<div class="at">LEVEL AGENDA · INSIGHT VALUE NEEDS ' + insightGate() + '+ · EACH TOPIC MUST BE ASKED, SOUND, ANSWERABLE, AND ANSWERED BY ITS KEY PERSONAS</div>' + rows +
@@ -1579,7 +1626,7 @@ function renderQuestions(){
       html += '<div class="flagbox" style="background:#12312a;border-color:var(--teal);color:#c9f5e6">FIXED with ' + (fixVerbFor(q) || "SIMPLIFY") + '. The ' + d + ' defect and its symptom risk are gone.' + ((d === "DOUBLE-BARRELED" || d === "GRID BURDEN" || q.id === 25 || q.id === 53) ? ' Splitting the item adds a small time cost, shown above.' : '') + "</div>";
     }
     if (tier === "stupid" && st === "keep"){
-      html += '<div class="flagbox" style="background:#3a2a10;border-color:var(--orange);color:#ffe1b8"><b>TURN-OFF RISK.</b> ' + (q.flagTxt || "A stupid question: worded fine, worthless anyway.") + '<br><span style="font-size:12.5px">Earns <b>zero insight</b>, costs <b>+2 goodwill</b> in resentment while kept, and subtracts 3 Insight Value. The only sensible fix is <b>CUT (1 cr)</b>.</span></div>';
+      html += '<div class="flagbox" style="background:#3a2a10;border-color:var(--orange);color:#ffe1b8"><b>TURN-OFF RISK.</b> ' + (q.flagTxt || "A low-value item that contributes no agenda insight.") + '<br><span style="font-size:12.5px">Earns <b>zero insight</b>, reduces goodwill by <b>2 points</b> while kept, and subtracts 3 Insight Value. Remove it with <b>CUT (1 cr)</b>.</span></div>';
     }
     if (tier === "filler" && st === "keep"){
       html += '<div class="flagbox" style="background:#2e2a12;border-color:var(--gold);color:#ffe9a3"><b>LOW VALUE FILLER.</b> Harmless, but it spends respondent time like a real question. Earns half insight credit, and only if its topic is on the agenda.</div>';
@@ -1696,6 +1743,7 @@ function renderReadout(){
     "<span>Goodwill <b>" + gm.start + (gm.fatigue ? " (carried " + gm.carry + " \u2212 " + gm.fatigue + " fatigue)" : "") + " \u2192 " + Math.max(0, gm.ending) + "</b></span>" +
     (gm.trips ? '<span class="warn">Breaker forecast: <b>TRIPS</b></span>' : "<span>Breaker forecast: <b style='color:var(--teal)'>HOLDS</b></span>");
   renderBudget();
+  updateAffordability();
   if (state.level===3 || state.level===6) renderStakeholder();
   var lb = $("launchBtn");
   if (lb){ var over = budgetMath().total > BUDGET_TOTAL; lb.disabled = over; lb.style.opacity = over ? ".45" : ""; lb.textContent = over ? "OVER BUDGET" : "\u25B6 LAUNCH"; }
@@ -1734,24 +1782,48 @@ function openBRD(){
   if (!quick && state.level === 4) constraints += " The tired audience requires ending goodwill 35 or higher.";
   if (!quick && state.level === 5) constraints += " The multilingual list is 40% English-speaking. Consider invitation language and localization review.";
   if (!quick && state.level === 6) constraints += " Executive Blast is the available audience for this study.";
-  $("brdContent").innerHTML = '<h2>BRD</h2><p>Business Requirement Document</p><h3>'+L.name+'</h3><h3>STUDY PURPOSE</h3><p>Collect credible answers on the required business topics below. A high response rate alone does not establish useful evidence.</p><h3>REQUIRED TOPICS AND RESPONDENTS</h3><ul>'+agendaTopics().map(function(topic){
+  $("brdContent").innerHTML = '<h2>BRD</h2><p>Business Requirement Document</p><h3>'+L.name+(quick?"":" · "+L.difficulty)+'</h3><h3>STUDY PURPOSE</h3><p>Collect credible answers on the required business topics below. A high response rate alone does not establish useful evidence.</p><h3>REQUIRED TOPICS AND RESPONDENTS</h3><ul>'+agendaTopics().map(function(topic){
     var personas=(TOPIC_KEYS[topic]||[]).map(function(key){return PERSONAS[key].name;}).join(" or ");
     return '<li><b>'+topic+'</b>: credible answers from '+personas+'.</li>';
   }).join("")+'</ul><h3>ACCEPTANCE CRITERIA</h3><ul><li>Response strictly above '+Math.round(L.target*100)+'% of invitations actually sent.</li><li>Data quality 60+ and Insight '+insightGate()+'+.</li><li>Budget: '+L.budget+' credits'+(quick?' for one launch.':' across all attempts.')+'</li>'+(!quick && state.level===4?'<li>Maintain ending goodwill 35 or higher.</li>':"")+(quick?'<li>Repair all three cards; kept defects and cuts do not complete the challenge.</li>':"")+'</ul><h3>STUDY CONSTRAINTS</h3><p>'+constraints+'</p><p>These are the active study requirements, not a forecast. Consult MPOR for game rules, scoring definitions, and simulation limitations.</p>';
-  closeGuide();
-  var dialog=$("studyBRD"); dialog.classList.add("open"); dialog.scrollTop=0;
-  $("brdClose").focus({preventScroll:true});
+  openReference("studyBRD", "brdClose", "brdBtn");
 }
-function closeBRD(){ $("studyBRD").classList.remove("open"); $("brdBtn").focus({preventScroll:true}); }
+var activeReference = null;
+function openReference(id, closeId, openerId){
+  if (activeReference) closeReference();
+  var opener = document.activeElement;
+  activeReference = { id:id, opener:opener && opener !== document.body ? opener : $(openerId) };
+  $("topbar").inert = true; $("cabinet").inert = true;
+  var dialog = $(id); dialog.classList.add("open"); dialog.scrollTop = 0;
+  $(closeId).focus({preventScroll:true});
+}
+function closeReference(){
+  if (!activeReference) return;
+  var opener = activeReference.opener;
+  $(activeReference.id).classList.remove("open"); activeReference = null;
+  $("topbar").inert = false; $("cabinet").inert = false;
+  opener.focus({preventScroll:true});
+}
+function closeBRD(){ if (activeReference && activeReference.id === "studyBRD") closeReference(); }
 $("brdBtn").addEventListener("click",function(){sndClick();openBRD();});
 $("brdClose").addEventListener("click",function(){sndClick();closeBRD();});
 $("studyBRD").addEventListener("click",function(e){if(e.target===this)closeBRD();});
-function openGuide(){ var g = $("fieldGuide"); if (g){ g.classList.add("open"); g.scrollTop = 0; var c = $("guideClose"); if (c) c.focus({preventScroll:true}); } }
-function closeGuide(){ var g = $("fieldGuide"); if (g) g.classList.remove("open"); }
+function openGuide(){ openReference("fieldGuide", "guideClose", "guideBtn"); }
+function closeGuide(){ if (activeReference && activeReference.id === "fieldGuide") closeReference(); }
 var gbBtn = $("guideBtn"); if (gbBtn) gbBtn.addEventListener("click", function(){ initAudio(); sndClick(); openGuide(); });
 var gcBtn = $("guideClose"); if (gcBtn) gcBtn.addEventListener("click", function(){ sndClick(); closeGuide(); });
 var fgEl = $("fieldGuide"); if (fgEl) fgEl.addEventListener("click", function(e){ if (e.target === fgEl) closeGuide(); });
-document.addEventListener("keydown", function(e){ if (e.key === "Escape"){ if($("studyBRD").classList.contains("open")) closeBRD(); else closeGuide(); } });
+document.addEventListener("keydown", function(e){
+  if (!activeReference) return;
+  if (e.key === "Escape"){ e.preventDefault(); closeReference(); }
+  else if (e.key === "Tab"){
+    var controls = Array.prototype.slice.call($(activeReference.id).querySelectorAll('button:not([disabled]), a[href], input:not([disabled]), [tabindex="0"]'));
+    var first = controls[0], last = controls[controls.length - 1];
+    if (first && (e.shiftKey && document.activeElement === first || !e.shiftKey && document.activeElement === last)){
+      e.preventDefault(); (e.shiftKey ? last : first).focus({preventScroll:true});
+    }
+  }
+});
 setPixel($("mgrSetup"), MGR_NORMAL, 4);
 renderLevelUI(); renderSegments(); renderInvites(); renderQuestions(); renderPrep(); renderReadout();
 $("startBtn").addEventListener("click", function(){ initAudio(); sndCoin(); selectLevel(state.level,true); setMusicVariant("setup"); });
@@ -2125,7 +2197,7 @@ function showCampaign(){
   var el=$("campaignScreen"); el.style.display="block";
   var won=Object.keys(state.campaignWon).filter(function(k){return state.campaignWon[k];}).length;
   var avg=gradeRankAvg(); var seasonDone=!!state.campaignWon[6];
-  el.innerHTML='<div class="reportcard"><h2>'+(seasonDone?"★ SEASON COMPLETE ★":"CAMPAIGN · SEASON PROGRESS")+'</h2><div class="simnote">Session only — nothing is stored beyond this page. All results simulated.</div><p style="font-size:16px"><b>Levels won: '+won+' / 6</b> · Average grade: <b>'+(avg||"—")+'</b></p>'+LEVELS.map(function(lv){return '<p style="font-size:15px;margin:5px 0">Level '+lv.id+" · "+lv.name+" — "+(state.campaignWon[lv.id]?"<b>WON</b> · Best "+(state.campaignBest[lv.id]||"")+(state.campaignBonus[lv.id]!=null?" · BUDGET BONUS: "+state.campaignBonus[lv.id]+" CR LEFT WHEN WON":"") : (lv.id<=state.unlocked?"Not won yet":"🔒 Locked"))+"</p>";}).join("")+'<p style="font-size:16px;margin-top:12px"><b>'+(seasonDone?"Overall grade: "+avg+" · You ran the Big Quarter without burning the list. That is the whole craft: reach, respect, and data you can defend.": won>=3?"Verdict: Half the season in the bank. The breaker is learning to trust you.": won>=1?"Verdict: First win banked. Keep changing one lever at a time.":"Verdict: No wins yet. Start with Level 1: Fresh segment, full validation, dedupe, Honest Ask, trim to the core with escapes on.")+'</b></p><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px"><button class="againbtn" id="campBack">◀ LEVELS</button><button class="againbtn" id="campPlay" style="background:var(--gold)">▶ PLAY NEXT</button></div></div>';
+  el.innerHTML='<div class="reportcard"><h2>'+(seasonDone?"★ SEASON COMPLETE ★":"CAMPAIGN · SEASON PROGRESS")+'</h2><div class="simnote">Session only — nothing is stored beyond this page. All results simulated.</div><p style="font-size:16px"><b>Levels won: '+won+' / 6</b> · Average grade: <b>'+(avg||"—")+'</b></p>'+LEVELS.map(function(lv){return '<p style="font-size:15px;margin:5px 0">Level '+lv.id+" · "+lv.difficulty+" · "+lv.name+" — "+(state.campaignWon[lv.id]?"<b>WON</b> · Best "+(state.campaignBest[lv.id]||"")+(state.campaignBonus[lv.id]!=null?" · BUDGET BONUS: "+state.campaignBonus[lv.id]+" CR LEFT WHEN WON":"") : (lv.id<=state.unlocked?"Not won yet":"🔒 Locked"))+"</p>";}).join("")+'<p style="font-size:16px;margin-top:12px"><b>'+(seasonDone?"Overall grade: "+avg+" · You ran the Big Quarter without burning the list. That is the whole craft: reach, respect, and data you can defend.": won>=3?"Verdict: Half the season in the bank. The breaker is learning to trust you.": won>=1?"Verdict: First win banked. Keep changing one lever at a time.":"Verdict: No wins yet. Start with Level 1: Fresh segment, full validation, dedupe, Honest Ask, trim to the core with escapes on.")+'</b></p><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px"><button class="againbtn" id="campBack">◀ LEVELS</button><button class="againbtn" id="campPlay" style="background:var(--gold)">▶ PLAY NEXT</button></div></div>';
   if (seasonDone) setTimeout(sndSeason, 250);
   $("campBack").addEventListener("click",function(){ el.style.display="none"; $("startScreen").style.display="block"; renderLevelUI(); window.scrollTo({top:0,behavior:"smooth"}); });
   $("campPlay").addEventListener("click",function(){ var next=LEVELS.filter(function(lv){return !state.campaignWon[lv.id] && lv.id<=state.unlocked;})[0]||LEVELS[0]; selectLevel(next.id,true); });
@@ -2269,7 +2341,7 @@ function tick(now){
         ic.textContent = "DK"; ic.style.fontSize = "9px";
         sp.el.classList.add("escaped");
         setTimeout(function(){ sp.el.classList.remove("escaped"); }, 1200);
-        logLine(PERSONAS[sp.persona].name.toUpperCase() + " TOOK THE DK/NA EXIT. CLEAN DATA, STILL IN.");
+        logLine(PERSONAS[sp.persona].name.toUpperCase() + " CHOSE DK/NA. ITEM NONRESPONSE; STILL IN THE SURVEY.");
       } else if (e.type === "finish"){
         sp.done = true;
         sp.el.classList.add("cheer");
@@ -2326,7 +2398,7 @@ function computeInsight(c, run){
     var qs = kept.filter(function(q){ return q.topic === topic; });
     if (!qs.length) return { topic: topic, status: "LOST", earned: 0, reason: "No question on this topic is in the final instrument: it was cut, or never dealt and never added from the bank." };
     var creditable = qs.filter(function(q){ return tierOf(q) !== "stupid"; });
-    if (!creditable.length) return { topic: topic, status: "LOST", earned: 0, reason: "Only a stupid turn-off question asked about this topic (Q" + qs[0].id + "). Stupid questions earn zero insight by design." };
+    if (!creditable.length) return { topic: topic, status: "LOST", earned: 0, reason: "Only a low-value item asked about this topic (Q" + qs[0].id + "). Low-value items earn zero insight in this game." };
     var answerable = creditable.filter(function(q){ return !q.answerBy || q.answerBy.some(function(p){ return segPersonas.indexOf(p) >= 0; }); });
     if (!answerable.length) return { topic: topic, status: "LOST", earned: 0, reason: "Wrong audience: the question on this topic (Q" + creditable[0].id + ") can only be answered by " + creditable[0].know + ", who are not in the segment sent." };
     var keys = TOPIC_KEYS[topic] || [];
@@ -2550,8 +2622,10 @@ function showReport(){
     (gm.spendUnans ? "<tr><td>Unanswerable questions kept (" + gm.unansCount + " questions, per affected persona group \u00D7 6)</td><td>\u2212" + gm.spendUnans + "</td></tr>" : "") +
     (gm.spendOver ? "<tr><td>Honest Ask overrun (" + estMinutes() + " min vs the promised " + state.invite.promise + ")</td><td>\u2212" + gm.spendOver + "</td></tr>" : "") +
     (gm.spendNoSupp ? "<tr><td>Mailed anyway: opt-outs / surveyed in last 30 days (no suppression scrub)</td><td>\u2212" + gm.spendNoSupp + "</td></tr>" : "") +
-    (gm.spendStupid ? "<tr><td>Stupid turn-off questions kept (" + gm.stupidKept + " \u00D7 2 resentment)</td><td>\u2212" + gm.spendStupid + "</td></tr>" : "") +
-    (gm.earn ? "<tr><td>Earned back (" + state.invite.name + (state.invite.id === "honest" ? ", promise kept" : ", closing the loop") + ")</td><td>+" + gm.earn + "</td></tr>" : "") +
+    (gm.spendStake ? "<tr><td>Stakeholder burden (" + stakeholderImpact().title + ")</td><td>\u2212" + gm.spendStake + "</td></tr>" : "") +
+    (gm.spendStupid ? "<tr><td>Low-value items kept (" + gm.stupidKept + " \u00D7 2 resentment)</td><td>\u2212" + gm.spendStupid + "</td></tr>" : "") +
+    (gm.earn - gm.earnReport ? "<tr><td>Earned back (" + state.invite.name + (state.invite.id === "honest" ? ", promise kept" : ", closing the loop") + ")</td><td>+" + (gm.earn - gm.earnReport) + "</td></tr>" : "") +
+    (gm.earnReport ? "<tr><td>Report-back restoration (" + (run.kept.length <= 7 ? "short instrument" : "long instrument") + ")</td><td>+" + gm.earnReport + "</td></tr>" : "") +
     worthLine(1, c.remRecovery.r1) + worthLine(2, c.remRecovery.r2) +
     '<tr class="total"><td>Ending goodwill</td><td>' + Math.max(0, gm.ending) + (gm.trips ? " · BREAKER TRIPPED" : "") + "</td></tr></table></div>";
 
@@ -2649,7 +2723,7 @@ function showReport(){
   /* v1.5 VALUE panel: every agenda topic, verdicted from the run itself */
   var statusColor = { "ANSWERED CREDIBLY": "#14713f", "ANSWERED WITH SUSPECT DATA": "#8a6408", "LOST": "#b3372f" };
   html += '<div class="reportcard"><h2>VALUE · DID THE BUSINESS GET ITS ANSWERS?</h2>' +
-    '<div class="simnote">Insight Value ' + insight + ' / 100 (gate ' + insightGate() + '+). Each agenda topic owns ' + (Math.round(ins.share * 10) / 10) + ' points. A topic pays out only when its question shipped, was sound, could be answered by this audience, and was answered by finishers from the group the topic is about.' + (ins.bonus ? ' Non-agenda sound topics added +' + ins.bonus + '.' : '') + (ins.stupidKept ? ' Kept stupid questions cost ' + (ins.stupidKept * 3) + ' insight (' + ins.stupidKept + ' kept × 3) on top of earning nothing.' : '') + '</div>' +
+    '<div class="simnote">Insight Value ' + insight + ' / 100 (gate ' + insightGate() + '+). Each agenda topic has ' + (Math.round(ins.share * 10) / 10) + ' available points. Credit depends on inclusion, simulated measurement risks, answerability, and the mix of completing respondent groups.' + (ins.bonus ? ' Non-agenda sound topics added +' + ins.bonus + '.' : '') + (ins.stupidKept ? ' Kept low-value items cost ' + (ins.stupidKept * 3) + ' insight (' + ins.stupidKept + ' kept × 3) on top of earning nothing.' : '') + '</div>' +
     ins.topics.map(function(t){
       return '<div class="dropitem"><div class="dh" style="text-transform:capitalize">' + t.topic + ' · <span style="color:' + statusColor[t.status] + '">' + t.status + '</span></div><p>' + t.reason + '</p></div>';
     }).join("") +
@@ -2698,11 +2772,12 @@ function showReport(){
     histEntries.map(function(h){ return '<p style="font-size:15px;margin:4px 0">Attempt ' + h.attempt + ': <b>' + pct(h.rate * 100) + '</b> response · quality <b>' + h.quality + '</b>' + (h.insight !== undefined ? ' · insight <b>' + h.insight + '</b>' : '') + ' · spent ' + h.spent + ' cr' + (h.won ? ' · <b>WON</b>' : '') + '</p>'; }).join("") +
     '<p style="font-size:15px;margin-top:8px">Best attempt rate so far: <b>' + pct(Math.max(state.bestAttemptRate, respRate) * 100) + '</b> · Credits remaining: <b>' + remainingAfter + ' / ' + BUDGET_TOTAL + '</b></p></div>';
 
-  var canRetry = remainingAfter >= 30;
+  var minSend = minimumSendCost();
+  var canRetry = remainingAfter >= minSend;
   var levelFailed = !won && !canRetry;
   if (levelFailed){
     html += '<div class="reportcard" style="background:#2b0f16;color:#ffd7db;border-color:var(--red)"><h2 style="color:var(--red)">\u25A0 LEVEL FAILED \u25A0</h2>' +
-      '<p style="font-size:16px;line-height:1.55">The budget ran out before the target fell. Target was <b>response rate &gt; ' + Math.round(targetRate * 100) + '% with quality 60+ and Insight ' + insightGate() + '+</b>. Your best attempt reached <b>' + pct(Math.max(state.bestAttemptRate, respRate) * 100) + '</b>. Only <b>' + remainingAfter + ' credits</b> remain, and the cheapest possible send costs 30, so no further attempt can be mailed on this level.</p>' +
+      '<p style="font-size:16px;line-height:1.55">The remaining budget cannot fund another invitation batch. The acceptance criteria were <b>response rate &gt; ' + Math.round(targetRate * 100) + '% with quality 60+ and Insight ' + insightGate() + '+</b>. Your best attempt reached <b>' + pct(Math.max(state.bestAttemptRate, respRate) * 100) + '</b>. Only <b>' + remainingAfter + ' credits</b> remain, and the cheapest possible send costs ' + minSend + ', so no further attempt can be mailed on this level.</p>' +
       '<p style="font-size:15px">The lesson is in the attempt history above: the pool is spent across attempts, so the cheap early fixes matter.</p>' +
       '<div class="againrow"><button class="againbtn" id="failedNewGameBtn" style="background:var(--gold)">\u21BB NEW GAME</button><button class="againbtn" id="levelSelectBtn">\u25C0 LEVEL SELECT</button></div></div>';
   } else if (!canRetry && won){
@@ -2711,6 +2786,13 @@ function showReport(){
   } else {
     html += '<div class="againrow"><button class="againbtn" id="againBtn">\u25B6 TRY AGAIN \u00B7 ' + remainingAfter + ' CR LEFT</button><button class="againbtn" id="newGameBtn" style="background:var(--gold)">\u21BB NEW GAME</button></div>' +
       '<p style="font-size:14px;color:var(--dim);margin-top:8px">TRY AGAIN continues this level on the budget you have left: owned prep, your instrument edits, goodwill (' + Math.max(0, gm.ending) + ') and reputation (' + repA + ') carry over, and each new send and new edit is charged again. NEW GAME restarts this level with a full pool and a new random questionnaire (INSTRUMENT #' + state.instrumentSeed + ' is retired).</p>';
+  }
+
+  if (canRetry){
+    html += '<div class="againrow"><button class="againbtn" id="levelSelectBtn">\u25C0 LEVEL SELECT</button></div>';
+  }
+  if (won){
+    html += '<div class="againrow"><button class="againbtn" id="nextLevelBtn">' + (state.level < 6 ? "\u25B6 NEXT LEVEL" : "\u2605 SEASON RESULTS") + '</button></div>';
   }
 
   /* finalize the attempt chain: pool, history, goodwill, reputation, baseline */
@@ -2739,8 +2821,8 @@ function showReport(){
     if (gb){ gb.classList.add("stamp"); sndStamp(); }
     if (won) spawnConfetti();
   }, 180);
-  var rb1=$("abRunBigger"); if(rb1) rb1.addEventListener("click",function(){ $("abVerdictMsg").innerHTML="<b>Correct call.</b> TOO CLOSE TO CALL accepted — that restraint is scored kindly and is the winning methodology move."; sndNeutral(); });
-  var dc1=$("abDeclare"); if(dc1) dc1.addEventListener("click",function(){ $("abVerdictMsg").innerHTML="<b>Not defensible yet.</b> The gap sits inside the uncertainty range. Running it bigger would have been the winning move."; sndWrong(); });
+  var rb1=$("abRunBigger"); if(rb1) rb1.addEventListener("click",function(){ $("abVerdictMsg").innerHTML="<b>Inconclusive result.</b> The gap is within the game's uncertainty range. A larger randomized sample could give a more precise estimate. This verdict does not change scores."; sndNeutral(); });
+  var dc1=$("abDeclare"); if(dc1) dc1.addEventListener("click",function(){ $("abVerdictMsg").innerHTML="<b>Not defensible yet.</b> The gap is within the game's uncertainty range. Do not declare a superior invitation from this result. This verdict does not change scores."; sndWrong(); });
   var ab2=$("againBtn"); if(ab2) ab2.addEventListener("click", function(){
     sndCoin();
     state.attempt++;
@@ -2751,6 +2833,11 @@ function showReport(){
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
   var ng2=$("newGameBtn"); if(ng2) ng2.addEventListener("click", function(){ sndCoin(); newGameSameLevel(); });
+  var next2=$("nextLevelBtn"); if(next2) next2.addEventListener("click", function(){
+    sndCoin();
+    if (state.level < 6){ selectLevel(state.level + 1, true); setMusicVariant("setup"); }
+    else showCampaign();
+  });
   var fn2=$("failedNewGameBtn"); if(fn2) fn2.addEventListener("click", function(){ sndCoin(); resetCampaignNewGame(); });
   var ls2=$("levelSelectBtn"); if(ls2) ls2.addEventListener("click", function(){
     sndClick();

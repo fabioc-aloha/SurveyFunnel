@@ -2,74 +2,53 @@
 
 ## Current State
 
-Production hosting is the public Free-tier `swa-surveyfunnel-prod` in
-`rg-surveyfunnel-prod`, East US 2, under GCX Survey Operations PROD.
-GitHub Actions publishes the packaged game from `main`; the production
-environment restricts deployment to that branch and holds the app token.
-See the latest workflow run for current publication status.
+UAT fixes, initial-budget winnability checks, approved difficulty labels,
+player terminology corrections, and collapsed QR-border removal are ready
+for the user-authorized commit, push, and deployment. Publication is not
+yet verified. Implementation and prior release evidence
+are preserved in [CHANGELOG.md](CHANGELOG.md).
 
-Release scope: Quick Challenge, event-based respondent reactions,
-stakeholder dialogue/forecasts, MPOR, active-study BRD, Marge removal,
-and collapsible mobile QR. The user authorized commit, push, and deployment.
-The existing production workflow is the publication path; check its latest
-run rather than assuming a local implementation checkpoint is deployed.
-Gameplay release `3df78b8` deployed successfully in
-[run 41231850728](https://github.com/fabioc-aloha/SurveyFunnel/actions/runs/41231850728).
-The following documentation-only commit records that verification and
-triggers the same workflow without changing the game package.
+The existing [production workflow](.github/workflows/deploy-production.yml)
+deploys the five-file static package on pushes to `main`. The last recorded
+release is gameplay commit `3df78b8` followed by documentation commit
+`58af2ed`; current production was not rechecked during meditation.
+See [deployment guidance](docs/deployment.md) for the hosting target.
 
 ## Blockers
 
-The browser regression suite in [TODO.md](TODO.md) needs approval.
-Human listening remains necessary to verify music and effects.
+The tracked browser-suite proposal still needs approval; human audio, physical-phone QR/touch,
+cross-browser, and screen-reader checks remain open in [TODO.md](TODO.md).
 
 ## Next Action
 
-Complete the human audio check and resolve the tracked browser-test
-decision in [TODO.md](TODO.md).
+Commit and push the approved changes, then use the existing production
+workflow and verify the deployed package and gameplay.
+Do not treat local acceptance as deployment evidence.
 
 ## Verification
 
+Latest local command:
 `node --test scripts/build-site.test.mjs scripts/game-features.test.mjs`
-passed 21 local tests covering packaging, challenge repairs and campaign
-isolation, reactions, stakeholder forecasts, stale animation callbacks,
-MPOR labels/coaching removal, level/challenge BRD requirements, and QR toggling.
-Ten campaign setups matched committed simulation and budget results,
-excluding only the added question-ID event metadata.
+passed 38 tests, including 390 winning launches/reports: fixed starts plus
+64 seeded draws per level, all within initial budgets. This is sampled,
+not exhaustive random coverage. Scope and difficulty rationale are in
+[development notes](docs/development.md).
 
-Local browser checks passed all three challenge wins within 40 credits,
-cut/restore, retry/next/back, campaign progress isolation, live reactions,
-skipped and fully animated reports, and Level 3/6 stakeholder choices.
-Checks at 390px and 1440px found no horizontal overflow or runtime errors.
-Reduced-motion play and Field Guide top/focus behavior passed; screenshots
-were checked. Human audio listening is still unverified.
+Local browser checks passed an uninterrupted six-level campaign, retry
+recovery, the finale's audience-specific minimum send cost, modal keyboard
+containment and opener restoration, and 390px/1440px layout checks.
+These are manual/session checks, not a tracked browser suite.
+All three inline scripts and the five-file package passed validation.
 
-The release workflow runs all 21 tests and verifies the five-file package:
-HTML, static configuration, font, license, and QR. Live byte/header checks
-exclude the host configuration file and verify unpublished docs return 404.
-Rendered local QR screenshots decoded to the production URL at both widths.
-
-Independent post-deployment verification matched production HTML, font,
-license, QR bytes, MIME/security headers, and unpublished-document 404s.
-Live browser checks at 390px and 1440px CSS widths passed expanded QR
-layout without horizontal overflow; mouse and Enter/Space toggling passed.
-MPOR opened at the top with close-button focus. The challenge BRD opened
-at the top, described all three repairs, and restored focus on close.
-The first live challenge won with three repairs, 40/40 credits, response
-17.5%, quality 94, and Insight 100. A desktop screenshot was inspected.
-
-The gameplay release push matched the remote `main` hash. Default Git
-authentication failed; the successful retry used the existing GitHub CLI
-credential helper for that command only, without changing Git configuration.
-Do not assume the default helper is repaired.
-
-Full balance invariants were not rechecked; the ten baseline comparisons
-and targeted gameplay tests are the current regression evidence.
+Default Git authentication failed during the prior release; the existing
+GitHub CLI helper worked when selected for that push only. Git configuration
+was not changed; do not assume the default helper is repaired.
 
 ## References
 
-- [Open work](TODO.md)
-- [Completed-change history](CHANGELOG.md)
-- [Development notes and balance invariants](docs/development.md)
-- [Deployment guide](docs/deployment.md)
+- [Open work and approval decisions](TODO.md)
+- [Completed-change history and release evidence](CHANGELOG.md)
+- [Game structure and balance invariants](docs/development.md)
+- [Current player guidance](docs/player-guide.md)
+- [Deployment and live verification](docs/deployment.md)
 - [Production game](https://nice-mushroom-0bdb0ef0f.6.azurestaticapps.net)

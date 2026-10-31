@@ -8,14 +8,20 @@ import { join } from 'node:path';
 function game() {
   const elements = new Map();
   const timers = [];
+  const classes = new Map();
   function element(id) {
     if (!elements.has(id)) elements.set(id, {
       attributes: {}, setAttribute(key, value) { this.attributes[key] = String(value); },
       getAttribute(key) { return this.attributes[key]; },
-      style: {}, classList: { add() {}, remove() {}, toggle() {} },
+      style: {}, classList: {
+        add(name) { classes.set(`${id}:${name}`, true); },
+        remove(name) { classes.delete(`${id}:${name}`); },
+        contains(name) { return classes.has(`${id}:${name}`); },
+        toggle(name) { classes.set(`${id}:${name}`, !classes.get(`${id}:${name}`)); }
+      },
       firstChild: {}, innerHTML: '', textContent: '', addEventListener() {},
       querySelectorAll() { return []; }, querySelector() { return element('child'); },
-      focus() {}, appendChild() {}, remove() {}
+      focus() { document.activeElement = this; }, appendChild() {}, remove() {}
     });
     return elements.get(id);
   }
@@ -318,3 +324,218 @@ test('mobile QR toggles between a collapsed icon and the full player panel', () 
   assert.equal(element('mobileQR').getAttribute('aria-expanded'), 'false');
   assert.equal(element('mobileQRLink').hidden, true);
 });
+
+test('a winning report always offers level selection and the next study', () => {
+  const { context: g, element } = game();
+  g.selectLevel(1, false);
+  g.state.validation = 'full'; g.state.dedupe = true; g.state.suppression = true;
+  g.state.invite = g.INVITES[1]; g.state.escapes = true;
+  g.activeQuestions().forEach(q => {
+    g.state.qstate[q.id] = [1, 2, 3, 4, 6, 9].includes(q.id) ? (q.id === 3 ? 'simplify' : 'keep') : 'cut';
+  });
+  g.startRun(); g.showReport();
+  assert.equal(g.state.campaignWon[1], true);
+  assert.match(element('report').innerHTML, /id="levelSelectBtn"/);
+  assert.match(element('report').innerHTML, /id="nextLevelBtn"/);
+});
+
+test('retry requires the minimum send cost of the available audience', () => {
+  const { context: g, element } = game();
+  g.selectLevel(6, false);
+  g.state.spentBefore = 150 - g.budgetMath().attemptCost - 35;
+  g.startRun(); g.showReport();
+  assert.equal(150 - g.state.spentBefore, 35);
+  assert.doesNotMatch(element('report').innerHTML, /id="againBtn"/);
+  assert.match(element('report').innerHTML, /cheapest possible send costs 45/);
+});
+
+test('an over-budget retry allows successive cost reductions but blocks increases', () => {
+  const { context: g } = game();
+  g.selectLevel(2, false);
+  g.state.spentBefore = 85;
+  assert.equal(g.budgetMath().attemptCost, 48);
+  assert.equal(g.budgetChangeBlocked({ invite: g.INVITES[0] }), false);
+  assert.equal(g.budgetChangeBlocked({ reminders: 0 }), false);
+  assert.equal(g.budgetChangeBlocked({ reminders: 2 }), true);
+  g.state.invite = g.INVITES[0]; g.state.reminders = 0;
+  assert.equal(g.budgetMath().total, 115);
+});
+
+test('modal close restores focus and releases the background', () => {
+  const { context: g, element } = game();
+  element('guideBtn').focus();
+  g.openGuide();
+  assert.equal(element('topbar').inert, true);
+  assert.equal(element('cabinet').inert, true);
+  assert.equal(g.document.activeElement, element('guideClose'));
+  g.closeGuide();
+  assert.equal(g.document.activeElement, element('guideBtn'));
+  assert.equal(element('topbar').inert, false);
+  assert.equal(element('cabinet').inert, false);
+  element('brdBtn').focus();
+  g.openBRD(); g.closeBRD();
+  assert.equal(g.document.activeElement, element('brdBtn'));
+});
+
+test('difficulty labels describe all six studies consistently', () => {
+  const { context: g, element } = game();
+  assert.deepEqual(Array.from(g.LEVELS, level => level.difficulty),
+    ['EASY', 'EASY', 'MEDIUM', 'HARD', 'MEDIUM', 'HARD']);
+  for (let level = 1; level <= 6; level++) {
+    g.selectLevel(level, false);
+    g.openBRD();
+    const difficulty = g.curLevel().difficulty;
+    assert.match(element('hudLevel').innerHTML, new RegExp(difficulty));
+    assert.match(element('brdContent').innerHTML, new RegExp(difficulty));
+    assert.match(element('levelGrid').innerHTML, new RegExp(`LEVEL ${level} · ${difficulty}`));
+    g.closeBRD();
+    g.showCampaign();
+    assert.match(element('campaignScreen').innerHTML, new RegExp(`Level ${level} · ${difficulty}`));
+  }
+});
+
+test('HUD shows the actual finale gate and resets for Quick Challenge', () => {
+  const { context: g, element } = game();
+  g.selectLevel(6, false);
+  assert.match(element('hudGates').innerHTML, /70\+/);
+  g.startQuickChallenge(0);
+  assert.match(element('hudGates').innerHTML, /60\+/);
+  assert.doesNotMatch(element('hudGates').innerHTML, /70\+/);
+});
+
+test('player terminology distinguishes game indices and item nonresponse', () => {
+  const html = readFileSync(join(root, 'site', 'index.html'), 'utf8');
+  assert.match(html, /AAPOR/);
+  assert.match(html, /item nonresponse/i);
+  assert.match(html, /game indices/i);
+  assert.doesNotMatch(html, /ONE TRUE FIX|clean data|near-identical|scored kindly/i);
+  const { context: g } = game();
+  assert.equal(g.LEVELS[4].name, 'GLOBAL FIELDWORK');
+  assert.match(g.QUESTIONS.find(q => q.id === 6).text, /renew/i);
+  assert.match(g.QUESTIONS.find(q => q.id === 9).text, /help article/i);
+  assert.equal(g.QUESTION_BANK.find(q => q.id === 65).text, g.QUESTIONS.find(q => q.id === 9).text);
+  for (const id of [13, 43]) assert.match(g.OPTIONAL_QUESTIONS.concat(g.QUESTION_BANK).find(q => q.id === id).text, /renew/i);
+});
+
+test('stakeholder controls permit cost reductions even before the retry fits', () => {
+  const { context: g, element } = game();
+  g.selectLevel(6, false);
+  g.state.spentBefore = 100;
+  g.state.stakeholder = 'accept';
+  g.renderStakeholder();
+  assert.doesNotMatch(element('stakeholderPanel').innerHTML, /data-stake="pushback"[^>]*disabled/);
+  assert.equal(g.chooseStakeholder('pushback'), true);
+});
+
+test('budget warnings refresh when another control frees credits', () => {
+  const { context: g, element } = game();
+  assert.equal(typeof g.updateAffordability, 'function');
+  g.selectLevel(2, false);
+  g.state.invite = g.INVITES[0]; g.state.reminders = 0;
+  const card = element('honest-card'), warning = element('warning');
+  card.setAttribute('data-inv', 'honest');
+  card.querySelector = () => warning;
+  g.document.querySelectorAll = selector => selector === '[data-inv]' ? [card] : [];
+  g.state.spentBefore = 100;
+  g.updateAffordability();
+  assert.equal(card.disabled, true);
+  assert.equal(warning.hidden, false);
+  g.state.spentBefore = 80;
+  g.updateAffordability();
+  assert.equal(card.disabled, false);
+  assert.equal(warning.hidden, true);
+  assert.equal(card.title, '');
+});
+
+test('preparation and audience controls recover affordability without losing ownership locks', () => {
+  const { context: g, element } = game();
+  g.selectLevel(2, false);
+  g.state.spentBefore = 100;
+  g.state.invite = g.INVITES[0]; g.state.reminders = 0;
+  const validation = element('validation-full'), prep = element('prep-dedupe'), segment = element('seg-fresh');
+  validation.setAttribute('data-val', 'full'); prep.setAttribute('data-prep', 'dedupe');
+  segment.setAttribute('data-seg', 'fresh');
+  g.document.querySelectorAll = selector => ({
+    '[data-val]': [validation], '[data-prep]': [prep], '[data-seg]': [segment]
+  })[selector] || [];
+  g.updateAffordability();
+  assert.equal(validation.disabled, true);
+  assert.equal(prep.disabled, true);
+  g.state.spentBefore = 70;
+  g.updateAffordability();
+  assert.equal(validation.disabled, false);
+  assert.equal(prep.disabled, false);
+  g.state.baseline = g.snapshotCurrent(); g.state.baseline.dedupe = true;
+  g.state.chainActive = true;
+  g.state.seg = g.SEGMENTS.find(seg => seg.id === 'stale');
+  g.updateAffordability();
+  assert.equal(prep.disabled, true);
+  assert.equal(segment.disabled, true);
+});
+
+const winningSetups = JSON.parse(readFileSync(join(root, 'scripts', 'fixtures', 'winning-setups.json'), 'utf8'));
+test('goodwill ledger identifies report-back rewards and stakeholder penalties', () => {
+  const { context: g, element } = game();
+  g.selectLevel(4, false);
+  g.state.reportBack = true;
+  g.activeQuestions().forEach(q => { g.state.qstate[q.id] = [1, 2, 4, 6, 9].includes(q.id) ? 'keep' : 'cut'; });
+  g.startRun(); g.showReport();
+  let ledger = element('report').innerHTML.match(/GOODWILL LEDGER[\s\S]*?<\/table>/)[0];
+  assert.match(ledger, /Report-back restoration[\s\S]*?<td>\+18<\/td>/);
+  assert.match(ledger, /Earned back \(Known Name[\s\S]*?<td>\+3<\/td>/);
+  g.selectLevel(3, false);
+  g.state.stakeholder = 'accept';
+  g.startRun(); g.showReport();
+  ledger = element('report').innerHTML.match(/GOODWILL LEDGER[\s\S]*?<\/table>/)[0];
+  assert.match(ledger, /Stakeholder burden[\s\S]*?<td>−10<\/td>/);
+});
+
+for (let level = 1; level <= 6; level++) {
+  test(`Level ${level} is winnable from its fixed start and 64 seeded draws within the initial budget`, () => {
+    const { context: g, element } = game();
+    const setups = winningSetups.filter(setup => setup.level === level);
+    assert.equal(setups.length, 65);
+    assert.equal(new Set(setups.map(setup => setup.seed)).size, 65);
+    assert.ok(setups.some(setup => setup.seed === 'fixed'));
+    for (let seed = 0; seed < 64; seed++) {
+      assert.ok(setups.some(setup => setup.seed === seed.toString(16).toUpperCase().padStart(4, '0')));
+    }
+    for (const setup of setups) {
+      const label = `Level ${level}, instrument ${setup.seed}`;
+      g.state.randomMode = false;
+      g.state.levelSeeds = setup.seed === 'fixed' ? {} : { [level]: setup.seed };
+      g.selectLevel(level, false);
+      assert.equal(g.state.spentBefore, 0, label);
+      assert.equal(g.state.attempt, 1, label);
+      g.state.validation = 'full'; g.state.dedupe = true; g.state.suppression = true;
+      g.state.stakeholder = level === 3 || level === 6 ? 'pushback' : null;
+      g.state.reportBack = level === 4;
+      g.state.localization = level === 5;
+      g.state.langChoice = level === 5 ? 'localized' : 'en';
+      g.state.abEnabled = level === 2;
+      g.state.invite = g.INVITES.find(invite => invite.id === setup.invite);
+      g.state.abInvite = g.INVITES.find(invite => invite.id !== setup.invite).id;
+      g.state.reminders = setup.reminders; g.state.escapes = setup.escapes;
+      for (const q of g.activeQuestions()) {
+        g.state.qstate[q.id] = setup.kept.includes(q.id) ?
+          (setup.repaired.includes(q.id) ? 'simplify' : 'keep') : 'cut';
+      }
+      for (const q of g.addBankQuestions()) {
+        g.state.added[q.id] = setup.added.includes(q.id);
+        g.state.qstate[q.id] = setup.repaired.includes(q.id) ? 'simplify' : 'keep';
+      }
+      assert.ok(setup.kept.every(id => g.activeQuestions().some(q => q.id === id)), label);
+      assert.ok(setup.added.every(id => g.addBankQuestions().some(q => q.id === id)), label);
+      assert.equal(g.budgetMath().total, setup.cost, label);
+      assert.ok(g.budgetMath().total <= g.BUDGET_TOTAL, label);
+      g.startRun(); g.showReport();
+      assert.equal(g.state.campaignWon[level], true, label);
+      assert.ok(g.state.lastRound.rate > g.curLevel().target, label);
+      assert.ok(g.state.lastRound.quality >= 60, label);
+      assert.ok(g.state.lastRound.insight >= g.insightGate(), label);
+      if (level === 4) assert.ok(g.state.goodwillCarry >= 35, label);
+      assert.match(element('report').innerHTML, /ROUND WON/, label);
+      assert.match(element('report').innerHTML, /id="nextLevelBtn"/, label);
+    }
+  });
+}

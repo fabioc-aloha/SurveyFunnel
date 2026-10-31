@@ -19,8 +19,28 @@
   session browser evaluations, not saved tests.
 - Include BRD level/challenge content and focus, QR mouse/keyboard
   expansion, and independent decoding of the rendered full QR.
+- Include an uninterrupted Level 1-to-6 campaign using actual controls,
+  a 35-credit Level 2 retry recovered through successive cost reductions,
+  and a Level 6 report with 35 credits left that offers no retry.
+- Exercise Tab/Shift-Tab containment, inert background controls, Escape,
+  opener-focus restoration, and cleared affordability warnings.
+  Start from a freshly loaded game and assert the expected screen before
+  interacting; a stale/reset browser page must fail explicitly.
+- Reuse the existing gameplay witnesses rather than duplicating scoring.
+  Positive case: navigate all six winning reports to Season Results.
+  Negative cases: an over-budget setup cannot launch, and owned prep and
+  audience locks remain enforced. Node fixtures already cover scoring;
+  the proposed browser checks cover rendered controls and event wiring.
+  Approve test files, tooling/dependencies, and any workflow changes
+  separately before implementation.
 
 ## Release verification
 
+- Complete the authorized publication of UAT fixes, difficulty labels,
+  terminology corrections, and collapsed QR-border removal.
+  The current 38 tests and local browser checks do not verify deployment.
 - A human must listen to WebAudio on the live site. Automated checks
   cannot establish that music and effects sound correct.
+- Scan the expanded QR with a physical phone and repeat key journeys on
+  iOS Safari and Android Chrome. Cross-browser and screen-reader UAT
+  remain unverified.
