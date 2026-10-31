@@ -229,8 +229,18 @@
 
   /* ---------- report ---------- */
   #report{ display:none; }
-  .scorehead{ display:grid; grid-template-columns:1fr 1fr auto; gap:12px; margin-bottom:14px; }
-  @media (max-width:760px){ .scorehead{ grid-template-columns:1fr 1fr; } }
+  .scorehead{ display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:12px; margin-bottom:14px; }
+  @media (max-width:900px){ .scorehead{ grid-template-columns:1fr 1fr; } }
+  .scorebox.i .num{ color:var(--blue); }
+  .tag.topic{ color:var(--ink); border-color:var(--faint); text-transform:uppercase; }
+  .tag.stupid{ color:#2b0006; background:var(--orange); border-color:var(--orange); font-weight:700; }
+  .tag.filler{ color:#231a00; background:var(--gold); border-color:var(--gold); font-weight:700; }
+  .agenda{ background:var(--panel); border:3px solid var(--line); border-radius:8px; padding:11px; margin-top:12px; }
+  .agenda .at{ font-family:"Press Start 2P",monospace; font-size:9px; color:var(--teal); line-height:1.6; margin-bottom:7px; }
+  .agenda .arow{ display:flex; justify-content:space-between; gap:8px; font-size:13.5px; color:var(--dim); padding:3px 0; }
+  .agenda .arow b{ color:var(--ink); text-transform:capitalize; }
+  .agenda .ok{ color:var(--teal); font-weight:700; white-space:nowrap; }
+  .agenda .miss{ color:var(--red); font-weight:700; white-space:nowrap; }
   .scorebox{ background:#0a0d18; border:3px solid var(--line); border-radius:10px; padding:14px; text-align:center; }
   .scorebox .lbl{ font-family:"Press Start 2P", monospace; font-size:9px; color:var(--faint); line-height:1.7; }
   .scorebox .num{ font-family:"Press Start 2P", monospace; font-size:clamp(28px,6vw,44px); color:var(--teal); margin-top:8px; }
@@ -329,7 +339,43 @@
   .report-title b{ color:var(--gold); }
   @media (prefers-reduced-motion: reduce){
     .sprite.cheer, .sprite.shake, .breaker.tripped, .cabinet.shaking, .gradebox.stamp, #countdownNum.pop{ animation:none; }
+    .confetti-bit{ display:none !important; }
   }
+  /* ---- v1.5 novice learning layer ---- */
+  :focus-visible{ outline:3px solid var(--gold); outline-offset:2px; }
+  .qbtn{ min-height:40px; font-size:10px; }
+  .segbtn{ min-height:40px; }
+  .speedbtn{ min-height:40px; }
+  .card, .lvlcard, .choicebtn{ min-height:40px; }
+  .coachstrip{
+    display:flex; gap:10px; align-items:flex-start; text-align:left;
+    background:#12312a; border:3px solid var(--teal); border-radius:8px;
+    padding:11px 12px; margin:14px auto; max-width:820px; color:#c9f5e6;
+  }
+  .coachstrip .who{ font-family:"Press Start 2P",monospace; font-size:9px; color:var(--teal); line-height:1.7; white-space:nowrap; padding-top:2px; }
+  .coachstrip .tip{ font-size:14.5px; line-height:1.5; }
+  body.hints-off .coachstrip{ display:none; }
+  body.hints-off .flagbox{ display:none; }
+  body.hints-off .agenda .fineprint{ display:none; }
+  .checklist{ background:var(--cab2); border:3px solid var(--line); border-radius:10px; padding:12px 14px; margin-bottom:12px; }
+  .checklist .ct{ font-family:"Press Start 2P",monospace; font-size:10px; color:var(--teal); line-height:1.6; margin-bottom:8px; }
+  .checklist .crow{ display:flex; justify-content:space-between; gap:10px; align-items:center; font-size:14px; color:var(--dim); padding:4px 0; }
+  .checklist .crow .st{ font-family:"Press Start 2P",monospace; font-size:9px; white-space:nowrap; }
+  .checklist .crow.done .st{ color:var(--teal); }
+  .checklist .crow.todo .st{ color:var(--gold); }
+  .checklist .skipbtn2{ font-family:"Press Start 2P",monospace; font-size:9px; cursor:pointer; background:var(--panel); color:var(--ink); border:2px solid var(--line); border-radius:5px; padding:8px 9px; min-height:40px; }
+  #fieldGuide{ display:none; position:fixed; inset:0; z-index:60; background:rgba(6,8,14,.82); padding:14px; overflow:auto; }
+  #fieldGuide.open{ display:block; }
+  .fgcard{ max-width:760px; margin:10px auto 30px; background:var(--cab2); color:var(--ink); border:3px solid var(--teal); border-radius:12px; padding:18px; }
+  .fgcard h2{ font-family:"Press Start 2P",monospace; font-size:13px; color:var(--gold); line-height:1.7; margin:0 0 10px; }
+  .fgcard h3{ font-family:"Press Start 2P",monospace; font-size:10px; color:var(--teal); line-height:1.6; margin:16px 0 6px; }
+  .fgcard p, .fgcard li{ font-size:14.5px; line-height:1.55; color:var(--dim); }
+  .fgcard b{ color:var(--ink); }
+  .fgcard ul{ margin:4px 0; padding-left:20px; }
+  .fgclose{ font-family:"Press Start 2P",monospace; font-size:12px; cursor:pointer; color:#0c2a1e; background:var(--teal); border:3px solid #b8ffe9; border-radius:8px; padding:12px 18px; min-height:44px; }
+  .lessoncard{ background:#eaf6ef; border:3px solid #14713f; border-radius:10px; padding:16px 18px; margin-bottom:14px; color:#1c2430; }
+  .lessoncard h2{ font-family:"Press Start 2P",monospace; font-size:12px; margin:0 0 8px; color:#14713f; line-height:1.7; }
+  .lessoncard p{ font-size:15.5px; margin:4px 0; line-height:1.55; }
 
   .lvlgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:900px;margin:18px auto;text-align:left}
   @media(max-width:700px){.lvlgrid{grid-template-columns:1fr 1fr}}
@@ -363,6 +409,7 @@
       <div class="tagline">RESPONS presents · A practice cabinet for Microsoft Instrument Managers. Tune the send, watch the funnel, fix the biggest leak. No real customer data anywhere in here.</div>
     </div>
     <div class="spacer"></div>
+    <button class="soundbtn" id="guideBtn" aria-label="Open field guide">? FIELD GUIDE</button>
     <button class="soundbtn" id="soundBtn" aria-label="Toggle sound">♪ SOUND: ON</button>
   </div>
 
@@ -371,7 +418,7 @@
     <div class="hud">
       <span class="chip" id="hudLevel">LEVEL 1 · <b>FIRST SEND</b></span>
       <span class="chip target" id="hudTarget">TARGET RESPONSE RATE <b>&gt; 12%</b></span>
-      <span class="chip">WIN NEEDS QUALITY <b>60+</b></span>
+      <span class="chip">WIN NEEDS QUALITY <b>60+</b> · INSIGHT <b>60+</b></span>
       <span class="chip sim">ALL RESULTS SIMULATED</span>
     </div>
 
@@ -379,10 +426,11 @@
     <div id="startScreen">
       <div class="marquee"><small>★ RESPONS PRESENTS ★</small>DEAR<br>VALUED<br>CUSTOMER</div>
       <p class="joke">The salutation nobody loves, now a game about <b>earning a reply</b>. You are the Instrument Manager. Send a survey people actually finish, without tripping the goodwill breaker.</p>
+      <div class="coachstrip" role="note"><span class="who">MARGE<br>SENIOR IM</span><span class="tip">First run? Pick <b>Level 1</b> and I will ride along with one short tip per step. Everything here is simulated, so the only thing a bad send can burn is my patience.</span></div>
       <div class="howto">
         <div><b>1 · AUDIENCE</b>Pick who gets the invite. Goodwill is the breaker: spend it to zero and the segment goes dark.</div>
         <div><b>2 · INVITATION</b>Write the email that earns the click. Reminders recover people and cost goodwill.</div>
-        <div><b>3 · QUESTIONNAIRE</b>Trim the 12 questions. Too long, or questions a role cannot answer, and sprites wander off.</div>
+        <div><b>3 · QUESTIONNAIRE</b>Trim the dealt questions (9 to 16, by seed). Too long, or questions a role cannot answer, and sprites wander off. Winning also needs Insight: the agenda topics must come back answered.</div>
       </div>
       <div class="lvlgrid" id="levelGrid"></div>
       <div class="bestline" id="seasonLine"></div>
@@ -395,6 +443,7 @@
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
           <button class="segbtn" id="musicToggle">MUSIC: ON</button>
           <button class="segbtn" id="sfxToggle">SFX: ON</button>
+          <button class="segbtn" id="hintsToggle">HINTS: ON</button>
           <button class="segbtn" id="muteToggle">MUTE (M)</button>
           <label style="font-size:13px;color:var(--dim)">Music <input type="range" id="musicVol" min="0" max="100" value="50" style="vertical-align:middle;width:110px"></label>
           <label style="font-size:13px;color:var(--dim)">SFX <input type="range" id="sfxVol" min="0" max="100" value="80" style="vertical-align:middle;width:110px"></label>
@@ -412,6 +461,7 @@
 
     <!-- ================= SETUP ================= -->
     <div id="setup" style="display:none">
+      <div class="coachstrip" role="note" style="margin:0 0 14px;max-width:none"><span class="who">MARGE<br>SENIOR IM</span><span class="tip" id="coachTip">Step 1 is the audience. Pick who can actually answer your agenda topics: a big list of the wrong people is just a faster way to be wrong.</span></div>
       <div class="budgetpanel" id="budgetPanel" aria-label="Campaign budget"></div>
       <div id="levelBanner"></div>
       <div id="stakeholderPanel"></div>
@@ -419,7 +469,7 @@
       <div id="levelExtras"></div>
       <section class="lever" aria-label="Lever 1 audience">
         <div class="lever-head">
-          <span class="lever-no">LEVER 1</span><span class="lever-title">AUDIENCE</span>
+          <span class="lever-no">STEP 1</span><span class="lever-title">AUDIENCE</span>
           <span class="lever-sub">Who gets the invite. Goodwill is the breaker panel: spend it to zero and the segment goes dark.</span>
         </div>
         <div class="grid3" id="segGrid"></div>
@@ -429,7 +479,7 @@
       <div class="grid2">
         <section class="lever" aria-label="Lever 2 invitation">
           <div class="lever-head">
-            <span class="lever-no">LEVER 2</span><span class="lever-title">INVITATION</span>
+            <span class="lever-no">STEP 3</span><span class="lever-title">INVITATION</span>
             <span class="lever-sub">The email that earns the click.</span>
           </div>
           <div id="invGrid" style="display:grid; gap:10px;"></div>
@@ -444,14 +494,15 @@
         <div>
           <section class="lever" aria-label="Questionnaire summary" style="margin-bottom:14px;">
             <div class="lever-head">
-              <span class="lever-no">LEVER 3</span><span class="lever-title">QUESTIONNAIRE</span>
-              <span class="lever-sub">Trim the instrument below. Red flags are real leaks: fix them or pay for them.</span>
+              <span class="lever-no">STEP 4</span><span class="lever-title">QUESTIONNAIRE</span>
+              <span class="lever-sub">Trim the instrument below. Every defective card names its defect class, the symptom it risks, and the one fix that actually works on that class.</span>
             </div>
             <div class="escrow" style="margin-top:0;">
               <div class="txt"><b>ADD ESCAPES (Don't know / Not applicable).</b> Costs +0.5 min. Respondents who hit a question they cannot answer take the side exit and still finish with clean data, instead of guessing or quitting.</div>
               <button class="bigswitch" id="escBtn">ESCAPES: OFF</button>
             </div>
             <div id="patienceWarn" role="status"></div>
+            <div class="agenda" id="agendaPanel" aria-label="Level agenda coverage"></div>
           </section>
           <div class="locked" id="abLockedSlot" aria-label="Locked feature">
             <span class="px">▓ A/B TEST · UNLOCKS AT LEVEL 2 ▓</span>
@@ -462,12 +513,13 @@
 
       <section class="lever" aria-label="Question cards">
         <div class="lever-head">
-          <span class="lever-title" style="font-size:12px;">THE INSTRUMENT · 12 QUESTIONS AS DRAFTED</span>
-          <span class="lever-sub">KEEP, SIMPLIFY (half the time, plain language, flaw fixed), or CUT. The 6 core questions carry the decisions this survey exists for.</span>
+          <span class="lever-title" style="font-size:12px;">THE INSTRUMENT · AS DEALT INTO THE SKELETON</span>
+          <span class="lever-sub">KEEP, apply the class-correct fix on the card (SPLIT, NEUTRALIZE, DEFINE, ANCHOR and the rest, each at its price), or CUT for 1 credit. A generic simplify only fixes a WORDY STEM. Stupid turn-off items earn zero insight: CUT is their only fix. Sections run A outcome core, B drivers, C diagnostics, D sensitive, E open-text closer, F demographics last.</span>
         </div>
         <div class="qgrid" id="qGrid"></div><div id="cutTray"></div><div id="bankPanel"></div>
       </section>
 
+      <div class="checklist" id="launchCheck" aria-label="Ready to launch checklist"></div>
       <div class="launchbar">
         <div id="mgrSetup"></div>
         <div class="readout" id="readout"></div>
@@ -504,7 +556,50 @@
     <div id="campaignScreen" style="display:none"></div>
   </div>
 
-  <p class="foot">Dear Valued Customer · Respons v1.3 · Six-level campaign. A training game for the GCX survey craft: audience, invitation, questionnaire, deliverability and data quality. Every number on the report is simulated from your choices, and identical choices replay to near identical results. Single self-contained file: works from file:// or any static host.</p>
+  <!-- ================= FIELD GUIDE OVERLAY ================= -->
+  <div id="fieldGuide" role="dialog" aria-modal="true" aria-label="Field guide">
+    <div class="fgcard">
+      <h2>FIELD GUIDE · THE TRADE IN PLAIN WORDS</h2>
+      <p>Everything on the cards and panels, defined once, in the words a senior IM would use at your desk. Close this and it is all still in the game.</p>
+      <h3>THE THREE SCORES</h3>
+      <ul>
+        <li><b>Response rate:</b> of everyone invited, how many finished. Reach, mostly: the right list, an honest invite, a survey short enough to finish.</li>
+        <li><b>Data quality:</b> of the answers you got, how many you can defend. Guessed, rushed, or straight-lined answers lower it.</li>
+        <li><b>Insight Value:</b> did the business topics this survey exists for (the agenda) come back answered, by the people those topics are about? A fast survey that answers nothing scores zero here, and zero here loses the level.</li>
+      </ul>
+      <h3>GOODWILL AND REPUTATION</h3>
+      <ul>
+        <li><b>Goodwill:</b> how much patience a list has left for you. Long surveys, reminders, and questions people cannot answer spend it. At zero, the breaker trips and sending stops.</li>
+        <li><b>Sender reputation:</b> whether mail systems trust your domain. Dead addresses (hard bounces) damage it; damaged reputation means spam folders eat your opens.</li>
+        <li><b>DK/NA escapes:</b> "Don't know / Not applicable" exits on a question. They let a respondent who cannot answer stay in the survey with clean data instead of guessing or quitting.</li>
+        <li><b>Satisficing:</b> what tired respondents do instead of thinking: rushing, picking the same answer down a grid, parking in the middle. Length and burden cause it.</li>
+      </ul>
+      <h3>THE 11 DEFECT CLASSES AND THEIR ONE TRUE FIX</h3>
+      <ul>
+        <li><b>DOUBLE-BARRELED</b> (two questions in one item): fix is <b>SPLIT</b>.</li>
+        <li><b>LEADING</b> (wording pushes a happy answer): fix is <b>NEUTRALIZE</b>.</li>
+        <li><b>JARGON</b> (insider words the audience does not share): fix is <b>DEFINE</b>.</li>
+        <li><b>VAGUE TIMEFRAME</b> ("recently", "usually", no period named): fix is <b>ANCHOR</b>.</li>
+        <li><b>RECALL OVERLOAD</b> (asking for counts over a year): fix is <b>SHORTEN WINDOW</b>.</li>
+        <li><b>BEYOND KNOWLEDGE</b> (this audience cannot know it): <b>no wording fix</b>. CUT it, or buy DK/NA escapes.</li>
+        <li><b>DOUBLE NEGATIVE</b> (negatives stacked until it flips meaning): fix is <b>REWORD</b>.</li>
+        <li><b>BROKEN OPTIONS</b> (answer ranges overlap or miss the truth): fix is <b>FIX OPTIONS</b>.</li>
+        <li><b>GRID BURDEN</b> (a big rating matrix, worst on phones): fix is <b>BREAK UP</b>.</li>
+        <li><b>SENSITIVE, NO ASSURANCE</b> (a risky question with no privacy promise): fix is <b>ADD PRIVACY LINE</b>.</li>
+        <li><b>WORDY STEM</b> (a paragraph where a sentence would do): fix is <b>SIMPLIFY</b>. It is the only class Simplify fixes.</li>
+      </ul>
+      <h3>TWO TIERS THAT ARE NOT DEFECTS</h3>
+      <ul>
+        <li><b>STUPID (TURN-OFF RISK):</b> vanity, blame, nosy, trivia, and duplicate questions. Worded fine, worthless anyway. They earn zero insight, cost goodwill, and the fix is <b>CUT</b>.</li>
+        <li><b>FILLER (LOW VALUE):</b> harmless but empty. Full time cost, half insight credit at best. Cut when the agenda needs the room.</li>
+      </ul>
+      <h3>WIN GATES</h3>
+      <p>Beat the level's response target <b>and</b> quality 60+ <b>and</b> Insight 60+ (Level 6: 70+). Level 4 also needs ending goodwill 35+. Rate alone never wins: that is the whole lesson of the game.</p>
+      <div style="margin-top:16px"><button class="fgclose" id="guideClose">◀ BACK TO THE GAME</button></div>
+    </div>
+  </div>
+
+  <p class="foot">Dear Valued Customer · Respons v1.5 · Six-level campaign. A 64-question bank (clean, defective across 11 classes audited against Pew / CDC questionnaire design guidance and Krosnick satisficing research, plus stupid turn-off items and harmless filler) is dealt into the same survey skeleton at a variable length of 9 to 16 questions, so no two games open alike. Winning now needs three scores: response rate, data quality, and Insight Value, because a fast survey that answers nothing the business asked is a loss (Groves &amp; Peytcheva 2008: response rate alone barely predicts nonresponse bias). Every number on the report is simulated from your choices, and identical choices replay to near identical results. Single self-contained file: works from file:// or any static host.</p>
 </div>
 <script>
 "use strict";
@@ -559,43 +654,217 @@ var INVITES = [
     note:"Highest opens. Earns +3 goodwill because people see their last answers went somewhere." }
 ];
 
-/* answerBy: null = everyone can answer. flag: knowledge|mobile|jargon */
+/* v1.4 defect taxonomy, grounded in Pew questionnaire design guidance, the
+   CDC survey design canon (spell out acronyms, specific recall windows, no
+   double-barreled / negative / biased items, exhaustive mutually exclusive
+   options) and Krosnick satisficing indicators (straightlining, speeding,
+   DK misuse). Every defective question carries exactly ONE primary class;
+   its text genuinely exhibits that defect. CLEAN questions are controls:
+   no defect, honest time cost only.
+   answerBy: null = everyone can answer. flag: legacy sim hook (grid/jargon/knowledge). */
+var DEFECT_INFO = {
+  "DOUBLE-BARRELED":        { fix:"SPLIT",            cost:3, symptom:"Mid-scale mush / hesitation", explain:"Two judgments in one item. A respondent who agrees with one half and not the other parks in the middle, and you cannot tell which half the answer describes." },
+  "LEADING":                { fix:"NEUTRALIZE",       cost:2, symptom:"Suspect top-box inflation",   explain:"The wording pushes toward a positive answer. Top-box scores inflate and stop being evidence." },
+  "JARGON":                 { fix:"DEFINE",           cost:2, symptom:"Guess clusters",              explain:"Undefined acronyms or insider terms (SLA, MTTR, tenant, throttling) for this audience. People who cannot parse the question guess at it." },
+  "VAGUE TIMEFRAME":        { fix:"ANCHOR",           cost:2, symptom:"Guess clusters",              explain:"'Recently / often / usually' with no recall window. Each respondent invents their own window, so the answers are not measuring the same period." },
+  "RECALL OVERLOAD":        { fix:"SHORTEN WINDOW",   cost:2, symptom:"Estimation guesses",          explain:"Counting or averaging events over 12 months exceeds honest recall. Respondents estimate, round, and invent." },
+  "BEYOND KNOWLEDGE":       { fix:null,               cost:0, symptom:"Guess clusters",              explain:"Asks this respondent for facts they cannot know from their role. No wording fix: this audience cannot know this. CUT it (1 cr) or buy the DK/NA escapes (2 cr) so it stops ending runs." },
+  "DOUBLE NEGATIVE":        { fix:"REWORD",           cost:2, symptom:"Misread inconsistency",       explain:"Negation stacked on negation. The item must be parsed twice, and a share of respondents answer the opposite of what they mean." },
+  "BROKEN OPTIONS":         { fix:"FIX OPTIONS",      cost:2, symptom:"Junk / Other-box noise",      explain:"Answer ranges overlap, or no option fits. Forced into a wrong box or the Other box, which collects junk instead of data." },
+  "GRID BURDEN":            { fix:"BREAK UP",         cost:3, symptom:"Straightlining",              explain:"A long rating matrix. On a phone it means pinch, scroll and mis-tap, and tired respondents straight-line the same answer down every row." },
+  "SENSITIVE NO ASSURANCE": { fix:"ADD PRIVACY LINE", cost:2, symptom:"Refusals / safe answers",     explain:"A performance, security or job-related item with no confidentiality line. Respondents refuse, or pick the safe answer instead of the true one." },
+  "WORDY STEM":             { fix:"SIMPLIFY",         cost:2, symptom:"Speeding / satisficing (length)", explain:"A paragraph-long stem where a sentence would do. The reading load itself breeds speeding and satisficing." },
+  "CLEAN":                  { fix:null,               cost:0, symptom:"None (control)",              explain:"Clean control question. One judgment, plain words, a recall window the respondent can actually use." }
+};
+function defectOf(q){ return (q && q.defect) || "CLEAN"; }
+function fixInfoFor(q){ return DEFECT_INFO[defectOf(q)] || DEFECT_INFO["CLEAN"]; }
+function fixVerbFor(q){ return fixInfoFor(q).fix; }
+function fixCostFor(q){ return fixInfoFor(q).cost || 0; }
+function effMin(q){
+  if (state.qstate[q.id] === "simplify"){
+    var d = defectOf(q);
+    if (d === "DOUBLE-BARRELED" || d === "GRID BURDEN") return Math.round((q.min + 0.5) * 100) / 100; /* split / break up adds a small time cost */
+    return q.min / 2;
+  }
+  return q.min;
+}
 var QUESTIONS = [
-  { id:1,  text:"Overall, how satisfied are you with your support experience?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null },
-  { id:2,  text:"How easy was it to get help when you needed it?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null },
-  { id:3,  text:"How would you rate the speed of the resolution?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:true, answerBy:null },
-  { id:4,  text:"Did the fix still hold 48 hours later?", min:0.5, know:"Whoever lived the case", who:"all", cx:"Low", val:"Medium", core:true, answerBy:null },
-  { id:5,  text:"What is the annual contract value of the agreement tied to this case?", min:1.0, know:"Partner Admin only", who:"admin", cx:"High", val:"Medium", core:false, answerBy:["admin"], flag:"knowledge",
-    flagTxt:"UNANSWERABLE for most of this list. Contract values sit in a system only a Partner Admin can see. Technicians, end users and executives will guess or quit here." },
-  { id:6,  text:"How likely are you to recommend this support experience to a colleague? (0-10)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null },
-  { id:7,  text:"Grid: rate 12 product features across 5 scales each", min:2.5, know:"Everyone, slowly", who:"all", cx:"High", val:"Medium", core:false, answerBy:null, flag:"mobile",
-    flagTxt:"MOBILE KILLER. A 12-row grid on a phone means pinch, scroll, mis-tap. Half the list answers on a phone between other jobs." },
-  { id:8,  text:"Was the synergy enablement and cadence alignment adequate for your org?", min:1.0, know:"Unclear, even in-house", who:"itdm", cx:"High", val:"Low", core:false, answerBy:["itdm"], flag:"jargon",
-    flagTxt:"DOUBLE-BARRELED JARGON. Two questions wearing one coat, in words nobody outside HQ uses. Only an IT Decision Maker can even parse it." },
-  { id:9,  text:"Which channel did you use first: chat, phone, or portal?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:true, answerBy:null },
-  { id:10, text:"How would you rate the quality of the documentation you were sent?", min:0.75, know:"Whoever read it", who:"all", cx:"Medium", val:"Medium", core:false, answerBy:null },
-  { id:11, text:"In your own words: what is the one thing we should fix first?", min:1.5, know:"Everyone", who:"all", cx:"Medium", val:"High", core:false, answerBy:null },
-  { id:12, text:"May we contact you about your answers?", min:0.25, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null }
+  { id:1,  text:"Overall, how satisfied are you with your support experience?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"overall satisfaction", tier:"clean" },
+  { id:2,  text:"How easy was it to get help when you needed it?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"customer effort", tier:"clean" },
+  { id:3,  text:"Recently, how would you rate the speed of the resolution?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:true, answerBy:null, defect:"VAGUE TIMEFRAME", topic:"support speed", tier:"defective",
+    flagTxt:"VAGUE TIMEFRAME. 'Recently' is not a recall window. Anchor it to this case and its dates, or every respondent answers about a different period." },
+  { id:4,  text:"Did the fix still hold 48 hours later?", min:0.5, know:"Whoever lived the case", who:"all", cx:"Low", val:"Medium", core:true, answerBy:null, defect:"CLEAN", topic:"product reliability", tier:"clean" },
+  { id:5,  text:"What is the annual contract value of the agreement tied to this case?", min:1.0, know:"Partner Admin only", who:"admin", cx:"High", val:"Medium", core:false, answerBy:["admin"], flag:"knowledge", defect:"BEYOND KNOWLEDGE", topic:"billing clarity", tier:"defective",
+    flagTxt:"BEYOND KNOWLEDGE. Contract values sit in a system only a Partner Admin can see. No wording fix: this audience cannot know this. Technicians, end users and executives will guess or quit here." },
+  { id:6,  text:"How likely are you to recommend this support experience to a colleague? (0-10)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"renewal risk", tier:"clean" },
+  { id:7,  text:"Grid: rate 12 product features across 5 scales each", min:2.5, know:"Everyone, slowly", who:"all", cx:"High", val:"Medium", core:false, answerBy:null, flag:"mobile", defect:"GRID BURDEN", topic:"product reliability", tier:"defective",
+    flagTxt:"GRID BURDEN. A 12-row grid on a phone means pinch, scroll, mis-tap, and straight-lined rows. Half the list answers on a phone between other jobs." },
+  { id:8,  text:"How satisfied are you with the speed and knowledge of the support you received?", min:1.0, know:"Everyone", who:"all", cx:"High", val:"Low", core:false, answerBy:null, defect:"DOUBLE-BARRELED", topic:"agent knowledge", tier:"defective",
+    flagTxt:"DOUBLE-BARRELED. Speed and knowledge are two judgments sharing one answer. A fast-but-wrong case and a slow-but-right case land in the same box. SIMPLIFY cannot fix this: only SPLIT can." },
+  { id:9,  text:"Which channel did you use first: chat, phone, or portal?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:true, answerBy:null, defect:"CLEAN", topic:"self-service gap", tier:"clean" },
+  { id:10, text:"How excellent was the quality of the documentation you were sent?", min:0.75, know:"Whoever read it", who:"all", cx:"Medium", val:"Medium", core:false, answerBy:null, defect:"LEADING", topic:"self-service gap", tier:"defective",
+    flagTxt:"LEADING. 'How excellent' presumes the answer. Expect inflated top-box scores that flatter the documentation and measure nothing." },
+  { id:11, text:"Thinking about everything that happened from the moment you first noticed the problem, through every chat, call, portal update, handoff and follow-up, and considering how all of those pieces fit together as one overall experience, in your own words: what is the one thing we should fix first?", min:1.5, know:"Everyone", who:"all", cx:"Medium", val:"High", core:false, answerBy:null, defect:"WORDY STEM", topic:"resolution quality", tier:"defective",
+    flagTxt:"WORDY STEM. A paragraph where a sentence would do. The reading load alone spends patience before the respondent types a word. This is the one class SIMPLIFY actually fixes." },
+  { id:12, text:"Did any support behaviour put your job, or your organisation's security, at risk during this case?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"SENSITIVE NO ASSURANCE", topic:"product reliability", tier:"defective",
+    flagTxt:"SENSITIVE, NO ASSURANCE. A job and security question with no confidentiality line anywhere near it. Expect refusals and safe answers, not true ones." }
 ];
 var CORE_TOTAL = QUESTIONS.filter(function(q){ return q.core; }).length; /* 6 */
 var OPTIONAL_QUESTIONS=[
- {id:13,text:"OPTIONAL · In your own words, what would make you recommend us?",min:1.0,know:"Everyone",who:"all",cx:"Medium",val:"High",core:false,answerBy:null},
- {id:14,text:"OPTIONAL · Rank these 4 features by importance to your team",min:1.0,know:"Everyone",who:"all",cx:"Medium",val:"Medium",core:false,answerBy:null},
- {id:15,text:"OPTIONAL · Which best describes your organisation size?",min:0.5,know:"Everyone",who:"all",cx:"Low",val:"Medium",core:false,answerBy:null}
+ {id:13,text:"OPTIONAL · In your own words, what would make you recommend us?",min:1.0,know:"Everyone",who:"all",cx:"Medium",val:"High",core:false,answerBy:null,defect:"CLEAN", topic:"renewal risk", tier:"clean"},
+ {id:14,text:"OPTIONAL · Rank these 4 features by importance to your team",min:1.0,know:"Everyone",who:"all",cx:"Medium",val:"Medium",core:false,answerBy:null,defect:"CLEAN", topic:"product reliability", tier:"clean"},
+ {id:15,text:"OPTIONAL · How many people are in your organisation? (under 100 / 100-500 / 500-1,000 / over 500 / Other)",min:0.5,know:"Everyone",who:"all",cx:"Low",val:"Medium",core:false,answerBy:null,defect:"BROKEN OPTIONS", topic:"onboarding", tier:"defective",flagTxt:"BROKEN OPTIONS. The ranges overlap at 500, and anyone unsure lands in Other. The Other box will collect junk, not company sizes."}
 ];
-/* v1.3 question bank for random instruments: original 12 + 6 more (18+).
+/* v1.4 question bank: original 12 + 6 more = 18, plus clean controls above.
    Core pool and non-core pool are drawn separately (6 + 6) so every
-   generated instrument keeps exactly 6 core questions. */
+   generated instrument keeps exactly 6 core questions. Defect classes stay
+   attached to the question text that genuinely exhibits them; the seed
+   draw decides WHICH defective questions appear and in what order, so the
+   traps move with the seed without ever mismatching text and defect. */
 var QUESTION_BANK = QUESTIONS.concat([
- { id:21, text:"How clear was the estimated wait time we gave you?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:true, answerBy:null },
- { id:24, text:"Did the self-service article solve it before you contacted us?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:true, answerBy:null },
- { id:25, text:"How much effort did it take to explain your issue?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null },
- { id:22, text:"Rate the agent's knowledge of your product setup", min:2.0, know:"Everyone, slowly", who:"all", cx:"High", val:"Medium", core:false, answerBy:null },
- { id:23, text:"What was the business impact severity classification of this incident?", min:1.0, know:"Partner Admin only", who:"admin", cx:"High", val:"Medium", core:false, answerBy:["admin"] },
- { id:26, text:"Was the handoff between teams timely?", min:1.0, know:"Everyone", who:"all", cx:"Medium", val:"Low", core:false, answerBy:null }
+ { id:21, text:"Did the agent clear the MTTR breach inside the SLA for your tenant before throttling was lifted?", min:0.5, know:"IT Decision Maker, maybe", who:"itdm", cx:"High", val:"Medium", core:true, answerBy:["itdm"], flag:"jargon", defect:"JARGON", topic:"support speed", tier:"defective",
+   flagTxt:"JARGON. MTTR, SLA, tenant, throttling: four insider terms, none defined. Only an IT Decision Maker can even parse it; everyone else guesses." },
+ { id:24, text:"Do you disagree that the self-service article was not unhelpful before you contacted us?", min:0.5, know:"Everyone, after two reads", who:"all", cx:"High", val:"Medium", core:true, answerBy:null, defect:"DOUBLE NEGATIVE", topic:"self-service gap", tier:"defective",
+   flagTxt:"DOUBLE NEGATIVE. Disagree, not, unhelpful: the item must be parsed twice, and a share of respondents will answer the opposite of what they mean." },
+ { id:25, text:"Over the last 12 months, how many times did you contact support, and how long did you wait on average each time?", min:1.0, know:"Everyone, from memory", who:"all", cx:"High", val:"High", core:true, answerBy:null, defect:"RECALL OVERLOAD", topic:"customer effort", tier:"defective",
+   flagTxt:"RECALL OVERLOAD. A year of contacts, counted and averaged, from memory. Nobody recalls this; they estimate it, and the estimates look like data." },
+ { id:22, text:"How many people helped with your case? Choose one: 1-2 / 2-4 / 4-6 / more than 6 / Other", min:1.0, know:"Everyone", who:"all", cx:"High", val:"Medium", core:false, answerBy:null, defect:"BROKEN OPTIONS", topic:"resolution quality", tier:"defective",
+   flagTxt:"BROKEN OPTIONS. The ranges overlap (2 and 4 each appear twice), so two honest respondents with the same case can pick different boxes, and the unsure land in Other." },
+ { id:23, text:"What was the total organisation-wide cost of the outage behind this incident?", min:1.0, know:"Finance only, not on this list", who:"admin", cx:"High", val:"Medium", core:false, answerBy:["admin"], flag:"knowledge", defect:"BEYOND KNOWLEDGE", topic:"product reliability", tier:"defective",
+   flagTxt:"BEYOND KNOWLEDGE. Org-wide outage cost is a finance figure no one on this list can see. No wording fix: this audience cannot know this." },
+ { id:26, text:"How outstanding was the handoff between teams on your case?", min:1.0, know:"Everyone", who:"all", cx:"Medium", val:"Low", core:false, answerBy:null, defect:"LEADING", topic:"resolution quality", tier:"defective", sec:"B",
+   flagTxt:"LEADING. 'How outstanding' loads the answer before the respondent starts. Handoff scores will read better than handoffs were." },
+ /* ---- v1.5 expansion: bank grows to 64. Clean controls (40%), defective
+    across all 11 classes (35%), STUPID turn-off items (15%), FILLER (10%). */
+ { id:27, text:"Thinking only about this support case, how satisfied are you overall? (1-5)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"overall satisfaction", tier:"clean", sec:"A" },
+ { id:28, text:"How likely is your team to renew the service at the next renewal date? (0-10)", min:0.5, know:"IT Decision Maker or Executive", who:"itdm", cx:"Low", val:"High", core:true, answerBy:["itdm","exec"], defect:"CLEAN", topic:"renewal risk", tier:"clean", sec:"A" },
+ { id:29, text:"How much effort did it take to describe the problem to us? (1-5, very little to a great deal)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:false, answerBy:null, defect:"CLEAN", topic:"customer effort", tier:"clean", sec:"B" },
+ { id:30, text:"How long did you wait for the first response on this case? (under an hour / same day / 1-2 days / longer)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"support speed", tier:"clean", sec:"B" },
+ { id:31, text:"Did the agent understand the problem the first time you explained it? (yes / partly / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:false, answerBy:null, defect:"CLEAN", topic:"agent knowledge", tier:"clean", sec:"B" },
+ { id:32, text:"Before contacting us, did you try to solve this yourself? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"self-service gap", tier:"clean", sec:"B" },
+ { id:33, text:"Was the problem fully resolved by the end of this case? (yes / partly / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"resolution quality", tier:"clean", sec:"B" },
+ { id:34, text:"Since this case closed, has the same problem happened again? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"product reliability", tier:"clean", sec:"B" },
+ { id:35, text:"When your team first started using the product, which best describes setup? (smooth / slow / confusing / never finished)", min:0.5, know:"Everyone", who:"all", cx:"Medium", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"onboarding", tier:"clean", sec:"C" },
+ { id:36, text:"Were the charges connected to this case explained clearly before they were applied? (yes / no)", min:0.5, know:"Partner Admin only", who:"admin", cx:"Low", val:"High", core:false, answerBy:["admin"], defect:"CLEAN", topic:"billing clarity", tier:"clean", sec:"C" },
+ { id:37, text:"How many times did you have to repeat your problem to a different person? (0 / 1 / 2 / 3 or more)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:false, answerBy:null, defect:"CLEAN", topic:"customer effort", tier:"clean", sec:"C" },
+ { id:38, text:"Your answers are confidential and are never linked to your name. Did anything in this case make you hesitant to share information with support? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"product reliability", tier:"clean", sec:"D" },
+ { id:39, text:"In your own words, what one change would most improve support?", min:1.0, know:"Everyone", who:"all", cx:"Medium", val:"High", core:false, answerBy:null, defect:"CLEAN", topic:"resolution quality", tier:"clean", sec:"E" },
+ { id:40, text:"Which best describes your role? (frontline / admin / manager / executive / other)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"onboarding", tier:"clean", sec:"F" },
+ { id:41, text:"How long have you used the product? (under 3 months / 3-12 months / 1-3 years / over 3 years)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"onboarding", tier:"clean", sec:"F" },
+ { id:42, text:"Did you complete the guided setup when your team started? (yes / no / it was not offered)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"onboarding", tier:"clean", sec:"B" },
+ { id:43, text:"If a similar problem happened tomorrow, how confident are you that support would resolve it? (1-5)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:false, answerBy:null, defect:"CLEAN", topic:"renewal risk", tier:"clean", sec:"B" },
+ { id:44, text:"Overall, how easy was this support experience from first contact to close? (1-5)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"customer effort", tier:"clean", sec:"A" },
+ { id:45, text:"While the case was open, did you receive a progress update at least every two days? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"support speed", tier:"clean", sec:"B" },
+ { id:46, text:"Before this case, was there a help article about this problem? (yes / no / did not look)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"self-service gap", tier:"clean", sec:"C" },
+ { id:47, text:"Is the fix from this case still working today? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"product reliability", tier:"clean", sec:"B" },
+ { id:48, text:"Do you usually get a quick response when you contact support?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"VAGUE TIMEFRAME", topic:"support speed", tier:"defective", sec:"B",
+   flagTxt:"VAGUE TIMEFRAME. 'Usually' and 'quick' are both undefined. Every respondent grades a different period against a different standard." },
+ { id:49, text:"Grid: rate 10 reliability aspects across 4 scales each", min:2.0, know:"Everyone, slowly", who:"all", cx:"High", val:"Medium", core:false, answerBy:null, flag:"mobile", defect:"GRID BURDEN", topic:"product reliability", tier:"defective", sec:"B",
+   flagTxt:"GRID BURDEN. Another long matrix: pinch, scroll, mis-tap, straight-line. Phone respondents pay the highest price." },
+ { id:50, text:"How satisfied are you with the agent's courtesy and technical skill?", min:1.0, know:"Everyone", who:"all", cx:"High", val:"Low", core:false, answerBy:null, defect:"DOUBLE-BARRELED", topic:"agent knowledge", tier:"defective", sec:"B",
+   flagTxt:"DOUBLE-BARRELED. A polite agent who could not fix it and a rude agent who could both land in the same middle box. Only SPLIT separates them." },
+ { id:51, text:"Considering the entire journey from the very first symptom, through troubleshooting, waiting, escalation, and everything else that may or may not have happened in between, and weighing all of it together as one single combined impression, please describe in your own words the complete story of this case and everything we could possibly do differently next time.", min:1.5, know:"Everyone", who:"all", cx:"Medium", val:"Medium", core:false, answerBy:null, defect:"WORDY STEM", topic:"resolution quality", tier:"defective", sec:"E",
+   flagTxt:"WORDY STEM. The stem is the survey. Respondents satisfice or quit before typing. SIMPLIFY is the correct verb for this class." },
+ { id:52, text:"Did you share your password, or internal system details, with the agent during this case?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"SENSITIVE NO ASSURANCE", topic:"product reliability", tier:"defective", sec:"D",
+   flagTxt:"SENSITIVE, NO ASSURANCE. Asking about credential sharing with no confidentiality line invites denial, not data." },
+ { id:53, text:"Rate the FCR on your Sev-2 against the committed SLO at P2 severity.", min:0.5, know:"IT Decision Maker, maybe", who:"itdm", cx:"High", val:"Low", core:false, answerBy:["itdm"], flag:"jargon", defect:"JARGON", topic:"support speed", tier:"defective", sec:"B",
+   flagTxt:"JARGON. FCR, Sev-2, SLO, P2: four undefined insider terms in one short item. Everyone outside the incident team guesses." },
+ { id:54, text:"Would you disagree that the help article was not unclear?", min:0.5, know:"Everyone, after two reads", who:"all", cx:"High", val:"Low", core:false, answerBy:null, defect:"DOUBLE NEGATIVE", topic:"self-service gap", tier:"defective", sec:"B",
+   flagTxt:"DOUBLE NEGATIVE. Disagree plus not plus unclear. A share of respondents will answer the exact opposite of their experience." },
+ { id:55, text:"How many contacts did this case take? Choose one: 1 / 1-3 / 3-5 / 5 or more", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"BROKEN OPTIONS", topic:"customer effort", tier:"defective", sec:"C",
+   flagTxt:"BROKEN OPTIONS. 1, 3 and 5 each sit in two ranges. CDC canon: options must be mutually exclusive. These are not." },
+ { id:56, text:"Over the past year, how many support cases did your whole team open in total?", min:1.0, know:"Everyone, from memory", who:"all", cx:"High", val:"Medium", core:false, answerBy:null, defect:"RECALL OVERLOAD", topic:"customer effort", tier:"defective", sec:"C",
+   flagTxt:"RECALL OVERLOAD. A year of team-wide case counts from one person's memory. The answers will be round numbers and wishful thinking." },
+ /* STUPID tier: worded fine, worthless anyway. Zero insight, +2 goodwill
+    resentment each while kept, and CUT is the only sensible verb. */
+ { id:57, text:"How awesome are we, on a scale of 1 to 10?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"overall satisfaction", tier:"stupid", sec:"B", rg:"vanity",
+   flagTxt:"STUPID · VANITY. A compliment fishing trip wearing a scale. It measures nothing the business can act on, and respondents know it." },
+ { id:58, text:"Why did you not read the manual before calling us?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"self-service gap", tier:"stupid", sec:"B", rg:"blame",
+   flagTxt:"STUPID · BLAME. The question accuses the respondent of causing their own ticket. Expect resentment, not self-service insight." },
+ { id:59, text:"Which mistake by your team caused this problem?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"resolution quality", tier:"stupid", sec:"B", rg:"blame",
+   flagTxt:"STUPID · BLAME. Presumes the customer was at fault. People do not finish surveys that insult them." },
+ { id:60, text:"What is your household income?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"onboarding", tier:"stupid", sec:"F", rg:"nosy",
+   flagTxt:"STUPID · NOSY. Household income has no bearing on a support case. Irrelevant personal questions read as data harvesting." },
+ { id:61, text:"How many children do you have?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"onboarding", tier:"stupid", sec:"F", rg:"nosy",
+   flagTxt:"STUPID · NOSY. Nothing in the support workflow turns on this. It only tells respondents their time is not respected." },
+ { id:62, text:"What do you think of our internal codename for this product, 'Project Falcon'?", min:0.5, know:"Nobody outside the building", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"product reliability", tier:"stupid", sec:"B", rg:"trivia",
+   flagTxt:"STUPID · TRIVIA. Respondents have never seen the internal codename. There is no answer they can give that means anything." },
+ { id:63, text:"What was the agent's internal team code for this case? (It appears nowhere in your case.)", min:0.5, know:"Nobody on this list", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"agent knowledge", tier:"stupid", sec:"C", rg:"trivia",
+   flagTxt:"STUPID · TRIVIA. The question itself admits the answer is unknowable. Asking it anyway is the insult." },
+ { id:64, text:"Overall, how satisfied are you with your support experience?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"overall satisfaction", tier:"stupid", sec:"A", rg:"dup-overall", dup:true,
+   flagTxt:"STUPID · DUPLICATE. This is Q1 again, word for word. Asking twice doubles the burden and adds zero information." },
+ { id:65, text:"Which channel did you use first: chat, phone, or portal?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"self-service gap", tier:"stupid", sec:"B", rg:"dup-channel", dup:true,
+   flagTxt:"STUPID · DUPLICATE. This repeats the channel question already in the instrument. Same answer, second time, for free resentment." },
+ { id:66, text:"Don't you agree our support is the best in the industry?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"renewal risk", tier:"stupid", sec:"B", rg:"vanity",
+   flagTxt:"STUPID · VANITY. A cheer, not a question. Renewal decisions will never be made from answers to this." },
+ /* FILLER tier: harmless, wordy or low value. Full time cost, half insight
+    credit and only when their topic is on the agenda. */
+ { id:67, text:"How did you first hear about this survey?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"onboarding", tier:"filler", sec:"F" },
+ { id:68, text:"Which day of the week do you prefer to receive surveys on?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"customer effort", tier:"filler", sec:"F" },
+ { id:69, text:"Please rate the layout of this survey form. (1-5)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"resolution quality", tier:"filler", sec:"B" },
+ { id:70, text:"Roughly how many surveys have you received in the last month?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"customer effort", tier:"filler", sec:"C" },
+ { id:71, text:"Would you like to receive a monthly product newsletter? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"renewal risk", tier:"filler", sec:"F" },
+ { id:72, text:"What device are you answering on right now? (phone / tablet / computer)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"onboarding", tier:"filler", sec:"F" }
 ]);
 function activeQuestions(){ return state.instrument || QUESTIONS; }
 function fmtMin(m){ return Math.round(m * 100) / 100; }
+
+/* ================= v1.5 · TOPICS, AGENDAS, SKELETON ================= */
+var TOPIC_KEYS = {
+  "overall satisfaction":["exec","itdm"], "customer effort":["end","tech"],
+  "support speed":["tech","end"], "product reliability":["tech","itdm"],
+  "billing clarity":["admin"], "renewal risk":["itdm","exec"],
+  "agent knowledge":["end","tech"], "self-service gap":["end","tech"],
+  "resolution quality":["itdm","end"], "onboarding":["admin","end"]
+};
+var LEVEL_AGENDA = {
+  1:["overall satisfaction","customer effort","self-service gap","renewal risk"],
+  2:["overall satisfaction","support speed","agent knowledge","renewal risk"],
+  3:["resolution quality","customer effort","product reliability","self-service gap"],
+  4:["overall satisfaction","customer effort","resolution quality"],
+  5:["support speed","self-service gap","product reliability","customer effort"],
+  6:["overall satisfaction","renewal risk","billing clarity","resolution quality","product reliability"]
+};
+function agendaTopics(){ return LEVEL_AGENDA[state.level] || LEVEL_AGENDA[1]; }
+function insightGate(){ return state.level === 6 ? 70 : 60; }
+var SEC_RANK = { A:0, B:1, C:2, D:3, E:4, F:5 };
+var SEC_MAP = { 1:"A",2:"A",3:"B",4:"B",5:"C",6:"A",7:"B",8:"B",9:"B",10:"B",11:"E",12:"D",13:"E",14:"B",15:"F",21:"B",22:"C",23:"C",24:"B",25:"C",26:"B" };
+function sectionOf(q){ return q.sec || SEC_MAP[q.id] || "B"; }
+function tierOf(q){ return q.tier || (defectOf(q) === "CLEAN" ? "clean" : "defective"); }
+function coreTotalAvailable(){
+  var n = activeQuestions().filter(function(q){ return q.core; }).length;
+  addBankQuestions().forEach(function(q){ if (q.core && state.added[q.id]) n++; });
+  return n;
+}
+/* Dynamic per-level add bank: at least 6 questions (we deal 8), favouring
+   agenda topics the instrument does not cover and sound versions of
+   covered ones, so a lost topic can always be repaired on TRY AGAIN. */
+function computeAddBankIds(){
+  var instIds = {}; activeQuestions().forEach(function(q){ instIds[q.id] = true; });
+  var covered = {}; activeQuestions().forEach(function(q){ covered[q.topic] = true; });
+  var agenda = agendaTopics();
+  var pool = QUESTION_BANK.filter(function(q){ return !instIds[q.id]; });
+  pool.sort(function(a, b){
+    function score(q){
+      var s = 0;
+      if (agenda.indexOf(q.topic) >= 0 && !covered[q.topic]) s += 100;
+      if (agenda.indexOf(q.topic) >= 0) s += 40;
+      if (tierOf(q) === "clean") s += 20; else if (tierOf(q) === "defective") s += 8; else if (tierOf(q) === "filler") s += 3;
+      return s;
+    }
+    return score(b) - score(a) || a.id - b.id;
+  });
+  var picked = [], seenTopic = {};
+  pool.forEach(function(q){ if (picked.length < 8 && !seenTopic[q.topic]){ picked.push(q.id); seenTopic[q.topic] = true; } });
+  pool.forEach(function(q){ if (picked.length < 8 && picked.indexOf(q.id) < 0) picked.push(q.id); });
+  return picked;
+}
+function addBankQuestions(){
+  var ids = state.addBankIds && state.addBankIds.length ? state.addBankIds : OPTIONAL_QUESTIONS.map(function(q){ return q.id; });
+  return ids.map(function(id){
+    return QUESTION_BANK.filter(function(q){ return q.id === id; })[0] || OPTIONAL_QUESTIONS.filter(function(q){ return q.id === id; })[0];
+  }).filter(Boolean);
+}
 
 /* ================= STATE ================= */
 var state = {
@@ -609,12 +878,13 @@ var state = {
   /* v1.3 attempt economy */
   attempt: 1, spentBefore: 0, history: [], goodwillCarry: null, repCarry: 90,
   baseline: null, chainActive: false, bestAttemptRate: 0, launchCost: 0, launchedSnapshot: null,
-  reportShown: false, instrument: null, instrumentSeed: "A001", randomMode: false, campaignSeed: null,
+  reportShown: false, instrument: null, instrumentSeed: "A001", randomMode: false, campaignSeed: null, addBankIds: [],
   campaignBonus: {}, levelSeeds: {},
-  musicOn: true, sfxOn: true, muted: false, musicVol: 0.5, sfxVol: 0.8
+  musicOn: true, sfxOn: true, muted: false, musicVol: 0.5, sfxVol: 0.8,
+  hints: true, touched: { seg: false, prep: false, invite: false }
 };
 var LEVELS=[
- {id:1,name:"FIRST SEND",target:0.12,budget:120,desc:"Learn the three levers. Beat 12%, quality 60+."},
+ {id:1,name:"FIRST SEND",target:0.12,budget:120,desc:"Learn the three levers. Beat 12%, quality 60+, Insight 60+."},
  {id:2,name:"THE SPLIT",target:0.12,budget:120,desc:"Unlock A/B testing. Two invites, split send, honest verdict."},
  {id:3,name:"THE STAKEHOLDER",target:0.12,budget:120,desc:"Eight extra questions arrive mid-build. Accept, push back, or rotate."},
  {id:4,name:"THE TIRED LIST",target:0.10,budget:120,desc:"Goodwill starts at 25. Win at 10%+ and end goodwill at 35+."},
@@ -633,38 +903,53 @@ function mulberry(seed){ return function(){ seed |= 0; seed = seed + 0x6D2B79F5 
 function choiceKey(){
   return state.seg.id + "|" + state.invite.id + "|" + state.reminders + "|" + (state.escapes?1:0) + "|" + (state.instrumentSeed || "") + "|" +
     activeQuestions().map(function(q){ return state.qstate[q.id][0]; }).join("") + "|" +
-    OPTIONAL_QUESTIONS.map(function(q){ return state.added[q.id] ? "1" : "0"; }).join("") + "|" + state.validation + "|" + (state.dedupe?1:0) + (state.suppression?1:0);
+    addBankQuestions().map(function(q){ return state.added[q.id] ? "1" : "0"; }).join("") + "|" + state.validation + "|" + (state.dedupe?1:0) + (state.suppression?1:0);
 }
 /* ---- v1.3 random instrument generation (seeded, reproducible) ---- */
 function shuffleWith(rng, arr){ var a = arr.slice(); for (var i = a.length - 1; i > 0; i--){ var j = Math.floor(rng() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
 function generateInstrument(level, seedStr){
   var rng = mulberry(hashStr("inst|" + level + "|" + seedStr));
-  var corePool = shuffleWith(rng, QUESTION_BANK.filter(function(q){ return q.core; }));
-  var restPool = shuffleWith(rng, QUESTION_BANK.filter(function(q){ return !q.core; }));
-  var drawn = shuffleWith(rng, corePool.slice(0, 6).concat(restPool.slice(0, 6)));
+  /* v1.5: variable deal, 9 to 16 questions, into the fixed skeleton:
+     A outcome core 2-3 · B drivers (bulk) · C diagnostics 1-3 ·
+     D sensitive 0-1 late · E open-text closer 0-1 · F demographics 0-2 last. */
+  var targetLen = 9 + Math.floor(rng() * 8); /* 9..16 */
+  var pools = { A:[], B:[], C:[], D:[], E:[], F:[] };
+  QUESTION_BANK.forEach(function(q){ pools[sectionOf(q)].push(q); });
+  Object.keys(pools).forEach(function(s){ pools[s] = shuffleWith(rng, pools[s]); });
+  var quota = { A: 2 + Math.floor(rng() * 2), C: 1 + Math.floor(rng() * 3), D: Math.floor(rng() * 2), E: Math.floor(rng() * 2), F: Math.floor(rng() * 3) };
+  var fixed = quota.A + quota.C + quota.D + quota.E + quota.F;
+  quota.B = Math.max(3, targetLen - fixed);
+  var drawn = [];
+  ["A","B","C","D","E","F"].forEach(function(s){ drawn = drawn.concat(pools[s].slice(0, quota[s])); });
+  /* Winnability guarantee: at least half the agenda topics must have a
+     question (any tier) in the deal itself; swap B-section fillers out
+     until they do. The add bank covers the rest. */
+  var agenda = LEVEL_AGENDA[level] || LEVEL_AGENDA[1];
+  function topicsPresent(){ var t = {}; drawn.forEach(function(q){ t[q.topic] = true; }); return t; }
+  var need = Math.ceil(agenda.length / 2);
+  agenda.forEach(function(topic){
+    var present = topicsPresent();
+    var have = agenda.filter(function(t){ return present[t]; }).length;
+    if (present[topic] || have >= need + 1) return;
+    var candidate = QUESTION_BANK.filter(function(q){ return q.topic === topic && drawn.indexOf(q) < 0; })[0];
+    if (!candidate) return;
+    var swapIdx = -1;
+    for (var i = drawn.length - 1; i >= 0; i--){ if (sectionOf(drawn[i]) === "B" && agenda.indexOf(drawn[i].topic) < 0 && tierOf(drawn[i]) !== "clean"){ swapIdx = i; break; } }
+    if (swapIdx < 0) for (var j = drawn.length - 1; j >= 0; j--){ if (sectionOf(drawn[j]) === "B" && agenda.indexOf(drawn[j].topic) < 0){ swapIdx = j; break; } }
+    if (swapIdx >= 0) drawn[swapIdx] = candidate;
+  });
+  /* skeleton order when displayed and played */
+  drawn.sort(function(a, b){ return (SEC_RANK[sectionOf(a)] - SEC_RANK[sectionOf(b)]) || (a.id - b.id); });
   var inst = drawn.map(function(src){
     var q = {}; for (var k in src) q[k] = src[k];
     if (src.answerBy) q.answerBy = src.answerBy.slice();
-    /* jitter time cost within +/-20%, rounded to 5 seconds (1/12 min) */
+    /* jitter time cost within +/-20%, rounded to 5 seconds (1/12 min).
+       Defect, flag, know and answerBy travel WITH the text: a class is
+       never pasted onto a question whose wording does not exhibit it. */
     var j = src.min * (0.8 + rng() * 0.4);
     q.min = Math.max(0.25, Math.round(j * 12) / 12);
-    /* traps are reassigned below, so strip the bank placement first */
-    q.flag = null; q.flagTxt = null; q.answerBy = null; q.know = "Everyone";
     return q;
   });
-  /* Reassign the three trap types among eligible non-core questions.
-     The grid trap goes to the heaviest eligible question, so no time cost
-     ever leaves its +/-20% jitter band. */
-  var elig = shuffleWith(rng, inst.filter(function(q){ return !q.core; }));
-  var gridPick = null;
-  elig.forEach(function(q){ if (!gridPick || q.min > gridPick.min) gridPick = q; });
-  var rest = elig.filter(function(q){ return q !== gridPick; });
-  if (rest[0]){ rest[0].answerBy = ["admin"]; rest[0].flag = "knowledge"; rest[0].know = "Partner Admin only";
-    rest[0].flagTxt = "UNANSWERABLE for most of this list. The answer sits in a system only a Partner Admin can see. Everyone else will guess or quit here."; }
-  if (gridPick){ gridPick.flag = "mobile"; gridPick.know = "Everyone, slowly";
-    gridPick.flagTxt = "MOBILE KILLER. A heavy, wide question on a phone means pinch, scroll, mis-tap. Half the list answers on a phone between other jobs."; }
-  if (rest[1]){ rest[1].answerBy = ["itdm"]; rest[1].flag = "jargon"; rest[1].know = "Unclear, even in-house";
-    rest[1].flagTxt = "DOUBLE-BARRELED JARGON. Two questions wearing one coat, in words nobody outside HQ uses. Only an IT Decision Maker can even parse it."; }
   return inst;
 }
 function randomSeedStr(){
@@ -680,7 +965,7 @@ function pristineBaseline(){
 }
 function snapshotCurrent(){
   var qs = {}; QUESTION_BANK.forEach(function(q){ qs[q.id] = state.qstate[q.id] || "keep"; });
-  var ad = {}; OPTIONAL_QUESTIONS.forEach(function(q){ ad[q.id] = !!state.added[q.id]; });
+  var ad = {}; addBankQuestions().forEach(function(q){ ad[q.id] = !!state.added[q.id]; });
   return { qstate: qs, added: ad, validation: state.validation, dedupe: state.dedupe, suppression: state.suppression,
            localization: state.localization, escapes: state.escapes, stakeholder: state.stakeholder,
            abEnabled: state.abEnabled, reportBack: state.reportBack, langChoice: state.langChoice };
@@ -845,8 +1130,8 @@ function validationCostFor(seg, mode){
 }
 function simplifyCount(){ return activeQuestions().filter(function(q){ return state.qstate[q.id] === "simplify"; }).length; }
 function cutCount(){ return activeQuestions().filter(function(q){ return state.qstate[q.id] === "cut"; }).length; }
-function addedCount(){ return OPTIONAL_QUESTIONS.filter(function(q){ return state.added[q.id]; }).length; }
-function allQuestionPool(){ return QUESTIONS.concat(OPTIONAL_QUESTIONS.filter(function(q){ return state.added[q.id]; })); }
+function addedCount(){ return addBankQuestions().filter(function(q){ return state.added[q.id]; }).length; }
+function allQuestionPool(){ return QUESTIONS.concat(addBankQuestions().filter(function(q){ return state.added[q.id]; })); }
 function stakeCost(v){ return v === "rotate" ? 4 : v === "accept" ? 10 : 0; }
 function budgetMath(ov){
   ov = ov || {};
@@ -872,11 +1157,11 @@ function budgetMath(ov){
     var cur = state.qstate[q.id] || "keep", was = base.qstate[q.id] || "keep";
     if (cur === was) return;
     if (was === "cut" && cur !== "cut"){ nRestore++; editCharge += 1; }
-    if (cur === "simplify" && was !== "simplify"){ nSimp++; editCharge += 2; }
+    if (cur === "simplify" && was !== "simplify"){ nSimp++; editCharge += fixCostFor(q); }
     if (cur === "cut" && was !== "cut"){ nCut++; editCharge += 1; }
   });
   var nAdd = 0;
-  OPTIONAL_QUESTIONS.forEach(function(q){ if (state.added[q.id] && !base.added[q.id]) nAdd++; });
+  addBankQuestions().forEach(function(q){ if (state.added[q.id] && !base.added[q.id]) nAdd++; });
   editCharge += nAdd * 3;
   if (ov.simplifyCount !== undefined){ /* legacy grey-out probe: price one extra simplify */
     editCharge += Math.max(0, ov.simplifyCount - simplifyCount()) * 2;
@@ -896,7 +1181,7 @@ function budgetMath(ov){
     ["Send · " + seg.name + " (per send)", seg.sendCost],
     ["Invite (per send) · " + inv.name, inv.cost],
     ["Reminders · " + rem + " \u00D7 8", rem * 8],
-    ["New edits this attempt (simplify " + nSimp + " \u00D7 2, cut " + nCut + " \u00D7 1, restore " + nRestore + " \u00D7 1, add " + nAdd + " \u00D7 3)", editCharge],
+    ["New edits this attempt (class fixes " + nSimp + " at verb prices, cut " + nCut + " \u00D7 1, restore " + nRestore + " \u00D7 1, add " + nAdd + " \u00D7 3)", editCharge],
     ["DK/NA escapes" + (base.escapes && esc ? " · already on, owned" : ""), escCharge],
     ["Stakeholder response", stakeCharge],
     ["A/B split setup", abCharge],
@@ -942,7 +1227,7 @@ function renderPrep(){
     var label = ownedTier ? "OWNED" : (valRank[v[0]] > valRank[base.validation] && base.validation !== "skip" ? (v[2] - validationCostFor(state.seg, base.validation)) + " CR UPGRADE" : v[2] + " CR");
     return '<button class="segbtn' + (state.validation === v[0] ? " sel" : "") + '" data-val="' + v[0] + '"' + (belowOwned || cant ? " disabled title=\"" + (belowOwned ? "A higher tier is already owned" : "Not enough budget in the remaining pool") + "\"" : "") + '>' + v[1] + '<small>' + label + '</small></button>';
   }).join("");
-  el.innerHTML = '<div class="lever-head" style="margin-top:14px"><span class="lever-no" style="background:var(--blue)">PREP</span><span class="lever-title" style="font-size:12px">PREPARE THE LIST</span><span class="lever-sub">Bought before launch, paid from the same 120 credits.</span></div>' +
+  el.innerHTML = '<div class="lever-head" style="margin-top:14px"><span class="lever-no" style="background:var(--blue)">STEP 2</span><span class="lever-title" style="font-size:12px">PREPARE THE LIST</span><span class="lever-sub">Bought before launch, paid from the same credits. Marge: validation is the cheapest insurance against bounces.</span></div>' +
     '<div class="prepgrid">' +
     '<div class="prow"><span class="pt">Validate emails (BrightVerify)</span><div class="valbtns">' + valBtns + '</div><div class="pe">Full checks the whole list; Partial checks the riskiest half. Validation removes most invalid addresses, but a small share survives, since catch-all domains cannot be verified.</div></div>' +
     tog("dedupe", state.dedupe, 4, "Dedupe pass", "Removes duplicate addresses so nobody gets the survey twice, and no response is counted twice.") +
@@ -950,10 +1235,10 @@ function renderPrep(){
     tog("localization", state.localization, 8, "Localization review", "Plain-language and locale check across the list\u2019s languages. Cleaner answers, +2 data quality.") +
     '</div>';
   Array.prototype.forEach.call(el.querySelectorAll("[data-val]"), function(btn){
-    btn.addEventListener("click", function(){ var before = budgetMath().attemptCost; state.validation = btn.getAttribute("data-val"); if (state.validation !== "skip") sndScan(); if (budgetMath().attemptCost > before) sndSpend(); else if (budgetMath().attemptCost < before) sndRefund(); else sndClick(); renderPrep(); renderSegments(); renderReadout(); });
+    btn.addEventListener("click", function(){ state.touched.prep = true; var before = budgetMath().attemptCost; state.validation = btn.getAttribute("data-val"); if (state.validation !== "skip") sndScan(); if (budgetMath().attemptCost > before) sndSpend(); else if (budgetMath().attemptCost < before) sndRefund(); else sndClick(); renderPrep(); renderSegments(); renderReadout(); });
   });
   Array.prototype.forEach.call(el.querySelectorAll("[data-prep]"), function(btn){
-    btn.addEventListener("click", function(){ var k = btn.getAttribute("data-prep"); var before = budgetMath().attemptCost; state[k] = !state[k]; if (state[k] && k === "dedupe") sndPops(); else if (state[k] && k === "suppression") sndSwipe(); else if (state[k]) sndSpend(); else sndRefund(); renderPrep(); renderReadout(); });
+    btn.addEventListener("click", function(){ state.touched.prep = true; var k = btn.getAttribute("data-prep"); var before = budgetMath().attemptCost; state[k] = !state[k]; if (state[k] && k === "dedupe") sndPops(); else if (state[k] && k === "suppression") sndSwipe(); else if (state[k]) sndSpend(); else sndRefund(); renderPrep(); renderReadout(); });
   });
 }
 function curLevel(){ return LEVELS[state.level-1]; }
@@ -961,8 +1246,8 @@ function renderLevelUI(){
   var L=curLevel();
   var hl=$("hudLevel"); if(hl) hl.innerHTML="LEVEL "+L.id+" · <b>"+L.name+"</b> · ATTEMPT "+state.attempt+" · INSTRUMENT #"+state.instrumentSeed;
   var ht=$("hudTarget"); if(ht) ht.innerHTML="TARGET RESPONSE RATE <b>&gt; "+Math.round(L.target*100)+"%</b>"+(L.id===4?" · END GOODWILL 35+":"");
-  var st=$("startTargetLine"); if(st) st.textContent="Level "+L.id+" · "+L.name+" · Target: response rate > "+Math.round(L.target*100)+"% and quality 60+"+(L.id===4?" and ending goodwill 35+":"");
-  var lb=$("levelBanner"); if(lb) lb.innerHTML='<div class="lever" style="border-color:var(--gold)"><div class="lever-head"><span class="lever-no">LEVEL '+L.id+'</span><span class="lever-title">'+L.name+'</span><span class="lever-sub">'+L.desc+' Budget '+L.budget+' credits. All results simulated.</span></div></div>';
+  var st=$("startTargetLine"); if(st) st.textContent="Level "+L.id+" · "+L.name+" · Target: response rate > "+Math.round(L.target*100)+"% and quality 60+ and Insight "+insightGate()+"+"+(L.id===4?" and ending goodwill 35+":"");
+  var lb=$("levelBanner"); if(lb) lb.innerHTML='<div class="lever" style="border-color:var(--gold)"><div class="lever-head"><span class="lever-no">LEVEL '+L.id+'</span><span class="lever-title">'+L.name+'</span><span class="lever-sub">'+L.desc+' Budget '+L.budget+' credits. The field office draft runs <b style="color:var(--ink)">'+activeQuestions().length+' questions</b> (dealt 9-16 into the A-F skeleton). <b style="color:var(--ink)">AGENDA:</b> '+agendaTopics().join(" · ")+'. Win needs rate, quality 60+ AND Insight '+insightGate()+'+. All results simulated.</span></div></div>';
   // level grid
   var grid=$("levelGrid"); if(grid){ grid.innerHTML=LEVELS.map(function(lv){ var locked=lv.id>state.unlocked; var best=state.campaignBest[lv.id]; return '<button class="lvlcard'+(locked?" locked":"")+(lv.id===state.level?" sel":"")+'" data-level="'+lv.id+'" '+(locked?"disabled":"")+'>'+'<div class="ln">LEVEL '+lv.id+(locked?" · 🔒 LOCKED":"")+'</div><h3>'+lv.name+'</h3><p>'+lv.desc+'</p>'+(best?'<div class="best">BEST: '+best+'</div>':"")+'</button>';}).join("");
     Array.prototype.forEach.call(grid.querySelectorAll("[data-level]"),function(b){ b.addEventListener("click",function(){ selectLevel(parseInt(b.getAttribute("data-level"),10),false); }); });
@@ -976,7 +1261,7 @@ function renderStakeholder(){
   var opts=[["pushback","PUSH BACK · 0 CR","Refuse the 8 extras. No survey cost. Stakeholder trust note only."],
             ["rotate","ROTATE · 4 CR","Extras in rotating modules: half see them, +1 min, partial data value."],
             ["accept","ACCEPT · 10 CR","Add all 8: +4 min, −10 goodwill, bulk edit + retest cost."]];
-  el.innerHTML='<div class="eventpanel"><h3>⚠ STAKEHOLDER EVENT · “WHILE WE ARE ASKING ANYWAY…”</h3><div style="font-size:14.5px;line-height:1.5">A stakeholder demands <b>8 extra questions</b>. Choose one response before launch. Prices apply to the final configuration.</div><div class="choicegrid">'+opts.map(function(o){return '<button class="choicebtn'+(state.stakeholder===o[0]?" sel":"")+'" data-stake="'+o[0]+'"><b>'+o[1]+'</b><span>'+o[2]+'</span></button>';}).join("")+'</div>'+(state.stakeholder?"":'<div style="margin-top:8px;font-size:13px">No choice yet — PUSH BACK (0 cr) is the default if you launch without choosing.</div>')+'</div>';
+  el.innerHTML='<div class="eventpanel"><h3>⚠ STAKEHOLDER EVENT · “WHILE WE ARE ASKING ANYWAY…”</h3><div style="font-size:14.5px;line-height:1.5">A stakeholder demands <b>8 extra questions</b>. They arrive with defects of their own (double-barreled and wordy stems among them), which is part of why pushing back or rotating exists. Choose one response before launch. Prices apply to the final configuration.</div><div class="choicegrid">'+opts.map(function(o){return '<button class="choicebtn'+(state.stakeholder===o[0]?" sel":"")+'" data-stake="'+o[0]+'"><b>'+o[1]+'</b><span>'+o[2]+'</span></button>';}).join("")+'</div>'+(state.stakeholder?"":'<div style="margin-top:8px;font-size:13px">No choice yet — PUSH BACK (0 cr) is the default if you launch without choosing.</div>')+'</div>';
   Array.prototype.forEach.call(el.querySelectorAll("[data-stake]"),function(b){b.addEventListener("click",function(){state.stakeholder=b.getAttribute("data-stake"); sndClick(); renderStakeholder(); renderReadout();});});
 }
 function renderABPanel(){
@@ -995,6 +1280,7 @@ function renderLevelExtras(){
   Array.prototype.forEach.call(el.querySelectorAll("[data-lang]"),function(b){b.addEventListener("click",function(){state.langChoice=b.getAttribute("data-lang"); sndClick(); renderLevelExtras(); renderReadout(); renderBudget();});});
 }
 function resetChainState(){
+  state.touched = { seg: false, prep: false, invite: false };
   state.attempt=1; state.spentBefore=0; state.history=[]; state.goodwillCarry=null; state.repCarry=90;
   state.chainActive=false; state.bestAttemptRate=0; state.launchCost=0; state.launchedSnapshot=null; state.reportShown=false;
   state.baseline=pristineBaseline();
@@ -1016,6 +1302,7 @@ function applyInstrumentForLevel(n){
     state.instrument = QUESTIONS.slice();
   }
   QUESTION_BANK.forEach(function(q){ if (state.qstate[q.id] === undefined) state.qstate[q.id]="keep"; });
+  state.addBankIds = computeAddBankIds();
 }
 function selectLevel(n,startNow){
   state.level=n; var L=curLevel(); BUDGET_TOTAL=L.budget;
@@ -1058,6 +1345,7 @@ function renderSegments(){
   Array.prototype.forEach.call(document.querySelectorAll("[data-seg]"), function(b){
     b.addEventListener("click", function(){
       state.seg = SEGMENTS.filter(function(s){ return s.id === b.getAttribute("data-seg"); })[0];
+      state.touched.seg = true;
       sndSelect(); renderSegments(); renderInvites(); renderPrep(); renderReadout();
     });
   });
@@ -1074,6 +1362,7 @@ function renderInvites(){
   Array.prototype.forEach.call(document.querySelectorAll("[data-inv]"), function(b){
     b.addEventListener("click", function(){
       var before = budgetMath().attemptCost;
+      state.touched.invite = true;
       state.invite = INVITES.filter(function(s){ return s.id === b.getAttribute("data-inv"); })[0];
       sndSelect(); if (budgetMath().attemptCost > before) sndSpend(); else if (budgetMath().attemptCost < before) sndRefund();
       renderInvites(); renderSegments(); renderReadout();
@@ -1091,36 +1380,70 @@ function renderInvites(){
   });
 }
 function renderCutTrayAndBank(){
-  var tray=$("cutTray"); if(tray){ var cut=activeQuestions().filter(function(q){return state.qstate[q.id]==="cut";});
+  var tray=$("cutTray"); if(tray){ var cut=activeQuestions().concat(addBankQuestions().filter(function(q){ return state.added[q.id]; })).filter(function(q){return state.qstate[q.id]==="cut";});
     tray.innerHTML = cut.length ? '<div style="margin-top:12px;background:var(--panel);border:3px solid var(--line);border-radius:8px;padding:11px"><b style="color:var(--ink)">Cut questions (cutting costs 1 cr; restoring a question cut in an earlier attempt costs 1 cr, un-cutting one cut in this same setup is free):</b>'+cut.map(function(q){return '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:7px;font-size:14px;color:var(--dim)"><span>Q'+q.id+" · "+q.text+'</span><button class="segbtn" data-restore="'+q.id+'">RESTORE TO KEEP</button></div>';}).join("")+"</div>" : "";
     Array.prototype.forEach.call(tray.querySelectorAll("[data-restore]"),function(b){b.addEventListener("click",function(){state.qstate[parseInt(b.getAttribute("data-restore"),10)]="keep";sndClick();renderQuestions();renderReadout();});});
   }
   var bank=$("bankPanel"); if(bank){
-    bank.innerHTML='<div style="margin-top:12px;background:var(--panel);border:3px solid var(--gold);border-radius:8px;padding:11px"><div style="font-family:\'Press Start 2P\',monospace;font-size:10px;color:var(--gold);line-height:1.6">OPTIONAL QUESTION BANK · ADD = 3 CR EACH</div>'+OPTIONAL_QUESTIONS.map(function(q){var on=!!state.added[q.id]; var cant=!on && budgetMath().total+3>BUDGET_TOTAL; return '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:9px;font-size:14px;color:var(--dim)"><span><b style="color:var(--ink)">'+q.text+'</b><br>'+q.min+' min · Who can answer: '+q.know+' · Decision value: '+q.val+'</span><button class="segbtn'+(on?" sel":"")+'" data-add="'+q.id+'"'+(cant?' disabled title="Not enough budget"':"")+'>'+(on?"ADDED · 3 CR":"ADD · 3 CR")+'</button></div>';}).join("")+"</div>";
+    bank.innerHTML='<div style="margin-top:12px;background:var(--panel);border:3px solid var(--gold);border-radius:8px;padding:11px"><div style="font-family:\'Press Start 2P\',monospace;font-size:10px;color:var(--gold);line-height:1.6">QUESTION BANK · ADD = 3 CR EACH · DEALT FOR THIS LEVEL</div><div style="font-size:13px;color:var(--dim);margin-top:4px">Eight bank questions dealt for this level, favouring agenda topics your instrument does not cover yet. Adding one is how a lost topic gets repaired on TRY AGAIN.</div>'+addBankQuestions().map(function(q){var on=!!state.added[q.id]; var cant=!on && budgetMath().total+3>BUDGET_TOTAL; var tierTag = tierOf(q)==="stupid" ? ' · <b style="color:var(--orange)">TURN-OFF RISK</b>' : tierOf(q)==="filler" ? ' · <b style="color:var(--gold)">LOW VALUE</b>' : ""; return '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:9px;font-size:14px;color:var(--dim)"><span><b style="color:var(--ink)">'+q.text+'</b><br>'+q.min+' min · Topic: <b style="color:var(--ink)">'+q.topic+'</b> · Who can answer: '+q.know+' · Decision value: '+q.val+' · '+(defectOf(q)==='CLEAN'?'Clean control':'DEFECT: '+defectOf(q)+' · Fix: '+(fixVerbFor(q)?fixVerbFor(q)+' ('+fixCostFor(q)+' cr)':'none, CUT or escapes'))+tierTag+'</span><button class="segbtn'+(on?" sel":"")+'" data-add="'+q.id+'"'+(cant?' disabled title="Not enough budget"':"")+'>'+(on?"ADDED · 3 CR":"ADD · 3 CR")+'</button></div>';}).join("")+"</div>";
     Array.prototype.forEach.call(bank.querySelectorAll("[data-add]"),function(b){b.addEventListener("click",function(){var id=parseInt(b.getAttribute("data-add"),10); state.added[id]=!state.added[id]; if(state.added[id]) sndSpend(); else sndRefund(); renderQuestions(); renderReadout();});});
   }
 }
+function renderAgenda(){
+  var el = $("agendaPanel"); if (!el) return;
+  if (!el._wired){ el._wired = true; el.addEventListener("click", function(){ state.touched.agenda = true; renderChecklist(); }); }
+  var kept = keptQuestions();
+  var rows = agendaTopics().map(function(topic){
+    var qs = kept.filter(function(q){ return q.topic === topic; });
+    var creditable = qs.filter(function(q){ return tierOf(q) !== "stupid"; });
+    var status = creditable.length ? '<span class="ok">COVERED · Q' + creditable.map(function(q){ return q.id; }).join(", Q") + '</span>'
+      : (qs.length ? '<span class="miss">ONLY A STUPID QUESTION · EARNS 0</span>' : '<span class="miss">NOT COVERED</span>');
+    return '<div class="arow"><b>' + topic + '</b>' + status + '</div>';
+  }).join("");
+  el.innerHTML = '<div class="at">LEVEL AGENDA · INSIGHT VALUE NEEDS ' + insightGate() + '+ · EACH TOPIC MUST BE ASKED, SOUND, ANSWERABLE, AND ANSWERED BY ITS KEY PERSONAS</div>' + rows +
+    '<div class="fineprint" style="font-size:12.5px;color:var(--faint);margin-top:6px">Coverage is the pre-run signal. Insight itself is scored from the actual run: who finished matters as much as how many (Groves &amp; Peytcheva 2008).</div>';
+}
 function renderQuestions(){
-  $("qGrid").innerHTML = activeQuestions().filter(function(q){ return state.qstate[q.id] !== "cut"; }).map(function(q){
+  var displayQs = activeQuestions().concat(addBankQuestions().filter(function(q){ return state.added[q.id]; }));
+  $("qGrid").innerHTML = displayQs.filter(function(q){ return state.qstate[q.id] !== "cut"; }).map(function(q){
     var st = state.qstate[q.id];
-    var tags = "";
+    var d = defectOf(q), info = fixInfoFor(q), verb = fixVerbFor(q), fcost = fixCostFor(q);
+    var tier = tierOf(q);
+    if (tier === "stupid" || tier === "filler") verb = null; /* no wording fix rescues a turn-off or filler item */
+    var tags = '<span class="tag topic">' + q.topic + '</span><span class="tag">§' + sectionOf(q) + '</span>';
     if (q.core) tags += '<span class="tag core">CORE</span>';
-    if (q.flag && st === "keep") tags += '<span class="tag flag">FLAG</span>';
-    if (st === "simplify") tags += '<span class="tag" style="color:var(--gold);border-color:var(--gold)">SIMPLIFIED</span>';
-    var mins = st === "simplify" ? (q.min/2) : q.min;
-    var html = '<div class="qcard' + (st === "simplified" ? "" : "") + (st === "simplify" ? " simplified" : "") + '" id="qc' + q.id + '">' +
+    if (tier === "stupid") tags += '<span class="tag stupid">TURN-OFF RISK</span>' + (q.dup ? '<span class="tag stupid">REDUNDANT</span>' : "");
+    else if (tier === "filler") tags += '<span class="tag filler">LOW VALUE</span>';
+    else if (d === "CLEAN") tags += '<span class="tag" style="color:var(--blue);border-color:var(--blue)">CLEAN CONTROL</span>';
+    if (tier !== "stupid" && tier !== "filler" && d !== "CLEAN" && st === "keep") tags += '<span class="tag flag">DEFECT: ' + d + '</span>';
+    if (st === "simplify") tags += '<span class="tag" style="color:var(--gold);border-color:var(--gold)">FIXED \u00B7 ' + (verb || "SIMPLIFY") + '</span>';
+    var mins = effMin(q);
+    var html = '<div class="qcard' + (st === "simplify" ? " simplified" : "") + '" id="qc' + q.id + '">' +
       '<span class="qnum">Q' + q.id + "</span> " + tags +
       "<h4>" + q.text + "</h4>" +
       '<div class="meta">' +
       "<span>Time: <b>" + fmtMin(mins) + " min</b>" + (st === "simplify" ? " (was " + fmtMin(q.min) + ")" : "") + "</span>" +
       "<span>Who can answer: <b>" + q.know + "</b></span>" +
-      "<span>Complexity: <b>" + q.cx + "</b> · Decision value: <b>" + q.val + "</b></span></div>";
-    if (q.flag && st === "keep") html += '<div class="flagbox">' + q.flagTxt + "</div>";
+      "<span>Complexity: <b>" + q.cx + "</b> \u00B7 Decision value: <b>" + q.val + "</b></span></div>";
+    if (d !== "CLEAN" && st === "keep"){
+      html += '<div class="flagbox"><b>DEFECT: ' + d + '.</b> ' + info.explain + '<br><span style="font-size:12.5px">Symptom risk: ' + info.symptom + ". " +
+        (verb ? 'Correct fix: <b>' + verb + ' (' + fcost + ' cr)</b> or CUT (1 cr).' : '<b>No wording fix: this audience cannot know this.</b> CUT (1 cr), or buy the DK/NA escapes (2 cr).') + "</span></div>";
+    }
+    if (d !== "CLEAN" && st === "simplify"){
+      html += '<div class="flagbox" style="background:#12312a;border-color:var(--teal);color:#c9f5e6">FIXED with ' + (fixVerbFor(q) || "SIMPLIFY") + '. The ' + d + ' defect and its symptom risk are gone.' + ((d === "DOUBLE-BARRELED" || d === "GRID BURDEN") ? ' Splitting the item adds a small time cost, shown above.' : '') + "</div>";
+    }
+    if (tier === "stupid" && st === "keep"){
+      html += '<div class="flagbox" style="background:#3a2a10;border-color:var(--orange);color:#ffe1b8"><b>TURN-OFF RISK.</b> ' + (q.flagTxt || "A stupid question: worded fine, worthless anyway.") + '<br><span style="font-size:12.5px">Earns <b>zero insight</b>, costs <b>+2 goodwill</b> in resentment while kept, and subtracts 3 Insight Value. The only sensible fix is <b>CUT (1 cr)</b>.</span></div>';
+    }
+    if (tier === "filler" && st === "keep"){
+      html += '<div class="flagbox" style="background:#2e2a12;border-color:var(--gold);color:#ffe9a3"><b>LOW VALUE FILLER.</b> Harmless, but it spends respondent time like a real question. Earns half insight credit, and only if its topic is on the agenda.</div>';
+    }
     if (st !== "cut"){
       html += '<div class="qbtns">' +
         '<button class="qbtn' + (st === "keep" ? " sel" : "") + '" data-q="' + q.id + '" data-act="keep">KEEP</button>' +
-        '<button class="qbtn' + (st === "simplify" ? " sel" : "") + '" data-q="' + q.id + '" data-act="simplify"' + (st !== "simplify" && budgetMath().total + 2 > BUDGET_TOTAL ? " disabled title=\"Not enough budget to simplify (2 cr)\"" : "") + '>SIMPLIFY</button>' +
-        '<button class="qbtn" data-q="' + q.id + '" data-act="cut">CUT</button></div>';
+        (verb ? '<button class="qbtn' + (st === "simplify" ? " sel" : "") + '" data-q="' + q.id + '" data-act="simplify"' + (st !== "simplify" && budgetMath().total + fcost > BUDGET_TOTAL ? " disabled title=\"Not enough budget for " + verb + " (" + fcost + " cr)\"" : "") + '>' + verb + ' \u00B7 ' + fcost + '</button>'
+              : (d !== "CLEAN" ? '<button class="qbtn" disabled title="No wording fix exists for this class">NO WORDING FIX</button>' : "")) +
+        '<button class="qbtn" data-q="' + q.id + '" data-act="cut">CUT \u00B7 1</button></div>';
     }
     return html + "</div>";
   }).join("");
@@ -1149,9 +1472,9 @@ function renderQuestions(){
 }
 
 /* live derived numbers */
-function keptQuestions(){ var base=activeQuestions().filter(function(q){ return state.qstate[q.id] !== "cut"; }); var adds=OPTIONAL_QUESTIONS.filter(function(q){ return state.added[q.id]; }); return base.concat(adds); }
+function keptQuestions(){ var base=activeQuestions().filter(function(q){ return state.qstate[q.id] !== "cut"; }); var adds=addBankQuestions().filter(function(q){ return state.added[q.id] && state.qstate[q.id] !== "cut"; }); return base.concat(adds); }
 function estMinutes(){
-  var m = keptQuestions().reduce(function(a,q){ return a + (state.qstate[q.id] === "simplify" ? q.min/2 : q.min); }, 0);
+  var m = keptQuestions().reduce(function(a,q){ return a + effMin(q); }, 0);
   var stakeMin = state.stakeholder==="accept" ? 4 : state.stakeholder==="rotate" ? 1 : 0;
   return Math.round((m + (state.escapes ? 0.5 : 0) + stakeMin) * 100) / 100;
 }
@@ -1169,24 +1492,68 @@ function goodwillMath(){
     if (q.answerBy && state.qstate[q.id] === "keep"){ var g = affectedGroups(q); if (g.length){ spendUnans += 6 * g.length; unansCount++; } }
   });
   var spendNoSupp = state.suppression ? 0 : 6;
+  var stupidKept = kept.filter(function(q){ return tierOf(q) === "stupid"; }).length;
+  var spendStupid = stupidKept * 2; /* respondents resent turn-off items at their funnel position */
   var spendStake = state.stakeholder==="accept" ? 10 : state.stakeholder==="rotate" ? 3 : 0;
   var earn = 0, spendOver = 0, over = 0;
   if (state.invite.id === "honest"){
     over = Math.max(0, estMinutes() - state.invite.promise);
     if (over > 0) spendOver = 3; else earn = state.invite.earn;
   } else if (state.invite.id === "known"){ earn = state.invite.earn; }
-  var spend = spendRem + spendExtra + spendUnans + spendOver + spendNoSupp + spendStake;
+  var spend = spendRem + spendExtra + spendUnans + spendOver + spendNoSupp + spendStake + spendStupid;
   var earnReport = state.reportBack ? (kept.length<=7 ? 18 : 8) : 0;
   earn += earnReport;
   var gs = goodwillStart();
   var ending = gs.start + earn - spend;
-  return { spendRem:spendRem, spendExtra:spendExtra, spendUnans:spendUnans, spendOver:spendOver, spendNoSupp:spendNoSupp, spendStake:spendStake, earnReport:earnReport, spend:spend,
+  return { spendRem:spendRem, spendExtra:spendExtra, spendUnans:spendUnans, spendOver:spendOver, spendNoSupp:spendNoSupp, spendStake:spendStake, spendStupid:spendStupid, stupidKept:stupidKept, earnReport:earnReport, spend:spend,
            earn:earn, ending:ending, over:over, trips: ending <= 0, extra:extra, unansCount:unansCount, start:gs.start, fatigue:gs.fatigue, carry:gs.carry };
 }
 function tightestPersona(){
   var best = null;
   PKEYS.forEach(function(k){ if ((state.seg.mix[k]||0) >= 0.05){ var p = PERSONAS[k]; if (!best || p.patience < best.patience) best = { key:k, name:p.name, patience:p.patience }; } });
   return best;
+}
+/* ---- v1.5 coach + ready-to-launch checklist (informs, never blocks) ---- */
+var COACH_TIPS = {
+  audience: "Step 1 is the audience. Pick who can actually answer your agenda topics: a big list of the wrong people is just a faster way to be wrong.",
+  prep: "Step 2, prepare the list. Validation is the cheapest insurance against bounces: dead addresses damage your sender reputation, not just this send.",
+  invite: "Step 3, the invitation. Say why this person, and how long it takes, honestly. A promised 5 minutes that becomes 9 spends goodwill you can watch in the ledger.",
+  questions: "Step 4, the questionnaire. Fix the defect, not the symptom: SPLIT a double-barreled question, CUT what this audience cannot know. And guard the agenda: a topic you cut is value you chose not to collect.",
+  prelaunch: "All five checks are ticked. Before you launch, read the three gates once: rate needs reach, quality needs sound questions, value needs agenda coverage. Then press the big red button."
+};
+function coachStage(){
+  var t = state.touched || {};
+  var prepDone = t.prep || state.validation !== "skip" || state.dedupe || state.suppression || state.localization || (state.baseline && (state.baseline.validation !== "skip" || state.baseline.dedupe || state.baseline.suppression || state.baseline.localization));
+  var reviewDone = !!t.review || activeQuestions().some(function(q){ return state.qstate[q.id] !== "keep"; }) || addedCount() > 0;
+  if (!t.seg && !state.chainActive) return "audience";
+  if (!prepDone) return "prep";
+  if (!t.invite && !state.chainActive) return "invite";
+  if (!reviewDone) return "questions";
+  return "prelaunch";
+}
+function coachSay(){
+  var el = $("coachTip"); if (!el) return;
+  el.textContent = COACH_TIPS[coachStage()];
+}
+function renderChecklist(){
+  var el = $("launchCheck"); if (!el) return;
+  var t = state.touched || {};
+  var prepDone = t.prep || state.validation !== "skip" || state.dedupe || state.suppression || state.localization || (state.baseline && (state.baseline.validation !== "skip" || state.baseline.dedupe || state.baseline.suppression || state.baseline.localization));
+  var reviewDone = !!t.review || activeQuestions().some(function(q){ return state.qstate[q.id] !== "keep"; }) || addedCount() > 0;
+  var rows = [
+    ["Segment chosen (Step 1)", !!(t.seg || state.chainActive)],
+    ["List prep decided (Step 2): validation, dedupe, suppression", !!prepDone],
+    ["Invite chosen (Step 3)", !!(t.invite || state.chainActive)],
+    ["Defects reviewed (Step 4): at least one fix or cut, or skip below", !!reviewDone],
+    ["Agenda coverage seen: check the AGENDA panel in Step 4", !!(reviewDone || t.agenda)]
+  ];
+  el.innerHTML = '<div class="ct">READY TO LAUNCH? · THIS LIST INFORMS, IT NEVER BLOCKS THE BUTTON</div>' +
+    rows.map(function(r, i){
+      return '<div class="crow ' + (r[1] ? "done" : "todo") + '"><span>' + (r[1] ? "✓ " : "○ ") + r[0] + '</span><span class="st">' + (r[1] ? "DONE" : "TO DO") + '</span>' +
+        (i === 3 && !r[1] ? '<button class="skipbtn2" id="skipReviewBtn">SKIP REVIEW</button>' : "") + "</div>";
+    }).join("");
+  var sb = $("skipReviewBtn");
+  if (sb) sb.addEventListener("click", function(){ state.touched.review = true; sndClick(); renderChecklist(); coachSay(); });
 }
 function renderReadout(){
   var kept = keptQuestions(), gm = goodwillMath();
@@ -1195,9 +1562,12 @@ function renderReadout(){
   var overBy = tight ? est - tight.patience : 0;
   var estCls = overBy <= 0 ? "" : (overBy <= 2 ? "amber" : "redwarn");
   var estLabel = overBy > 0 ? " · OVER " + tight.name.toUpperCase() + " PATIENCE (" + tight.patience + " MIN)" : "";
+  renderAgenda();
+  renderChecklist();
+  coachSay();
   $("readout").innerHTML =
     "<span>Segment <b>" + state.seg.name + "</b></span>" +
-    "<span>Questions <b>" + kept.length + " / 12</b> (core " + coreKept + "/" + CORE_TOTAL + ")</span>" +
+    "<span>Questions <b>" + kept.length + "</b> dealt (core " + coreKept + "/" + coreTotalAvailable() + ") · Instrument #" + state.instrumentSeed + "</span>" +
     '<span class="' + estCls + '">Est. length <b>' + est + " min" + estLabel + "</b></span>" +
     "<span>Goodwill <b>" + gm.start + (gm.fatigue ? " (carried " + gm.carry + " \u2212 " + gm.fatigue + " fatigue)" : "") + " \u2192 " + Math.max(0, gm.ending) + "</b></span>" +
     (gm.trips ? '<span class="warn">Breaker forecast: <b>TRIPS</b></span>' : "<span>Breaker forecast: <b style='color:var(--teal)'>HOLDS</b></span>");
@@ -1229,6 +1599,13 @@ $("escBtn").addEventListener("click", function(){
 $("soundBtn").addEventListener("click", function(){
   toggleMute();
 });
+/* field guide overlay */
+function openGuide(){ var g = $("fieldGuide"); if (g){ g.classList.add("open"); var c = $("guideClose"); if (c) c.focus(); } }
+function closeGuide(){ var g = $("fieldGuide"); if (g) g.classList.remove("open"); }
+var gbBtn = $("guideBtn"); if (gbBtn) gbBtn.addEventListener("click", function(){ initAudio(); sndClick(); openGuide(); });
+var gcBtn = $("guideClose"); if (gcBtn) gcBtn.addEventListener("click", function(){ sndClick(); closeGuide(); });
+var fgEl = $("fieldGuide"); if (fgEl) fgEl.addEventListener("click", function(e){ if (e.target === fgEl) closeGuide(); });
+document.addEventListener("keydown", function(e){ if (e.key === "Escape") closeGuide(); });
 setPixel($("mgrSetup"), MGR_NORMAL, 4);
 renderLevelUI(); renderSegments(); renderInvites(); renderQuestions(); renderPrep(); renderReadout();
 $("startBtn").addEventListener("click", function(){ initAudio(); sndCoin(); selectLevel(state.level,true); setMusicVariant("setup"); });
@@ -1265,6 +1642,8 @@ function buildRun(){
   var rng = mulberry(hashStr(choiceKey()));
   var seg = state.seg, inv = state.invite, gm = goodwillMath();
   var kept = keptQuestions();
+  var keptDefects = {};
+  kept.forEach(function(q){ if (state.qstate[q.id] === "keep" && defectOf(q) !== "CLEAN") keptDefects[defectOf(q)] = true; });
   var scale = seg.n / 40;
 
   /* persona assignment from mix */
@@ -1286,7 +1665,7 @@ function buildRun(){
       events:[], done:false, counted:false, surveyStart:0, patienceTotal: P.patience };
     if (gm.trips && sp.spawnAt > 10500){ sp.fate = "notsent"; sp.done = true; sprites.push(sp); continue; }
     sp.angry = false; sp.dupEnv = false;
-    sp.qSpeed = false; sp.qStraight = false; sp.qDup = false; sp.qFwd = false; sp.qJunk = false;
+    sp.qSpeed = false; sp.qStraight = false; sp.qDup = false; sp.qFwd = false; sp.qJunk = false; sp.qTopBox = false; sp.qMush = false; sp.qRefusal = false; sp.qInconsist = false; sp.qEstimate = false;
 
     /* BOUNCE at DELIVERED gate */
     var rm = repMath();
@@ -1342,7 +1721,7 @@ function buildRun(){
     var stretch = GATE_X.finish - GATE_X.started - 6;
     var cums = [], runCum = state.escapes ? 0.5 : 0, crossIdx = -1;
     kept.forEach(function(q, qi){
-      runCum += state.qstate[q.id] === "simplify" ? q.min/2 : q.min;
+      runCum += effMin(q);
       cums.push(runCum);
       if (crossIdx === -1 && runCum > P.patience) crossIdx = qi;
     });
@@ -1368,6 +1747,15 @@ function buildRun(){
         if (!alive) break;
         continue;
       }
+      /* vague timeframe: no knowledge wall, but respondents invent their
+         own recall window and a share simply guess */
+      if (defectOf(q) === "VAGUE TIMEFRAME" && st === "keep"){
+        var vroll = ((sp.i * 37 + q.id * 7) % 100) / 100; /* index-derived: keeps the deterministic run stream stable */
+        if (state.escapes){
+          if (vroll < 0.55){ sp.escapedUsed = true; sp.events.push({ t: tq+350, type:"escape", x: qx, qid: q.id }); }
+          else if (vroll < 0.82){ sp.guessed = true; sp.events.push({ t: tq+350, type:"guess", x: qx, qid: q.id }); }
+        } else if (vroll < 0.5){ sp.guessed = true; sp.events.push({ t: tq+350, type:"guess", x: qx, qid: q.id }); }
+      }
       /* mobile grid friction */
       if (q.flag === "mobile" && st === "keep" && sp.mobile && rng() < 0.35){
         alive = false; sp.fate = "drop"; sp.dropCause = "mobile"; sp.dropQ = q.id;
@@ -1390,7 +1778,14 @@ function buildRun(){
       sp.qFwd = rng() < (0.02 + (seg.id === "blast" ? 0.05 : 0) + (inv.id === "generic" ? 0.03 : 0));
       var openQ = kept.filter(function(q){ return q.text.indexOf("In your own words") === 0; })[0];
       var q11kept = !!openQ;
-      sp.qJunk = rng() < (!q11kept ? 0.02 : (totalMin > P.patience ? 0.14 : 0.04));
+      sp.qJunk = rng() < (keptDefects["BROKEN OPTIONS"] ? 0.16 : 0.02);
+      /* defect symptom flags: index-derived pseudo-rolls, so adding the
+         v1.4 symptom layer never shifts the deterministic run stream */
+      sp.qTopBox = keptDefects["LEADING"] ? ((sp.i * 53 + 7) % 100) < 22 : false;
+      sp.qMush = keptDefects["DOUBLE-BARRELED"] ? ((sp.i * 41 + 13) % 100) < 20 : false;
+      sp.qRefusal = keptDefects["SENSITIVE NO ASSURANCE"] ? ((sp.i * 29 + 3) % 100) < 15 : false;
+      sp.qInconsist = keptDefects["DOUBLE NEGATIVE"] ? ((sp.i * 67 + 19) % 100) < 18 : false;
+      sp.qEstimate = keptDefects["RECALL OVERLOAD"] ? ((sp.i * 59 + 23) % 100) < 22 : false;
       sp.events.push({ t: tStart + 7600 + rng()*500, type:"finish" });
     }
     sprites.push(sp);
@@ -1399,13 +1794,14 @@ function buildRun(){
 }
 
 function tally(run){
-  var c = { invited:0, sent:0, delivered:0, bouncedHard:0, bouncedSoft:0, angry:0, dupEnv:0, qSpeed:0, qStraight:0, qDup:0, qFwd:0, qJunk:0, opened:0, started:0, completed:0, guessed:0, guessedAny:0, escapesUsed:0,
+  var c = { invited:0, sent:0, delivered:0, bouncedHard:0, bouncedSoft:0, angry:0, dupEnv:0, qSpeed:0, qStraight:0, qDup:0, qFwd:0, qJunk:0, qTopBox:0, qMush:0, qRefusal:0, qInconsist:0, qEstimate:0, guessByQ:{}, opened:0, started:0, completed:0, guessed:0, guessedAny:0, escapesUsed:0,
     drops:{ noopen:0, nostart:0, patience:0, knowledge:0, mobile:0 },
     dropPersona:{}, dropQ:{}, remRecovery:{ r1:0, r2:0 }, perPersona:{}, perAB:{A:{invited:0,completed:0},B:{invited:0,completed:0}}, perLang:{} };
   PKEYS.forEach(function(k){ c.perPersona[k] = { invited:0, opened:0, completed:0 }; });
   run.sprites.forEach(function(sp){
     c.invited++; if(c.perAB[sp.abGroup]) c.perAB[sp.abGroup].invited++; if(!c.perLang[sp.lang]) c.perLang[sp.lang]={invited:0,completed:0}; c.perLang[sp.lang].invited++;
     c.perPersona[sp.persona].invited++;
+    sp.events.forEach(function(e){ if (e.type === "guess" && e.qid) c.guessByQ[e.qid] = (c.guessByQ[e.qid]||0)+1; });
     if (sp.fate === "notsent") return;
     c.sent++;
     if (sp.angry) c.angry++;
@@ -1426,6 +1822,11 @@ function tally(run){
     if (sp.qDup) c.qDup++;
     if (sp.qFwd) c.qFwd++;
     if (sp.qJunk) c.qJunk++;
+    if (sp.qTopBox) c.qTopBox++;
+    if (sp.qMush) c.qMush++;
+    if (sp.qRefusal) c.qRefusal++;
+    if (sp.qInconsist) c.qInconsist++;
+    if (sp.qEstimate) c.qEstimate++;
     if (sp.via === "r1") c.remRecovery.r1++;
     if (sp.via === "r2") c.remRecovery.r2++;
     if (sp.guessed) c.guessed++;
@@ -1461,7 +1862,7 @@ function setupStage(run){
   var n = run.kept.length, stretch = GATE_X.finish - GATE_X.started - 6;
   $("qmarks").innerHTML = run.kept.map(function(q, qi){
     var x = GATE_X.started + 4 + (n === 1 ? stretch/2 : (qi/(n-1)) * stretch);
-    var bad = q.answerBy && state.qstate[q.id] === "keep";
+    var bad = state.qstate[q.id] === "keep" && (q.answerBy || defectOf(q) !== "CLEAN");
     return '<span class="qmark' + (bad ? " bad" : "") + '" style="left:' + x + '%">Q' + q.id + "</span>";
   }).join("");
   setPixel($("mgrRun"), MGR_NORMAL, 4);
@@ -1661,6 +2062,69 @@ $("skipBtn").addEventListener("click", function(){
   showReport();
 });
 
+/* ================= v1.5 · INSIGHT VALUE =================
+   Scored from the actual run. Each agenda topic owns an equal share of
+   100. Full share needs: a creditable question in the final instrument,
+   sound (clean, filler at half, or defective and correctly fixed;
+   defective-unfixed scales by 1 minus its observed contamination),
+   answerable by the sent segment, and at least one finisher from the
+   topic's key persona group. Stupid questions earn 0 and cost 3 each. */
+function computeInsight(c, run){
+  var agenda = agendaTopics();
+  var share = 100 / agenda.length;
+  var kept = run.kept;
+  var segPersonas = PKEYS.filter(function(k){ return (state.seg.mix[k] || 0) >= 0.05; });
+  function contamination(q){
+    if (!c.completed) return 0;
+    var d = defectOf(q), n = 0;
+    if (d === "GRID BURDEN") n = c.qStraight;
+    else if (d === "BROKEN OPTIONS") n = c.qJunk;
+    else if (d === "LEADING") n = c.qTopBox;
+    else if (d === "DOUBLE-BARRELED") n = c.qMush;
+    else if (d === "SENSITIVE NO ASSURANCE") n = c.qRefusal;
+    else if (d === "DOUBLE NEGATIVE") n = c.qInconsist;
+    else if (d === "RECALL OVERLOAD") n = c.qEstimate;
+    else if (d === "WORDY STEM") n = c.qSpeed;
+    else n = (c.guessByQ[q.id] || 0);
+    return Math.min(1, n / c.completed);
+  }
+  var topics = agenda.map(function(topic){
+    var qs = kept.filter(function(q){ return q.topic === topic; });
+    if (!qs.length) return { topic: topic, status: "LOST", earned: 0, reason: "No question on this topic is in the final instrument: it was cut, or never dealt and never added from the bank." };
+    var creditable = qs.filter(function(q){ return tierOf(q) !== "stupid"; });
+    if (!creditable.length) return { topic: topic, status: "LOST", earned: 0, reason: "Only a stupid turn-off question asked about this topic (Q" + qs[0].id + "). Stupid questions earn zero insight by design." };
+    var answerable = creditable.filter(function(q){ return !q.answerBy || q.answerBy.some(function(p){ return segPersonas.indexOf(p) >= 0; }); });
+    if (!answerable.length) return { topic: topic, status: "LOST", earned: 0, reason: "Wrong audience: the question on this topic (Q" + creditable[0].id + ") can only be answered by " + creditable[0].know + ", who are not in the segment sent." };
+    var keys = TOPIC_KEYS[topic] || [];
+    var personaOk = keys.some(function(k){ return c.perPersona[k] && c.perPersona[k].completed > 0; });
+    if (!personaOk) return { topic: topic, status: "LOST", earned: 0, reason: "Missing persona: no finisher was a " + keys.map(function(k){ return PERSONAS[k].name; }).join(" or ") + ", the group this topic is about. Who responds decides what the data can say." };
+    var best = -1, bestQ = null, bestWhy = "";
+    answerable.forEach(function(q){
+      var tier = tierOf(q), e, why;
+      if (tier === "clean"){ e = share; why = "clean question Q" + q.id; }
+      else if (tier === "filler"){ e = share * 0.5; why = "only filler Q" + q.id + " covered it (half credit)"; }
+      else if (state.qstate[q.id] === "simplify"){ e = share; why = "defective Q" + q.id + " correctly fixed with " + fixVerbFor(q); }
+      else { var cont = contamination(q); e = share * (1 - cont); why = "Q" + q.id + " kept with its " + defectOf(q) + " defect unfixed; observed contamination " + Math.round(cont * 100) + "% of completions"; }
+      if (e > best){ best = e; bestQ = q; bestWhy = why; }
+    });
+    var earned = best;
+    if (answerable.length > 1) earned = Math.min(share, earned + share * 0.10); /* second question on the topic: +10% of share */
+    var status = earned >= share * 0.99 ? "ANSWERED CREDIBLY" : "ANSWERED WITH SUSPECT DATA";
+    return { topic: topic, status: status, earned: Math.round(earned * 10) / 10, reason: "Earned " + (Math.round(earned * 10) / 10) + " of " + (Math.round(share * 10) / 10) + ": " + bestWhy + (answerable.length > 1 ? ", with a second question on the topic adding depth." : ".") };
+  });
+  var score = topics.reduce(function(a, t){ return a + t.earned; }, 0);
+  var stupidKept = kept.filter(function(q){ return tierOf(q) === "stupid"; }).length;
+  score -= stupidKept * 3;
+  var bonusTopics = {};
+  kept.forEach(function(q){
+    if (agenda.indexOf(q.topic) >= 0 || tierOf(q) === "stupid") return;
+    if (tierOf(q) === "clean" || state.qstate[q.id] === "simplify") bonusTopics[q.topic] = true;
+  });
+  var bonus = Math.min(6, Object.keys(bonusTopics).length * 2);
+  score += bonus;
+  return { score: Math.max(0, Math.min(100, Math.round(score))), topics: topics, stupidKept: stupidKept, bonus: bonus, share: share };
+}
+
 /* ================= REPORT ================= */
 function fmt(n){ return Math.round(n).toLocaleString("en-US"); }
 function pct(x){ return (Math.round(x * 10) / 10) + "%"; }
@@ -1714,21 +2178,26 @@ function showReport(){
     if (share < 0.10) nobodyCan++;
   });
   var keptCore = run.kept.filter(function(q){ return q.core; }).length;
-  var missingCore = Math.max(0, CORE_TOTAL - keptCore);
+  var missingCore = Math.max(0, coreTotalAvailable() - keptCore);
   var overMin = state.invite.id === "honest" ? Math.max(0, Math.ceil(estMinutes() - state.invite.promise)) : 0;
   var qGuess = 4 * c.guessed, qNobody = 3 * nobodyCan, qOver = 2 * overMin,
       qCore = 10 * missingCore, qEsc = (state.escapes && c.escapesUsed > 0) ? 5 : 0;
   function sharePct(n){ return c.completed ? Math.round(n / c.completed * 1000) / 10 : 0; }
   var shSpeed = sharePct(c.qSpeed), shStraight = sharePct(c.qStraight), shFwd = sharePct(c.qFwd), shJunk = sharePct(c.qJunk);
+  var shTop = sharePct(c.qTopBox), shMush = sharePct(c.qMush), shRef = sharePct(c.qRefusal), shInc = sharePct(c.qInconsist), shEst = sharePct(c.qEstimate);
   var qSpeed = Math.round(shSpeed * 0.6), qStraight = Math.round(shStraight * 0.6),
       qDup = 3 * c.qDup, qFwd = Math.round(shFwd * 0.5), qJunk = Math.round(shJunk * 0.4),
+      qTopD = Math.round(shTop * 0.5), qMushD = Math.round(shMush * 0.5), qRefD = Math.round(shRef * 0.5), qIncD = Math.round(shInc * 0.5), qEstD = Math.round(shEst * 0.5),
       qLoc = state.localization ? 2 : 0;
-  var quality = Math.max(0, Math.min(100, 100 - qGuess - qNobody - qOver - qCore + qEsc - qSpeed - qStraight - qDup - qFwd - qJunk + qLoc));
+  var quality = Math.max(0, Math.min(100, 100 - qGuess - qNobody - qOver - qCore + qEsc - qSpeed - qStraight - qDup - qFwd - qJunk - qTopD - qMushD - qRefD - qIncD - qEstD + qLoc));
 
+  var ins = computeInsight(c, run);
+  var insight = ins.score;
   var targetRate = curLevel().target;
-  var won = respRate > targetRate && quality >= 60 && (state.level!==4 || gm.ending >= 35);
+  var won = respRate > targetRate && quality >= 60 && insight >= insightGate() && (state.level!==4 || gm.ending >= 35);
+  var fastUseless = !won && respRate > targetRate && quality >= 60 && insight < insightGate();
   var grade;
-  if (won) grade = (respScore >= 85 && quality >= 85) ? "S" : (respScore >= 70 && quality >= 70) ? "A" : "B";
+  if (won){ var avg3 = (respScore + quality + insight) / 3; grade = avg3 >= 85 ? "S" : avg3 >= 70 ? "A" : "B"; }
   else grade = (respRate >= 0.09 || (quality >= 60 && respRate >= 0.06)) ? "C" : "TRY AGAIN";
   if(won){ state.campaignWon[state.level]=true; state.unlocked=Math.max(state.unlocked, Math.min(6, state.level+1)); if(!state.campaignBest[state.level] || (GRADE_RANK[grade]||0)>(GRADE_RANK[state.campaignBest[state.level]]||0)) state.campaignBest[state.level]=grade; }
   else if(!state.campaignBest[state.level]){ /* keep empty until won for level grid best-on-win; still show last grade below */ }
@@ -1753,13 +2222,13 @@ function showReport(){
       lever:"LEVER 2 · INVITATION", quest:"Use an invite with a why-me line and a stated time, then check the questionnaire really matches the promise." },
     { key:"patience", n: c.drops.patience * scale, gate:"INSIDE THE SURVEY · CLOCK",
       cause:function(p){ return "The survey ran past the " + PERSONAS[p].lower + "'s patience of about " + PERSONAS[p].patience + " minutes, and the clock won."; },
-      lever:"LEVER 3 · QUESTIONNAIRE", quest:"Cut or simplify until the estimated length fits inside the shortest patience in your mix." },
+      lever:"LEVER 3 · QUESTIONNAIRE", quest:"Cut questions, or SIMPLIFY a WORDY STEM (the one class that verb fixes), until the estimated length fits inside the shortest patience in your mix. Speeding traces to total length, so length is the lever." },
     { key:"knowledge", n: c.drops.knowledge * scale, gate:"INSIDE THE SURVEY · KNOWLEDGE",
       cause:function(p){ return "A question asked for something a " + PERSONAS[p].lower + " cannot see from their role, so they quit instead of guessing."; },
-      lever:"LEVER 3 · QUESTIONNAIRE", quest:"Cut or simplify the question only another role can answer, or add DK/NA escapes so it stops ending runs." },
+      lever:"LEVER 3 · QUESTIONNAIRE", quest:"Name the class first: BEYOND KNOWLEDGE has no wording fix, so CUT it (1 cr) or buy DK/NA escapes; JARGON takes DEFINE, a VAGUE TIMEFRAME takes ANCHOR (2 cr each)." },
     { key:"mobile", n: c.drops.mobile * scale, gate:"INSIDE THE SURVEY · PHONE",
       cause:function(p){ return "A wide grid question on a phone screen ended the run for " + PERSONAS[p].lower + "s answering between other jobs."; },
-      lever:"LEVER 3 · QUESTIONNAIRE", quest:"Simplify the grid question so it works one-handed on a phone, or cut it and ask the top item only." }
+      lever:"LEVER 3 · QUESTIONNAIRE", quest:"The class is GRID BURDEN: BREAK UP the grid (3 cr) so it works one item at a time on a phone, or CUT it (1 cr) and ask the top item only." }
   ];
   var drops = dropDefs.filter(function(d){ return d.n > 0; }).sort(function(a,b){ return b.n - a.n; }).slice(0, 3);
   var questDrop = drops[0];
@@ -1785,9 +2254,10 @@ function showReport(){
     vsHTML = '<div class="reportcard"><h2>THIS ROUND VS LAST ROUND</h2>' +
       '<div class="simnote">The proof-of-concept stand-in for an A/B test: one setup change at a time, then compare.</div>' +
       '<div class="vsrow"><span class="h">Response rate</span><span>Last: ' + pct(L.rate * 100) + '</span><span>Now: ' + pct(respRate * 100) + "</span>" + delta(respRate * 100, L.rate * 100, " pts", true) + "</div>" +
-      '<div class="vsrow" style="margin-top:6px"><span class="h">Data quality</span><span>Last: ' + L.quality + '</span><span>Now: ' + quality + "</span>" + delta(quality, L.quality, " pts", true) + "</div></div>";
+      '<div class="vsrow" style="margin-top:6px"><span class="h">Data quality</span><span>Last: ' + L.quality + '</span><span>Now: ' + quality + "</span>" + delta(quality, L.quality, " pts", true) + "</div>" +
+      (L.insight !== undefined ? '<div class="vsrow" style="margin-top:6px"><span class="h">Insight Value</span><span>Last: ' + L.insight + '</span><span>Now: ' + insight + "</span>" + delta(insight, L.insight, " pts", true) + "</div>" : "") + "</div>";
   }
-  var prevRound = { rate: respRate, quality: quality };
+  var prevRound = { rate: respRate, quality: quality, insight: insight };
 
   var funnelSteps = [
     ["INVITED", simInvites, 1], ["SENT", simSent, simInvites ? simSent / simInvites : 0], ["DELIVERED", simDelivered, simInvites ? simDelivered / simInvites : 0],
@@ -1801,7 +2271,8 @@ function showReport(){
   html += '<div class="scorehead">' +
     '<div class="scorebox"><div class="lbl">RESPONSE SCORE</div><div class="num">' + respScore + '</div><div class="sub">Response rate ' + pct(respRate * 100) + " vs the 12% level target. Score scales to a 20% stretch.</div></div>" +
     '<div class="scorebox q"><div class="lbl">DATA QUALITY SCORE</div><div class="num">' + quality + '</div><div class="sub">' + (c.completed === 0 ? "No completions at all, so there is no response data to grade. The score is theoretical until somebody finishes." : quality >= 60 ? "At or above the 60-point quality gate." : "Below the 60-point quality gate. The round cannot be won on rate alone.") + "</div></div>" +
-    '<div class="gradebox ' + (won ? "win" : "lose") + '" id="gradeBox"><div class="g" style="font-size:' + (grade.length > 2 ? "22px" : "") + '">' + grade + '</div><div class="w">' + (won ? "ROUND WON" : gm.trips ? "BREAKER TRIPPED" : "NOT YET") + '</div><div style="font-family:\'Press Start 2P\',monospace;font-size:8px;color:var(--gold);margin-top:10px;line-height:1.6">BEST: ' + state.bestGrade + " \u00B7 " + pct(state.bestRate * 100) + "</div></div></div>";
+    '<div class="scorebox i"><div class="lbl">INSIGHT VALUE</div><div class="num">' + insight + '</div><div class="sub">' + (insight >= insightGate() ? "At or above the " + insightGate() + "-point insight gate: the agenda topics came back answered credibly." : "Below the " + insightGate() + "-point insight gate. See the VALUE panel: a high rate on the wrong questions is not business value.") + "</div></div>" +
+    '<div class="gradebox ' + (won ? "win" : "lose") + '" id="gradeBox"><div class="g" style="font-size:' + (grade.length > 2 ? "22px" : "") + '">' + grade + '</div><div class="w">' + (won ? "ROUND WON" : fastUseless ? "FAST AND USELESS" : gm.trips ? "BREAKER TRIPPED" : "NOT YET") + '</div><div style="font-family:\'Press Start 2P\',monospace;font-size:8px;color:var(--gold);margin-top:10px;line-height:1.6">BEST: ' + state.bestGrade + " \u00B7 " + pct(state.bestRate * 100) + "</div></div></div>";
 
   html += '<div style="display:flex;gap:14px;align-items:center;margin-bottom:14px;flex-wrap:wrap"><div id="mgrReport"></div>' +
     '<p class="mgrcaption">' + (gm.trips ? "The breaker tripped and the segment went dark mid-send. Goodwill is spent by long surveys, reminders, and questions people cannot answer." : won ? "Clean send. The manager approves, and so does the breaker panel." : "The send went out. The detective report below shows exactly where it leaked.") + "</p></div>";
@@ -1835,6 +2306,7 @@ function showReport(){
     (gm.spendUnans ? "<tr><td>Unanswerable questions kept (" + gm.unansCount + " questions, per affected persona group \u00D7 6)</td><td>\u2212" + gm.spendUnans + "</td></tr>" : "") +
     (gm.spendOver ? "<tr><td>Honest Ask overrun (" + estMinutes() + " min vs the promised " + state.invite.promise + ")</td><td>\u2212" + gm.spendOver + "</td></tr>" : "") +
     (gm.spendNoSupp ? "<tr><td>Mailed anyway: opt-outs / surveyed in last 30 days (no suppression scrub)</td><td>\u2212" + gm.spendNoSupp + "</td></tr>" : "") +
+    (gm.spendStupid ? "<tr><td>Stupid turn-off questions kept (" + gm.stupidKept + " \u00D7 2 resentment)</td><td>\u2212" + gm.spendStupid + "</td></tr>" : "") +
     (gm.earn ? "<tr><td>Earned back (" + state.invite.name + (state.invite.id === "honest" ? ", promise kept" : ", closing the loop") + ")</td><td>+" + gm.earn + "</td></tr>" : "") +
     worthLine(1, c.remRecovery.r1) + worthLine(2, c.remRecovery.r2) +
     '<tr class="total"><td>Ending goodwill</td><td>' + Math.max(0, gm.ending) + (gm.trips ? " · BREAKER TRIPPED" : "") + "</td></tr></table></div>";
@@ -1866,10 +2338,15 @@ function showReport(){
     (c.dupEnv ? "<p style='font-size:15.5px;margin:4px 0'><b>No dedupe:</b> duplicate envelopes went out during the run. <b>Fix:</b> buy the Dedupe pass (4 cr).</p>" : "") +
     '<h2 style="margin-top:14px">DATA QUALITY FLAGS</h2>' +
     flagRow("Speeders", c.qSpeed, shSpeed, qSpeed, "Clicked through far too fast to have read the questions. Long, low-relevance surveys breed them, and a flagged completion counts half.", "LEVER 1 relevance and LEVER 3 length: shorten the survey and send it while the case is warm.") +
-    flagRow("Straight liners", c.qStraight, shStraight, qStraight, "Same answer down every row. The heavy grid question is the usual factory.", "LEVER 3: simplify the grid question, or cut it and ask the top item only.") +
+    flagRow("Straight liners", c.qStraight, shStraight, qStraight, "Same answer down every row. That is the GRID BURDEN question doing exactly what grid burden does (Krosnick satisficing).", "LEVER 3: BREAK UP the grid question (3 cr), or CUT it (1 cr). A generic simplify is not offered for this class.") +
     flagRow("Duplicates", c.qDup, sharePct(c.qDup), qDup, "The same response counted twice because duplicate addresses were never removed.", "PREP: buy the Dedupe pass (4 cr).") +
     flagRow("Forwarded link responses", c.qFwd, shFwd, qFwd, "The invite link got forwarded and people outside the segment answered, hurting sample fit.", "LEVER 1 and LEVER 2: tighter audience, and an invite written for the named recipient.") +
-    flagRow("Junk open text", c.qJunk, shJunk, qJunk, "The open-text box filled with noise because patience ran out before the last question.", "LEVER 3: get the estimated length under the tightest patience, and keep the open-text question early enough to matter.") +
+    flagRow("Junk / Other-box noise", c.qJunk, shJunk, qJunk, "Respondents who fit no option land in Other, and Other collects junk. That traces to BROKEN OPTIONS: overlapping ranges or no fitting box.", "LEVER 3: FIX OPTIONS (2 cr) so ranges are exhaustive and mutually exclusive, or CUT the question.") +
+    flagRow("Suspect top-box", c.qTopBox, shTop, qTopD, "Positives inflated past credibility. A LEADING question ('How excellent...') manufactures top-box answers.", "LEVER 3: NEUTRALIZE the leading question (2 cr), or CUT it.") +
+    flagRow("Mid-scale mush", c.qMush, shMush, qMushD, "Answers parked in the middle, saying nothing. Two judgments in one DOUBLE-BARRELED item force exactly that hedge.", "LEVER 3: SPLIT the double-barreled question (3 cr), or CUT it. Simplifying cannot un-barrel it.") +
+    flagRow("Refusals / safe answers", c.qRefusal, shRef, qRefD, "A SENSITIVE question with no confidentiality line gets refusals and safe answers instead of true ones.", "LEVER 3: ADD PRIVACY LINE (2 cr), or CUT the question.") +
+    flagRow("Misread inconsistency", c.qInconsist, shInc, qIncD, "Answers that contradict the respondent's own pattern. A DOUBLE NEGATIVE item was parsed the wrong way round.", "LEVER 3: REWORD the double negative (2 cr), or CUT it.") +
+    flagRow("Estimation guesses", c.qEstimate, shEst, qEstD, "Counts and averages nobody can recall honestly, presented as numbers. That is RECALL OVERLOAD: a 12-month window.", "LEVER 3: SHORTEN WINDOW (2 cr) to a recall period people can actually use, or CUT it.") +
     "</div>";
 
   /* guesses + quality breakdown */
@@ -1883,37 +2360,131 @@ function showReport(){
     (qGuess ? "<span>\u2212" + qGuess + " for guessed completions (" + c.guessed + " guessing respondents \u00D7 4)</span>" : "") +
     (qNobody ? "<span>\u2212" + qNobody + " for kept questions essentially no one in this segment can answer (\u00D7 3)</span>" : "") +
     (qOver ? "<span>\u2212" + qOver + " for overrunning the invite's stated time (" + overMin + " min \u00D7 2)</span>" : "") +
-    (qCore ? "<span>\u2212" + qCore + " for cutting " + missingCore + " of the 6 core questions (\u00D7 10). A one-question survey posts a great rate and decides nothing.</span>" : "") +
+    (qCore ? "<span>\u2212" + qCore + " for cutting " + missingCore + " of the " + coreTotalAvailable() + " core questions in play (\u00D7 10). A one-question survey posts a great rate and decides nothing.</span>" : "") +
     (qSpeed ? "<span>\u2212" + qSpeed + " for speeders (" + shSpeed + "% of completions, flagged completions count half)</span>" : "") +
     (qStraight ? "<span>\u2212" + qStraight + " for straight liners (" + shStraight + "% of completions)</span>" : "") +
     (qDup ? "<span>\u2212" + qDup + " for duplicates (" + c.qDup + " duplicate responses \u00D7 3)</span>" : "") +
     (qFwd ? "<span>\u2212" + qFwd + " for forwarded link responses (" + shFwd + "% of completions)</span>" : "") +
-    (qJunk ? "<span>\u2212" + qJunk + " for junk open text (" + shJunk + "% of completions)</span>" : "") +
+    (qJunk ? "<span>\u2212" + qJunk + " for junk / Other-box noise (" + shJunk + "% of completions)</span>" : "") +
+    (qTopD ? "<span>\u2212" + qTopD + " for suspect top-box inflation from a LEADING question (" + shTop + "% of completions)</span>" : "") +
+    (qMushD ? "<span>\u2212" + qMushD + " for mid-scale mush from a DOUBLE-BARRELED question (" + shMush + "% of completions)</span>" : "") +
+    (qRefD ? "<span>\u2212" + qRefD + " for refusals / safe answers at a SENSITIVE question with no assurance (" + shRef + "% of completions)</span>" : "") +
+    (qIncD ? "<span>\u2212" + qIncD + " for misread inconsistency from a DOUBLE NEGATIVE question (" + shInc + "% of completions)</span>" : "") +
+    (qEstD ? "<span>\u2212" + qEstD + " for estimation guesses at a RECALL OVERLOAD question (" + shEst + "% of completions)</span>" : "") +
     (qLoc ? "<span>+2 because a localization review was bought</span>" : "") +
     (qEsc ? "<span>+5 because DK/NA escapes were on and " + c.escapesUsed + " respondents used them instead of guessing</span>" : "") +
     "<span><b>Data quality: " + quality + " / 100.</b></span></div></div>";
 
+  /* v1.4 defect diagnostics: OBSERVED with the run's real symptom count,
+     or LATENT with no count claimed. */
+  function symptomCountFor(q){
+    var d = defectOf(q);
+    if (d === "GRID BURDEN") return c.qStraight + (c.dropQ[q.id] || 0);
+    if (d === "BROKEN OPTIONS") return c.qJunk;
+    if (d === "LEADING") return c.qTopBox;
+    if (d === "DOUBLE-BARRELED") return c.qMush;
+    if (d === "SENSITIVE NO ASSURANCE") return c.qRefusal;
+    if (d === "DOUBLE NEGATIVE") return c.qInconsist;
+    if (d === "RECALL OVERLOAD") return c.qEstimate;
+    if (d === "WORDY STEM") return c.qSpeed;
+    return (c.guessByQ[q.id] || 0) + (d === "BEYOND KNOWLEDGE" ? (c.dropQ[q.id] || 0) : 0);
+  }
+  var defectObserved = [];
+  var defectRowsHTML = run.kept.filter(function(q){ return defectOf(q) !== "CLEAN"; }).map(function(q){
+    var d = defectOf(q), info = fixInfoFor(q);
+    if (state.qstate[q.id] === "simplify") return "<p style='font-size:15px;margin:4px 0'><b>Q" + q.id + " \u00B7 " + d + ": FIXED</b> with " + fixVerbFor(q) + ". No symptom risk remains from this item.</p>";
+    var n = symptomCountFor(q);
+    if (n > 0) defectObserved.push({ q: q, d: d, n: n });
+    var fixTxt = fixVerbFor(q) ? fixVerbFor(q) + " (" + fixCostFor(q) + " cr) or CUT (1 cr)" : "No wording fix \u2014 CUT (1 cr) or DK/NA escapes (2 cr)";
+    return "<p style='font-size:15px;margin:4px 0'><b>Q" + q.id + " \u00B7 " + d + ": " + (n > 0 ? "OBSERVED" : "LATENT") + ".</b> Symptom: " + info.symptom + (n > 0 ? " \u2014 " + fmt(n * scale) + " simulated respondents (" + n + " sprites) showed it this run." : " \u2014 no symptom this run, so no count is claimed; the defect is still a measurement risk.") + " <b>Fix:</b> " + fixTxt + "</p>";
+  }).join("");
+  var largestObservedDefect = defectObserved.sort(function(a,b){ return b.n - a.n; })[0] || null;
+  html += '<div class="reportcard"><h2>DEFECT DIAGNOSTICS \u00B7 PER QUESTION</h2>' +
+    '<div class="simnote">Every defective question kept this run, reported OBSERVED with its actual symptom count or LATENT with none. Speeding traces to total instrument length (satisficing), never to a single question; guess clusters trace to BEYOND KNOWLEDGE, JARGON and VAGUE TIMEFRAME items kept unfixed.</div>' +
+    (defectRowsHTML || "<p style='font-size:15px'>No defective questions were kept this run. The instrument that shipped was clean.</p>") + "</div>";
+  /* v1.5 VALUE panel: every agenda topic, verdicted from the run itself */
+  var statusColor = { "ANSWERED CREDIBLY": "#14713f", "ANSWERED WITH SUSPECT DATA": "#8a6408", "LOST": "#b3372f" };
+  html += '<div class="reportcard"><h2>VALUE · DID THE BUSINESS GET ITS ANSWERS?</h2>' +
+    '<div class="simnote">Insight Value ' + insight + ' / 100 (gate ' + insightGate() + '+). Each agenda topic owns ' + (Math.round(ins.share * 10) / 10) + ' points. A topic pays out only when its question shipped, was sound, could be answered by this audience, and was answered by finishers from the group the topic is about.' + (ins.bonus ? ' Non-agenda sound topics added +' + ins.bonus + '.' : '') + (ins.stupidKept ? ' Kept stupid questions cost ' + (ins.stupidKept * 3) + ' insight (' + ins.stupidKept + ' kept × 3) on top of earning nothing.' : '') + '</div>' +
+    ins.topics.map(function(t){
+      return '<div class="dropitem"><div class="dh" style="text-transform:capitalize">' + t.topic + ' · <span style="color:' + statusColor[t.status] + '">' + t.status + '</span></div><p>' + t.reason + '</p></div>';
+    }).join("") +
+    (fastUseless ? '<p style="font-size:16px;margin-top:10px"><b>Verdict: FAST AND USELESS.</b> The rate and the data quality both passed, and the survey still failed, because the business questions it existed to answer came back empty or suspect. Response rate is a weak proxy for value: who answers, and what they were asked, decides what the data can support.</p>' : '') +
+    "</div>";
   html += extraReportHTML(c);
   /* quest */
-  if (questDrop){
+  var lostTopics = ins.topics.filter(function(t){ return t.status === "LOST"; });
+  var suspectTopics = ins.topics.filter(function(t){ return t.status === "ANSWERED WITH SUSPECT DATA"; });
+  if (!won && insight < insightGate() && respRate > targetRate && lostTopics.length){
+    html += '<div class="reportcard"><h2>FIX QUEST · NEXT TRY</h2><div class="quest"><span class="px">\u2605 QUEST</span>' +
+      "The reach worked; the value did not. <b>" + lostTopics.length + " agenda topic(s) came back LOST</b>, first: <b style='text-transform:capitalize'>" + lostTopics[0].topic + "</b>. " + lostTopics[0].reason + " On TRY AGAIN, restore a cut question on that topic or ADD one from the question bank (3 cr): the bank is dealt to cover exactly these gaps." + "</div></div>";
+  } else if (!won && insight < insightGate() && suspectTopics.length && !lostTopics.length){
+    html += '<div class="reportcard"><h2>FIX QUEST · NEXT TRY</h2><div class="quest"><span class="px">\u2605 QUEST</span>' +
+      "Every agenda topic was asked, but <b style='text-transform:capitalize'>" + suspectTopics[0].topic + "</b> came back suspect: " + suspectTopics[0].reason + " Fix the defect on that question with its class-correct verb, or swap it for the clean bank version (ADD 3 cr, CUT 1 cr)." + "</div></div>";
+  } else if (largestObservedDefect){
+    var LOD = largestObservedDefect, lodInfo = fixInfoFor(LOD.q);
+    html += '<div class="reportcard"><h2>FIX QUEST · NEXT TRY</h2><div class="quest"><span class="px">\u2605 QUEST</span>' +
+      "Largest OBSERVED defect damage: <b>" + LOD.d + "</b> on Q" + LOD.q.id + " \u2014 " + lodInfo.symptom.toLowerCase() + ", " + fmt(LOD.n * scale) + " simulated respondents this run. " +
+      (fixVerbFor(LOD.q) ? "Apply the class-correct fix: <b>" + fixVerbFor(LOD.q) + " (" + fixCostFor(LOD.q) + " cr)</b>, or CUT it (1 cr). No other verb fixes this class." : "<b>No wording fix exists for this class.</b> CUT it (1 cr), or buy the DK/NA escapes (2 cr) so it stops ending runs.") + "</div></div>";
+  } else if (questDrop){
     var qp = topPersona(questDrop.key) || "end";
     html += '<div class="reportcard"><h2>FIX QUEST · NEXT TRY</h2><div class="quest"><span class="px">\u2605 QUEST</span>' +
       "Biggest recoverable leak: <b>" + questDrop.gate + "</b>, about " + fmt(questDrop.n) + " simulated people, mostly " + PERSONAS[qp].lower + "s. " + questDrop.quest + "</div></div>";
   }
 
+  /* v1.5 ONE LESSON recap: the single biggest trade lesson of this run,
+     in plain words first, methodology term in parentheses. */
+  var PLAIN_DEFECT = {
+    "DOUBLE-BARRELED": "one question was secretly two questions, so its answers cannot be read",
+    "LEADING": "the wording pushed people toward the happy answer, so the praise cannot be trusted",
+    "JARGON": "insider words the audience does not share made people guess",
+    "VAGUE TIMEFRAME": "no time period was named, so everyone answered about a different period",
+    "RECALL OVERLOAD": "people were asked to count a year of events from memory, so the numbers are inventions",
+    "BEYOND KNOWLEDGE": "a question asked for facts this audience cannot see from their job",
+    "DOUBLE NEGATIVE": "stacked negatives flipped the meaning and people answered the opposite",
+    "BROKEN OPTIONS": "the answer choices overlapped, so honest answers landed in junk boxes",
+    "GRID BURDEN": "a giant rating grid on a phone made people tap the same answer down the page",
+    "SENSITIVE NO ASSURANCE": "a risky question with no privacy promise got safe answers instead of true ones",
+    "WORDY STEM": "a paragraph-long question spent people's patience before they could answer"
+  };
+  var lessonTxt, lessonTry;
+  if (won){
+    lessonTxt = "You protected coverage while trimming: that is the job. The survey got shorter and the business still got every answer it came for.";
+    lessonTry = "Keep the habit on the next level: change one lever per attempt and let the report prove the change worked.";
+  } else if (fastUseless){
+    lessonTxt = "A popular survey can still be a useless one. The replies came back fast and clean, and the questions the business actually needed were not in the instrument (Insight Value: response rate does not measure value).";
+    lessonTry = "Restore or ADD a question for each LOST topic in the VALUE panel, then re-send. Reach was never the problem.";
+  } else if (lostTopics.length){
+    lessonTxt = "The business topic '" + lostTopics[0].topic + "' came back with no usable answer (Insight Value: a topic only counts when it is asked, sound, answerable, and answered by the people it is about). " + lostTopics[0].reason;
+    lessonTry = "TRY AGAIN and ADD the bank question on '" + lostTopics[0].topic + "' (3 cr), or restore the question you cut.";
+  } else if (largestObservedDefect){
+    lessonTxt = "The biggest leak was self-inflicted: " + (PLAIN_DEFECT[largestObservedDefect.d] || "a defective question damaged its own answers") + " (" + largestObservedDefect.d + "). " + fmt(largestObservedDefect.n * scale) + " simulated respondents showed the symptom this run.";
+    lessonTry = fixVerbFor(largestObservedDefect.q) ? (fixVerbFor(largestObservedDefect.q) + " Q" + largestObservedDefect.q.id + " (" + fixCostFor(largestObservedDefect.q) + " cr), then re-send. One fix, one change, one comparison.") : ("CUT Q" + largestObservedDefect.q.id + " (1 cr), or buy the DK/NA escapes (2 cr), then re-send.");
+  } else if (questDrop){
+    lessonTxt = "The instrument was not the main problem this time; the funnel leaked at " + questDrop.gate.toLowerCase() + " (reach: who gets the invite, and whether it earns the click, decides everything downstream).";
+    lessonTry = questDrop.quest;
+  } else if (gm.trips){
+    lessonTxt = "Goodwill is a budget too. This send spent the list's patience to zero and the breaker stopped the mailing (goodwill: every ask spends trust that later asks need).";
+    lessonTry = "Shorten the instrument, keep reminders to one, and buy the suppression scrub so the wrong people stop getting mailed.";
+  } else {
+    lessonTxt = "No single disaster: the round fell short on the gates. Read the three scores and fix the lowest one first (triangulation: rate, quality, and value are separate problems with separate levers).";
+    lessonTry = "Change exactly one lever, re-send, and compare in THIS ROUND VS LAST ROUND.";
+  }
+  html += '<div class="lessoncard"><h2>ONE LESSON · MARGE, SENIOR IM</h2><p>' + lessonTxt + '</p><p><b>TRY THIS NEXT:</b> ' + lessonTry + '</p></div>';
+
   html += vsHTML;
 
   /* attempt history strip (this attempt included) */
-  var histEntries = state.history.concat([{ attempt: state.attempt, rate: respRate, quality: quality, spent: state.launchCost || 0, won: won }]);
+  var histEntries = state.history.concat([{ attempt: state.attempt, rate: respRate, quality: quality, insight: insight, spent: state.launchCost || 0, won: won }]);
   html += '<div class="reportcard"><h2>ATTEMPT HISTORY · THIS LEVEL</h2><div class="simnote">One budget pool across every attempt in this chain. Prep, instrument edits, goodwill and reputation carry between attempts.</div>' +
-    histEntries.map(function(h){ return '<p style="font-size:15px;margin:4px 0">Attempt ' + h.attempt + ': <b>' + pct(h.rate * 100) + '</b> response · quality <b>' + h.quality + '</b> · spent ' + h.spent + ' cr' + (h.won ? ' · <b>WON</b>' : '') + '</p>'; }).join("") +
+    histEntries.map(function(h){ return '<p style="font-size:15px;margin:4px 0">Attempt ' + h.attempt + ': <b>' + pct(h.rate * 100) + '</b> response · quality <b>' + h.quality + '</b>' + (h.insight !== undefined ? ' · insight <b>' + h.insight + '</b>' : '') + ' · spent ' + h.spent + ' cr' + (h.won ? ' · <b>WON</b>' : '') + '</p>'; }).join("") +
     '<p style="font-size:15px;margin-top:8px">Best attempt rate so far: <b>' + pct(Math.max(state.bestAttemptRate, respRate) * 100) + '</b> · Credits remaining: <b>' + remainingAfter + ' / ' + BUDGET_TOTAL + '</b></p></div>';
 
   var canRetry = remainingAfter >= 30;
   var levelFailed = !won && !canRetry;
   if (levelFailed){
     html += '<div class="reportcard" style="background:#2b0f16;color:#ffd7db;border-color:var(--red)"><h2 style="color:var(--red)">\u25A0 LEVEL FAILED \u25A0</h2>' +
-      '<p style="font-size:16px;line-height:1.55">The budget ran out before the target fell. Target was <b>response rate &gt; ' + Math.round(targetRate * 100) + '% with quality 60+</b>. Your best attempt reached <b>' + pct(Math.max(state.bestAttemptRate, respRate) * 100) + '</b>. Only <b>' + remainingAfter + ' credits</b> remain, and the cheapest possible send costs 30, so no further attempt can be mailed on this level.</p>' +
+      '<p style="font-size:16px;line-height:1.55">The budget ran out before the target fell. Target was <b>response rate &gt; ' + Math.round(targetRate * 100) + '% with quality 60+ and Insight ' + insightGate() + '+</b>. Your best attempt reached <b>' + pct(Math.max(state.bestAttemptRate, respRate) * 100) + '</b>. Only <b>' + remainingAfter + ' credits</b> remain, and the cheapest possible send costs 30, so no further attempt can be mailed on this level.</p>' +
       '<p style="font-size:15px">The lesson is in the attempt history above: the pool is spent across attempts, so the cheap early fixes matter.</p>' +
       '<div class="againrow"><button class="againbtn" id="failedNewGameBtn" style="background:var(--gold)">\u21BB NEW GAME</button><button class="againbtn" id="levelSelectBtn">\u25C0 LEVEL SELECT</button></div></div>';
   } else if (!canRetry && won){
@@ -1991,6 +2562,7 @@ function resetCampaignNewGame(){
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 function spawnConfetti(){
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return; /* reduced motion: no confetti */
   var cab = $("cabinet"); if (!cab) return;
   var colors = ["#2ee6a8","#f5c542","#ff5d6c","#3fa7f5","#43d17c","#b78bff","#ff9f43"];
   var rectW = cab.clientWidth || 800;
@@ -2092,13 +2664,18 @@ document.addEventListener("visibilitychange", function(){
 });
 /* ---- preferences (this device only) ---- */
 function savePrefs(){
-  try { localStorage.setItem("dvc-sound-prefs", JSON.stringify({ musicOn: state.musicOn, sfxOn: state.sfxOn, muted: state.muted, musicVol: state.musicVol, sfxVol: state.sfxVol })); } catch(e){}
+  try { localStorage.setItem("dvc-sound-prefs", JSON.stringify({ musicOn: state.musicOn, sfxOn: state.sfxOn, muted: state.muted, musicVol: state.musicVol, sfxVol: state.sfxVol, hints: state.hints })); } catch(e){}
 }
 function loadPrefs(){
   try {
     var p = JSON.parse(localStorage.getItem("dvc-sound-prefs") || "null");
-    if (p){ state.musicOn = p.musicOn !== false; state.sfxOn = p.sfxOn !== false; state.muted = !!p.muted; if (typeof p.musicVol === "number") state.musicVol = p.musicVol; if (typeof p.sfxVol === "number") state.sfxVol = p.sfxVol; }
+    if (p){ state.musicOn = p.musicOn !== false; state.sfxOn = p.sfxOn !== false; state.muted = !!p.muted; if (typeof p.musicVol === "number") state.musicVol = p.musicVol; if (typeof p.sfxVol === "number") state.sfxVol = p.sfxVol; if (typeof p.hints === "boolean") state.hints = p.hints; }
   } catch(e){}
+}
+function applyHints(){
+  document.body.classList.toggle("hints-off", !state.hints);
+  var ht = $("hintsToggle");
+  if (ht){ ht.textContent = "HINTS: " + (state.hints ? "ON" : "OFF"); ht.classList.toggle("sel", state.hints); }
 }
 function updateSoundUI(){
   var mt = $("musicToggle"), st = $("sfxToggle"), mu = $("muteToggle"), sb = $("soundBtn");
@@ -2111,7 +2688,8 @@ function updateSoundUI(){
   if (sv) sv.value = Math.round(state.sfxVol * 100);
 }
 function toggleMute(){ state.muted = !state.muted; savePrefs(); updateSoundUI(); applyMusicGain(120); if (!state.muted) sndClick(); }
-loadPrefs(); updateSoundUI();
+loadPrefs(); updateSoundUI(); applyHints();
+var htB = $("hintsToggle"); if (htB) htB.addEventListener("click", function(){ initAudio(); state.hints = !state.hints; savePrefs(); applyHints(); if (state.hints) sndClick(); });
 var mtB = $("musicToggle"); if (mtB) mtB.addEventListener("click", function(){ initAudio(); state.musicOn = !state.musicOn; savePrefs(); updateSoundUI(); applyMusicGain(150); if (state.musicOn) sndClick(); });
 var stB = $("sfxToggle"); if (stB) stB.addEventListener("click", function(){ initAudio(); state.sfxOn = !state.sfxOn; savePrefs(); updateSoundUI(); if (state.sfxOn) sndClick(); });
 var muB = $("muteToggle"); if (muB) muB.addEventListener("click", function(){ initAudio(); toggleMute(); });

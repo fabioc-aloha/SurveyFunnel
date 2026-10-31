@@ -89,6 +89,51 @@ buttons; the speaker button in the header and the M key mute
 everything. Your settings are remembered on the device. Audio
 starts after your first click, as browsers require.
 
+## Question defects and their fixes
+
+Every defective question has one named defect, and the fix button
+names the real repair. Simplifying does not fix everything:
+
+- **Double-barreled** (two judgments, one answer): SPLIT it, or
+  cut one half.
+- **Leading** (wording pushes an answer): NEUTRALIZE it.
+- **Jargon / acronym**: DEFINE it in plain words.
+- **Vague timeframe** ("recently"): ANCHOR it to a real window.
+- **Recall overload** (counting a year of events): SHORTEN the
+  window.
+- **Beyond knowledge** (they cannot know this): CUT it, or add
+  Don't Know escapes.
+- **Double negative**: REWORD it positive.
+- **Broken options** (overlap, or no fit): FIX the options.
+- **Grid burden** (long matrix): BREAK IT UP, or cut rows.
+- **Sensitive, no assurance**: ADD a privacy line.
+- **Wordy stem**: SIMPLIFY it.
+
+The Detective only blames a defect for damage it actually saw in
+your run; the rest are flagged as risks. The full field guide is
+`docs/question-defects.md`.
+
+## The third score: Insight Value
+
+Each level brief lists an agenda: the business topics the survey
+exists to answer. Insight Value (0-100) credits a topic only when
+its question is in your final survey, sound (clean, or fixed the
+right way), answerable by the audience you sent, and answered by
+finishers from the personas the topic is about. Stupid questions
+earn nothing and cost Insight and goodwill. Winning takes all
+three gates: rate at target, quality 60+, Insight 60+ (70+ in the
+finale). Pass the first two and fail Insight and the run is
+stamped FAST AND USELESS: plenty of answers, nothing learned.
+
+## Learning the trade
+
+Marge, a senior IM, coaches one tip per setup stage (turn her off
+with the HINTS toggle once you know the ropes). The FIELD GUIDE
+button explains every term in plain words, and every report ends
+with ONE LESSON and a TRY THIS NEXT line. Setup steps are numbered
+1 to 4, and the ready checklist above LAUNCH shows what you have
+decided so far; it never blocks you.
+
 ## Personas
 
 | Persona | Patience | Answers well | Cannot answer |

@@ -41,9 +41,12 @@ read the Drop-off Detective, go again.
 - **A funnel you can watch.** Forty persona sprites walk SENT,
   DELIVERED, OPENED, STARTED, FINISH. They bounce, wander off, stall
   on questions they cannot answer, or jump at the finish line.
-- **Two scores.** Response score first, data quality second, and
-  quality gates the win: beat the rate target with a gutted survey
-  and you still lose.
+- **Three scores.** Response rate first, data quality second,
+  Insight Value third, and all three gate the win: beat the rate
+  target with a gutted or off-agenda survey and you still lose.
+  The 64 question bank deals a different instrument every game,
+  and a coach, a field guide, and a one-lesson recap teach the
+  trade as you play.
 - **Six levels.** First Send, The Split (A/B testing), The
   Stakeholder, The Tired List, 45 Languages, The Big Quarter.
 

@@ -1,5 +1,29 @@
 # Changelog
 
+## v1.5 - 2026-10-31 - Big bank, Insight Value, novice UX
+
+- Question bank expanded to 64: 26 clean, 22 defective (two per
+  defect class), 10 stupid turn-off items, 6 filler. Instruments
+  deal 9 to 16 questions into the same A-F skeleton by seed.
+- Insight Value, the third score: per level agendas of required
+  topics, credited only when asked soundly, answerable by the
+  audience, and answered by the right personas. Winning now needs
+  rate, quality 60+, and Insight 60+ (70+ in the finale). A run
+  that passes rate and quality but fails Insight is stamped FAST
+  AND USELESS, and the report verdicts every topic.
+- Novice learning layer: Marge the coach (one tip per stage),
+  numbered setup steps, a non-blocking ready checklist, an in-game
+  field guide, a ONE LESSON recap per report, and a hints toggle.
+
+## v1.4 - 2026-10-31 - Defect taxonomy audit
+
+- Every question carries one of 11 research-grounded defect
+  classes (or is a labeled clean control), its text genuinely
+  exhibits the defect, and its fix button is the class-correct
+  remedy at its price. Beyond Knowledge has no wording fix.
+- Detective diagnostics report each defect OBSERVED with real
+  counts or LATENT, and data quality flags trace to their classes.
+
 ## v1.3 - 2026-10-31 - Two option flow and soundtrack
 
 - Two options after every round: TRY AGAIN continues the level on
