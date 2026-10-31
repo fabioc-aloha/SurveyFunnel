@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="320" viewBox="0 0 1200 320" role="img" aria-label="Dear Valued Customer - a GCX response rate arcade">
+  <defs>
+    <linearGradient id="cab" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#171738"/>
+      <stop offset="1" stop-color="#08081a"/>
+    </linearGradient>
+    <linearGradient id="neon" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2dd4ff"/>
+      <stop offset="0.5" stop-color="#7c5cff"/>
+      <stop offset="1" stop-color="#ff2e88"/>
+    </linearGradient>
+    <pattern id="scan" width="4" height="4" patternUnits="userSpaceOnUse">
+      <rect width="4" height="2" fill="#ffffff" opacity="0.03"/>
+    </pattern>
+  </defs>
+
+  <!-- cabinet frame -->
+  <rect x="4" y="4" width="1192" height="312" rx="26" fill="url(#cab)"/>
+  <rect x="4" y="4" width="1192" height="312" rx="26" fill="url(#scan)"/>
+  <rect x="4" y="4" width="1192" height="312" rx="26" fill="none" stroke="url(#neon)" stroke-width="4"/>
+  <rect x="18" y="18" width="1164" height="284" rx="18" fill="none" stroke="#2dd4ff" stroke-width="1.5" opacity="0.5"/>
+
+  <!-- marquee bulbs -->
+  <g>
+    <circle cx="52" cy="38" r="7" fill="#ffd23f"/><circle cx="148" cy="38" r="7" fill="#ff5da2"/>
+    <circle cx="244" cy="38" r="7" fill="#ffd23f"/><circle cx="340" cy="38" r="7" fill="#ff5da2"/>
+    <circle cx="436" cy="38" r="7" fill="#ffd23f"/><circle cx="532" cy="38" r="7" fill="#ff5da2"/>
+    <circle cx="628" cy="38" r="7" fill="#ffd23f"/><circle cx="724" cy="38" r="7" fill="#ff5da2"/>
+    <circle cx="820" cy="38" r="7" fill="#ffd23f"/><circle cx="916" cy="38" r="7" fill="#ff5da2"/>
+    <circle cx="1012" cy="38" r="7" fill="#ffd23f"/><circle cx="1108" cy="38" r="7" fill="#ff5da2"/>
+  </g>
+
+  <!-- ghost watermark -->
+  <text x="1170" y="302" text-anchor="end" font-family="Courier New, monospace" font-size="96" font-weight="bold" fill="#ffffff" opacity="0.06">RESPONS</text>
+
+  <!-- brand row -->
+  <text x="48" y="82" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" letter-spacing="4" fill="#2dd4ff">RESPONS PRESENTS</text>
+  <rect x="48" y="92" width="300" height="3" fill="url(#neon)"/>
+
+  <!-- title -->
+  <text x="51" y="152" font-family="Courier New, monospace" font-size="55" font-weight="bold" letter-spacing="1" fill="#ff2e88" opacity="0.55">DEAR VALUED CUSTOMER</text>
+  <text x="48" y="149" font-family="Courier New, monospace" font-size="55" font-weight="bold" letter-spacing="1" fill="#ffd23f">DEAR VALUED CUSTOMER</text>
+
+  <!-- subtitle -->
+  <text x="48" y="184" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" font-weight="600" letter-spacing="2.5" fill="#7df9ff">A GCX RESPONSE RATE ARCADE - HOW MANY SPRITES REACH FINISH?</text>
+
+  <!-- gates -->
+  <g font-family="Courier New, monospace" font-size="13" font-weight="bold" text-anchor="middle">
+    <rect x="66" y="204" width="96" height="22" rx="4" fill="#1d1d42" stroke="#2dd4ff" stroke-width="1.5"/>
+    <text x="114" y="219" fill="#aee9ff">INVITED</text>
+    <rect x="282" y="204" width="110" height="22" rx="4" fill="#1d1d42" stroke="#2dd4ff" stroke-width="1.5"/>
+    <text x="337" y="219" fill="#aee9ff">DELIVERED</text>
+    <rect x="512" y="204" width="96" height="22" rx="4" fill="#1d1d42" stroke="#2dd4ff" stroke-width="1.5"/>
+    <text x="560" y="219" fill="#aee9ff">OPENED</text>
+    <rect x="728" y="204" width="96" height="22" rx="4" fill="#1d1d42" stroke="#2dd4ff" stroke-width="1.5"/>
+    <text x="776" y="219" fill="#aee9ff">STARTED</text>
+    <rect x="944" y="202" width="96" height="26" rx="4" fill="#0f3524" stroke="#3dff8f" stroke-width="2"/>
+    <text x="992" y="220" fill="#3dff8f">FINISH</text>
+  </g>
+
+  <!-- track -->
+  <rect x="48" y="256" width="1104" height="6" fill="#39406e"/>
+  <g fill="#39406e">
+    <rect x="110" y="262" width="8" height="8"/><rect x="333" y="262" width="8" height="8"/>
+    <rect x="556" y="262" width="8" height="8"/><rect x="772" y="262" width="8" height="8"/>
+    <rect x="988" y="262" width="8" height="8"/>
+  </g>
+
+  <!-- pixel sprites on the track (feet at y=256) -->
+  <g>
+    <!-- gold executive -->
+    <rect x="196" y="226" width="12" height="12" fill="#ffd23f"/><rect x="193" y="238" width="18" height="12" fill="#ffd23f"/><rect x="193" y="250" width="7" height="6" fill="#8a6d1c"/><rect x="204" y="250" width="7" height="6" fill="#8a6d1c"/>
+    <!-- blue technician -->
+    <rect x="424" y="226" width="12" height="12" fill="#57a8ff"/><rect x="421" y="238" width="18" height="12" fill="#57a8ff"/><rect x="421" y="250" width="7" height="6" fill="#274b73"/><rect x="432" y="250" width="7" height="6" fill="#274b73"/>
+    <!-- green partner admin -->
+    <rect x="648" y="226" width="12" height="12" fill="#3dff8f"/><rect x="645" y="238" width="18" height="12" fill="#3dff8f"/><rect x="645" y="250" width="7" height="6" fill="#14532d"/><rect x="656" y="250" width="7" height="6" fill="#14532d"/>
+    <!-- orange end user, jumping at finish -->
+    <rect x="1066" y="216" width="12" height="12" fill="#ff9f43"/><rect x="1063" y="228" width="18" height="12" fill="#ff9f43"/><rect x="1063" y="240" width="7" height="6" fill="#7a4416"/><rect x="1074" y="240" width="7" height="6" fill="#7a4416"/>
+    <!-- purple decision maker wandering off below the track -->
+    <rect x="556" y="272" width="12" height="12" fill="#b98cff"/><rect x="553" y="284" width="18" height="12" fill="#b98cff"/><rect x="553" y="296" width="7" height="6" fill="#463064"/><rect x="564" y="296" width="7" height="6" fill="#463064"/>
+    <text x="586" y="290" font-family="Courier New, monospace" font-size="14" font-weight="bold" fill="#b98cff">?</text>
+  </g>
+
+  <!-- returned envelope at the delivered gate -->
+  <g>
+    <rect x="306" y="238" width="26" height="17" fill="#f4f4f8"/>
+    <path d="M306 238 L319 248 L332 238" fill="none" stroke="#c33" stroke-width="2"/>
+    <path d="M308 253 L330 240 M330 253 L308 240" stroke="#c33" stroke-width="2"/>
+  </g>
+
+  <!-- footer strip -->
+  <text x="48" y="300" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" letter-spacing="2" fill="#9aa3c7">PICK · VALIDATE · INVITE · TRIM · LAUNCH · LEARN</text>
+  <text x="1152" y="300" text-anchor="end" font-family="Courier New, monospace" font-size="14" font-weight="bold" letter-spacing="2" fill="#ff5da2">INSERT COIN</text>
+</svg>
