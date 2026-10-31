@@ -1,13 +1,24 @@
 # Changelog
 
-## Unreleased
+## 2026-10-31 - Gameplay release
+
+- Gameplay commit `3df78b8` deployed successfully in
+  [production run 41231850728](https://github.com/fabioc-aloha/SurveyFunnel/actions/runs/41231850728).
+- All 21 tests passed locally and in CI. Independent post-deployment
+  verification matched live asset bytes, MIME/security headers, and
+  unpublished-document 404s.
+- Live browser checks passed QR layout at 390px and 1440px CSS widths,
+  mouse/keyboard toggling, MPOR/BRD top and focus behavior, and a
+  repaired 40-credit challenge win. A desktop screenshot was inspected.
+- Human audio listening and approval for a tracked browser suite remain
+  open in [TODO.md](TODO.md).
 
 ### 2026-10-31 - Release authorization and continuity
 
 - Authorized publication of the gameplay, MPOR/BRD, coaching removal,
   and collapsible QR changes through the existing production workflow.
   The entries below record local implementation checkpoints, not the
-  final deployment status; consult the latest workflow for publication.
+  final deployment status; the release evidence above records publication.
 - Reconciled the task list and shortened handoff after preserving
   implementation evidence here. No new skill, episodic record, or
   native memory was created.

@@ -13,6 +13,10 @@ stakeholder dialogue/forecasts, MPOR, active-study BRD, Marge removal,
 and collapsible mobile QR. The user authorized commit, push, and deployment.
 The existing production workflow is the publication path; check its latest
 run rather than assuming a local implementation checkpoint is deployed.
+Gameplay release `3df78b8` deployed successfully in
+[run 41231850728](https://github.com/fabioc-aloha/SurveyFunnel/actions/runs/41231850728).
+The following documentation-only commit records that verification and
+triggers the same workflow without changing the game package.
 
 ## Blockers
 
@@ -21,8 +25,8 @@ Human listening remains necessary to verify music and effects.
 
 ## Next Action
 
-Check the latest production workflow and live game. Complete the human
-audio check and resolve the tracked browser-test decision in [TODO.md](TODO.md).
+Complete the human audio check and resolve the tracked browser-test
+decision in [TODO.md](TODO.md).
 
 ## Verification
 
@@ -45,7 +49,16 @@ HTML, static configuration, font, license, and QR. Live byte/header checks
 exclude the host configuration file and verify unpublished docs return 404.
 Rendered local QR screenshots decoded to the production URL at both widths.
 
-The push was verified against the remote `main` hash. Default Git
+Independent post-deployment verification matched production HTML, font,
+license, QR bytes, MIME/security headers, and unpublished-document 404s.
+Live browser checks at 390px and 1440px CSS widths passed expanded QR
+layout without horizontal overflow; mouse and Enter/Space toggling passed.
+MPOR opened at the top with close-button focus. The challenge BRD opened
+at the top, described all three repairs, and restored focus on close.
+The first live challenge won with three repairs, 40/40 credits, response
+17.5%, quality 94, and Insight 100. A desktop screenshot was inspected.
+
+The gameplay release push matched the remote `main` hash. Default Git
 authentication failed; the successful retry used the existing GitHub CLI
 credential helper for that command only, without changing Git configuration.
 Do not assume the default helper is repaired.
