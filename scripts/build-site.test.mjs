@@ -5,11 +5,11 @@ import { join } from 'node:path';
 import test from 'node:test';
 import { buildSite, files, output, root, validateHtml } from './build-site.mjs';
 
-test('production package contains only the game, config, font, and license', () => {
+test('production package contains only the game, config, font, license, and QR code', () => {
   buildSite();
   assert.deepEqual(readdirSync(output).sort(), ['assets', 'index.html', 'staticwebapp.config.json']);
   assert.deepEqual(readdirSync(join(output, 'assets')).sort(), [
-    'OFL-Press-Start-2P.txt', 'press-start-2p.ttf'
+    'OFL-Press-Start-2P.txt', 'play-mobile-qr.svg', 'press-start-2p.ttf'
   ]);
   for (const [source, destination] of files) {
     const expected = destination.endsWith('.ttf')
@@ -27,6 +27,11 @@ test('production package contains only the game, config, font, and license', () 
   const hostedPath = new URL(font[1], 'https://example.com/').pathname;
   assert.equal(hostedPath, '/assets/press-start-2p.ttf');
   assert.ok(readFileSync(join(output, hostedPath.slice(1))).length > 0);
+  assert.match(html, /href="https:\/\/nice-mushroom-0bdb0ef0f\.6\.azurestaticapps\.net\/"/);
+  assert.match(html, /src="\.\.\/assets\/play-mobile-qr\.svg"/);
+  const qr = readFileSync(join(output, 'assets', 'play-mobile-qr.svg'), 'utf8');
+  assert.match(qr, /<svg/);
+  assert.doesNotMatch(qr, /<script|<foreignObject/);
 });
 
 test('syntax validation rejects invalid inline JavaScript', () => {

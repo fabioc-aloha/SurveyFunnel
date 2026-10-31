@@ -2,6 +2,92 @@
 
 ## Unreleased
 
+### 2026-10-31 - Release authorization and continuity
+
+- Authorized publication of the gameplay, MPOR/BRD, coaching removal,
+  and collapsible QR changes through the existing production workflow.
+  The entries below record local implementation checkpoints, not the
+  final deployment status; consult the latest workflow for publication.
+- Reconciled the task list and shortened handoff after preserving
+  implementation evidence here. No new skill, episodic record, or
+  native memory was created.
+- Existing feature tests cover the demonstrated challenge-win,
+  forecast, and stale-callback failures. The remaining recommendation
+  is a tracked browser suite in the existing backlog, pending approval.
+
+### 2026-10-31 - Collapsible mobile QR (local only)
+
+- The mobile QR defaults to a 49px icon. Click to expand the 196px
+  mobile player panel; click again to collapse. The production link is
+  separate so toggling never opens another page.
+- Mouse and Enter/Space toggling passed at 390px and 1440px, with no
+  horizontal overflow. All 21 gameplay/package tests passed.
+- Changes remain local and uncommitted.
+
+### 2026-10-31 - Study BRD (local only)
+
+- Added **? Consult BRD** to setup, replacing the removed coaching
+  banner with an on-demand Business Requirement Document.
+- The active level or challenge determines required topics, respondent
+  groups, acceptance gates, budget, and study constraints. MPOR remains
+  the shared rules reference.
+- All 20 gameplay/package tests passed. Browser checks at 390px and
+  1440px passed opening/reopening at the top, Escape/button close,
+  restored button focus, and unchanged setup state.
+- Changes remain local; nothing is committed, pushed, or deployed.
+
+### 2026-10-31 - Mobile QR portal (local only)
+
+- Added a clickable arcade-themed QR panel left of the start-screen
+  title, with teal/gold framing and pixel-font labels. On narrow screens
+  it sits below the title without horizontal overflow.
+- Bundled a static SVG encoding the production URL, with H error
+  correction and a four-module quiet zone. No external QR service,
+  runtime library, or image request is needed.
+- Included the QR in production packaging and live byte/MIME checks.
+- All 19 gameplay/package tests passed. Actual browser QR screenshots
+  at 390px and 1440px independently decoded to the exact production URL.
+- Changes remain local; nothing is committed, pushed, or deployed.
+
+### 2026-10-31 - MPOR and coaching removal (local only)
+
+- Renamed the in-game guide button to **? Consult MPOR** and the
+  dialog to **MPOR (Master Plan of Record)**. Opening, scrolling,
+  focus, and closing behavior are unchanged.
+- Removed Marge's setup banner and report lesson recap as requested,
+  including their unused styles and scripting. Detective diagnostics,
+  fix quests, checklist, and scoring remain.
+- Updated player and novice UX guidance. The combined test command
+  passed 19 tests, including the guide label and coaching removal.
+- Changes remain local; nothing is committed, pushed, or deployed.
+
+### 2026-10-31 - Quick Challenge and game feedback (local only)
+
+- Added three Quick Challenges: three defective cards, prepared audience
+  and invitation, 40 credits, and one launch. All three repairs and the
+  response, quality, and Insight gates are required to win.
+- Retry starts fresh; Next changes scenarios; returning to levels restores
+  campaign state without awarding progress or spending campaign credits.
+- Added paced respondent reactions from actual simulated events and a
+  short report selection. Reactions add no randomness or scoring penalties.
+- Added stakeholder dialogue, live cost/minute/goodwill forecasts,
+  disabled unaffordable choices, and a results-based debrief in Levels 3
+  and 6. Existing trade-offs are unchanged; extras remain modeled burden.
+- Fixed forecast handling of owned stakeholder choices and Honest Ask
+  time-promise penalties. Cuts now apply before launch, and stale cut or
+  countdown callbacks cannot change a restored campaign or restart a run.
+- Added dependency-free gameplay tests to the local production workflow
+  definition. The combined gameplay/package command passed 18 tests.
+  Ten campaign setups matched committed simulation and budget results;
+  the comparison excluded only new question-ID event metadata.
+- Browser checks passed all three repaired challenge wins, cut/restore,
+  fresh retry, next/back navigation, unchanged campaign progress, live
+  reactions, skipped and fully animated reports, and stakeholder controls
+  at 390px and 1440px. Reduced-motion play and Field Guide top/focus
+  behavior also passed. Screenshots were checked for readability.
+- These changes are not committed, pushed, or deployed. Human audio
+  listening remains unverified.
+
 ### 2026-10-31 - Production deployment automation
 
 - Created dedicated Free-tier Azure Static Web Apps hosting in

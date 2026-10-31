@@ -5,7 +5,20 @@ and help those who receive it complete the questionnaire, without
 burning the audience or wrecking the data. One round is one survey
 launch, 3 to 5 minutes.
 
-## A round, step by step
+## Quick Challenge
+
+Choose **Quick Challenge** for three defective cards and one launch.
+The Fresh audience, full list preparation, and Honest Ask invitation
+are provided. Repair all three cards within 40 credits, then reach
+response above 12%, quality 60+, and Insight 60+. Keeping a defect or
+cutting a card leaves the challenge unfinished.
+
+The send costs 30 credits, the invitation costs 4, and the three
+repairs cost 6. **Retry Challenge** starts fresh with the same cards;
+**Next Challenge** switches scenarios. Neither changes campaign
+progress or spends the campaign's credits.
+
+## A campaign round, step by step
 
 1. **AUDIENCE.** Pick a segment. Read its size, persona mix,
    relevance, contact history, List Health (percent of addresses
@@ -24,7 +37,9 @@ launch, 3 to 5 minutes.
 5. **LAUNCH.** Countdown, then up to 40 sprites run the funnel:
    SENT, DELIVERED, OPENED, STARTED, FINISH. A breaker trip stops
    new sends and interrupts anyone still in the funnel. Only
-   completions before the trip count.
+   completions before the trip count. Respondent bubbles illustrate
+   actual simulated events; they add no penalties or randomness.
+   The report retains a few reactions even when you skip the animation.
 6. **REPORT.** The Drop-off Detective shows the funnel, the three
    biggest leaks with causes and fixing levers, the goodwill and
    credit ledgers, deliverability and data quality, and one fix
@@ -83,6 +98,21 @@ That choice is the lesson.
   so a draw can be replayed or shared. From the start screen, New
   Game starts a whole fresh campaign.
 
+## Stakeholder encounters
+
+In Levels 3 and 6, a stakeholder asks for eight more questions.
+Choose **Show the Evidence** (no added cost), **Negotiate Modules**
+(4 credits, +1 minute, -3 goodwill), or **Accept the Request**
+(10 credits, +4 minutes, -10 goodwill).
+
+Each choice shows the projected survey length, ending goodwill,
+and total credit spend. Unaffordable choices are disabled. You can
+change your response before launch; the report compares the chosen
+trade-off with the run's completion and patience results.
+
+The extras are modeled as added burden. They are not editable cards,
+and extra-topic answers are not simulated or scored.
+
 ## Sound
 
 The cabinet has a soundtrack: an original chiptune loop that
@@ -131,12 +161,18 @@ stamped FAST AND USELESS: plenty of answers, nothing learned.
 
 ## Learning the trade
 
-Marge, a senior IM, coaches one tip per setup stage (turn her off
-with the HINTS toggle once you know the ropes). The FIELD GUIDE
-button explains every term in plain words, and every report ends
-with ONE LESSON and a TRY THIS NEXT line. Setup steps are numbered
+The **? Consult MPOR** button opens the **Master Plan of Record**,
+which explains the game rules and methodology in plain words.
+Reports retain the Detective diagnostics and fix quests, without
+a separate coaching banner or lesson recap. Setup steps are numbered
 1 to 4, and the ready checklist above LAUNCH shows what you have
 decided so far; it never blocks you.
+
+**? Consult BRD** opens the **Business Requirement Document** for the
+active study from setup. It lists required topics and respondent groups,
+response/quality/Insight acceptance gates, credit budget, and level-specific
+constraints. Quick Challenge has its own BRD. Unlike MPOR's shared rules,
+the BRD changes with the level; consulting it does not change your choices.
 
 ## Personas
 

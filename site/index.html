@@ -297,6 +297,18 @@
   #startScreen{ text-align:center; padding:28px 10px 18px; }
   .marquee{ font-family:"Press Start 2P",monospace; font-size:clamp(22px,5.5vw,44px); line-height:1.25; color:var(--gold); text-shadow:4px 4px 0 #0a0d18, 0 0 0 var(--gold); letter-spacing:1px; }
   .marquee small{ display:block; font-size:10px; color:var(--teal); letter-spacing:2px; margin-bottom:14px; text-shadow:none; }
+  .title-stage{display:flex;justify-content:center;align-items:center;gap:32px;margin-bottom:16px}
+  .mobile-portal-wrap{flex:none;display:grid;justify-items:center;gap:10px}
+  .mobile-portal{display:grid;justify-items:center;gap:10px;padding:8px;background:var(--panel);border:3px solid var(--teal);box-shadow:6px 6px 0 #0a0d18,inset 0 0 0 3px var(--panel2);color:var(--gold);font-family:"Press Start 2P",monospace;font-size:9px;line-height:1.6;cursor:pointer}
+  .mobile-portal img{display:block;width:49px;height:49px;border:3px solid var(--gold);box-sizing:content-box}
+  .mobile-portal span{display:none}
+  .mobile-portal[aria-expanded="true"]{padding:14px}
+  .mobile-portal[aria-expanded="true"] img{width:196px;height:196px}
+  .mobile-portal[aria-expanded="true"] span{display:block}
+  #mobileQRLink{color:var(--teal);font-size:13px}
+  .mobile-portal:hover{border-color:var(--gold);color:var(--teal)}
+  .mobile-portal:focus-visible{outline:3px solid var(--gold);outline-offset:5px}
+  @media(max-width:700px){.title-stage{flex-direction:column;gap:22px}.mobile-portal-wrap{order:2}}
   .creditline{ margin:8px 0 0; font-size:12px; color:var(--faint); }
   .startbtn{ font-family:"Press Start 2P",monospace; font-size:16px; cursor:pointer; color:#0c2a1e; background:var(--teal); border:4px solid #b8ffe9; border-radius:10px; padding:16px 32px; box-shadow:0 5px 0 #147a58; letter-spacing:1px; }
   .startbtn:active{ transform:translateY(4px); box-shadow:0 1px 0 #147a58; }
@@ -345,14 +357,6 @@
   .segbtn{ min-height:40px; }
   .speedbtn{ min-height:40px; }
   .card, .lvlcard, .choicebtn{ min-height:40px; }
-  .coachstrip{
-    display:flex; gap:10px; align-items:flex-start; text-align:left;
-    background:#12312a; border:3px solid var(--teal); border-radius:8px;
-    padding:11px 12px; margin:14px auto; max-width:820px; color:#c9f5e6;
-  }
-  .coachstrip .who{ font-family:"Press Start 2P",monospace; font-size:9px; color:var(--teal); line-height:1.7; white-space:nowrap; padding-top:2px; }
-  .coachstrip .tip{ font-size:14.5px; line-height:1.5; }
-  body.hints-off .coachstrip{ display:none; }
   body.hints-off .flagbox{ display:none; }
   body.hints-off .agenda .fineprint{ display:none; }
   .checklist{ background:var(--cab2); border:3px solid var(--line); border-radius:10px; padding:12px 14px; margin-bottom:12px; }
@@ -362,8 +366,8 @@
   .checklist .crow.done .st{ color:var(--teal); }
   .checklist .crow.todo .st{ color:var(--gold); }
   .checklist .skipbtn2{ font-family:"Press Start 2P",monospace; font-size:9px; cursor:pointer; background:var(--panel); color:var(--ink); border:2px solid var(--line); border-radius:5px; padding:8px 9px; min-height:40px; }
-  #fieldGuide{ display:none; position:fixed; inset:0; z-index:60; background:rgba(6,8,14,.82); padding:14px; overflow:auto; }
-  #fieldGuide.open{ display:block; }
+  #fieldGuide,#studyBRD{ display:none; position:fixed; inset:0; z-index:60; background:rgba(6,8,14,.82); padding:14px; overflow:auto; }
+  #fieldGuide.open,#studyBRD.open{ display:block; }
   .fgcard{ max-width:760px; margin:10px auto 30px; background:var(--cab2); color:var(--ink); border:3px solid var(--teal); border-radius:12px; padding:18px; }
   .fgcard h2{ font-family:"Press Start 2P",monospace; font-size:13px; color:var(--gold); line-height:1.7; margin:0 0 10px; }
   .fgcard h3{ font-family:"Press Start 2P",monospace; font-size:10px; color:var(--teal); line-height:1.6; margin:16px 0 6px; }
@@ -371,9 +375,6 @@
   .fgcard b{ color:var(--ink); }
   .fgcard ul{ margin:4px 0; padding-left:20px; }
   .fgclose{ font-family:"Press Start 2P",monospace; font-size:12px; cursor:pointer; color:#0c2a1e; background:var(--teal); border:3px solid #b8ffe9; border-radius:8px; padding:12px 18px; min-height:44px; }
-  .lessoncard{ background:#eaf6ef; border:3px solid #14713f; border-radius:10px; padding:16px 18px; margin-bottom:14px; color:#1c2430; }
-  .lessoncard h2{ font-family:"Press Start 2P",monospace; font-size:12px; margin:0 0 8px; color:#14713f; line-height:1.7; }
-  .lessoncard p{ font-size:15.5px; margin:4px 0; line-height:1.55; }
 
   .lvlgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:900px;margin:18px auto;text-align:left}
   @media(max-width:700px){.lvlgrid{grid-template-columns:1fr 1fr}}
@@ -393,6 +394,14 @@
   .choicebtn.sel{border-color:var(--teal);box-shadow:0 0 0 2px var(--teal) inset}
   .choicebtn b{display:block;margin-bottom:5px}
   .choicebtn span{font-size:13px;color:var(--dim);line-height:1.4;display:block}
+  .choicebtn:disabled{opacity:.5;cursor:not-allowed}
+  .dialogue{margin:12px 0;padding:12px;border-left:4px solid var(--gold);background:#141826;line-height:1.6}
+  .reaction{position:relative;margin:16px 0 10px;padding:14px 16px;border:3px solid var(--teal);border-radius:14px;background:var(--panel);min-height:92px;line-height:1.5;overflow-wrap:anywhere}
+  .reaction b{display:block;color:var(--gold);font-size:13px}
+  .reaction p{margin:4px 0;font-size:16px}
+  .quick-mode #audienceLever,.quick-mode #inviteLever,.quick-mode #questionSummary,.quick-mode #abLockedSlot,.quick-mode #bankPanel,.quick-mode #launchCheck{display:none}
+  .quick-mode .grid2{display:block}
+  [hidden]{display:none!important}
   table.mini{width:100%;border-collapse:collapse;font-size:14.5px;margin-top:8px}
   table.mini th,table.mini td{padding:6px 4px;border-bottom:1px solid #d8d2bd;text-align:left}
   table.mini td:last-child,table.mini th:last-child{text-align:right}
@@ -405,7 +414,7 @@
       <div class="logo" style="font-size:clamp(15px,3.2vw,24px);line-height:1.3;">DEAR VALUED CUSTOMER</div>
     </div>
     <div class="spacer"></div>
-    <button class="soundbtn" id="guideBtn" aria-label="Open field guide">? FIELD GUIDE</button>
+    <button class="soundbtn" id="guideBtn" aria-label="Consult MPOR (Master Plan of Record)">? Consult MPOR</button>
     <button class="soundbtn" id="soundBtn" aria-label="Toggle sound">♪ SOUND: ON</button>
   </div>
 
@@ -419,13 +428,24 @@
 
     <!-- ================= START SCREEN ================= -->
     <div id="startScreen">
-      <div class="marquee"><small>★ GCX PRESENTS ★</small>DEAR<br>VALUED<br>CUSTOMER</div>
+      <div class="title-stage">
+        <div class="mobile-portal-wrap">
+          <button class="mobile-portal" id="mobileQR" aria-expanded="false" aria-label="Expand mobile player QR code">
+            <span aria-hidden="true">★ MOBILE PLAYER ★</span>
+            <img src="../assets/play-mobile-qr.svg" width="196" height="196" alt="QR code linking to the production game">
+            <span>SCAN TO PLAY</span>
+          </button>
+          <a id="mobileQRLink" href="https://nice-mushroom-0bdb0ef0f.6.azurestaticapps.net/" target="_blank" rel="noopener noreferrer" hidden>Open game on mobile</a>
+        </div>
+        <div class="marquee"><small>★ GCX PRESENTS ★</small>DEAR<br>VALUED<br>CUSTOMER</div>
+      </div>
       <p class="creditline">Produced by GCX · Created by Fabio Correa</p>
       <div class="lvlgrid" id="levelGrid"></div>
       <div class="bestline" id="seasonLine"></div>
       <button class="startbtn" id="startBtn">▶ PLAY SELECTED LEVEL</button>
       <button class="startbtn" id="campaignBtn" style="background:var(--gold);border-color:#ffe9a3;box-shadow:0 5px 0 #8a6408;margin-left:8px;margin-top:10px">★ CAMPAIGN</button>
       <button class="startbtn" id="newGameStartBtn" style="background:var(--panel2);color:var(--ink);border-color:var(--line);box-shadow:0 5px 0 #0a0d18;margin-left:8px;margin-top:10px">↻ NEW GAME</button>
+      <button class="startbtn" id="quickBtn" style="background:var(--teal);margin-top:10px">QUICK CHALLENGE</button>
       <div id="soundPanel" style="max-width:820px;margin:22px auto 4px;background:var(--panel);border:3px solid var(--line);border-radius:8px;padding:14px;text-align:left">
         <div style="font-family:'Press Start 2P',monospace;font-size:10px;color:var(--teal);line-height:1.6;margin-bottom:10px">♪ SOUND</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
@@ -447,13 +467,14 @@
 
     <!-- ================= SETUP ================= -->
     <div id="setup" style="display:none">
-      <div class="coachstrip" role="note" style="margin:0 0 14px;max-width:none"><span class="who">MARGE<br>SENIOR IM</span><span class="tip" id="coachTip">Step 1 is the audience. Pick who can actually answer your agenda topics: a big list of the wrong people is just a faster way to be wrong.</span></div>
+      <button class="soundbtn" id="brdBtn" aria-label="Consult BRD (Business Requirement Document)" style="margin-bottom:14px">? Consult BRD</button>
+      <button class="segbtn" id="quickExit" hidden>BACK TO LEVELS</button>
       <div class="budgetpanel" id="budgetPanel" aria-label="Campaign budget"></div>
       <div id="levelBanner"></div>
       <div id="stakeholderPanel"></div>
       <div id="abPanel"></div>
       <div id="levelExtras"></div>
-      <section class="lever" aria-label="Lever 1 audience">
+      <section class="lever" id="audienceLever" aria-label="Lever 1 audience">
         <div class="lever-head">
           <span class="lever-no">STEP 1</span><span class="lever-title">AUDIENCE</span>
           <span class="lever-sub">Who gets the invite. Goodwill is the breaker panel: spend it to zero and the segment goes dark.</span>
@@ -463,7 +484,7 @@
       </section>
 
       <div class="grid2">
-        <section class="lever" aria-label="Lever 2 invitation">
+        <section class="lever" id="inviteLever" aria-label="Lever 2 invitation">
           <div class="lever-head">
             <span class="lever-no">STEP 3</span><span class="lever-title">INVITATION</span>
             <span class="lever-sub">The email that earns the click.</span>
@@ -478,7 +499,7 @@
         </section>
 
         <div>
-          <section class="lever" aria-label="Questionnaire summary" style="margin-bottom:14px;">
+          <section class="lever" id="questionSummary" aria-label="Questionnaire summary" style="margin-bottom:14px;">
             <div class="lever-head">
               <span class="lever-no">STEP 4</span><span class="lever-title">QUESTIONNAIRE</span>
               <span class="lever-sub">Trim the instrument below. Every defective card names its defect class, the symptom it risks, and the one fix that actually works on that class.</span>
@@ -500,7 +521,7 @@
       <section class="lever" aria-label="Question cards">
         <div class="lever-head">
           <span class="lever-title" style="font-size:12px;">THE INSTRUMENT · AS DEALT INTO THE SKELETON</span>
-          <span class="lever-sub">KEEP, apply the class-correct fix on the card (SPLIT, NEUTRALIZE, DEFINE, ANCHOR and the rest, each at its price), or CUT for 1 credit. A generic simplify only fixes a WORDY STEM. Stupid turn-off items earn zero insight: CUT is their only fix. Sections run A outcome core, B drivers, C diagnostics, D sensitive, E open-text closer, F demographics last.</span>
+          <span class="lever-sub" id="instrumentHelp">KEEP, apply the class-correct fix on the card (SPLIT, NEUTRALIZE, DEFINE, ANCHOR and the rest, each at its price), or CUT for 1 credit. A generic simplify only fixes a WORDY STEM. Stupid turn-off items earn zero insight: CUT is their only fix. Sections run A outcome core, B drivers, C diagnostics, D sensitive, E open-text closer, F demographics last.</span>
         </div>
         <div class="qgrid" id="qGrid"></div><div id="cutTray"></div><div id="bankPanel"></div>
       </section>
@@ -533,6 +554,7 @@
           <div class="stampmsg" id="stampMsg">SENDING…</div>
         </div>
       </div>
+      <div class="reaction" id="respondentBubble" role="status" aria-live="polite" aria-atomic="true" hidden><b id="reactionPerson"></b><p id="reactionText"></p></div>
       <div class="legendrow" id="personaLegend"></div>
       <div class="runlog" id="runLog"></div>
     </div>
@@ -542,10 +564,24 @@
     <div id="campaignScreen" style="display:none"></div>
   </div>
 
-  <!-- ================= FIELD GUIDE OVERLAY ================= -->
-  <div id="fieldGuide" role="dialog" aria-modal="true" aria-label="Field guide">
+  <div id="studyBRD" role="dialog" aria-modal="true" aria-label="Business Requirement Document">
     <div class="fgcard">
-      <h2>FIELD GUIDE</h2>
+      <div id="brdContent"></div>
+      <div style="margin-top:16px"><button class="fgclose" id="brdClose">◀ BACK TO THE STUDY</button></div>
+    </div>
+  </div>
+
+  <!-- ================= MPOR OVERLAY ================= -->
+  <div id="fieldGuide" role="dialog" aria-modal="true" aria-label="Master Plan of Record">
+    <div class="fgcard">
+      <h2>MPOR</h2>
+      <p>Master Plan of Record</p>
+      <h3>QUICK CHALLENGE</h3>
+      <p>Three defective questions, 40 credits, one launch. The audience, list preparation, and Honest Ask invitation are provided. Repair all three cards to win; keeping a defect or cutting a card leaves the challenge unfinished. Sending costs 30 credits, the invitation costs 4, and the three repairs cost 6 in total. Also reach response above 12%, quality 60+, and Insight 60+. Retry resets this challenge; Next Challenge changes the three cards. Neither changes campaign progress.</p>
+      <h3>RESPONDENT REACTIONS</h3>
+      <p>Speech bubbles illustrate events in the simulation, such as guessing, a DK/NA escape, or encountering a defective question. They are not real customer quotes and do not change scores. Only a few bubbles appear at a readable pace. The report keeps a short selection, even if you skip the animation.</p>
+      <h3>STAKEHOLDER ENCOUNTERS</h3>
+      <p>In Levels 3 and 6, a stakeholder asks for eight extra questions. Accept the request, negotiate rotating modules, or show the evidence for keeping the survey focused. Read the projected minutes, goodwill, and credit costs before choosing; you may change your choice before launch. The extras are modeled as added burden, not separately editable cards or new scored agenda topics. Showing evidence is the default if no choice is made. The report ties the conversation to the run's actual results.</p>
       <h3>HOW TO PLAY</h3>
       <ul>
         <li>Choose a level, then set the audience, invitation, and questionnaire within the credit budget.</li>
@@ -853,7 +889,7 @@ var LEVEL_AGENDA = {
   5:["support speed","self-service gap","product reliability","customer effort"],
   6:["overall satisfaction","renewal risk","billing clarity","resolution quality","product reliability"]
 };
-function agendaTopics(){ return LEVEL_AGENDA[state.level] || LEVEL_AGENDA[1]; }
+function agendaTopics(){ return state.quickChallenge ? state.quickChallenge.topics : LEVEL_AGENDA[state.level] || LEVEL_AGENDA[1]; }
 function insightGate(){ return state.level === 6 ? 70 : 60; }
 var SEC_RANK = { A:0, B:1, C:2, D:3, E:4, F:5 };
 var SEC_MAP = { 1:"A",2:"A",3:"B",4:"B",5:"C",6:"A",7:"B",8:"B",9:"B",10:"B",11:"E",12:"D",13:"E",14:"B",15:"F",21:"B",22:"C",23:"C",24:"B",25:"C",26:"B" };
@@ -888,6 +924,7 @@ function computeAddBankIds(){
   return picked;
 }
 function addBankQuestions(){
+  if (state.quickChallenge) return [];
   var ids = state.addBankIds && state.addBankIds.length ? state.addBankIds : OPTIONAL_QUESTIONS.map(function(q){ return q.id; });
   return ids.map(function(id){
     return QUESTION_BANK.filter(function(q){ return q.id === id; })[0] || OPTIONAL_QUESTIONS.filter(function(q){ return q.id === id; })[0];
@@ -909,7 +946,8 @@ var state = {
   reportShown: false, instrument: null, instrumentSeed: "A001", randomMode: false, campaignSeed: null, addBankIds: [],
   campaignBonus: {}, levelSeeds: {},
   musicOn: true, sfxOn: true, muted: false, musicVol: 0.5, sfxVol: 0.8,
-  hints: true, touched: { seg: false, prep: false, invite: false }
+  hints: true, touched: { seg: false, prep: false, invite: false },
+  quickChallenge: null
 };
 var LEVELS=[
  {id:1,name:"FIRST SEND",target:0.12,budget:120,desc:"Learn the three levers. Beat 12%, quality 60+, Insight 60+."},
@@ -920,6 +958,12 @@ var LEVELS=[
  {id:6,name:"THE BIG QUARTER",target:0.12,budget:150,desc:"Finale: Executive Blast, full traps, stakeholder event, 150 credits."}
 ];
 var BUDGET_TOTAL = 120;
+var QUICK_CHALLENGES = [
+  { name:"SAY WHAT YOU MEAN", ids:[3,10,24] },
+  { name:"LESS WORK, BETTER ANSWERS", ids:[48,55,11] },
+  { name:"MAKE IT SAFE TO ANSWER", ids:[54,56,52] }
+];
+var quickSession = null;
 var GRADE_RANK = { "S":5, "A":4, "B":3, "C":2, "TRY AGAIN":1 };
 QUESTIONS.forEach(function(q){ state.qstate[q.id] = "keep"; });
 QUESTION_BANK.forEach(function(q){ if (state.qstate[q.id] === undefined) state.qstate[q.id] = "keep"; });
@@ -1160,7 +1204,19 @@ function simplifyCount(){ return activeQuestions().filter(function(q){ return st
 function cutCount(){ return activeQuestions().filter(function(q){ return state.qstate[q.id] === "cut"; }).length; }
 function addedCount(){ return addBankQuestions().filter(function(q){ return state.added[q.id]; }).length; }
 function allQuestionPool(){ return QUESTIONS.concat(addBankQuestions().filter(function(q){ return state.added[q.id]; })); }
-function stakeCost(v){ return v === "rotate" ? 4 : v === "accept" ? 10 : 0; }
+var STAKE_CHOICES = {
+  pushback:{ title:"SHOW THE EVIDENCE", cost:0, minutes:0, goodwill:0,
+    reply:"Let's keep this send focused on the agenda. We can plan the other topics with the audience that can answer them.",
+    response:"Show me the results from this focused send. We'll discuss the remaining topics separately." },
+  rotate:{ title:"NEGOTIATE MODULES", cost:4, minutes:1, goodwill:3,
+    reply:"Let's rotate the extras rather than ask everybody everything. The extra topics will have smaller samples.",
+    response:"Agreed. Report the smaller samples clearly; don't present them as the full audience." },
+  accept:{ title:"ACCEPT THE REQUEST", cost:10, minutes:4, goodwill:10,
+    reply:"We'll include the full request. That adds four minutes and spends more of the audience's goodwill.",
+    response:"Thanks. If the longer survey loses people, show that cost alongside the answers." }
+};
+function stakeholderImpact(choice){ return STAKE_CHOICES[choice !== undefined ? choice : state.stakeholder] || STAKE_CHOICES.pushback; }
+function stakeCost(v){ return STAKE_CHOICES[v] ? STAKE_CHOICES[v].cost : 0; }
 function budgetMath(ov){
   ov = ov || {};
   var seg = ov.seg || state.seg;
@@ -1171,6 +1227,7 @@ function budgetMath(ov){
   var sup = ov.suppression !== undefined ? ov.suppression : state.suppression;
   var loc = ov.localization !== undefined ? ov.localization : state.localization;
   var esc = ov.escapes !== undefined ? ov.escapes : state.escapes;
+  var stakeholder = ov.stakeholder !== undefined ? ov.stakeholder : state.stakeholder;
   var base = state.baseline || pristineBaseline();
   /* Persistent prep: owned tiers/items are never charged again; only an
      upgrade difference or a first purchase in this attempt is charged. */
@@ -1195,7 +1252,7 @@ function budgetMath(ov){
     editCharge += Math.max(0, ov.simplifyCount - simplifyCount()) * 2;
   }
   var escCharge = (esc && !base.escapes) ? 2 : 0;
-  var stakeCharge = (state.stakeholder !== base.stakeholder) ? stakeCost(state.stakeholder) : 0;
+  var stakeCharge = (stakeholder !== base.stakeholder) ? stakeCost(stakeholder) : 0;
   var abCharge = (state.abEnabled && !base.abEnabled) ? 6 : 0;
   var rbCharge = (state.reportBack && !base.reportBack) ? 3 : 0;
   var langCharge = (state.langChoice === "localized" && base.langChoice !== "localized") ? 4 : 0;
@@ -1226,6 +1283,10 @@ function budgetMath(ov){
 function renderBudget(){
   var el = $("budgetPanel"); if (!el) return;
   var b = budgetMath();
+  if (state.quickChallenge){
+    el.innerHTML = '<b>QUICK CHALLENGE · 40 CR</b><p>Send 30 + Honest Ask 4 + card edits ' + (b.attemptCost - 34) + ' = <b>' + b.attemptCost + ' credits</b> · <b>' + b.remaining + ' left</b></p><p>List preparation is provided. One launch; retry starts fresh.</p>';
+    return;
+  }
   function col(items, sub, title){
     var rows = items.filter(function(i){ return i[1] > 0; }).map(function(i){ return "<span>" + i[0] + ": <b>" + i[1] + " cr</b></span>"; }).join("");
     if (!rows) rows = "<span>Nothing bought yet</span>";
@@ -1255,7 +1316,7 @@ function renderPrep(){
     var label = ownedTier ? "OWNED" : (valRank[v[0]] > valRank[base.validation] && base.validation !== "skip" ? (v[2] - validationCostFor(state.seg, base.validation)) + " CR UPGRADE" : v[2] + " CR");
     return '<button class="segbtn' + (state.validation === v[0] ? " sel" : "") + '" data-val="' + v[0] + '"' + (belowOwned || cant ? " disabled title=\"" + (belowOwned ? "A higher tier is already owned" : "Not enough budget in the remaining pool") + "\"" : "") + '>' + v[1] + '<small>' + label + '</small></button>';
   }).join("");
-  el.innerHTML = '<div class="lever-head" style="margin-top:14px"><span class="lever-no" style="background:var(--blue)">STEP 2</span><span class="lever-title" style="font-size:12px">PREPARE THE LIST</span><span class="lever-sub">Bought before launch, paid from the same credits. Marge: validation is the cheapest insurance against bounces.</span></div>' +
+  el.innerHTML = '<div class="lever-head" style="margin-top:14px"><span class="lever-no" style="background:var(--blue)">STEP 2</span><span class="lever-title" style="font-size:12px">PREPARE THE LIST</span><span class="lever-sub">Bought before launch, paid from the same credits.</span></div>' +
     '<div class="prepgrid">' +
     '<div class="prow"><span class="pt">Validate emails (BrightVerify)</span><div class="valbtns">' + valBtns + '</div><div class="pe">Full checks the whole list; Partial checks the riskiest half. Validation removes most invalid addresses, but a small share survives, since catch-all domains cannot be verified.</div></div>' +
     tog("dedupe", state.dedupe, 4, "Dedupe pass", "Removes duplicate addresses so nobody gets the survey twice, and no response is counted twice.") +
@@ -1269,12 +1330,16 @@ function renderPrep(){
     btn.addEventListener("click", function(){ state.touched.prep = true; var k = btn.getAttribute("data-prep"); var before = budgetMath().attemptCost; state[k] = !state[k]; if (state[k] && k === "dedupe") sndPops(); else if (state[k] && k === "suppression") sndSwipe(); else if (state[k]) sndSpend(); else sndRefund(); renderPrep(); renderReadout(); });
   });
 }
-function curLevel(){ return LEVELS[state.level-1]; }
+function curLevel(){ return state.quickChallenge ? { id:1, name:state.quickChallenge.name, target:0.12, budget:40, desc:"Repair all three cards. One send." } : LEVELS[state.level-1]; }
 function renderLevelUI(){
   var L=curLevel();
   var hl=$("hudLevel"); if(hl) hl.innerHTML="LEVEL "+L.id+" · <b>"+L.name+"</b> · ATTEMPT "+state.attempt+" · INSTRUMENT #"+state.instrumentSeed;
   var ht=$("hudTarget"); if(ht) ht.innerHTML="TARGET RESPONSE RATE <b>&gt; "+Math.round(L.target*100)+"%</b>"+(L.id===4?" · END GOODWILL 35+":"");
   var lb=$("levelBanner"); if(lb) lb.innerHTML='<div class="lever" style="border-color:var(--gold)"><div class="lever-head"><span class="lever-no">LEVEL '+L.id+'</span><span class="lever-title">'+L.name+'</span><span class="lever-sub">'+L.desc+' Budget '+L.budget+' credits. The field office draft runs <b style="color:var(--ink)">'+activeQuestions().length+' questions</b> (dealt 9-16 into the A-F skeleton). <b style="color:var(--ink)">AGENDA:</b> '+agendaTopics().join(" · ")+'</span></div></div>';
+  if (state.quickChallenge){
+    hl.textContent = "QUICK CHALLENGE · " + L.name;
+    lb.innerHTML = '<div class="lever"><h2>' + L.name + '</h2><p>Repair all three cards for the prepared Fresh audience and Honest Ask invitation. Also reach response above 12%, quality 60+, and Insight 60+.</p><p><b>AGENDA:</b> ' + agendaTopics().join(" · ") + '</p></div>';
+  }
   // level grid
   var grid=$("levelGrid"); if(grid){ grid.innerHTML=LEVELS.map(function(lv){ var locked=lv.id>state.unlocked; var best=state.campaignBest[lv.id]; return '<button class="lvlcard'+(locked?" locked":"")+(lv.id===state.level?" sel":"")+'" data-level="'+lv.id+'" '+(locked?"disabled":"")+'>'+'<div class="ln">LEVEL '+lv.id+(locked?" · 🔒 LOCKED":"")+'</div><h3>'+lv.name+'</h3><p>'+lv.desc+'</p>'+(best?'<div class="best">BEST: '+best+'</div>':"")+'</button>';}).join("");
     Array.prototype.forEach.call(grid.querySelectorAll("[data-level]"),function(b){ b.addEventListener("click",function(){ selectLevel(parseInt(b.getAttribute("data-level"),10),false); }); });
@@ -1285,11 +1350,24 @@ function renderLevelUI(){
 function renderStakeholder(){
   var el=$("stakeholderPanel"); if(!el) return;
   if(state.level!==3 && state.level!==6){ el.innerHTML=""; return; }
-  var opts=[["pushback","PUSH BACK · 0 CR","Refuse the 8 extras. No survey cost. Stakeholder trust note only."],
-            ["rotate","ROTATE · 4 CR","Extras in rotating modules: half see them, +1 min, partial data value."],
-            ["accept","ACCEPT · 10 CR","Add all 8: +4 min, −10 goodwill, bulk edit + retest cost."]];
-  el.innerHTML='<div class="eventpanel"><h3>⚠ STAKEHOLDER EVENT · “WHILE WE ARE ASKING ANYWAY…”</h3><div style="font-size:14.5px;line-height:1.5">A stakeholder demands <b>8 extra questions</b>. They arrive with defects of their own (double-barreled and wordy stems among them), which is part of why pushing back or rotating exists. Choose one response before launch. Prices apply to the final configuration.</div><div class="choicegrid">'+opts.map(function(o){return '<button class="choicebtn'+(state.stakeholder===o[0]?" sel":"")+'" data-stake="'+o[0]+'"><b>'+o[1]+'</b><span>'+o[2]+'</span></button>';}).join("")+'</div>'+(state.stakeholder?"":'<div style="margin-top:8px;font-size:13px">No choice yet — PUSH BACK (0 cr) is the default if you launch without choosing.</div>')+'</div>';
-  Array.prototype.forEach.call(el.querySelectorAll("[data-stake]"),function(b){b.addEventListener("click",function(){state.stakeholder=b.getAttribute("data-stake"); sndClick(); renderStakeholder(); renderReadout();});});
+  var current = stakeholderImpact();
+  el.innerHTML='<div class="eventpanel"><h3>STAKEHOLDER ENCOUNTER · THE LAST-MINUTE REQUEST</h3><div class="dialogue"><b>STAKEHOLDER:</b> "While we are asking anyway, can you add eight questions for my team?"</div><p>Choose your response. Extra topics are modeled as burden, not new scored agenda topics.</p><div class="choicegrid">'+Object.keys(STAKE_CHOICES).map(function(key){
+    var option = STAKE_CHOICES[key], projected = budgetMath({stakeholder:key}).total;
+    var cant = projected > BUDGET_TOTAL;
+    return '<button class="choicebtn'+(state.stakeholder===key?" sel":"")+'" data-stake="'+key+'"'+(cant?' disabled title="Not enough credits for this response"':"")+'><b>'+option.title+' · '+option.cost+' CR</b><span>'+option.reply+'</span><span>Forecast: '+fmtMin(estMinutes(key))+' min · ending goodwill '+Math.max(0,goodwillMath(key).ending)+' · '+projected+' total credits'+(cant?' · OVER BUDGET':"")+'</span></button>';
+  }).join("")+'</div><div class="dialogue" role="status">'+(state.stakeholder?'<b>YOU:</b> '+current.reply+'<br><b>STAKEHOLDER:</b> '+current.response:'No choice yet. SHOW THE EVIDENCE is the default at launch.')+'</div></div>';
+  Array.prototype.forEach.call(el.querySelectorAll("[data-stake]"),function(b){b.addEventListener("click",function(){chooseStakeholder(b.getAttribute("data-stake"));});});
+}
+function chooseStakeholder(choice){
+  if (Object.keys(STAKE_CHOICES).indexOf(choice) < 0) throw new Error("Unknown stakeholder response: " + choice);
+  if (state.level !== 3 && state.level !== 6) throw new Error("No stakeholder encounter on this level.");
+  var before = state.stakeholder;
+  state.stakeholder = choice;
+  if (budgetMath().total > BUDGET_TOTAL){
+    state.stakeholder = before;
+    sndError(); logLine("Not enough credits for that stakeholder response."); return false;
+  }
+  sndClick(); renderStakeholder(); renderReadout(); return true;
 }
 function renderABPanel(){
   var el=$("abPanel"); if(!el) return;
@@ -1333,6 +1411,7 @@ function applyInstrumentForLevel(n){
   state.addBankIds = computeAddBankIds();
 }
 function selectLevel(n,startNow){
+  if (quickSession) leaveQuickChallenge(false);
   state.level=n; var L=curLevel(); BUDGET_TOTAL=L.budget;
   resetChainState();
   applyInstrumentForLevel(n);
@@ -1340,6 +1419,45 @@ function selectLevel(n,startNow){
   state.seg=SEGMENTS.filter(function(x){return x.id===defId;})[0];
   renderLevelUI(); renderSegments(); renderInvites(); renderQuestions(); renderPrep(); renderReadout(); updateBestDisplay();
   if(startNow){ $("startScreen").style.display="none"; $("campaignScreen").style.display="none"; $("report").style.display="none"; $("setup").style.display="block"; window.scrollTo({top:0,behavior:"smooth"}); }
+}
+function startQuickChallenge(index){
+  if (!Number.isInteger(index) || !QUICK_CHALLENGES[index]) throw new Error("Unknown quick challenge: " + index);
+  if (state.running) throw new Error("Finish the current run before starting a challenge.");
+  if (!quickSession){
+    quickSession = { saved:Object.assign({},state,{ qstate:Object.assign({},state.qstate) }), budget:BUDGET_TOTAL };
+  }
+  resetChainState();
+  var challenge = QUICK_CHALLENGES[index];
+  state.level = 1; BUDGET_TOTAL = 40;
+  state.instrument = challenge.ids.map(function(id){
+    var q = QUESTION_BANK.filter(function(item){ return item.id === id; })[0];
+    return Object.assign({},q,{ core:true });
+  });
+  var topics = state.instrument.map(function(q){return q.topic;}).filter(function(topic,i,all){return all.indexOf(topic)===i;});
+  state.quickChallenge = { index:index, name:challenge.name, topics:topics };
+  state.instrumentSeed = "QC0" + (index+1); state.lastRound = null;
+  state.seg = SEGMENTS[0]; state.invite = INVITES[1]; state.reminders = 0;
+  state.validation = "full"; state.dedupe = true; state.suppression = true;
+  state.baseline = snapshotCurrent();
+  $("cabinet").classList.add("quick-mode"); $("quickExit").hidden = false;
+  $("instrumentHelp").textContent = "Repair all three cards to win. Repairs cost 2 credits each. Keeping a defect or cutting a card leaves the challenge unfinished.";
+  $("startScreen").style.display="none"; $("campaignScreen").style.display="none"; $("report").style.display="none"; $("setup").style.display="block";
+  renderLevelUI(); renderQuestions(); renderReadout(); setMusicVariant("setup");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+var instrumentHelpText = $("instrumentHelp").textContent;
+function leaveQuickChallenge(showStart){
+  if (!quickSession) return;
+  if (state.running) throw new Error("Finish the challenge before leaving.");
+  var preferences = {};
+  ["sound","musicOn","sfxOn","muted","musicVol","sfxVol","hints"].forEach(function(key){preferences[key]=state[key];});
+  Object.assign(state,quickSession.saved,preferences); BUDGET_TOTAL=quickSession.budget; quickSession=null;
+  $("cabinet").classList.remove("quick-mode"); $("quickExit").hidden=true;
+  $("instrumentHelp").textContent=instrumentHelpText;
+  if (showStart !== false){
+    $("report").style.display="none"; $("setup").style.display="none"; $("runStage").style.display="none"; $("startScreen").style.display="block";
+    renderLevelUI(); setMusicVariant("title"); window.scrollTo({top:0,behavior:"smooth"});
+  }
 }
 function visibleSegments(){
   if(state.level===4) return SEGMENTS.filter(function(x){return ["tired","fresh","stale"].indexOf(x.id)>=0;});
@@ -1480,14 +1598,14 @@ function renderQuestions(){
     b.addEventListener("click", function(){
       var qid = parseInt(b.getAttribute("data-q"), 10), act = b.getAttribute("data-act");
       if (act === "cut"){
+        var instrument = state.instrument;
+        state.qstate[qid] = "cut";
         var card = $("qc" + qid);
         card.style.transform = "translateX(70px) rotate(8deg)"; card.style.opacity = "0";
         sndCut();
+        renderCutTrayAndBank(); renderReadout();
         setTimeout(function(){
-          state.qstate[qid] = "cut";
-          var grid = $("qGrid"), gone = $("qc" + qid);
-          if (gone) grid.removeChild(gone);
-          renderReadout();
+          if (state.instrument === instrument && !state.running) renderQuestions();
         }, 380);
       } else {
         var beforeQ = budgetMath().attemptCost;
@@ -1501,16 +1619,16 @@ function renderQuestions(){
 
 /* live derived numbers */
 function keptQuestions(){ var base=activeQuestions().filter(function(q){ return state.qstate[q.id] !== "cut"; }); var adds=addBankQuestions().filter(function(q){ return state.added[q.id] && state.qstate[q.id] !== "cut"; }); return base.concat(adds); }
-function estMinutes(){
+function estMinutes(stakeholder){
   var m = keptQuestions().reduce(function(a,q){ return a + effMin(q); }, 0);
-  var stakeMin = state.stakeholder==="accept" ? 4 : state.stakeholder==="rotate" ? 1 : 0;
+  var stakeMin = stakeholderImpact(stakeholder).minutes;
   return Math.round((m + (state.escapes ? 0.5 : 0) + stakeMin) * 100) / 100;
 }
 function affectedGroups(q){
   if (!q.answerBy) return [];
   return PKEYS.filter(function(k){ return state.seg.mix[k] >= 0.05 && q.answerBy.indexOf(k) === -1; });
 }
-function goodwillMath(){
+function goodwillMath(stakeholder){
   var kept = keptQuestions();
   var spendRem = state.reminders * 5;
   var extra = Math.max(0, kept.length - 6);
@@ -1522,10 +1640,10 @@ function goodwillMath(){
   var spendNoSupp = state.suppression ? 0 : 6;
   var stupidKept = kept.filter(function(q){ return tierOf(q) === "stupid"; }).length;
   var spendStupid = stupidKept * 2; /* respondents resent turn-off items at their funnel position */
-  var spendStake = state.stakeholder==="accept" ? 10 : state.stakeholder==="rotate" ? 3 : 0;
+  var spendStake = stakeholderImpact(stakeholder).goodwill;
   var earn = 0, spendOver = 0, over = 0;
   if (state.invite.id === "honest"){
-    over = Math.max(0, estMinutes() - state.invite.promise);
+    over = Math.max(0, estMinutes(stakeholder) - state.invite.promise);
     if (over > 0) spendOver = 3; else earn = state.invite.earn;
   } else if (state.invite.id === "known"){ earn = state.invite.earn; }
   var spend = spendRem + spendExtra + spendUnans + spendOver + spendNoSupp + spendStake + spendStupid;
@@ -1541,28 +1659,7 @@ function tightestPersona(){
   PKEYS.forEach(function(k){ if ((state.seg.mix[k]||0) >= 0.05){ var p = PERSONAS[k]; if (!best || p.patience < best.patience) best = { key:k, name:p.name, patience:p.patience }; } });
   return best;
 }
-/* ---- v1.5 coach + ready-to-launch checklist (informs, never blocks) ---- */
-var COACH_TIPS = {
-  audience: "Step 1 is the audience. Pick who can actually answer your agenda topics: a big list of the wrong people is just a faster way to be wrong.",
-  prep: "Step 2, prepare the list. Validation is the cheapest insurance against bounces: dead addresses damage your sender reputation, not just this send.",
-  invite: "Step 3, the invitation. Say why this person, and how long it takes, honestly. A promised 5 minutes that becomes 9 spends goodwill you can watch in the ledger.",
-  questions: "Step 4, the questionnaire. Fix the defect, not the symptom: SPLIT a double-barreled question, CUT what this audience cannot know. And guard the agenda: a topic you cut is value you chose not to collect.",
-  prelaunch: "All five checks are ticked. Before you launch, read the three gates once: rate needs reach, quality needs sound questions, value needs agenda coverage. Then press the big red button."
-};
-function coachStage(){
-  var t = state.touched || {};
-  var prepDone = t.prep || state.validation !== "skip" || state.dedupe || state.suppression || state.localization || (state.baseline && (state.baseline.validation !== "skip" || state.baseline.dedupe || state.baseline.suppression || state.baseline.localization));
-  var reviewDone = !!t.review || activeQuestions().some(function(q){ return state.qstate[q.id] !== "keep"; }) || addedCount() > 0;
-  if (!t.seg && !state.chainActive) return "audience";
-  if (!prepDone) return "prep";
-  if (!t.invite && !state.chainActive) return "invite";
-  if (!reviewDone) return "questions";
-  return "prelaunch";
-}
-function coachSay(){
-  var el = $("coachTip"); if (!el) return;
-  el.textContent = COACH_TIPS[coachStage()];
-}
+/* Ready-to-launch checklist (informs, never blocks). */
 function renderChecklist(){
   var el = $("launchCheck"); if (!el) return;
   var t = state.touched || {};
@@ -1581,7 +1678,7 @@ function renderChecklist(){
         (i === 3 && !r[1] ? '<button class="skipbtn2" id="skipReviewBtn">SKIP REVIEW</button>' : "") + "</div>";
     }).join("");
   var sb = $("skipReviewBtn");
-  if (sb) sb.addEventListener("click", function(){ state.touched.review = true; sndClick(); renderChecklist(); coachSay(); });
+  if (sb) sb.addEventListener("click", function(){ state.touched.review = true; sndClick(); renderChecklist(); });
 }
 function renderReadout(){
   var kept = keptQuestions(), gm = goodwillMath();
@@ -1592,7 +1689,6 @@ function renderReadout(){
   var estLabel = overBy > 0 ? " · OVER " + tight.name.toUpperCase() + " PATIENCE (" + tight.patience + " MIN)" : "";
   renderAgenda();
   renderChecklist();
-  coachSay();
   $("readout").innerHTML =
     "<span>Segment <b>" + state.seg.name + "</b></span>" +
     "<span>Questions <b>" + kept.length + "</b> dealt (core " + coreKept + "/" + coreTotalAvailable() + ") · Instrument #" + state.instrumentSeed + "</span>" +
@@ -1600,6 +1696,7 @@ function renderReadout(){
     "<span>Goodwill <b>" + gm.start + (gm.fatigue ? " (carried " + gm.carry + " \u2212 " + gm.fatigue + " fatigue)" : "") + " \u2192 " + Math.max(0, gm.ending) + "</b></span>" +
     (gm.trips ? '<span class="warn">Breaker forecast: <b>TRIPS</b></span>' : "<span>Breaker forecast: <b style='color:var(--teal)'>HOLDS</b></span>");
   renderBudget();
+  if (state.level===3 || state.level===6) renderStakeholder();
   var lb = $("launchBtn");
   if (lb){ var over = budgetMath().total > BUDGET_TOTAL; lb.disabled = over; lb.style.opacity = over ? ".45" : ""; lb.textContent = over ? "OVER BUDGET" : "\u25B6 LAUNCH"; }
   var escB = $("escBtn");
@@ -1627,17 +1724,46 @@ $("escBtn").addEventListener("click", function(){
 $("soundBtn").addEventListener("click", function(){
   toggleMute();
 });
-/* field guide overlay */
+/* MPOR overlay */
+function openBRD(){
+  var L = curLevel(), quick = !!state.quickChallenge;
+  var constraints = quick ? "Repair all three cards within 40 credits; one launch. The Fresh audience, full validation, dedupe, suppression, and Honest Ask invitation with no reminders are provided. Retry starts fresh without changing campaign progress." :
+    "One credit pool for the whole level, shared across attempts. Choose an audience that can answer the required topics. Preserve useful coverage while controlling burden and data contamination.";
+  if (!quick && state.level === 2) constraints += " A/B testing is available: compare different invitations and report uncertainty rather than assuming a winner.";
+  if (!quick && (state.level === 3 || state.level === 6)) constraints += " Resolve the stakeholder request for eight extra questions. Costs and added burden depend on your response; extra-topic answers are not simulated or scored.";
+  if (!quick && state.level === 4) constraints += " The tired audience requires ending goodwill 35 or higher.";
+  if (!quick && state.level === 5) constraints += " The multilingual list is 40% English-speaking. Consider invitation language and localization review.";
+  if (!quick && state.level === 6) constraints += " Executive Blast is the available audience for this study.";
+  $("brdContent").innerHTML = '<h2>BRD</h2><p>Business Requirement Document</p><h3>'+L.name+'</h3><h3>STUDY PURPOSE</h3><p>Collect credible answers on the required business topics below. A high response rate alone does not establish useful evidence.</p><h3>REQUIRED TOPICS AND RESPONDENTS</h3><ul>'+agendaTopics().map(function(topic){
+    var personas=(TOPIC_KEYS[topic]||[]).map(function(key){return PERSONAS[key].name;}).join(" or ");
+    return '<li><b>'+topic+'</b>: credible answers from '+personas+'.</li>';
+  }).join("")+'</ul><h3>ACCEPTANCE CRITERIA</h3><ul><li>Response strictly above '+Math.round(L.target*100)+'% of invitations actually sent.</li><li>Data quality 60+ and Insight '+insightGate()+'+.</li><li>Budget: '+L.budget+' credits'+(quick?' for one launch.':' across all attempts.')+'</li>'+(!quick && state.level===4?'<li>Maintain ending goodwill 35 or higher.</li>':"")+(quick?'<li>Repair all three cards; kept defects and cuts do not complete the challenge.</li>':"")+'</ul><h3>STUDY CONSTRAINTS</h3><p>'+constraints+'</p><p>These are the active study requirements, not a forecast. Consult MPOR for game rules, scoring definitions, and simulation limitations.</p>';
+  closeGuide();
+  var dialog=$("studyBRD"); dialog.classList.add("open"); dialog.scrollTop=0;
+  $("brdClose").focus({preventScroll:true});
+}
+function closeBRD(){ $("studyBRD").classList.remove("open"); $("brdBtn").focus({preventScroll:true}); }
+$("brdBtn").addEventListener("click",function(){sndClick();openBRD();});
+$("brdClose").addEventListener("click",function(){sndClick();closeBRD();});
+$("studyBRD").addEventListener("click",function(e){if(e.target===this)closeBRD();});
 function openGuide(){ var g = $("fieldGuide"); if (g){ g.classList.add("open"); g.scrollTop = 0; var c = $("guideClose"); if (c) c.focus({preventScroll:true}); } }
 function closeGuide(){ var g = $("fieldGuide"); if (g) g.classList.remove("open"); }
 var gbBtn = $("guideBtn"); if (gbBtn) gbBtn.addEventListener("click", function(){ initAudio(); sndClick(); openGuide(); });
 var gcBtn = $("guideClose"); if (gcBtn) gcBtn.addEventListener("click", function(){ sndClick(); closeGuide(); });
 var fgEl = $("fieldGuide"); if (fgEl) fgEl.addEventListener("click", function(e){ if (e.target === fgEl) closeGuide(); });
-document.addEventListener("keydown", function(e){ if (e.key === "Escape") closeGuide(); });
+document.addEventListener("keydown", function(e){ if (e.key === "Escape"){ if($("studyBRD").classList.contains("open")) closeBRD(); else closeGuide(); } });
 setPixel($("mgrSetup"), MGR_NORMAL, 4);
 renderLevelUI(); renderSegments(); renderInvites(); renderQuestions(); renderPrep(); renderReadout();
 $("startBtn").addEventListener("click", function(){ initAudio(); sndCoin(); selectLevel(state.level,true); setMusicVariant("setup"); });
 $("campaignBtn").addEventListener("click", function(){ initAudio(); sndClick(); showCampaign(); });
+$("quickBtn").addEventListener("click", function(){ initAudio(); sndCoin(); startQuickChallenge(0); });
+function toggleMobileQR(expanded){
+  $("mobileQR").setAttribute("aria-expanded",String(expanded));
+  $("mobileQR").setAttribute("aria-label",expanded ? "Collapse mobile player QR code" : "Expand mobile player QR code");
+  $("mobileQRLink").hidden=!expanded;
+}
+$("mobileQR").addEventListener("click",function(){toggleMobileQR(this.getAttribute("aria-expanded")!=="true");});
+$("quickExit").addEventListener("click", function(){ sndClick(); leaveQuickChallenge(); });
 function setSpeed(s){
   state.speed = s;
   $("spd1").classList.toggle("sel", s === 1);
@@ -1760,7 +1886,7 @@ function buildRun(){
       var cum = cums[qi];
       var qx = GATE_X.started + 4 + (n === 1 ? stretch/2 : (qi/(n-1)) * stretch);
       var tq = tStart + 1200 + ((qi+1)/(n+0.6)) * 6000 + rng()*260;
-      sp.events.push({ t: tq, type:"qmark", x: qx, cum: cum });
+      sp.events.push({ t: tq, type:"qmark", x: qx, cum: cum, qid:q.id });
 
       /* knowledge block */
       if (q.answerBy && st === "keep" && q.answerBy.indexOf(pk) === -1){
@@ -1894,6 +2020,53 @@ function tally(run){
 /* ================= RUN ANIMATION ================= */
 var rafId = null, runData = null, runStart = 0, finishedCount = 0, guessShown = 0, tripFired = false;
 var virtualT = 0, lastNow = null;
+var reactionLastAt = -Infinity;
+function respondentReaction(event, sprite){
+  if (event.type === "guess") return "I don't know this. I'm guessing.";
+  if (event.type === "escape") return "I can say 'don't know' instead of guessing.";
+  if (event.type === "angry") return "Didn't I already ask you to stop sending these?";
+  if (event.type === "dupe") return "Two invitations for the same person?";
+  if (event.type === "finish") return sprite.guessed ? "Finished, but I had to guess some answers." : "That's my last answer. I'm finished.";
+  if (event.type === "drop"){
+    return { patience:"This is taking longer than I can spare.", knowledge:"I can't answer that from my role.",
+      mobile:"That grid is too much on my phone.", breaker:"The survey stopped before I could finish.",
+      noopen:"I'm leaving this invitation unopened.", nostart:"I'm not ready to start this survey." }[event.cause] || "";
+  }
+  if (event.type !== "qmark") return "";
+  var q = activeQuestions().concat(addBankQuestions()).filter(function(item){return item.id===event.qid;})[0];
+  if (!q) return "";
+  if (state.qstate[q.id] === "simplify") return "That wording is clearer. I know what you're asking.";
+  return { "DOUBLE-BARRELED":"Which half am I answering?", "LEADING":"You already seem to want a positive answer.",
+    "VAGUE TIMEFRAME":"Recently? Do you mean this case or the whole year?", "DOUBLE NEGATIVE":"Wait. Does yes mean it helped or it didn't?",
+    "RECALL OVERLOAD":"A whole year? I don't remember that many details.", "GRID BURDEN":"All these rows on this little screen?",
+    "SENSITIVE NO ASSURANCE":"Who gets to see this answer?", "BROKEN OPTIONS":"My answer fits more than one box.",
+    "WORDY STEM":"Can we get to the question?", "JARGON":"What do those initials mean?" }[defectOf(q)] || "";
+}
+function sampleReactions(run){
+  var candidates=[];
+  run.sprites.forEach(function(sp){sp.events.forEach(function(event){
+    var text=respondentReaction(event,sp);
+    if(text) candidates.push({t:event.t,persona:sp.persona,text:text});
+  });});
+  candidates.sort(function(a,b){return a.t-b.t;});
+  var seen={}, samples=[];
+  candidates.forEach(function(item){if(!seen[item.text] && samples.length<4){seen[item.text]=true;samples.push(item);}});
+  return samples;
+}
+function showRespondentReaction(event,sprite){
+  var text=respondentReaction(event,sprite), now=performance.now();
+  if (!text || now-reactionLastAt<2500) return;
+  reactionLastAt=now;
+  $("reactionPerson").textContent=PERSONAS[sprite.persona].name+" · SIMULATED";
+  $("reactionText").textContent=text;
+  $("respondentBubble").hidden=false;
+}
+function reactionReportHTML(run){
+  var examples=sampleReactions(run);
+  return examples.length?'<div class="reportcard"><h2>VOICES FROM THE FUNNEL</h2><p>Illustrative reactions generated from simulated events, not real customer quotes.</p>'+examples.map(function(item){
+    return '<p><b>'+PERSONAS[item.persona].name+':</b> "'+item.text+'"</p>';
+  }).join("")+'</div>':"";
+}
 
 function personaLegend(){
   $("personaLegend").innerHTML = PKEYS.map(function(k){
@@ -1903,6 +2076,7 @@ function personaLegend(){
 }
 function logLineSoon(){ setTimeout(function(){ logLine("DOMAIN REPUTATION AT RISK. HARD BOUNCES OVER 10%: SPAM FILTERS ARE EATING THE OPENS."); }, 900); }
 function setupStage(run){
+  reactionLastAt=-Infinity; $("respondentBubble").hidden=true;
   $("gates").innerHTML =
     '<span class="gate" style="left:' + GATE_X.invited + '%">INVITED</span>' +
     '<span class="gate" style="left:' + GATE_X.delivered + '%">DELIVERED</span>' +
@@ -1967,6 +2141,7 @@ function startRun(){
   state.reportShown = false;
   state.running = true;
   runData = buildRun();
+  var thisRun = runData;
   finishedCount = 0; guessShown = 0; tripFired = false; virtualT = 0; lastNow = null;
   $("setup").style.display = "none";
   $("startScreen").style.display = "none";
@@ -1979,6 +2154,7 @@ function startRun(){
   var steps = ["3","2","1","GO!"], si = 0;
   overlay.classList.add("show");
   function showStep(){
+    if (!state.running || runData !== thisRun) return;
     if (si >= steps.length){ overlay.classList.remove("show"); beginTicks(); return; }
     num.textContent = steps[si];
     num.classList.remove("pop"); void num.offsetWidth; num.classList.add("pop");
@@ -2058,6 +2234,7 @@ function tick(now){
     }
     while (sp.events[sp.evIdx] && t >= sp.events[sp.evIdx].t){
       var e = sp.events[sp.evIdx]; sp.evIdx++;
+      showRespondentReaction(e,sp);
       if (e.type === "gate"){
         if (e.gate === "delivered") sndChime();
         else if (e.gate === "opened") sndPop();
@@ -2110,7 +2287,7 @@ function tick(now){
     if (sp.evIdx >= sp.events.length && !sp.done){ sp.done = true; }
   });
   if (t < RUN_MS && !allDone){ rafId = requestAnimationFrame(tick); }
-  else { rafId = null; setTimeout(showReport, 700); }
+  else { rafId = null; var completedRun = runData; setTimeout(function(){ if (state.running && runData === completedRun) showReport(); }, 700); }
 }
 $("launchBtn").addEventListener("click", startRun);
 $("skipBtn").addEventListener("click", function(){
@@ -2198,8 +2375,9 @@ function extraReportHTML(c){
   }
   if(state.level===3||state.level===6){
     var ch=state.stakeholder||"pushback";
-    var txt= ch==="accept"?"Detective: ACCEPT added 8 questions (+4 min, −10 goodwill, 10 cr bulk edit). Length and goodwill paid for breadth — check the patience leak above.": ch==="rotate"?"Detective: ROTATE put extras in rotating modules (+1 min, 4 cr). Half the sample carries the extras, so every topic gets partial data without taxing everyone.":"Detective: PUSH BACK kept the instrument clean (0 cr). The cost is a stakeholder conversation, not survey damage.";
-    h+='<div class="reportcard"><h2>STAKEHOLDER CHOICE</h2><p style="font-size:15.5px">'+txt+'</p></div>';
+    var txt= ch==="accept"?"Detective: ACCEPT modeled the eight-question request as +4 min, −10 goodwill, and 10 cr. Check the patience leak above.": ch==="rotate"?"Detective: Rotating modules are modeled as +1 minute, −3 goodwill, and 4 credits. Extra-topic answers are not simulated or scored.":"Detective: PUSH BACK kept the instrument focused (0 cr). The cost is a stakeholder conversation, not added survey burden.";
+    var impact=stakeholderImpact();
+    h+='<div class="reportcard"><h2>STAKEHOLDER DEBRIEF</h2><p><b>YOUR RESPONSE:</b> '+impact.title+'</p><p>'+txt+'</p><p><b>STAKEHOLDER:</b> '+impact.response+'</p><p>Evidence from this send: '+c.completed+' of '+c.sent+' sent sprites completed · '+estMinutes()+' minutes · '+Math.max(0,gmEndingForReport())+' ending goodwill · '+c.drops.patience+' patience drop-offs. Extra-topic coverage is not scored separately.</p></div>';
   }
   if(state.level===4){
     h+='<div class="reportcard"><h2>TIRED LIST · GOODWILL GATE</h2><p style="font-size:15.5px">Ending goodwill: <b>'+Math.max(0,gmEndingForReport())+' / must be 35+</b>. '+(state.reportBack?"Report back line was on (3 cr): what changed last time did the restoring.":"No report back line — the list got another ask with no proof the last one mattered.")+' Short instrument (≤7 kept) restores the most.</p></div>';
@@ -2255,6 +2433,10 @@ function showReport(){
   var targetRate = curLevel().target;
   var won = respRate > targetRate && quality >= 60 && insight >= insightGate() && (state.level!==4 || gm.ending >= 35);
   var fastUseless = !won && respRate > targetRate && quality >= 60 && insight < insightGate();
+  if (state.quickChallenge){
+    won = won && activeQuestions().every(function(q){return state.qstate[q.id] === "simplify";});
+    showQuickReport(run,c,respRate,quality,ins,won); return;
+  }
   var grade;
   if (won){ var avg3 = (respScore + quality + insight) / 3; grade = avg3 >= 85 ? "S" : avg3 >= 70 ? "A" : "B"; }
   else grade = (respRate >= 0.09 || (quality >= 60 && respRate >= 0.06)) ? "C" : "TRY AGAIN";
@@ -2474,6 +2656,7 @@ function showReport(){
     (fastUseless ? '<p style="font-size:16px;margin-top:10px"><b>Verdict: FAST AND USELESS.</b> The rate and the data quality both passed, and the survey still failed, because the business questions it existed to answer came back empty or suspect. Response rate is a weak proxy for value: who answers, and what they were asked, decides what the data can support.</p>' : '') +
     "</div>";
   html += extraReportHTML(c);
+  html += reactionReportHTML(run);
   /* quest */
   var lostTopics = ins.topics.filter(function(t){ return t.status === "LOST"; });
   var suspectTopics = ins.topics.filter(function(t){ return t.status === "ANSWERED WITH SUSPECT DATA"; });
@@ -2493,46 +2676,19 @@ function showReport(){
     html += '<div class="reportcard"><h2>FIX QUEST · NEXT TRY</h2><div class="quest"><span class="px">\u2605 QUEST</span>' +
       "Biggest recoverable leak: <b>" + questDrop.gate + "</b>, about " + fmt(questDrop.n) + " simulated people, mostly " + PERSONAS[qp].lower + "s. " + questDrop.quest + "</div></div>";
   }
-
-  /* v1.5 ONE LESSON recap: the single biggest trade lesson of this run,
-     in plain words first, methodology term in parentheses. */
-  var PLAIN_DEFECT = {
-    "DOUBLE-BARRELED": "one question was secretly two questions, so its answers cannot be read",
-    "LEADING": "the wording pushed people toward the happy answer, so the praise cannot be trusted",
-    "JARGON": "insider words the audience does not share made people guess",
-    "VAGUE TIMEFRAME": "no time period was named, so everyone answered about a different period",
-    "RECALL OVERLOAD": "people were asked to count a year of events from memory, so the numbers are inventions",
-    "BEYOND KNOWLEDGE": "a question asked for facts this audience cannot see from their job",
-    "DOUBLE NEGATIVE": "stacked negatives flipped the meaning and people answered the opposite",
-    "BROKEN OPTIONS": "the answer choices overlapped, so honest answers landed in junk boxes",
-    "GRID BURDEN": "a giant rating grid on a phone made people tap the same answer down the page",
-    "SENSITIVE NO ASSURANCE": "a risky question with no privacy promise got safe answers instead of true ones",
-    "WORDY STEM": "a paragraph-long question spent people's patience before they could answer"
-  };
-  var lessonTxt, lessonTry;
-  if (won){
-    lessonTxt = "You protected coverage while trimming: that is the job. The survey got shorter and the business still got every answer it came for.";
-    lessonTry = "Keep the habit on the next level: change one lever per attempt and let the report prove the change worked.";
-  } else if (fastUseless){
-    lessonTxt = "A popular survey can still be a useless one. The replies came back fast and clean, and the questions the business actually needed were not in the instrument (Insight Value: response rate does not measure value).";
-    lessonTry = "Restore or ADD a question for each LOST topic in the VALUE panel, then re-send. Reach was never the problem.";
-  } else if (lostTopics.length){
-    lessonTxt = "The business topic '" + lostTopics[0].topic + "' came back with no usable answer (Insight Value: a topic only counts when it is asked, sound, answerable, and answered by the people it is about). " + lostTopics[0].reason;
-    lessonTry = "TRY AGAIN and ADD the bank question on '" + lostTopics[0].topic + "' (3 cr), or restore the question you cut.";
-  } else if (largestObservedDefect){
-    lessonTxt = "The biggest leak was self-inflicted: " + (PLAIN_DEFECT[largestObservedDefect.d] || "a defective question damaged its own answers") + " (" + largestObservedDefect.d + "). " + fmt(largestObservedDefect.n * scale) + " simulated respondents showed the symptom this run.";
-    lessonTry = fixVerbFor(largestObservedDefect.q) ? (fixVerbFor(largestObservedDefect.q) + " Q" + largestObservedDefect.q.id + " (" + fixCostFor(largestObservedDefect.q) + " cr), then re-send. One fix, one change, one comparison.") : ("CUT Q" + largestObservedDefect.q.id + " (1 cr), or buy the DK/NA escapes (2 cr), then re-send.");
-  } else if (questDrop){
-    lessonTxt = "The instrument was not the main problem this time; the funnel leaked at " + questDrop.gate.toLowerCase() + " (reach: who gets the invite, and whether it earns the click, decides everything downstream).";
-    lessonTry = questDrop.quest;
-  } else if (gm.trips){
-    lessonTxt = "Goodwill is a budget too. This send spent the list's patience to zero and the breaker stopped the mailing (goodwill: every ask spends trust that later asks need).";
-    lessonTry = "Shorten the instrument, keep reminders to one, and buy the suppression scrub so the wrong people stop getting mailed.";
-  } else {
-    lessonTxt = "No single disaster: the round fell short on the gates. Read the three scores and fix the lowest one first (triangulation: rate, quality, and value are separate problems with separate levers).";
-    lessonTry = "Change exactly one lever, re-send, and compare in THIS ROUND VS LAST ROUND.";
+  function showQuickReport(run,c,rate,quality,ins,won){
+    var index=state.quickChallenge.index;
+    var repaired = activeQuestions().filter(function(q){return state.qstate[q.id] === "simplify";}).length;
+    $("report").innerHTML='<div class="reportcard"><h2>QUICK CHALLENGE · '+(won?"WON":"TRY ANOTHER REPAIR")+'</h2><p>'+state.quickChallenge.name+' · one launch · '+state.launchCost+' / 40 credits</p><p>Repairs <b>'+repaired+' / 3</b> (all three required)</p><p>Response <b>'+pct(rate*100)+'</b> (above 12%) · Quality <b>'+quality+'</b> (60+) · Insight <b>'+ins.score+'</b> (60+)</p><p>'+c.completed+' of '+c.sent+' sent sprites completed. All results simulated.</p>'+activeQuestions().map(function(q){
+      return '<p><b>Q'+q.id+' · '+defectOf(q)+':</b> '+(state.qstate[q.id]==="simplify"?"Repaired with "+fixVerbFor(q):state.qstate[q.id]==="cut"?"Cut; repair still required":"Kept unrepaired")+'</p>';
+    }).join("")+ins.topics.map(function(topic){return '<p><b>'+topic.topic+':</b> '+topic.status+'</p>';}).join("")+'<p>'+(won?"You kept the business topics and repaired the wording.":"Read the weakest score. Fixing wording and keeping the needed topics matter together.")+'</p></div>'+reactionReportHTML(run)+'<div class="againrow"><button class="againbtn" id="quickRetry">RETRY CHALLENGE</button><button class="againbtn" id="quickNext">NEXT CHALLENGE</button><button class="againbtn" id="quickBack">BACK TO LEVELS</button></div>';
+    $("runStage").style.display="none"; $("report").style.display="block";
+    $("quickRetry").addEventListener("click",function(){sndCoin();startQuickChallenge(index);});
+    $("quickNext").addEventListener("click",function(){sndCoin();startQuickChallenge((index+1)%QUICK_CHALLENGES.length);});
+    $("quickBack").addEventListener("click",function(){sndClick();leaveQuickChallenge();});
+    if(won) sndFanfare(); else sndSad();
+    setMusicVariant("setup"); window.scrollTo({top:0,behavior:"smooth"});
   }
-  html += '<div class="lessoncard"><h2>ONE LESSON · MARGE, SENIOR IM</h2><p>' + lessonTxt + '</p><p><b>TRY THIS NEXT:</b> ' + lessonTry + '</p></div>';
 
   html += vsHTML;
 

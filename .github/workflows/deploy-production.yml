@@ -30,7 +30,7 @@ jobs:
         with:
           node-version: '22'
       - name: Validate and package
-        run: node --test scripts/build-site.test.mjs
+        run: node --test scripts/build-site.test.mjs scripts/game-features.test.mjs
       - name: Check deployment credential
         env:
           DEPLOYMENT_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}

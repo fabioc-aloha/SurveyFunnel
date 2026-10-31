@@ -28,6 +28,7 @@ dist/index.html                    game (HTML, CSS, JS, WebAudio)
 dist/staticwebapp.config.json      response headers and font MIME type
 dist/assets/press-start-2p.ttf      pixel title font
 dist/assets/OFL-Press-Start-2P.txt   font license
+dist/assets/play-mobile-qr.svg     production URL QR code
 ```
 
 Deploy `dist/` as the web root, not `site/` or the repository root.
@@ -40,13 +41,15 @@ documentation, agent guidance, and the README banner are not published.
 every push to `main`, or manually through GitHub Actions on `main`.
 
 1. Check out the commit and set up Node 22.
-2. Run `node --test scripts/build-site.test.mjs`. Tests validate all inline
-   scripts, reject missing/external scripts, and check the exact package
-   contents, normalized source bytes, font path, and license. Text files
+2. Run `node --test scripts/build-site.test.mjs scripts/game-features.test.mjs`.
+   Tests cover Quick Challenge rules and campaign isolation, event-based
+   reactions, stakeholder forecasts, and default replay behavior. They also
+   validate all inline scripts, reject missing/external scripts, and check
+   the exact package contents, normalized source bytes, font path, and license. Text files
    use LF line endings on every platform; the font remains binary.
 3. Upload the prebuilt `dist/` package using Azure's deployment action.
    No Oryx build or API deployment runs.
-4. Verify the live HTML, font, and license against the packaged bytes,
+4. Verify the live HTML, font, license, and QR code against the packaged bytes,
    check response headers and MIME types, and confirm repository docs
    return HTTP 404. Retry transient deployment propagation failures;
    persistent failures mark the workflow failed.
@@ -64,7 +67,7 @@ Never place the token in source, logs, or a command-line argument.
 Local validation requires Node 22 or later:
 
 ```powershell
-node --test scripts\build-site.test.mjs
+node --test scripts\build-site.test.mjs scripts\game-features.test.mjs
 node scripts\verify-deployment.mjs https://nice-mushroom-0bdb0ef0f.6.azurestaticapps.net
 ```
 
@@ -83,9 +86,15 @@ Open `site/index.html` from disk with the adjacent `assets/` folder intact.
 The title uses the bundled pixel font, with a monospace fallback.
 The game makes no external runtime calls.
 
+The start-screen QR defaults to a tiny icon. Click to expand the scannable
+mobile player panel, and click again to collapse it. The expanded panel
+also offers a production link, even during offline play.
+Its SVG is bundled locally; no QR service or runtime generator is used.
+If the production hostname changes, regenerate the QR and update its link.
+
 ## Updating the game
 
-1. Edit the game or assets and run the local packaging tests.
+1. Edit the game or assets and run the local gameplay and packaging tests.
 2. Update `CHANGELOG.md` and push to `main`.
 3. Wait for the production workflow to succeed.
 4. Play a round on the live URL and check sound in a real browser.

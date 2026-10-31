@@ -6,22 +6,20 @@ every build, not a one-time polish list.
 
 ## Teaching layer
 
-- **Coach mode.** A senior IM voice ("Marge") gives one short tip
-  per setup stage on a first run: audience, list prep, invitation,
-  questionnaire, pre-launch. Tips teach the decision, not the
-  button. Dismissible, stored, replayable.
 - **Numbered flow.** Setup stages are numbered to match the three
   levers plus prep. A novice should never wonder what step they
   are on or what comes next.
 - **Ready checklist.** Above LAUNCH, a live checklist shows what
   has been decided. It informs; it never blocks. Blocking a novice
   for skipping a step teaches resentment, not method.
-- **In-game field guide.** Every methodology term in the game
+- **MPOR (Master Plan of Record).** Every methodology term in the game
   (defect classes, DK/NA, Insight Value, satisficing) is one tap
   away from a plain-language entry. No leaving the game to learn.
-- **Lesson recap.** Every report ends with ONE LESSON and a TRY
-  THIS NEXT line in the game's own verbs. One lesson per run is
-  what a novice retains.
+- **Report diagnostics.** Reports show observed defects, lost agenda
+  topics, and a fix quest. There is no separate coach banner or lesson recap.
+- **Study requirements.** Consult BRD on the setup screen opens the
+  active study's Business Requirement Document: topics, respondent groups,
+  acceptance gates, budget, and constraints. Shared game rules stay in MPOR.
 
 ## Legibility floor
 
@@ -32,7 +30,8 @@ every build, not a one-time polish list.
 - Every disabled control states why it is disabled.
 - Motion respects `prefers-reduced-motion` (no shake, no confetti).
 - Sound and hints are independent, persisted toggles. Hints off
-  removes coaching, never information (tags, prices, gates stay).
+  hides question explanations, never essential information (tags,
+  prices, gates stay). MPOR remains available.
 
 ## The test
 

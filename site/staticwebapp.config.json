@@ -5,6 +5,7 @@
     "Referrer-Policy": "no-referrer"
   },
   "mimeTypes": {
-    ".ttf": "font/ttf"
+    ".ttf": "font/ttf",
+    ".svg": "image/svg+xml"
   }
 }

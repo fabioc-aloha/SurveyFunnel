@@ -29,6 +29,9 @@ async function verify() {
     if (destination.endsWith('.ttf')) {
       assert.match(response.headers.get('content-type') ?? '', /font\/ttf/);
     }
+    if (destination.endsWith('.svg')) {
+      assert.match(response.headers.get('content-type') ?? '', /image\/svg\+xml/);
+    }
   }
   for (const path of ['/README.md', '/AGENTS.md', '/docs/development.md']) {
     const response = await fetch(new URL(path, base), { signal: AbortSignal.timeout(15000) });
@@ -39,7 +42,7 @@ async function verify() {
 for (let attempt = 1; attempt <= 12; attempt++) {
   try {
     await verify();
-    console.log(`Verified production HTML, font, license, headers, and unpublished docs at ${base.origin}.`);
+    console.log(`Verified production HTML, font, license, QR code, headers, and unpublished docs at ${base.origin}.`);
     break;
   } catch (error) {
     console.error(`Verification attempt ${attempt}/12 failed: ${error.message}`);

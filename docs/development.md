@@ -9,9 +9,10 @@ oversight: the game can be hosted statically or opened from disk.
 The title font is bundled in `assets/`; keep it alongside `site/`
 for offline play. The game sends no survey data.
 
-Production packaging and syntax checks use Node without npm dependencies:
-`node --test scripts/build-site.test.mjs`. The package contains only the
-game, static-host configuration, font, and license. See
+Gameplay, packaging, and syntax checks use Node without npm dependencies:
+`node --test scripts/build-site.test.mjs scripts/game-features.test.mjs`.
+The package contains only the
+game, static-host configuration, font, license, and mobile QR code. See
 [deployment guidance](deployment.md) for CI/CD and live verification.
 
 Campaign state lives in page memory and resets on reload. Sound and
@@ -71,6 +72,55 @@ All rates, costs, and persona numbers sit in one configuration
 block at the top of the script. Change numbers there, never inside
 the funnel logic. After any change, re run the six invariants above
 and record the results in `CHANGELOG.md`.
+
+## Quick Challenge and feedback
+
+Quick Challenge supplies three fixed defective cards, the Fresh audience,
+full validation, dedupe, suppression, and Honest Ask with no reminders.
+Its 40-credit budget covers the send (30), invitation (4), and all three
+repairs (6). A win requires all three repairs plus the usual response,
+quality, and Insight gates. Unique dealt topics form its agenda.
+
+Each scenario has a curated deterministic seed (`QC01`, `QC02`, `QC03`).
+Tests require every fully repaired scenario to win within budget, and
+prevent wins for kept defects or cut cards. Retry starts fresh. A saved
+campaign state is restored on exit; Quick reports bypass campaign awards,
+attempt history, and carried credits, goodwill, and reputation.
+
+Respondent reactions read existing events and question IDs. They draw no
+random numbers and change no simulation outcome. The live bubble is paced
+at most once per 2.5 seconds; report samples contain at most four distinct
+reactions. Delivery failures have no respondent voice.
+
+Stakeholder choices share the existing cost, minute, and goodwill values.
+Forecasts use the same baseline-aware budget and goodwill calculations as
+the actual choice, including Honest Ask time-promise penalties. Extras
+remain modeled burden, not new cards or scored agenda topics.
+
+`scripts/game-features.test.mjs` executes the first two inline scripts in
+a Node VM with a minimal DOM facade. It checks game behavior, not rendered
+layout, synthesized audio, or browser accessibility. Manual browser checks
+remain necessary for those surfaces.
+
+The setup BRD dialog derives study topics and required personas from
+`agendaTopics()` and `TOPIC_KEYS`, and acceptance gates from `curLevel()`
+and `insightGate()`. It includes level constraints and the Quick Challenge
+repair requirement without modifying campaign or setup state. Keep its
+criteria aligned with scoring when adding or changing a level.
+
+## Mobile QR
+
+The title-screen portal uses `assets/play-mobile-qr.svg`, linking to the
+production hostname. It is a static QR with H error correction, a
+four-module quiet zone, and dark modules on a light background. The arcade
+frame sits outside the QR. It defaults to a 49px icon; clicking expands
+the full 196px QR panel, and clicking again collapses it. Both sizes use
+an integer module scale. Scan the expanded version. Regenerate the QR
+if the production URL changes.
+
+The portal appears left of the title on desktop and below it on narrow
+screens. Generation used the local Python `qrcode` library; independent
+decoding uses `zxingcpp`. Neither is a game or CI runtime dependency.
 
 ## Adding a level
 

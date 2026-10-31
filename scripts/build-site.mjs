@@ -9,7 +9,8 @@ export const files = [
   ['site/index.html', 'index.html'],
   ['site/staticwebapp.config.json', 'staticwebapp.config.json'],
   ['assets/press-start-2p.ttf', 'assets/press-start-2p.ttf'],
-  ['assets/OFL-Press-Start-2P.txt', 'assets/OFL-Press-Start-2P.txt']
+  ['assets/OFL-Press-Start-2P.txt', 'assets/OFL-Press-Start-2P.txt'],
+  ['assets/play-mobile-qr.svg', 'assets/play-mobile-qr.svg']
 ];
 
 export function validateHtml(html) {
