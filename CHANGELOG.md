@@ -1,6 +1,16 @@
 # Changelog
 
-## 2026-10-31 - UAT fixes, difficulty and terminology (local only)
+## 2026-10-31 - UAT fixes, difficulty and terminology release
+
+- Gameplay commit `f8b2fac` deployed successfully in
+  [run 41236593589](https://github.com/fabioc-aloha/SurveyFunnel/actions/runs/41236593589).
+  All 38 tests passed locally and in the production workflow.
+- Independent verification matched live package bytes, security/MIME
+  headers, and unpublished-document 404s. A live uninterrupted campaign
+  reached Season Results with 6/6 wins and no runtime errors. Live checks
+  also passed difficulty/terminology labels, the finale HUD, MPOR/BRD
+  keyboard focus restoration and inert background, and the 0px collapsed
+  QR border. Human audio and physical-device checks remain open.
 
 - Fixed missing post-win navigation, multi-control retry budget recovery,
   and Executive Blast retries offered below its 45-credit batch cost.
@@ -31,8 +41,8 @@
   Season Results, actual 35-credit retry recovery, the finale's
   35-credit/no-retry case, dialog keyboard behavior, and computed QR/layout
   checks at 390px and 1440px. The desktop title capture was inspected.
-- Commit, push, and deployment are now explicitly authorized; publication
-  is pending verification. Human audio, physical-phone,
+- Authorized publication is verified for the gameplay commit above.
+  Human audio, physical-phone,
   cross-browser, and screen-reader checks remain in [TODO.md](TODO.md).
 
 ## 2026-10-31 - Gameplay release

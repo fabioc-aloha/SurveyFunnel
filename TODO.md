@@ -36,9 +36,6 @@
 
 ## Release verification
 
-- Complete the authorized publication of UAT fixes, difficulty labels,
-  terminology corrections, and collapsed QR-border removal.
-  The current 38 tests and local browser checks do not verify deployment.
 - A human must listen to WebAudio on the live site. Automated checks
   cannot establish that music and effects sound correct.
 - Scan the expanded QR with a physical phone and repeat key journeys on

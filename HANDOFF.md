@@ -3,15 +3,16 @@
 ## Current State
 
 UAT fixes, initial-budget winnability checks, approved difficulty labels,
-player terminology corrections, and collapsed QR-border removal are ready
-for the user-authorized commit, push, and deployment. Publication is not
-yet verified. Implementation and prior release evidence
-are preserved in [CHANGELOG.md](CHANGELOG.md).
+player terminology corrections, and collapsed QR-border removal deployed
+successfully in gameplay commit `f8b2fac`. Release evidence is preserved in
+[CHANGELOG.md](CHANGELOG.md).
 
 The existing [production workflow](.github/workflows/deploy-production.yml)
-deploys the five-file static package on pushes to `main`. The last recorded
-release is gameplay commit `3df78b8` followed by documentation commit
-`58af2ed`; current production was not rechecked during meditation.
+deploys the five-file static package on pushes to `main`.
+[Run 41236593589](https://github.com/fabioc-aloha/SurveyFunnel/actions/runs/41236593589)
+passed deployment and live verification for `f8b2fac`. The following
+documentation-only commit records that verification without changing the
+game package; check its workflow before assuming publication is complete.
 See [deployment guidance](docs/deployment.md) for the hosting target.
 
 ## Blockers
@@ -21,9 +22,8 @@ cross-browser, and screen-reader checks remain open in [TODO.md](TODO.md).
 
 ## Next Action
 
-Commit and push the approved changes, then use the existing production
-workflow and verify the deployed package and gameplay.
-Do not treat local acceptance as deployment evidence.
+Complete the remaining human audio and physical-device checks and resolve
+the tracked browser-suite approval decision in [TODO.md](TODO.md).
 
 ## Verification
 
@@ -39,6 +39,13 @@ recovery, the finale's audience-specific minimum send cost, modal keyboard
 containment and opener restoration, and 390px/1440px layout checks.
 These are manual/session checks, not a tracked browser suite.
 All three inline scripts and the five-file package passed validation.
+
+Independent post-deployment verification matched live HTML, font, license,
+QR bytes, security/MIME headers, and unpublished-document 404s.
+A live uninterrupted six-level campaign reached Season Results with 6/6
+wins and no runtime errors. MPOR/BRD keyboard focus restoration, inert
+background controls, terminology, difficulty labels, the finale's 70+
+Insight HUD, and the collapsed 0px QR border passed live checks.
 
 Default Git authentication failed during the prior release; the existing
 GitHub CLI helper worked when selected for that push only. Git configuration
