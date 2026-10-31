@@ -42,7 +42,8 @@ every push to `main`, or manually through GitHub Actions on `main`.
 1. Check out the commit and set up Node 22.
 2. Run `node --test scripts/build-site.test.mjs`. Tests validate all inline
    scripts, reject missing/external scripts, and check the exact package
-   contents, source bytes, font path, and license.
+   contents, normalized source bytes, font path, and license. Text files
+   use LF line endings on every platform; the font remains binary.
 3. Upload the prebuilt `dist/` package using Azure's deployment action.
    No Oryx build or API deployment runs.
 4. Verify the live HTML, font, and license against the packaged bytes,

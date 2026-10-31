@@ -16,8 +16,11 @@ async function verify() {
     url.searchParams.set('verify', revision);
     const response = await fetch(url, { signal: AbortSignal.timeout(15000) });
     assert.equal(response.status, 200, `${destination}: HTTP status`);
-    assert.deepEqual(Buffer.from(await response.arrayBuffer()),
-      readFileSync(join(output, destination)), `${destination}: deployed bytes differ`);
+    assert.equal(
+      createHash('sha256').update(Buffer.from(await response.arrayBuffer())).digest('hex'),
+      createHash('sha256').update(readFileSync(join(output, destination))).digest('hex'),
+      `${destination}: deployed bytes differ`
+    );
     assert.equal(response.headers.get('x-content-type-options'), 'nosniff');
     if (destination === 'index.html') {
       assert.match(response.headers.get('content-type') ?? '', /text\/html/);

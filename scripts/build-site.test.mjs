@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import test from 'node:test';
@@ -11,7 +12,14 @@ test('production package contains only the game, config, font, and license', () 
     'OFL-Press-Start-2P.txt', 'press-start-2p.ttf'
   ]);
   for (const [source, destination] of files) {
-    assert.deepEqual(readFileSync(join(output, destination)), readFileSync(join(root, source)));
+    const expected = destination.endsWith('.ttf')
+      ? readFileSync(join(root, source))
+      : Buffer.from(readFileSync(join(root, source), 'utf8').replace(/\r\n?/g, '\n'));
+    assert.equal(
+      createHash('sha256').update(readFileSync(join(output, destination))).digest('hex'),
+      createHash('sha256').update(expected).digest('hex'),
+      `${destination}: packaged content must match normalized source`
+    );
   }
   const html = readFileSync(join(output, 'index.html'), 'utf8');
   const font = /src:url\("([^"]+)"\) format\("truetype"\)/.exec(html);

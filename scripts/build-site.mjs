@@ -1,4 +1,4 @@
-import { copyFileSync, mkdirSync, readFileSync, rmSync } from 'node:fs';
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Script } from 'node:vm';
@@ -32,7 +32,10 @@ export function buildSite() {
   for (const [source, destination] of files) {
     const target = join(output, destination);
     mkdirSync(dirname(target), { recursive: true });
-    copyFileSync(join(root, source), target);
+    const content = destination.endsWith('.ttf')
+      ? readFileSync(join(root, source))
+      : readFileSync(join(root, source), 'utf8').replace(/\r\n?/g, '\n');
+    writeFileSync(target, content);
   }
   console.log(`Validated ${count} inline scripts; packaged ${files.length} files in dist.`);
 }

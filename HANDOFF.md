@@ -26,9 +26,12 @@ inline-script syntax, exact package contents, source bytes, font resolution,
 and rejected invalid/missing/external scripts. CI runs these tests and
 verifies live HTML/font/license bytes, response headers, and unpublished docs.
 
-Earlier session browser checks passed Field Guide first-open/reopen
-`scrollTop === 0`, close-button focus, button close, and Escape close.
-These gameplay checks are not yet a tracked browser suite.
+The first production workflow passed, and independent Windows verification
+passed after packaging normalized text to LF. Live browser checks passed
+pixel-font loading, Field Guide first-open/reopen `scrollTop === 0`,
+close-button focus, and a 390px-wide setup/launch/report round without
+horizontal overflow or runtime errors. These gameplay checks are not yet
+a tracked browser suite. Human audio listening is still unverified.
 
 The push was verified against the remote `main` hash. Default Git
 authentication failed; the successful retry used the existing GitHub CLI

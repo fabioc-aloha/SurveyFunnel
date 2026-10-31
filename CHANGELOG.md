@@ -10,7 +10,16 @@
   production environment, with pinned actions and an app-scoped secret.
 - Added dependency-free packaging tests and live checks for deployed
   bytes, font MIME type, response headers, and unpublished documentation.
+- Normalized packaged text to LF so Windows and Linux produce identical
+  deployed bytes, while preserving the binary font.
 - Updated hosting, packaging, rollback, local font, and scoring guidance.
+- First [production workflow](https://github.com/fabioc-aloha/SurveyFunnel/actions/runs/41228243143)
+  passed packaging, deployment, and live checks. Independent Windows
+  verification passed after line-ending normalization.
+- Live browser checks passed local font loading, Field Guide first-open
+  and reopen behavior, and a 390px-wide setup/launch/report round without
+  horizontal overflow or JavaScript runtime errors. Human audio listening
+  remains a release check.
 
 ### 2026-10-31 - Start screen and Field Guide
 
