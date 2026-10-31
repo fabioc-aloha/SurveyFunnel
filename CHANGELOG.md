@@ -1,5 +1,33 @@
 # Changelog
 
+## Unreleased
+
+### 2026-10-31 - Production deployment automation
+
+- Created dedicated Free-tier Azure Static Web Apps hosting in
+  GCX Prod, East US 2, with a public HTTPS hostname.
+- Added GitHub Actions deployment from `main`, restricted to the
+  production environment, with pinned actions and an app-scoped secret.
+- Added dependency-free packaging tests and live checks for deployed
+  bytes, font MIME type, response headers, and unpublished documentation.
+- Updated hosting, packaging, rollback, local font, and scoring guidance.
+
+### 2026-10-31 - Start screen and Field Guide
+
+- Updated the producer branding and creator credit.
+- Removed introductory and footer copy from the start screen.
+  Centralized instructions and simulation/privacy information in
+  the Field Guide.
+- Bundled the pixel title font and its license locally.
+- Field Guide opens at the top, including after scrolling and
+  reopening, without losing keyboard focus on the close button.
+- Included these changes and the v1.6 fixes in commit `8f05952`,
+  pushed to `main`. Deployment was not verified.
+- Browser checks passed for first-open and reopened guide scroll
+  position, close-button focus, button close, and Escape close.
+  All three inline scripts passed `node --check`; `git diff --check`
+  passed. These checks are not yet a tracked regression suite.
+
 ## v1.6 - 2026-10-31 - Breaker and instrument fixes
 
 - Goodwill breaker trips stop future invitations at the stated

@@ -15,12 +15,13 @@ customer data, no real sends.
 
 ## Play it
 
-The game is a single self contained HTML file. No build step, no
-server code, no accounts.
+The game uses one HTML file and a bundled pixel font. No server code
+or player accounts are required.
 
 - Local: open `site/index.html` in any modern browser.
-- Hosted: deploy the `site/` folder to any static host (see
-  `docs/deployment.md`).
+- Production: <https://nice-mushroom-0bdb0ef0f.6.azurestaticapps.net>.
+- Other hosts: run `node scripts/build-site.mjs` and publish `dist/`
+  (see `docs/deployment.md`).
 
 A round takes 3 to 5 minutes: pick an audience, prepare the list,
 tune the invite, trim the questionnaire, launch, watch the sprites,
@@ -64,19 +65,22 @@ read the Drop-off Detective, go again.
 | `docs/gameplay-concepts.md` | The brainstorm record behind the design |
 | `docs/game-concept.md` | The earlier Circuit Breaker framing, kept for history |
 | `docs/development.md` | How the single file game is put together, the simulation model, and how to tune balance |
-| `docs/deployment.md` | How to put `site/` on a subdomain, including Azure Static Web Apps |
+| `docs/deployment.md` | Production hosting, GitHub Actions, packaging, verification, and rollback |
 | `CHANGELOG.md` | Version history |
 
 ## Repo layout
 
 ```text
-assets/banner.svg      Cabinet banner (this README)
-site/index.html        The game. One file, deployable as is
+assets/                README banner, local pixel font, and font license
+site/                  Game HTML and Azure static-site configuration
+scripts/               Packaging tests and live deployment checks
+.github/workflows/     Production deployment from main
 docs/                  Design, play, development, deployment docs
 ```
 
 ## Status
 
+- Production updates deploy through GitHub Actions on every push to `main`.
 - v1.6 (2026-10-31): breaker send limits, corrected response-rate
   accounting, visible question repairs, distinct A/B variants, and
   offline font rendering. See `CHANGELOG.md` for earlier releases.

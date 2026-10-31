@@ -5,8 +5,14 @@
 The game is one HTML file (`site/index.html`) with inline CSS and
 JavaScript and WebAudio generated sound. There is no framework, no
 bundler, and no server. That is a deployment decision, not an
-oversight: the file can be hosted anywhere, emailed, or opened from
-disk, and it can never leak data because it never sends any.
+oversight: the game can be hosted statically or opened from disk.
+The title font is bundled in `assets/`; keep it alongside `site/`
+for offline play. The game sends no survey data.
+
+Production packaging and syntax checks use Node without npm dependencies:
+`node --test scripts/build-site.test.mjs`. The package contains only the
+game, static-host configuration, font, and license. See
+[deployment guidance](deployment.md) for CI/CD and live verification.
 
 Campaign state lives in page memory and resets on reload. Sound and
 hint preferences are saved in local storage; the game does not use
@@ -40,8 +46,11 @@ Per round, the model runs in this order:
    `mechanics-update-v1.1.md`. If goodwill reaches zero, the breaker
    stops new invitations and ends the run for anyone still in the
    funnel. Only completions before the trip count.
-6. **Scoring.** Response score against the level target; data
-   quality from the deduction table; win requires both.
+6. **Scoring.** Response score against the level target, data
+   quality from the deduction table, and Insight Value from agenda
+   coverage. Winning requires the response target, quality 60+,
+   and Insight 60+ (70+ in Level 6); Level 4 also requires ending
+   goodwill 35+.
 
 ## Balance invariants (test these after any tuning)
 
@@ -77,8 +86,8 @@ what the trap strategy must score) before shipping it.
 - Sound is WebAudio synthesized; it cannot be verified in headless
   test environments. Human ear check is a release step (see the
   deployment checklist).
-- Display fonts use the local monospace fallback; the game makes no
-  external requests and remains playable offline.
+- The title uses the locally bundled pixel font with a monospace
+  fallback; the game makes no external requests and remains playable offline.
 - Persona behavior is tuned to feel plausible and teach the right
   trade offs. It is a teaching simulation, not a forecasting model,
   and the game labels its results simulated.

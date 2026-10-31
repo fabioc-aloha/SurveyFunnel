@@ -1,70 +1,101 @@
 # Deployment
 
-The game ships as one self contained HTML file at `site/index.html`.
-There is no build step, no backend, no database, and no runtime
-configuration. Any static host can serve it. This guide covers the
-planned route (Azure Static Web Apps on a custom subdomain, under
-the owner's Microsoft account) and two fallbacks.
+The game has no backend, database, or runtime configuration. Production
+uses Azure Static Web Apps and GitHub Actions. A dependency-free Node
+script validates the inline JavaScript and packages the game with its
+local font.
+
+## Production target
+
+| Setting | Value |
+| --- | --- |
+| Subscription | GCX Survey Operations PROD |
+| Subscription ID | `f938d574-06bc-48b4-9b7b-2ed21e60c5f1` |
+| Resource group | `rg-surveyfunnel-prod` |
+| Static Web App | `swa-surveyfunnel-prod` |
+| Region | East US 2 |
+| Plan | Free; no SLA |
+| Access | Public; no login required |
+| URL | <https://nice-mushroom-0bdb0ef0f.6.azurestaticapps.net> |
+
+Free hosting is subject to subscription-wide bandwidth and app quotas.
+No custom domain, backend, or paid hosting resource is configured.
 
 ## What gets deployed
 
 ```text
-site/index.html     the whole game (HTML, CSS, JS, WebAudio sounds)
+dist/index.html                    game (HTML, CSS, JS, WebAudio)
+dist/staticwebapp.config.json      response headers and font MIME type
+dist/assets/press-start-2p.ttf      pixel title font
+dist/assets/OFL-Press-Start-2P.txt   font license
 ```
 
-Deploy the `site/` folder as the web root. The game must be served
-over HTTPS, which every route below provides.
+Deploy `dist/` as the web root, not `site/` or the repository root.
+The font URL resolves to `/assets/press-start-2p.ttf`. Repository
+documentation, agent guidance, and the README banner are not published.
 
-## Route A: Azure Static Web Apps (planned)
+## Continuous deployment
 
-Done by the owner in the Azure portal and the DNS provider; it
-cannot be done from the repo side. Outline:
+[Deploy production](../.github/workflows/deploy-production.yml) runs on
+every push to `main`, or manually through GitHub Actions on `main`.
 
-1. **Create the app.** Azure portal, Create a resource, Static Web
-   App. Plan: Free. Deployment source: GitHub, repo
-   `fabioc-aloha/SurveyFunnel`, branch `main`.
-2. **Build settings.** App location: `site`. Api location: leave
-   empty. Output location: leave empty (the file is already built).
-   Azure adds a GitHub Actions workflow to the repo; every push to
-   `main` redeploys.
-3. **First check.** Open the generated `*.azurestaticapps.net` URL
-   and play one full round, sound on, before touching DNS.
-4. **Custom subdomain.** In the Static Web App, Custom domains, add
-   the chosen subdomain (placeholder here: `<game>.correax.com`).
-   At the DNS provider, create the CNAME record Azure shows, plus
-   the TXT validation record if Azure asks for one. Wait for the
-   status to read Validated and for the free managed certificate to
-   issue, then browse the subdomain and play a round again.
-5. **Access note.** A Static Web App on the Free plan is public to
-   anyone with the URL unless authentication is configured. The
-   game contains no real data and no internal systems access, so
-   public is acceptable by design; if that changes, configure the
-   built in authentication before announcing the URL wider.
+1. Check out the commit and set up Node 22.
+2. Run `node --test scripts/build-site.test.mjs`. Tests validate all inline
+   scripts, reject missing/external scripts, and check the exact package
+   contents, source bytes, font path, and license.
+3. Upload the prebuilt `dist/` package using Azure's deployment action.
+   No Oryx build or API deployment runs.
+4. Verify the live HTML, font, and license against the packaged bytes,
+   check response headers and MIME types, and confirm repository docs
+   return HTTP 404. Retry transient deployment propagation failures;
+   persistent failures mark the workflow failed.
+
+The workflow has read-only repository permissions. Actions are pinned to
+commit SHAs, and production deployments are serialized. The GitHub
+`production` environment allows only the `main` branch. Its
+`AZURE_STATIC_WEB_APPS_API_TOKEN` secret is scoped to this Static Web App;
+the workflow does not need an Azure subscription credential.
+
+To rotate the deployment token, reset it in the Static Web App and replace
+the environment secret using a secure input to `gh secret set`.
+Never place the token in source, logs, or a command-line argument.
+
+Local validation requires Node 22 or later:
+
+```powershell
+node --test scripts\build-site.test.mjs
+node scripts\verify-deployment.mjs https://nice-mushroom-0bdb0ef0f.6.azurestaticapps.net
+```
+
+The second command verifies that production matches the locally packaged
+commit. It should fail if local changes have not yet been deployed.
 
 ## Route B: any static file host
 
-Upload `site/index.html` as the index document of any static
-website bucket, pages service, or plain web server. Point the
-subdomain at it with a CNAME. Nothing in the game depends on the
-host.
+Run `node scripts/build-site.mjs` and upload the contents of `dist/`
+to an HTTPS static host. The Azure configuration is platform-specific;
+configure equivalent headers and font MIME types on another host.
 
 ## Route C: local and offline
 
-Open `site/index.html` from disk. The game makes no external calls
-at runtime and uses the local monospace fallback.
+Open `site/index.html` from disk with the adjacent `assets/` folder intact.
+The title uses the bundled pixel font, with a monospace fallback.
+The game makes no external runtime calls.
 
 ## Updating the game
 
-1. Replace `site/index.html` with the new build.
-2. Update `CHANGELOG.md`.
-3. Push to `main`. On Route A the workflow redeploys automatically.
-4. Hard refresh the subdomain (Ctrl+F5) to beat cache, and play one
-   round to smoke test: setup, budget, launch, report, sound
-   toggle.
+1. Edit the game or assets and run the local packaging tests.
+2. Update `CHANGELOG.md` and push to `main`.
+3. Wait for the production workflow to succeed.
+4. Play a round on the live URL and check sound in a real browser.
+
+To roll back, revert the faulty commit and push the revert to `main`.
+The same workflow validates and deploys the restored version. A failed
+post-deployment check reports failure but does not automatically roll back.
 
 ## Pre launch checklist
 
-- [ ] One full round played on the real subdomain, desktop width.
+- [ ] One full round played on the production URL, desktop width.
 - [ ] One full round played on a phone width screen, no sideways
       scrolling.
 - [ ] Sound on and mute toggle both checked in a real browser (the
