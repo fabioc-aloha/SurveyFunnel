@@ -1,5 +1,18 @@
 # Changelog
 
+## v1.6 - 2026-10-31 - Breaker and instrument fixes
+
+- Goodwill breaker trips stop future invitations at the stated
+  cutoff and stop everyone still in the funnel. Only completions
+  before the trip count. Reports count response rate and A/B sample
+  sizes from invitations actually sent.
+- Question repairs now show the corrected wording or split items in
+  the instrument.
+- A/B arms cannot use the same invite. Removed the external font
+  requests and retained the local monospace fallback.
+- Updated the documented Level 6 budget and measured Level 1
+  default outcome.
+
 ## v1.5 - 2026-10-31 - Big bank, Insight Value, novice UX
 
 - Question bank expanded to 64: 26 clean, 22 defective (two per

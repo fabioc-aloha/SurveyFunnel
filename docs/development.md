@@ -8,8 +8,9 @@ bundler, and no server. That is a deployment decision, not an
 oversight: the file can be hosted anywhere, emailed, or opened from
 disk, and it can never leak data because it never sends any.
 
-State lives in page memory only. Reload resets the season. Nothing
-is stored in cookies or local storage.
+Campaign state lives in page memory and resets on reload. Sound and
+hint preferences are saved in local storage; the game does not use
+cookies or store survey responses.
 
 ## The simulation model
 
@@ -36,14 +37,17 @@ Per round, the model runs in this order:
    liners; skipped dedupe adds duplicates; open rates can add a
    forwarded response share.
 5. **Goodwill and budget.** Spends and earns apply as specified in
-   `mechanics-update-v1.1.md`. Goodwill at zero trips the breaker
-   and caps completions.
+   `mechanics-update-v1.1.md`. If goodwill reaches zero, the breaker
+   stops new invitations and ends the run for anyone still in the
+   funnel. Only completions before the trip count.
 6. **Scoring.** Response score against the level target; data
    quality from the deduction table; win requires both.
 
 ## Balance invariants (test these after any tuning)
 
-1. Lazy default run: near miss on rate, visible bounce problem.
+1. Lazy Level 1 default run: 2 completions from 40 sent (5%),
+   below the 12% target, with a visible bounce problem. This is a
+   clear miss, not a near miss.
 2. Prepared mid budget run (validation, dedupe, Honest Ask, trim):
    wins inside 120 credits.
 3. Executive Blast with no validation: worst run on the board.
@@ -73,8 +77,8 @@ what the trap strategy must score) before shipping it.
 - Sound is WebAudio synthesized; it cannot be verified in headless
   test environments. Human ear check is a release step (see the
   deployment checklist).
-- The pixel display font loads from a CDN when online; offline it
-  falls back to monospace with no loss of function.
+- Display fonts use the local monospace fallback; the game makes no
+  external requests and remains playable offline.
 - Persona behavior is tuned to feel plausible and teach the right
   trade offs. It is a teaching simulation, not a forecasting model,
   and the game labels its results simulated.

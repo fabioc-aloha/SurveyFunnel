@@ -5,8 +5,10 @@
 **Code name: Respons.** A retro arcade training game for Microsoft
 Instrument Managers in GCX (Global Customer Experience). It teaches
 how to raise customer satisfaction survey response rates: the share
-of invited customers who click through the invitation email and
-complete the questionnaire.
+of sent invitations that result in a customer clicking through and
+completing the questionnaire.
+
+Produced by GCX. Created by Fabio Correa.
 
 Practice space only. Simulated audiences, simulated results, no real
 customer data, no real sends.
@@ -30,17 +32,19 @@ read the Drop-off Detective, go again.
   INVITATION (wording and click through appeal), QUESTIONNAIRE
   (length, complexity, answerability). Every action belongs to one.
 - **Two budgets.** Goodwill, the audience's patience with you, shown
-  as a breaker panel. Credits, one pool of 120 per level shared
-  across all your attempts, spent across list preparation and
-  execution. You cannot afford everything; that is the game.
+  as a breaker panel. Credits, one pool of 120 per level (150 in
+  Level 6), shared across all your attempts and spent on list
+  preparation and execution. You cannot afford everything; that is
+  the game.
 - **Two ways forward.** After a round: TRY AGAIN and continue the
   level on the credits you have left, improving the process until
   you win or the money runs out, or NEW GAME for a fresh random
   questionnaire. It sounds like a cabinet too: original chiptune
   BGM and event effects, all synthesized inside the file.
-- **A funnel you can watch.** Forty persona sprites walk SENT,
-  DELIVERED, OPENED, STARTED, FINISH. They bounce, wander off, stall
-  on questions they cannot answer, or jump at the finish line.
+- **A funnel you can watch.** Up to 40 persona sprites walk SENT,
+  DELIVERED, OPENED, STARTED, FINISH. A breaker trip stops new sends
+  and interrupts anyone still in the funnel. Only completions before
+  the trip count.
 - **Three scores.** Response rate first, data quality second,
   Insight Value third, and all three gate the win: beat the rate
   target with a gutted or off-agenda survey and you still lose.
@@ -73,11 +77,9 @@ docs/                  Design, play, development, deployment docs
 
 ## Status
 
-- v1.0 POC (2026-10-30): one round, verified balance checks.
-- v1.1 (2026-10-31): named **Dear Valued Customer**, polish pass,
-  budget, deliverability, and data quality mechanics.
-- v1.2 (2026-10-31): full six level campaign, A/B test move,
-  deployment ready single file, this documentation set.
+- v1.6 (2026-10-31): breaker send limits, corrected response-rate
+  accounting, visible question repairs, distinct A/B variants, and
+  offline font rendering. See `CHANGELOG.md` for earlier releases.
 
 Internal training concept. Not a Microsoft product, not affiliated
 with any survey platform. Survey results inside the game are

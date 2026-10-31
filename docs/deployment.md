@@ -50,10 +50,8 @@ host.
 
 ## Route C: local and offline
 
-Open `site/index.html` from disk. Everything works offline after
-first load; there are no external calls at runtime. If the pixel
-display font cannot load (restricted networks), the game falls back
-to monospace and stays fully playable.
+Open `site/index.html` from disk. The game makes no external calls
+at runtime and uses the local monospace fallback.
 
 ## Updating the game
 

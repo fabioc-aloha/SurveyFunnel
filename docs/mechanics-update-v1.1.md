@@ -13,9 +13,10 @@ lever. Budget is a resource spent across all three, not a lever.
 
 ## 2. The campaign budget (new resource)
 
-- Each round starts with 120 credits. The budget bar sits at the top
-  of the setup screen and updates live with every choice. Unspent
-  credits do not carry into the next round.
+- Each level starts with 120 credits (150 in Level 6). The budget
+  bar sits at the top of the setup screen and updates live with
+  every choice. The pool is shared across attempts in that level;
+  unused credits do not carry into another level.
 - Every meaningful action has a price, so the player allocates
   instead of maximizing everything:
 
@@ -182,8 +183,9 @@ DELIVERABILITY AND DATA:
 
 ## 6. Balance guards (must still hold after this update)
 
-1. The default lazy run still near misses, and now also shows a
-   visible bounce problem the player chose not to pay to fix.
+1. The lazy Level 1 default run produces 2 completions from 40 sent
+   (5%), below the 12% target, and shows the visible bounce problem
+   the player chose not to pay to fix.
 2. A well prepared mid budget run still wins: validation plus
    dedupe plus an honest invite plus a trim must fit under 120.
 3. Executive Blast without validation is the worst run in the game:

@@ -1,7 +1,7 @@
 # Dear Valued Customer - Player Guide
 
-You are an Instrument Manager. Your job: get invited customers to
-click the invitation email and complete the questionnaire, without
+You are an Instrument Manager. Your job: choose who gets an invitation
+and help those who receive it complete the questionnaire, without
 burning the audience or wrecking the data. One round is one survey
 launch, 3 to 5 minutes.
 
@@ -21,8 +21,10 @@ launch, 3 to 5 minutes.
    simplify, or cut each flagged question. Watch the estimated
    minutes against each persona's patience. Add escapes (Don't know
    / Not applicable) to stop guessing.
-5. **LAUNCH.** Countdown, then 40 sprites run the funnel: SENT,
-   DELIVERED, OPENED, STARTED, FINISH. Watch where they leave.
+5. **LAUNCH.** Countdown, then up to 40 sprites run the funnel:
+   SENT, DELIVERED, OPENED, STARTED, FINISH. A breaker trip stops
+   new sends and interrupts anyone still in the funnel. Only
+   completions before the trip count.
 6. **REPORT.** The Drop-off Detective shows the funnel, the three
    biggest leaks with causes and fixing levers, the goodwill and
    credit ledgers, deliverability and data quality, and one fix
@@ -33,9 +35,11 @@ launch, 3 to 5 minutes.
 **Goodwill (0 to 100 per segment).** Questions beyond a lean core,
 reminders, and unanswerable questions spend it. Short surveys, an
 honest time ask, a why me line, and closing the loop earn it back.
-At zero the breaker trips and the segment stops responding.
+At zero the breaker stops new invitations and ends the run for anyone
+still in the funnel. Only completions before the trip count.
 
-**Credits (120 per level, one pool across all your attempts).**
+**Credits (120 per level, 150 in Level 6, one pool across all your
+attempts).**
 Prices:
 
 | Action | Cost |
