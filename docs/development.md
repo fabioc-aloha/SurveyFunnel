@@ -151,6 +151,47 @@ prevent wins for unrepaired BRD cards or unresolved extras. Retry starts fresh. 
 campaign state is restored on exit; Quick reports bypass campaign awards,
 attempt history, and carried credits, goodwill, and reputation.
 
+Stage 2 adds a BRD variation pack: each challenge carries three
+`variants` (twists) in `QUICK_CHALLENGES`, and `startQuickChallenge`
+draws one per run from the run seed via `quickVariantIndex`, the same
+`hashStr` + `mulberry` machinery as the instrument draw
+(`"qcvar|<index>|<seed>"`). The same seed always deals the same
+brief; an omitted seed draws a fresh one with `randomSeedStr()`. The
+seed and variant index live on `state.quickChallenge`; `quickVariant()`
+resolves the active twist. The twist never reseeds the run simulation
+(`instrumentSeed` is unchanged), so every stage-1 line keeps its exact
+scores; it only tightens acceptance:
+
+- `mandatory` (one extra id): `cutBlockReason` returns `"required"`
+  for that card after the core and floor checks, `quickExtraResolved`
+  accepts only `simplify` for it, and the card renders a BRD REQUIRED
+  tag with a cut lock line.
+- `ratebar` (a target above 0.12): `curLevel()` returns the raised
+  target, so the HUD, the BRD acceptance line, and the verdict all
+  read the same bar. Percentages print through `targetPct`, which
+  keeps one decimal (17.5%).
+- `qualitygate` (95): `quickQualityGate()` feeds the verdict, the
+  HUD gates line, and the BRD acceptance line; it is 60 everywhere
+  outside a qualitygate twist, campaign included.
+- `timecap` (minutes): the verdict requires
+  `estMinutes() <= maxMinutes` at report time, the engine's own
+  length model (repaired times, splits included).
+
+`showReport`'s Quick Challenge branch computes its verdict from the
+effective bars plus `quickVariantCheck(rate, quality).met`, and
+`showQuickReport` prints a BRD twist line (name, acceptance, MET or
+NOT MET, and the measured detail) next to the repairs and extras
+lines. Twist balance was measured against the engine before the
+numbers were fixed: every variant has a winning line inside the
+unchanged 48-credit budget, and for each variant a line that wins
+under the base rules loses on the twist alone (the intended line
+reaches exactly 17.5% against QC1's 17.5% bar and exactly 20%
+against QC2's 20% bar; cutting every extra scores quality 93
+against QC3's audit bar of 95). Tests pin twists by scanning the
+deterministic seeds (`startQCWithVariant`), assert the sweep reaches
+all three variants per challenge, and assert the campaign BRD, gate,
+and floor carry no twist after leaving a challenge.
+
 Respondent reactions read existing events and question IDs. They draw no
 random numbers and change no simulation outcome. The live bubble is paced
 at most once per 2.5 seconds; report samples contain at most four distinct

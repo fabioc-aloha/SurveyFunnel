@@ -60,11 +60,30 @@ function applyQuickLine(g, index, line) {
   }
 }
 
+/* Stage 2: every challenge run draws one BRD twist from the run seed.
+   Tests pin the twist by scanning deterministic seeds through the
+   game's own draw, so a test's line is always judged under the brief
+   it was written for. Variant order per challenge: 0 = the mandatory
+   stakeholder demand, then the raised bar / time ceiling twists. */
+function startQCWithVariant(g, index, variantIndex) {
+  for (let n = 0; n < 500; n++) {
+    const seed = 'V' + String(n).padStart(3, '0');
+    if (g.quickVariantIndex(index, seed) === variantIndex) {
+      g.startQuickChallenge(index, seed);
+      assert.equal(g.state.quickChallenge.variant, variantIndex);
+      return seed;
+    }
+  }
+  throw new Error(`No seed in the scan draws variant ${variantIndex} for challenge ${index}`);
+}
+
 test('Quick Challenge deals three BRD defects and three cuttable extras with fixed preparation', () => {
   const { context: g } = game();
   assert.equal(typeof g.startQuickChallenge, 'function');
   for (let index = 0; index < 3; index++) {
-    g.startQuickChallenge(index);
+    /* Pinned to the mandatory twist: the intended line repairs the
+       required extra in every challenge, so it wins under this brief. */
+    startQCWithVariant(g, index, 0);
     const challenge = g.QUICK_CHALLENGES[index];
     const core = g.activeQuestions().filter(q => q.core);
     const extras = g.activeQuestions().filter(q => !q.core);
@@ -104,9 +123,14 @@ test('Quick Challenge deals three BRD defects and three cuttable extras with fix
 });
 
 test('every Quick Challenge also wins by cutting all three extras', () => {
+  /* The cut-all line is judged under a twist it satisfies: QC1's
+     reporting threshold (the short instrument responds best), QC2's
+     four-minute ceiling, QC3's one-minute rule. Under the mandatory
+     twists the same line loses, which the twist tests below assert. */
+  const cutAllVariant = [1, 1, 2];
   for (let index = 0; index < 3; index++) {
     const { context: g, element } = game();
-    g.startQuickChallenge(index);
+    startQCWithVariant(g, index, cutAllVariant[index]);
     applyQuickLine(g, index, 'cut-extras');
     assert.equal(g.keptQuestions().length, 3, 'only the BRD cards remain');
     assert.equal(g.budgetMath().total, 43, 'base 34 + repairs 6 + three cuts');
@@ -120,7 +144,7 @@ test('every Quick Challenge also wins by cutting all three extras', () => {
 
 test('a Quick Challenge left with an unresolved extra does not win', () => {
   const { context: g, element } = game();
-  g.startQuickChallenge(0);
+  startQCWithVariant(g, 0, 0);
   applyQuickLine(g, 0, 'intended');
   /* Restore the last extra to an unresolved keep (the tray handler's own
      assignment): scores stay strong, but the drill is unfinished. */
@@ -129,6 +153,128 @@ test('a Quick Challenge left with an unresolved extra does not win', () => {
   g.showReport();
   assert.match(element('report').innerHTML, /TRY ANOTHER REPAIR/);
   assert.match(element('report').innerHTML, /Extras resolved <b>2 \/ 3<\/b>/);
+});
+
+test('BRD twist draw is deterministic per seed and reaches every variant', () => {
+  const { context: g, element } = game();
+  assert.equal(typeof g.quickVariantIndex, 'function');
+  for (let index = 0; index < 3; index++) {
+    /* Same seed, same brief: the draw is a pure function of the seed. */
+    assert.equal(g.quickVariantIndex(index, 'V042'), g.quickVariantIndex(index, 'V042'));
+    const seed = startQCWithVariant(g, index, 2);
+    const firstVariant = g.state.quickChallenge.variant;
+    const firstSeed = g.state.quickChallenge.seed;
+    g.startQuickChallenge(index, seed);
+    assert.equal(g.state.quickChallenge.variant, firstVariant);
+    assert.equal(g.state.quickChallenge.seed, firstSeed);
+    /* A seed sweep reaches all three twists of the challenge. */
+    const seen = new Set();
+    for (let n = 0; n < 200; n++) seen.add(g.quickVariantIndex(index, 'V' + String(n).padStart(3, '0')));
+    assert.deepEqual([...seen].sort(), [0, 1, 2], `Challenge ${index} sweep must reach every variant`);
+    /* The BRD prints the drawn twist as its own section, with the
+       acceptance line among the criteria and the seed named. */
+    g.openBRD();
+    const brd = element('brdContent').innerHTML;
+    const variant = g.QUICK_CHALLENGES[index].variants[firstVariant];
+    assert.match(brd, new RegExp(`BRD TWIST · ${variant.name}`));
+    assert.ok(brd.includes(variant.acceptance), 'acceptance criteria must include the twist');
+    assert.ok(brd.includes(firstSeed), 'BRD must name the run seed');
+    assert.ok(element('levelBanner').innerHTML.includes(variant.name), 'banner must name the twist');
+  }
+});
+
+test('a mandatory BRD twist makes its extra uncuttable and repair-only', () => {
+  for (let index = 0; index < 3; index++) {
+    const { context: g, element } = game();
+    startQCWithVariant(g, index, 0);
+    const variant = g.quickVariant();
+    assert.equal(variant.type, 'mandatory');
+    /* The action path refuses the cut, exactly like a core card. */
+    assert.equal(g.applyCut(variant.qid), 'required');
+    clickCut(g, variant.qid);
+    assert.equal(g.state.qstate[variant.qid], 'keep', `Q${variant.qid} must refuse its cut`);
+    g.renderQuestions();
+    assert.match(element('qGrid').innerHTML, /BRD REQUIRED/);
+    /* The verdict re-checks: even a state set past the guard (the
+       cut applied directly) cannot win with the required extra cut,
+       although the identical line wins under other briefs. */
+    applyQuickLine(g, index, 'intended');
+    g.state.qstate[variant.qid] = 'cut';
+    g.startRun();
+    g.showReport();
+    assert.match(element('report').innerHTML, /TRY ANOTHER REPAIR/);
+    assert.match(element('report').innerHTML, /BRD twist · <b>(.*?)<\/b>.*NOT MET/s);
+    /* The intended line keeps and repairs it: twist met, challenge won. */
+    const { context: g2, element: element2 } = game();
+    startQCWithVariant(g2, index, 0);
+    applyQuickLine(g2, index, 'intended');
+    g2.startRun();
+    g2.showReport();
+    assert.match(element2('report').innerHTML, /QUICK CHALLENGE · WON/);
+    assert.match(element2('report').innerHTML, /BRD twist · <b>(.*?)<\/b>.*— <b>MET<\/b>/s);
+  }
+});
+
+/* The raised bars and time ceilings. Each enforcement line below is a
+   line that wins under the base rules (the companion tests prove the
+   same shapes win under briefs they satisfy); it must lose here on
+   the twist alone, with the report ruling NOT MET. Each winning line
+   stays inside the unchanged 48-credit budget. */
+const QC_TWIST_LINES = [
+  /* challenge, variant, winning actions, violating actions */
+  [0, 1, 'cut-extras', 'intended'],   /* reporting threshold 17.5%: intended reaches exactly 17.5% */
+  [0, 2, { 26: 'simplify', 57: 'cut', 22: 'cut' }, 'intended'], /* short shift 1.5 min: intended reads 1.88 */
+  [1, 1, 'cut-extras', 'intended'],   /* four-minute ceiling: intended reads 5.0 min */
+  [1, 2, { 7: 'cut', 51: 'simplify', 68: 'cut' }, 'intended'],  /* reach bar 20%: intended reaches exactly 20% */
+  [2, 1, 'intended', 'cut-extras'],   /* audit bar 95: cutting every extra scores quality 93 */
+  [2, 2, 'cut-extras', 'intended']    /* one-minute rule 1.1 min: intended reads 1.25 */
+];
+function applyTwistLine(g, index, line) {
+  if (typeof line === 'string') { applyQuickLine(g, index, line); return; }
+  const challenge = g.QUICK_CHALLENGES[index];
+  for (const id of challenge.ids) clickSimplify(g, id);
+  for (const [id, action] of Object.entries(line)) {
+    if (action === 'cut') clickCut(g, Number(id)); else clickSimplify(g, Number(id));
+  }
+}
+test('raised bars and time ceilings are enforced and winnable within budget', () => {
+  for (const [index, variantIndex, winLine, loseLine] of QC_TWIST_LINES) {
+    const { context: g, element } = game();
+    startQCWithVariant(g, index, variantIndex);
+    applyTwistLine(g, index, loseLine);
+    assert.ok(g.budgetMath().total <= g.QUICK_BUDGET);
+    g.startRun();
+    g.showReport();
+    assert.match(element('report').innerHTML, /TRY ANOTHER REPAIR/,
+      `Challenge ${index} variant ${variantIndex}: the base-winning line must fail the twist`);
+    assert.match(element('report').innerHTML, /NOT MET/);
+    const { context: g2, element: element2 } = game();
+    startQCWithVariant(g2, index, variantIndex);
+    applyTwistLine(g2, index, winLine);
+    assert.ok(g2.budgetMath().total <= g2.QUICK_BUDGET,
+      `Challenge ${index} variant ${variantIndex}: winning line must fit 48 credits`);
+    g2.startRun();
+    g2.showReport();
+    assert.match(element2('report').innerHTML, /QUICK CHALLENGE · WON/,
+      `Challenge ${index} variant ${variantIndex}: its winning line must win`);
+    assert.match(element2('report').innerHTML, /— <b>MET<\/b>/);
+  }
+});
+
+test('BRD twists never leak into the campaign', () => {
+  const { context: g, element } = game();
+  startQCWithVariant(g, 2, 1); /* the audit bar: quality gate 95 while active */
+  assert.equal(g.quickQualityGate(), 95);
+  assert.equal(g.curLevel().target, 0.12);
+  g.leaveQuickChallenge();
+  g.selectLevel(1, false);
+  assert.equal(g.state.quickChallenge, null);
+  assert.equal(g.quickVariant(), null);
+  assert.equal(g.quickQualityGate(), 60);
+  assert.equal(g.curLevel().target, 0.12);
+  assert.equal(g.instrumentFloor(), 6);
+  g.openBRD();
+  assert.doesNotMatch(element('brdContent').innerHTML, /BRD TWIST/);
 });
 
 test('Quick Challenge report is one launch and does not award campaign progress', () => {
@@ -435,7 +581,9 @@ test('the floor itself refuses a cut at six kept on a low-core instrument', () =
 
 test('quick challenge floor is its core count: extras cut down to the BRD set and no further', () => {
   const { context: g, element } = game();
-  g.startQuickChallenge(0);
+  /* A non-mandatory twist, so every extra's cut is judged by the
+     floor alone, exactly as this test intends. */
+  startQCWithVariant(g, 0, 1);
   assert.equal(g.activeQuestions().length, 6);
   assert.equal(g.instrumentFloor(), 3);
   /* Core (BRD) cards refuse with reason "core" through the action path. */

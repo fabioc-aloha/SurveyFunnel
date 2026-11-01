@@ -15,6 +15,17 @@ by repair or by cut, within 48 credits, then reach response above
 12%, quality 60+, and Insight 60+. The BRD cards cannot be cut, and
 keeping an unresolved extra leaves the challenge unfinished.
 
+Each run also draws one **BRD twist** from the run seed, so the same
+six cards stop having one memorized answer. A twist is one of three
+kinds: a stakeholder demand (a named extra becomes required: it
+cannot be cut and only its repair resolves it), a raised bar (a
+higher response threshold, or a quality gate of 95+ instead of 60),
+or a time ceiling on the repaired instrument, read from its
+estimated minutes. The challenge banner and the BRD name the twist
+and its acceptance line; the report rules on whether it was met.
+The seed is printed in the BRD: the same seed always deals the same
+brief, and a retry draws a new one.
+
 The send costs 30 credits, the invitation costs 4, and the three
 BRD repairs cost 6. **Retry Challenge** starts fresh with the same cards;
 **Next Challenge** switches scenarios. Neither changes campaign

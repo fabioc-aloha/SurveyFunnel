@@ -1,5 +1,52 @@
 # Changelog
 
+## 2026-11-01 - Quick Challenges, stage 2 of 3: the BRD variation pack
+
+- Every Quick Challenge run now draws one BRD twist from the run
+  seed, so the same six cards no longer have one memorized answer.
+  The draw reuses the instrument draw's machinery (`hashStr` +
+  `mulberry` over `"qcvar|<index>|<seed>"`): the same seed always
+  deals the same brief, the seed is printed in the BRD, and a retry
+  draws a fresh brief. `startQuickChallenge` accepts an optional
+  seed; the twist is stored on `state.quickChallenge` and resolved
+  by `quickVariant()`. The twist never reseeds the run simulation,
+  so stage-1 lines keep their exact scores.
+- Three twists per challenge, across three lever families. The
+  stakeholder demands make one extra required (kept and repaired,
+  its cut refused with reason `"required"`): QC1's Q26 (the
+  sponsor's question), QC2's Q7 grid (the scorecard's only input),
+  QC3's Q12 (Compliance's security item). The raised bars: QC1's
+  reporting threshold (response strictly above 17.5%), QC2's reach
+  bar (above 20%), QC3's audit bar (data quality 95+). The time
+  ceilings, read from the engine's `estMinutes` on the repaired
+  instrument: QC1's short shift (1.5 min), QC2's four-minute
+  ceiling, QC3's one-minute rule (1.1 min).
+- Enforcement is real, not cosmetic: a mandatory extra resolves
+  only by its repair in `quickExtraResolved` and re-checks in the
+  verdict; a ratebar raises the target through `curLevel()` so the
+  HUD, BRD, and verdict read one bar; the audit gate flows through
+  `quickQualityGate()`; a time ceiling compares the launched
+  instrument's estimated minutes. The BRD prints a BRD TWIST
+  section with the brief and seed, the acceptance criteria gain the
+  twist line and the effective bars, the challenge banner repeats
+  the acceptance line, and the report prints a twist verdict
+  (MET / NOT MET with the measured value) next to the BRD repairs
+  and extras resolved lines.
+- Balance was measured on the engine before the numbers were set:
+  every variant has a winning line inside the unchanged 48-credit
+  budget, and for each variant a base-winning line loses on the
+  twist alone. The intended lines reach exactly 17.5% and 20%
+  against the two response bars, read 1.88 / 5.0 / 1.25 minutes
+  against the three ceilings, and cutting every extra scores
+  quality 93 against the audit bar of 95; the cutting lines win
+  the rate and ceiling twists, the repair lines win the audit bar
+  and the mandatory twists. Four new tests (61 total) pin twists
+  by seed scan, prove the sweep reaches all three variants per
+  challenge, drive both a violating and a winning line per twist
+  through the card handlers, and prove no twist leaks into the
+  campaign BRD, gates, or floor. The MPOR Quick Challenge section
+  and both guides document the system.
+
 ## 2026-11-01 - Fallout piles move to a bottom strip under their funnel steps
 
 - The bounce and unopened piles no longer sit up at the funnel
