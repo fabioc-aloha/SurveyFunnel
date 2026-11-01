@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-11-01 - Manager legibility: headset sprite and IM nameplate
+
+- The three manager mood sprites (normal, pumped, sad) now wear a
+  red headset: a band over the hair, ear cups at both sides of the
+  head, and a microphone boom ending beside the mouth. Sprite
+  dimensions are unchanged, so nothing in the layout shifts.
+- A desk nameplate reading "IM · INSTRUMENT MANAGER" now sits
+  beneath the manager figure on the setup launch bar, the run
+  track, and the round report: dark engraved plate, light border,
+  letter-spaced pixel font.
+- No gameplay, balance, or audio changes. Build validation and
+  all 38 tests pass.
+
 ## 2026-11-01 - New main theme: 132 BPM animated composition
 
 - The v2 main theme was replaced wholesale after the first human

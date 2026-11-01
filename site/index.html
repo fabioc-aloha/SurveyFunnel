@@ -174,6 +174,12 @@
   .mgr{ image-rendering:pixelated; flex:none; }
   .pixelbox{ position:relative; flex:none; }
   .pixelbox > div{ position:absolute; }
+  .mgrfig{ display:inline-flex; flex-direction:column; align-items:center; width:max-content; max-width:100%; flex:none; }
+  .nameplate{
+    margin-top:4px; font-family:"Press Start 2P", monospace; font-size:8px; letter-spacing:1px; white-space:nowrap;
+    color:#f3d27a; background:linear-gradient(180deg,#3b2c17,#241a0d); border:2px solid #d8b65c; border-radius:4px;
+    padding:4px 7px; box-shadow:0 2px 0 rgba(0,0,0,.45), inset 0 1px 0 rgba(255,240,200,.35);
+  }
 
   /* ---------- run stage ---------- */
   #runStage{ display:none; }
@@ -528,7 +534,7 @@
 
       <div class="checklist" id="launchCheck" aria-label="Ready to launch checklist"></div>
       <div class="launchbar">
-        <div id="mgrSetup"></div>
+        <div class="mgrfig"><div id="mgrSetup"></div><div class="nameplate">IM · INSTRUMENT MANAGER</div></div>
         <div class="readout" id="readout"></div>
         <button class="launchbtn" id="launchBtn">▶ LAUNCH</button>
       </div>
@@ -550,7 +556,7 @@
         <div class="track" id="track">
           <div class="qmarks" id="qmarks"></div>
           <div class="finishflag" id="finishFlag"></div>
-          <div class="desk" id="mgrRun"></div>
+          <div class="mgrfig"><div class="desk" id="mgrRun"></div><div class="nameplate">IM · INSTRUMENT MANAGER</div></div>
           <div class="stampmsg" id="stampMsg">SENDING…</div>
         </div>
       </div>
@@ -1168,13 +1174,13 @@ function sndSeason(){ duckMusic(1300); [523,659,784,1047,784,1047,1319,1047,1319
 /* ================= PIXEL ART ================= */
 var PAL = { H:"#241f31", S:"#f2c29b", E:"#241f31", B:"#1f8a8a", D:"#8a5a33", d:"#6e4525", P:"#f4f1e6", R:"#ff5d6c", T:"#141826" };
 var MGR_NORMAL = [
-"..HHHHHHHHH...",
-".HHHHHHHHHHH..",
-".HHSSSSSSSHH..",
-"..HSSSSSSSH...",
-"..HSESSES H...".replace(" ","S"),
-"..HSSSSSSSH...",
-"...SSSSSSS....",
+"..RRRRRRRRR...",
+".RHHHHHHHHHR..",
+".RRSSSSSSSHRR.",
+"..RSSSSSSSHR..",
+"..RSESSESSR...",
+"..HSSSSSSSRR..",
+"...SSSSSSR....",
 "..BBBBBBBBB...",
 ".BBBBBBBBBBB..",
 ".BBBBBBBBBBB..",
@@ -1186,12 +1192,12 @@ var MGR_PUMP = [
 ".BB.......BB..",
 ".BBB.....BBB..",
 "..BB.BB.BBB...",
-"..HHHHHHHHH...",
-".HHSSSSSSSHH..",
-"..HSSSSSSSH...",
-"..HSESSESSH...".replace(" ","S"),
-"..HSSSSSSSH...",
-"...SSSSSSS....",
+"..RRRRRRRRR...",
+".RRSSSSSSSHRR.",
+"..RSSSSSSSHR..",
+"..RSESSESSR...",
+"..HSSSSSSSRR..",
+"...SSSSSSR....",
 "..BBBBBBBBB...",
 ".BBBBBBBBBBB..",
 "DDDDDDDDDDDDD.",
@@ -1199,11 +1205,11 @@ var MGR_PUMP = [
 ];
 var MGR_SAD = [
 "..............",
-"...HHHHHHH....",
-"..HHHHHHHHH...",
-".HHHHHHHHHHH..",
-".HHSSSSSSSHH..",
-"..SSSSSSSS....",
+"...RRRRRRR....",
+"..RHHHHHHHR...",
+".RRHHHHHHHRR..",
+".RRSSSSSSSHRR.",
+"..SSSSSSSRRR..",
 ".BBBBBBBBBBB..",
 "BBBBBBBBBBBBB.",
 "DDDDDDDDDDDDD.",
@@ -2645,7 +2651,7 @@ function showReport(){
     '<div class="scorebox i"><div class="lbl">INSIGHT VALUE</div><div class="num">' + insight + '</div><div class="sub">' + (insight >= insightGate() ? "At or above the " + insightGate() + "-point insight gate: the agenda topics came back answered credibly." : "Below the " + insightGate() + "-point insight gate. See the VALUE panel: a high rate on the wrong questions is not business value.") + "</div></div>" +
     '<div class="gradebox ' + (won ? "win" : "lose") + '" id="gradeBox"><div class="g" style="font-size:' + (grade.length > 2 ? "22px" : "") + '">' + grade + '</div><div class="w">' + (won ? "ROUND WON" : fastUseless ? "FAST AND USELESS" : gm.trips ? "BREAKER TRIPPED" : "NOT YET") + '</div><div style="font-family:\'Press Start 2P\',monospace;font-size:8px;color:var(--gold);margin-top:10px;line-height:1.6">BEST: ' + state.bestGrade + " \u00B7 " + pct(state.bestRate * 100) + "</div></div></div>";
 
-  html += '<div style="display:flex;gap:14px;align-items:center;margin-bottom:14px;flex-wrap:wrap"><div id="mgrReport"></div>' +
+  html += '<div style="display:flex;gap:14px;align-items:center;margin-bottom:14px;flex-wrap:wrap"><div class="mgrfig"><div id="mgrReport"></div><div class="nameplate">IM · INSTRUMENT MANAGER</div></div>' +
     '<p class="mgrcaption">' + (gm.trips ? "The breaker tripped mid-send. New invitations stopped, and anyone still in the funnel was interrupted; only completions before the trip count." : won ? "Clean send. The manager approves, and so does the breaker panel." : "The send went out. The detective report below shows exactly where it leaked.") + "</p></div>";
 
   /* funnel */
