@@ -1,5 +1,35 @@
 # Changelog
 
+## 2026-11-01 - Quick Challenges, stage 1 of 3: six-card drills with real cut decisions
+
+- Each Quick Challenge now deals six questions instead of three: its
+  three signature BRD cards (still forced core) plus three curated
+  non-core extras, so cutting becomes a judgment in the drill, not
+  just repair. QC1 adds Q26 (LEADING), Q57 (stupid, vanity), and Q22
+  (BROKEN OPTIONS); QC2 adds Q7 (GRID BURDEN), Q51 (WORDY STEM), and
+  Q68 (filler); QC3 adds Q12 (SENSITIVE NO ASSURANCE), Q23 (BEYOND
+  KNOWLEDGE, no wording fix), and Q60 (stupid, nosy). Every challenge
+  carries at least one clear CUT candidate and at least one
+  fix-or-keep call in its teaching theme.
+- The challenge floor is now the instrument's core count (3):
+  extras can be cut down to the BRD set and no further, and the floor
+  note says so. Campaign floors are unchanged (six, or the dealt
+  size). The cut guard itself is untouched.
+- Budget re-derived as the named constant `QUICK_BUDGET = 48`: base
+  34 (send 30 + Honest Ask 4) + signature repairs 6 + the priciest
+  intended extras line 6, plus 2 credits of headroom. The intended
+  lines total 45, 46, and 44; cutting every extra totals 43 on all
+  three challenges. Both lines win per challenge, verified through
+  the game's own card handlers in the test suite.
+- A win now requires all three BRD repairs plus every extra
+  resolved (defective: repair or cut; low-value: cut; clean: keep or
+  cut). The challenge report shows BRD repairs and extras resolved
+  as separate counts. The agenda stays the BRD's alone: extras are
+  scope creep, never agenda topics, and the BRD, the challenge
+  banner, and MPOR now say the drill includes questions the BRD did
+  not ask for. Stages 2 (BRD variation) and 3 (second wave) are not
+  in this build.
+
 ## 2026-11-01 - Fallout piles: bounces and unopened mail pile up where they happen
 
 - The run screen now shows the funnel's fallout as it resolves: a

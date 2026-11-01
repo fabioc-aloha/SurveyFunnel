@@ -43,21 +43,56 @@ function game() {
   return { context, element, timers };
 }
 
-test('Quick Challenge deals three defects with affordable repairs and fixed preparation', () => {
+/* The intended line per challenge: repair the three BRD cards, then
+   resolve each extra as curated (repair what is worth saving, cut the
+   rest). Costs are the full launch totals at QUICK_BUDGET. */
+const QC_INTENDED = [
+  { actions: { 26: 'simplify', 57: 'cut', 22: 'simplify' }, cost: 45 },
+  { actions: { 7: 'simplify', 51: 'simplify', 68: 'cut' }, cost: 46 },
+  { actions: { 12: 'simplify', 23: 'cut', 60: 'cut' }, cost: 44 }
+];
+function applyQuickLine(g, index, line) {
+  const challenge = g.QUICK_CHALLENGES[index];
+  for (const id of challenge.ids) clickSimplify(g, id);
+  for (const id of challenge.extras) {
+    const action = line === 'cut-extras' ? 'cut' : QC_INTENDED[index].actions[id];
+    if (action === 'cut') clickCut(g, id); else clickSimplify(g, id);
+  }
+}
+
+test('Quick Challenge deals three BRD defects and three cuttable extras with fixed preparation', () => {
   const { context: g } = game();
   assert.equal(typeof g.startQuickChallenge, 'function');
   for (let index = 0; index < 3; index++) {
     g.startQuickChallenge(index);
-    assert.equal(g.activeQuestions().length, 3);
-    assert.equal(g.agendaTopics().length, new Set(g.activeQuestions().map(q => q.topic)).size);
-    assert.ok(g.activeQuestions().every(q => g.defectOf(q) !== 'CLEAN'));
-    assert.equal(g.BUDGET_TOTAL, 40);
+    const challenge = g.QUICK_CHALLENGES[index];
+    const core = g.activeQuestions().filter(q => q.core);
+    const extras = g.activeQuestions().filter(q => !q.core);
+    assert.equal(g.activeQuestions().length, 6);
+    assert.deepEqual(Array.from(core, q => q.id), Array.from(challenge.ids));
+    assert.deepEqual(Array.from(extras, q => q.id), Array.from(challenge.extras));
+    /* The agenda is the BRD's alone: signature topics only, so cutting
+       an extra can never lose a required topic. */
+    assert.deepEqual(Array.from(g.agendaTopics()),
+      Array.from(new Set(core.map(q => q.topic))));
+    assert.ok(core.every(q => g.defectOf(q) !== 'CLEAN'));
+    /* Every extra is a real judgment: defective in a theme class, or a
+       low-value item; none is core in the bank's own data. */
+    assert.ok(extras.every(q => g.QUESTION_BANK.find(b => b.id === q.id).core === false));
+    assert.ok(extras.every(q => g.defectOf(q) !== 'CLEAN' || g.tierOf(q) === 'stupid' || g.tierOf(q) === 'filler'));
+    assert.ok(extras.some(q => g.tierOf(q) === 'stupid' || g.tierOf(q) === 'filler'),
+      `Challenge ${index} needs a clear CUT candidate`);
+    assert.equal(g.QUICK_BUDGET, 48);
+    assert.equal(g.QUICK_BASE_COST, 34);
+    assert.equal(g.BUDGET_TOTAL, 48);
     assert.equal(g.addBankQuestions().length, 0);
     assert.equal(g.state.validation, 'full');
     assert.equal(g.state.dedupe, true);
     assert.equal(g.state.suppression, true);
-    g.activeQuestions().forEach(q => { g.state.qstate[q.id] = 'simplify'; });
-    assert.ok(g.budgetMath().total <= 40);
+    /* The intended line, driven through the card handlers, wins. */
+    applyQuickLine(g, index, 'intended');
+    assert.equal(g.budgetMath().total, QC_INTENDED[index].cost);
+    assert.ok(g.budgetMath().total <= g.QUICK_BUDGET);
     const run = g.buildRun();
     const count = g.tally(run);
     assert.ok(count.completed > count.sent * 0.12, `Challenge ${index} must be winnable`);
@@ -66,6 +101,34 @@ test('Quick Challenge deals three defects with affordable repairs and fixed prep
     g.showReport();
     assert.match(g.document.getElementById('report').innerHTML, /QUICK CHALLENGE · WON/);
   }
+});
+
+test('every Quick Challenge also wins by cutting all three extras', () => {
+  for (let index = 0; index < 3; index++) {
+    const { context: g, element } = game();
+    g.startQuickChallenge(index);
+    applyQuickLine(g, index, 'cut-extras');
+    assert.equal(g.keptQuestions().length, 3, 'only the BRD cards remain');
+    assert.equal(g.budgetMath().total, 43, 'base 34 + repairs 6 + three cuts');
+    assert.ok(g.budgetMath().total <= g.QUICK_BUDGET);
+    g.startRun();
+    g.showReport();
+    assert.match(element('report').innerHTML, /QUICK CHALLENGE · WON/, `Challenge ${index} cut line must win`);
+    assert.match(element('report').innerHTML, /Extras resolved <b>3 \/ 3<\/b>/);
+  }
+});
+
+test('a Quick Challenge left with an unresolved extra does not win', () => {
+  const { context: g, element } = game();
+  g.startQuickChallenge(0);
+  applyQuickLine(g, 0, 'intended');
+  /* Restore the last extra to an unresolved keep (the tray handler's own
+     assignment): scores stay strong, but the drill is unfinished. */
+  g.state.qstate[22] = 'keep';
+  g.startRun();
+  g.showReport();
+  assert.match(element('report').innerHTML, /TRY ANOTHER REPAIR/);
+  assert.match(element('report').innerHTML, /Extras resolved <b>2 \/ 3<\/b>/);
 });
 
 test('Quick Challenge report is one launch and does not award campaign progress', () => {
@@ -370,16 +433,41 @@ test('the floor itself refuses a cut at six kept on a low-core instrument', () =
   assert.match(tag, /aria-label="Cut unavailable: Minimum instrument reached/);
 });
 
-test('quick challenge floor equals its three dealt questions, so cutting is fully locked', () => {
-  const { context: g } = game();
+test('quick challenge floor is its core count: extras cut down to the BRD set and no further', () => {
+  const { context: g, element } = game();
   g.startQuickChallenge(0);
-  assert.equal(g.activeQuestions().length, 3);
+  assert.equal(g.activeQuestions().length, 6);
   assert.equal(g.instrumentFloor(), 3);
-  for (const q of g.activeQuestions()) {
+  /* Core (BRD) cards refuse with reason "core" through the action path. */
+  for (const q of g.activeQuestions().filter(q => q.core)) {
+    assert.equal(g.applyCut(q.id), 'core');
     clickCut(g, q.id);
-    assert.equal(g.state.qstate[q.id], 'keep', `challenge Q${q.id} must not be cut`);
+    assert.equal(g.state.qstate[q.id], 'keep', `BRD Q${q.id} must not be cut`);
+  }
+  /* Extras cut freely until only the core set remains. */
+  const extras = g.activeQuestions().filter(q => !q.core);
+  for (const q of extras) {
+    clickCut(g, q.id);
+    assert.equal(g.state.qstate[q.id], 'cut', `extra Q${q.id} must be cuttable`);
   }
   assert.equal(g.keptQuestions().length, 3);
+  assert.ok(g.keptQuestions().every(q => q.core));
+  /* The floor note states the challenge's actual minimum. */
+  g.renderQuestions();
+  assert.match(element('qFloorNote').innerHTML, /MINIMUM IS 3 \(THE THREE BRD CARDS\)/);
+  /* The floor branch itself: swap one kept card synthetically (legal
+     play cannot cut a core card) so a non-core card is kept at the
+     floor; its cut must be refused with reason "floor". */
+  const core0 = g.activeQuestions().find(q => q.core);
+  g.state.qstate[core0.id] = 'cut';
+  g.state.qstate[extras[0].id] = 'keep';
+  assert.equal(g.keptQuestions().length, 3);
+  assert.equal(g.applyCut(extras[0].id), 'floor');
+  assert.equal(g.state.qstate[extras[0].id], 'keep');
+  /* Campaign behavior is untouched: leaving restores a Level 1
+     instrument whose floor is still six. */
+  g.leaveQuickChallenge();
+  assert.equal(g.instrumentFloor(), 6);
 });
 
 test('Quick Challenge restores a previously prepared campaign attempt chain', () => {
@@ -488,9 +576,10 @@ test('BRD describes the active study requirements without changing the setup', (
   }
   g.startQuickChallenge(2);
   g.openBRD();
-  assert.match(element('brdContent').innerHTML, /Repair all three cards/);
+  assert.match(element('brdContent').innerHTML, /Repair the three BRD cards/);
+  assert.match(element('brdContent').innerHTML, /scope creep/);
   assert.match(element('brdContent').innerHTML, /one launch/);
-  assert.match(element('brdContent').innerHTML, /40 credits/);
+  assert.match(element('brdContent').innerHTML, /48 credits/);
 });
 
 test('mobile QR toggles between a collapsed icon and the full player panel', () => {

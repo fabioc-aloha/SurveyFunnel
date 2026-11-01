@@ -7,14 +7,16 @@ launch, 3 to 5 minutes.
 
 ## Quick Challenge
 
-Choose **Quick Challenge** for three defective cards and one launch.
+Choose **Quick Challenge** for six cards and one launch: three BRD
+cards with defects, plus three questions the BRD never asked for.
 The Fresh audience, full list preparation, and Honest Ask invitation
-are provided. Repair all three cards within 40 credits, then reach
-response above 12%, quality 60+, and Insight 60+. Keeping a defect or
-cutting a card leaves the challenge unfinished.
+are provided. Repair all three BRD cards and resolve each extra,
+by repair or by cut, within 48 credits, then reach response above
+12%, quality 60+, and Insight 60+. The BRD cards cannot be cut, and
+keeping an unresolved extra leaves the challenge unfinished.
 
 The send costs 30 credits, the invitation costs 4, and the three
-repairs cost 6. **Retry Challenge** starts fresh with the same cards;
+BRD repairs cost 6. **Retry Challenge** starts fresh with the same cards;
 **Next Challenge** switches scenarios. Neither changes campaign
 progress or spends the campaign's credits.
 

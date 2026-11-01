@@ -65,8 +65,8 @@ Per round, the model runs in this order:
 4. Gutted survey (only Q9 kept): quality and Insight fail, no win.
    A gutted instrument is also unreachable through the controls: core
    questions cannot be cut, the kept count cannot fall below six (or
-   the dealt size in Quick Challenges), and launch refuses a sub-floor
-   instrument.
+   the three BRD cards in Quick Challenges), and launch refuses a
+   sub-floor instrument.
 5. Validation alone, bad questionnaire kept: still loses.
 6. Identical choices replay identically.
 
@@ -132,15 +132,22 @@ and record the results in `CHANGELOG.md`.
 
 ## Quick Challenge and feedback
 
-Quick Challenge supplies three fixed defective cards, the Fresh audience,
-full validation, dedupe, suppression, and Honest Ask with no reminders.
-Its 40-credit budget covers the send (30), invitation (4), and all three
-repairs (6). A win requires all three repairs plus the usual response,
-quality, and Insight gates. Unique dealt topics form its agenda.
+Quick Challenge supplies three fixed defective BRD cards plus three
+curated non-core extras, the Fresh audience, full validation, dedupe,
+suppression, and Honest Ask with no reminders. Its 48-credit budget
+(`QUICK_BUDGET`) covers the send (30), invitation (4), all three BRD
+repairs (6), and the priciest intended extras line (6), with 2 credits
+of headroom; cutting every extra instead totals 43. A win requires all
+three BRD repairs, every extra resolved by repair or cut, plus the
+usual response, quality, and Insight gates. The challenge floor is its
+core count (3), so extras can be cut down to the BRD set and no
+further. Unique topics of the three BRD cards form its agenda; the
+extras are scope creep and never carry agenda topics.
 
 Each scenario has a curated deterministic seed (`QC01`, `QC02`, `QC03`).
-Tests require every fully repaired scenario to win within budget, and
-prevent wins for kept defects or cut cards. Retry starts fresh. A saved
+Tests require both winning lines per scenario (resolve the extras, or
+cut them all) to win within budget through the card handlers, and
+prevent wins for unrepaired BRD cards or unresolved extras. Retry starts fresh. A saved
 campaign state is restored on exit; Quick reports bypass campaign awards,
 attempt history, and carried credits, goodwill, and reputation.
 

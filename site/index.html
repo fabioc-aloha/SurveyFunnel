@@ -614,7 +614,7 @@
       <h2>MPOR</h2>
       <p>Master Plan of Record</p>
       <h3>QUICK CHALLENGE</h3>
-      <p>Three defective questions, 40 credits, one launch. The audience, list preparation, and Honest Ask invitation are provided. Repair all three cards to win; keeping a defect or cutting a card leaves the challenge unfinished. Sending costs 30 credits, the invitation costs 4, and the three repairs cost 6 in total. Also reach response above 12%, quality 60+, and Insight 60+. Retry resets this challenge; Next Challenge changes the three cards. Neither changes campaign progress.</p>
+      <p>Six questions, 48 credits, one launch. The audience, list preparation, and Honest Ask invitation are provided. Three questions are the BRD cards: repair all three to win, and they cannot be cut. Three more arrived unrequested: repair or cut each one, because keeping an unresolved extra leaves the challenge unfinished. Sending costs 30 credits, the invitation costs 4, and the three BRD repairs cost 6 in total. Also reach response above 12%, quality 60+, and Insight 60+. Retry resets this challenge; Next Challenge changes the six cards. Neither changes campaign progress.</p>
       <h3>RESPONDENT REACTIONS</h3>
       <p>Speech bubbles illustrate events in the simulation, such as guessing, a DK/NA escape, or encountering a defective question. They are not real customer quotes and do not change scores. Only a few bubbles appear at a readable pace. The report keeps a short selection, even if you skip the animation.</p>
       <h3>STAKEHOLDER ENCOUNTERS</h3>
@@ -998,10 +998,11 @@ var LEVELS=[
 ];
 var BUDGET_TOTAL = 120;
 var QUICK_BASE_COST = 34; /* Quick Challenge fixed cost in every attempt: 30 cr send + 4 cr Honest Ask invite. Card edits charge on top of this base. */
+var QUICK_BUDGET = 48; /* Six-card drill budget: base 34 + signature repairs 6 + the priciest intended extras line 6 (LESS WORK: BREAK UP 3 + FIX OPTIONS 2 + one cut 1) = 46, plus 2 cr headroom. Cutting every extra instead costs 34 + 6 + 3 = 43 on every challenge. */
 var QUICK_CHALLENGES = [
-  { name:"SAY WHAT YOU MEAN", ids:[3,10,24] },
-  { name:"LESS WORK, BETTER ANSWERS", ids:[48,55,11] },
-  { name:"MAKE IT SAFE TO ANSWER", ids:[54,56,52] }
+  { name:"SAY WHAT YOU MEAN", ids:[3,10,24], extras:[26,57,22] },
+  { name:"LESS WORK, BETTER ANSWERS", ids:[48,55,11], extras:[7,51,68] },
+  { name:"MAKE IT SAFE TO ANSWER", ids:[54,56,52], extras:[12,23,60] }
 ];
 var quickSession = null;
 var GRADE_RANK = { "S":5, "A":4, "B":3, "C":2, "TRY AGAIN":1 };
@@ -1392,7 +1393,7 @@ function renderBudget(){
   var el = $("budgetPanel"); if (!el) return;
   var b = budgetMath();
   if (state.quickChallenge){
-    el.innerHTML = '<b>QUICK CHALLENGE · 40 CR</b><p>Send 30 + Honest Ask 4 + card edits ' + (b.attemptCost - QUICK_BASE_COST) + ' = <b>' + b.attemptCost + ' credits</b> · <b>' + b.remaining + ' left</b></p><p>List preparation is provided. One launch; retry starts fresh.</p>';
+    el.innerHTML = '<b>QUICK CHALLENGE · ' + QUICK_BUDGET + ' CR</b><p>Send 30 + Honest Ask 4 + card edits ' + (b.attemptCost - QUICK_BASE_COST) + ' = <b>' + b.attemptCost + ' credits</b> · <b>' + b.remaining + ' left</b></p><p>List preparation is provided. One launch; retry starts fresh.</p>';
     return;
   }
   function col(items, sub, title){
@@ -1438,7 +1439,7 @@ function renderPrep(){
     btn.addEventListener("click", function(){ state.touched.prep = true; var k = btn.getAttribute("data-prep"); var before = budgetMath().attemptCost; state[k] = !state[k]; if (state[k] && k === "dedupe") sndPops(); else if (state[k] && k === "suppression") sndSwipe(); else if (state[k]) sndSpend(); else sndRefund(); renderPrep(); renderReadout(); });
   });
 }
-function curLevel(){ return state.quickChallenge ? { id:1, name:state.quickChallenge.name, target:0.12, budget:40, desc:"Repair all three cards. One send." } : LEVELS[state.level-1]; }
+function curLevel(){ return state.quickChallenge ? { id:1, name:state.quickChallenge.name, target:0.12, budget:QUICK_BUDGET, desc:"Repair the three BRD cards; judge the unrequested extras. One send." } : LEVELS[state.level-1]; }
 function renderLevelUI(){
   var L=curLevel();
   var hl=$("hudLevel"); if(hl) hl.innerHTML="LEVEL "+L.id+" · "+L.difficulty+" · <b>"+L.name+"</b> · ATTEMPT "+state.attempt+" · INSTRUMENT #"+state.instrumentSeed;
@@ -1447,7 +1448,7 @@ function renderLevelUI(){
   var lb=$("levelBanner"); if(lb) lb.innerHTML='<div class="lever" style="border-color:var(--gold)"><div class="lever-head"><span class="lever-no">LEVEL '+L.id+'</span><span class="lever-title">'+L.name+'</span><span class="lever-sub">'+L.desc+' Budget '+L.budget+' credits. The field office draft runs <b style="color:var(--ink)">'+activeQuestions().length+' questions</b> (dealt 9-16 into the A-F skeleton). <b style="color:var(--ink)">AGENDA:</b> '+agendaTopics().join(" · ")+'</span></div></div>';
   if (state.quickChallenge){
     hl.textContent = "QUICK CHALLENGE · " + L.name;
-    lb.innerHTML = '<div class="lever"><h2>' + L.name + '</h2><p>Repair all three cards for the prepared Fresh audience and Honest Ask invitation. Also reach response above 12%, quality 60+, and Insight 60+.</p><p><b>AGENDA:</b> ' + agendaTopics().join(" · ") + '</p></div>';
+    lb.innerHTML = '<div class="lever"><h2>' + L.name + '</h2><p>Repair the three BRD cards for the prepared Fresh audience and Honest Ask invitation. Three more questions arrived that the BRD never asked for: repair or cut each one. Also reach response above 12%, quality 60+, and Insight 60+.</p><p><b>AGENDA:</b> ' + agendaTopics().join(" · ") + '</p></div>';
   }
   // level grid
   var grid=$("levelGrid"); if(grid){ grid.innerHTML=LEVELS.map(function(lv){ var locked=lv.id>state.unlocked; var best=state.campaignBest[lv.id]; return '<button class="lvlcard'+(locked?" locked":"")+(lv.id===state.level?" sel":"")+'" data-level="'+lv.id+'" '+(locked?"disabled":"")+'>'+'<div class="ln">LEVEL '+lv.id+' · '+lv.difficulty+(locked?" · 🔒 LOCKED":"")+'</div><h3>'+lv.name+'</h3><p>'+lv.desc+'</p>'+(best?'<div class="best">BEST: '+best+'</div>':"")+'</button>';}).join("");
@@ -1537,19 +1538,27 @@ function startQuickChallenge(index){
   }
   resetChainState();
   var challenge = QUICK_CHALLENGES[index];
-  state.level = 1; BUDGET_TOTAL = 40;
+  state.level = 1; BUDGET_TOTAL = QUICK_BUDGET;
   state.instrument = challenge.ids.map(function(id){
     var q = QUESTION_BANK.filter(function(item){ return item.id === id; })[0];
     return Object.assign({},q,{ core:true });
-  });
-  var topics = state.instrument.map(function(q){return q.topic;}).filter(function(topic,i,all){return all.indexOf(topic)===i;});
-  state.quickChallenge = { index:index, name:challenge.name, topics:topics };
+  }).concat(challenge.extras.map(function(id){
+    var q = QUESTION_BANK.filter(function(item){ return item.id === id; })[0];
+    return Object.assign({},q);
+  }));
+  /* The agenda is the BRD's alone: topics come from the three signature
+     cards, never from the extras, so cutting scope creep cannot lose a
+     required topic. */
+  var topics = challenge.ids.map(function(id){
+    return QUESTION_BANK.filter(function(item){ return item.id === id; })[0].topic;
+  }).filter(function(topic,i,all){return all.indexOf(topic)===i;});
+  state.quickChallenge = { index:index, name:challenge.name, topics:topics, coreIds:challenge.ids.slice(), extraIds:challenge.extras.slice() };
   state.instrumentSeed = "QC0" + (index+1); state.lastRound = null;
   state.seg = SEGMENTS[0]; state.invite = INVITES[1]; state.reminders = 0;
   state.validation = "full"; state.dedupe = true; state.suppression = true;
   state.baseline = snapshotCurrent();
   $("cabinet").classList.add("quick-mode"); $("quickExit").hidden = false;
-  $("instrumentHelp").textContent = "Repair all three cards to win. Repairs cost 2 credits each. Keeping a defect or cutting a card leaves the challenge unfinished.";
+  $("instrumentHelp").textContent = "Repair the three BRD cards to win; they cannot be cut. The other three questions are scope creep the BRD never asked for: repair what is worth saving, cut what is not. An unresolved extra leaves the challenge unfinished.";
   $("startScreen").style.display="none"; $("campaignScreen").style.display="none"; $("report").style.display="none"; $("setup").style.display="block";
   renderLevelUI(); renderQuestions(); renderReadout(); setMusicVariant("setup");
   window.scrollTo({top:0,behavior:"smooth"});
@@ -1696,12 +1705,18 @@ function renderAgenda(){
 }
 /* Cut floor: CORE questions are the instrument's spine and can never be
    cut, and the kept count can never fall below the floor for the dealt
-   instrument: 6, or the dealt size itself when a mode deals fewer (the
-   3-card Quick Challenges). The guard lives in applyCut, the action path,
-   not only in button rendering, so no caller can bypass it. A refused cut
-   changes no state, so it charges nothing. */
+   instrument: 6 in the campaign, or the dealt size itself when a campaign
+   mode deals fewer. In a Quick Challenge the floor is the challenge
+   instrument's CORE count (its three BRD cards), so the three non-core
+   extras can be cut down to the core set and no further. The guard lives
+   in applyCut, the action path, not only in button rendering, so no
+   caller can bypass it. A refused cut changes no state, so it charges
+   nothing. */
 var MIN_QUESTIONS = 6;
-function instrumentFloor(){ return Math.min(MIN_QUESTIONS, activeQuestions().length); }
+function instrumentFloor(){
+  if (state.quickChallenge) return activeQuestions().filter(function(q){ return q.core; }).length;
+  return Math.min(MIN_QUESTIONS, activeQuestions().length);
+}
 function questionById(id){
   var pools = [activeQuestions(), addBankQuestions(), QUESTION_BANK, OPTIONAL_QUESTIONS];
   for (var i = 0; i < pools.length; i++){ var hit = pools[i].filter(function(q){ return q.id === id; })[0]; if (hit) return hit; }
@@ -1729,7 +1744,11 @@ function renderQuestions(){
   var fnote = $("qFloorNote");
   if (fnote){
     var keptN = keptQuestions().length, fl = instrumentFloor();
-    if (keptN <= fl){ fnote.className = "floornote atmin"; fnote.innerHTML = "\u26A0 MINIMUM INSTRUMENT REACHED \u00B7 " + keptN + " KEPT, MINIMUM IS " + fl + " \u00B7 CUT IS LOCKED \u00B7 RESTORE A CUT QUESTION OR ADD FROM THE BANK TO CUT AGAIN"; }
+    if (state.quickChallenge){
+      if (keptN <= fl){ fnote.className = "floornote atmin"; fnote.innerHTML = "\u26A0 MINIMUM INSTRUMENT REACHED \u00B7 " + keptN + " KEPT, MINIMUM IS " + fl + " (THE THREE BRD CARDS) \u00B7 CUT IS LOCKED \u00B7 RESTORE A CUT EXTRA TO CHOOSE A DIFFERENT CUT"; }
+      else { fnote.className = "floornote"; fnote.innerHTML = "MINIMUM INSTRUMENT: " + fl + " QUESTIONS (THE THREE BRD CARDS) \u00B7 BRD CARDS CANNOT BE CUT \u00B7 EXTRAS MAY BE CUT \u00B7 " + keptN + " KEPT"; }
+    }
+    else if (keptN <= fl){ fnote.className = "floornote atmin"; fnote.innerHTML = "\u26A0 MINIMUM INSTRUMENT REACHED \u00B7 " + keptN + " KEPT, MINIMUM IS " + fl + " \u00B7 CUT IS LOCKED \u00B7 RESTORE A CUT QUESTION OR ADD FROM THE BANK TO CUT AGAIN"; }
     else { fnote.className = "floornote"; fnote.innerHTML = "MINIMUM INSTRUMENT: " + fl + " QUESTIONS \u00B7 CORE QUESTIONS CANNOT BE CUT \u00B7 " + keptN + " KEPT"; }
   }
   var displayQs = activeQuestions().concat(addBankQuestions().filter(function(q){ return state.added[q.id]; }));
@@ -1919,7 +1938,7 @@ $("soundBtn").addEventListener("click", function(){
 /* MPOR overlay */
 function openBRD(){
   var L = curLevel(), quick = !!state.quickChallenge;
-  var constraints = quick ? "Repair all three cards within 40 credits; one launch. The Fresh audience, full validation, dedupe, suppression, and Honest Ask invitation with no reminders are provided. Retry starts fresh without changing campaign progress." :
+  var constraints = quick ? "Repair the three BRD cards and resolve the three unrequested extras within " + L.budget + " credits; one launch. Three questions in this drill were not asked for in this BRD: treat them as scope creep and judge each on its merits. The Fresh audience, full validation, dedupe, suppression, and Honest Ask invitation with no reminders are provided. Retry starts fresh without changing campaign progress." :
     "One credit pool for the whole level, shared across attempts. Choose an audience that can answer the required topics. Preserve useful coverage while controlling burden and data contamination.";
   if (!quick && state.level === 2) constraints += " A/B testing is available: compare different invitations and report uncertainty rather than assuming a winner.";
   if (!quick && (state.level === 3 || state.level === 6)) constraints += " Resolve the stakeholder request for eight extra questions. Costs and added burden depend on your response; extra-topic answers are not simulated or scored.";
@@ -1929,7 +1948,7 @@ function openBRD(){
   $("brdContent").innerHTML = '<h2>BRD</h2><p>Business Requirement Document</p><h3>'+L.name+(quick?"":" · "+L.difficulty)+'</h3><h3>STUDY PURPOSE</h3><p>Collect credible answers on the required business topics below. A high response rate alone does not establish useful evidence.</p><h3>REQUIRED TOPICS AND RESPONDENTS</h3><ul>'+agendaTopics().map(function(topic){
     var personas=(TOPIC_KEYS[topic]||[]).map(function(key){return PERSONAS[key].name;}).join(" or ");
     return '<li><b>'+topic+'</b>: credible answers from '+personas+'.</li>';
-  }).join("")+'</ul><h3>ACCEPTANCE CRITERIA</h3><ul><li>Response strictly above '+Math.round(L.target*100)+'% of invitations actually sent.</li><li>Data quality 60+ and Insight '+insightGate()+'+.</li><li>Budget: '+L.budget+' credits'+(quick?' for one launch.':' across all attempts.')+'</li>'+(!quick && state.level===4?'<li>Maintain ending goodwill 35 or higher.</li>':"")+(quick?'<li>Repair all three cards; kept defects and cuts do not complete the challenge.</li>':"")+'</ul><h3>STUDY CONSTRAINTS</h3><p>'+constraints+'</p><p>These are the active study requirements, not a forecast. Consult MPOR for game rules, scoring definitions, and simulation limitations.</p>';
+  }).join("")+'</ul><h3>ACCEPTANCE CRITERIA</h3><ul><li>Response strictly above '+Math.round(L.target*100)+'% of invitations actually sent.</li><li>Data quality 60+ and Insight '+insightGate()+'+.</li><li>Budget: '+L.budget+' credits'+(quick?' for one launch.':' across all attempts.')+'</li>'+(!quick && state.level===4?'<li>Maintain ending goodwill 35 or higher.</li>':"")+(quick?'<li>Repair all three BRD cards and resolve each extra by repair or cut; kept unresolved extras and cuts of BRD cards do not complete the challenge.</li>':"")+'</ul><h3>STUDY CONSTRAINTS</h3><p>'+constraints+'</p><p>These are the active study requirements, not a forecast. Consult MPOR for game rules, scoring definitions, and simulation limitations.</p>';
   openReference("studyBRD", "brdClose", "brdBtn");
 }
 var activeReference = null;
@@ -2787,6 +2806,19 @@ function bounceBacksHTML(bb){
   h += "<p style='font-size:14.5px;margin:6px 0'>" + note + "</p>";
   return h;
 }
+/* Quick Challenge verdict helpers. The three signature cards are forced
+   core in the challenge instrument; everything else dealt is an extra.
+   A win needs every BRD card repaired and every extra resolved: a
+   defective extra by its class-correct repair or a cut, a low-value
+   (stupid or filler) extra by a cut, a clean extra by keeping or cutting
+   it. Keeping an unresolved extra never completes the challenge. */
+function quickCoreQuestions(){ return activeQuestions().filter(function(q){ return q.core; }); }
+function quickExtraResolved(q){
+  var st = state.qstate[q.id];
+  if (tierOf(q) === "stupid" || tierOf(q) === "filler") return st === "cut";
+  if (defectOf(q) === "CLEAN") return st === "keep" || st === "cut";
+  return st === "simplify" || st === "cut";
+}
 function showReport(){
   if (!runData || state.reportShown) return;
   state.reportShown = true;
@@ -2832,7 +2864,8 @@ function showReport(){
   var won = respRate > targetRate && quality >= 60 && insight >= insightGate() && (state.level!==4 || gm.ending >= 35);
   var fastUseless = !won && respRate > targetRate && quality >= 60 && insight < insightGate();
   if (state.quickChallenge){
-    won = won && activeQuestions().every(function(q){return state.qstate[q.id] === "simplify";});
+    won = won && quickCoreQuestions().every(function(q){return state.qstate[q.id] === "simplify";})
+      && activeQuestions().filter(function(q){return !q.core;}).every(quickExtraResolved);
     showQuickReport(run,c,respRate,quality,ins,won); return;
   }
   var grade;
@@ -3080,10 +3113,21 @@ function showReport(){
   }
   function showQuickReport(run,c,rate,quality,ins,won){
     var index=state.quickChallenge.index;
-    var repaired = activeQuestions().filter(function(q){return state.qstate[q.id] === "simplify";}).length;
-    $("report").innerHTML='<div class="reportcard"><h2>QUICK CHALLENGE · '+(won?"WON":"TRY ANOTHER REPAIR")+'</h2><p>'+state.quickChallenge.name+' · one launch · '+state.launchCost+' / 40 credits</p><p>Repairs <b>'+repaired+' / 3</b> (all three required)</p><p>Response <b>'+pct(rate*100)+'</b> (above 12%) · Quality <b>'+quality+'</b> (60+) · Insight <b>'+ins.score+'</b> (60+)</p><p>'+c.completed+' of '+c.sent+' sent sprites completed. All results simulated.</p>'+activeQuestions().map(function(q){
-      return '<p><b>Q'+q.id+' · '+defectOf(q)+':</b> '+(state.qstate[q.id]==="simplify"?"Repaired with "+fixVerbFor(q):state.qstate[q.id]==="cut"?"Cut; repair still required":"Kept unrepaired")+'</p>';
-    }).join("")+ins.topics.map(function(topic){return '<p><b>'+topic.topic+':</b> '+topic.status+'</p>';}).join("")+'<p>'+(won?"You kept the business topics and repaired the wording.":"Read the weakest score. Fixing wording and keeping the needed topics matter together.")+'</p></div>'+reactionReportHTML(run)+'<div class="againrow"><button class="againbtn" id="quickRetry">RETRY CHALLENGE</button><button class="againbtn" id="quickNext">NEXT CHALLENGE</button><button class="againbtn" id="quickBack">BACK TO LEVELS</button></div>';
+    var repaired = quickCoreQuestions().filter(function(q){return state.qstate[q.id] === "simplify";}).length;
+    var extras = activeQuestions().filter(function(q){return !q.core;});
+    var resolved = extras.filter(quickExtraResolved).length;
+    $("report").innerHTML='<div class="reportcard"><h2>QUICK CHALLENGE · '+(won?"WON":"TRY ANOTHER REPAIR")+'</h2><p>'+state.quickChallenge.name+' · one launch · '+state.launchCost+' / '+QUICK_BUDGET+' credits</p><p>BRD card repairs <b>'+repaired+' / 3</b> (all three required) · Extras resolved <b>'+resolved+' / '+extras.length+'</b> (repair or cut each one)</p><p>Response <b>'+pct(rate*100)+'</b> (above 12%) · Quality <b>'+quality+'</b> (60+) · Insight <b>'+ins.score+'</b> (60+)</p><p>'+c.completed+' of '+c.sent+' sent sprites completed. All results simulated.</p>'+activeQuestions().map(function(q){
+      var st = state.qstate[q.id];
+      var kind = tierOf(q) === "stupid" ? "LOW-VALUE" : tierOf(q) === "filler" ? "FILLER" : defectOf(q);
+      var verdict;
+      if (q.core) verdict = st === "simplify" ? "Repaired with " + fixVerbFor(q) : st === "cut" ? "Cut; repair still required" : "Kept unrepaired";
+      else if (st === "simplify") verdict = "Resolved with " + fixVerbFor(q);
+      else if (st === "cut") verdict = "Cut; unrequested scope removed";
+      else if (quickExtraResolved(q)) verdict = "Kept; already sound";
+      else if (tierOf(q) === "stupid" || tierOf(q) === "filler") verdict = "Kept; cut this low-value item";
+      else verdict = "Kept unresolved; repair or cut it";
+      return '<p><b>' + (q.core ? "BRD" : "EXTRA") + ' Q' + q.id + ' · ' + kind + ':</b> ' + verdict + '</p>';
+    }).join("")+ins.topics.map(function(topic){return '<p><b>'+topic.topic+':</b> '+topic.status+'</p>';}).join("")+'<p>'+(won?"You repaired the BRD cards and judged the scope creep instead of mailing it.":"Repair every BRD card, then resolve each extra by repairing or cutting it. Read the weakest score too.")+'</p></div>'+reactionReportHTML(run)+'<div class="againrow"><button class="againbtn" id="quickRetry">RETRY CHALLENGE</button><button class="againbtn" id="quickNext">NEXT CHALLENGE</button><button class="againbtn" id="quickBack">BACK TO LEVELS</button></div>';
     $("runStage").style.display="none"; $("report").style.display="block";
     $("quickRetry").addEventListener("click",function(){sndCoin();startQuickChallenge(index);});
     $("quickNext").addEventListener("click",function(){sndCoin();startQuickChallenge((index+1)%QUICK_CHALLENGES.length);});
