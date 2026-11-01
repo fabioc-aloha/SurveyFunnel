@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-11-01 - Fallout piles: bounces and unopened mail pile up where they happen
+
+- The run screen now shows the funnel's fallout as it resolves: a
+  BOUNCED pile of returned envelopes grows at the DELIVERED gate,
+  and an UNOPENED pile accumulates at the OPENED gate for delivered
+  mail nobody opened. Glyphs cap at 12 per pile; the labels keep the
+  exact counts, driven by the same gate and drop events the tally
+  counts, so a pile can never disagree with the report.
+- Reminder emails read as what they are. The invite-stage control
+  now says each wave goes only to people who have not opened yet
+  (8 cr and -5 goodwill per wave, unchanged), and during the run
+  each bought wave fires a visible REMINDER SENT beat as its first
+  recovered open lands. Presentation only: the simulation is
+  untouched, and a regression test pins the run tallies to the
+  pre-change engine's numbers.
+- The report's deliverability card prints the run's unopened count
+  (UNOPENED · N sat in inboxes), from the same tally as the piles.
+
 ## 2026-11-01 - Code review fixes: the proof now matches the game
 
 - The winnability corpus was regenerated from UI-legal lines only:

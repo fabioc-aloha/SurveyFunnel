@@ -225,6 +225,23 @@
     position:absolute; left:8px; top:8px; font-family:"Press Start 2P", monospace; font-size:9px; color:var(--gold);
     opacity:0; transition:opacity .2s; z-index:6; max-width:150px; line-height:1.7;
   }
+  /* fallout piles: returned mail at the DELIVERED gate, unopened mail at
+     the OPENED gate. Glyphs appear/update instantly (no animation), so
+     reduced-motion needs nothing extra here. */
+  .pile{ position:absolute; bottom:4px; z-index:3; pointer-events:none; }
+  .pile-stack{ position:relative; width:76px; height:32px; }
+  .pile-env{ position:absolute; font-size:14px; line-height:1; }
+  #bouncePile .pile-env{ color:#ff8f9a; }
+  #unopenedPile .pile-env{ color:var(--gold); }
+  .pile-label{
+    font-family:"Press Start 2P", monospace; font-size:8px; color:var(--dim); white-space:nowrap;
+    background:#0a0d18; border:1px solid var(--line); border-radius:3px; padding:3px 4px; margin-top:2px;
+  }
+  .pile-label b{ color:var(--ink); font-weight:normal; }
+  .remstamp{
+    position:absolute; bottom:calc(100% + 8px); right:0; z-index:6; font-family:"Press Start 2P", monospace; font-size:9px;
+    color:#231a00; background:var(--gold); border:2px solid #fff0c8; border-radius:5px; padding:5px 7px; white-space:nowrap;
+  }
   .sprite{ position:absolute; width:22px; height:30px; z-index:4; will-change:left,top; }
   .sprite .badge{
     position:absolute; top:-9px; right:-7px; width:14px; height:14px; border-radius:3px; z-index:2;
@@ -507,8 +524,8 @@
             <span class="lever-sub">The email that earns the click.</span>
           </div>
           <div id="invGrid" style="display:grid; gap:10px;"></div>
-          <div class="segctl" role="group" aria-label="Reminders">
-            <span class="lbl"><b style="color:var(--ink)">Reminders:</b> each one recovers some non-openers.</span>
+          <div class="segctl" role="group" aria-label="Reminder emails">
+            <span class="lbl"><b style="color:var(--ink)">Reminder emails:</b> each wave goes only to people who have not opened yet, and recovers some of them. 8 cr and −5 goodwill per wave.</span>
             <button class="segbtn" data-rem="0">0<small>FREE</small></button>
             <button class="segbtn" data-rem="1">1<small>−5 GW · 8 CR</small></button>
             <button class="segbtn" data-rem="2">2<small>−10 GW · 16 CR</small></button>
@@ -569,6 +586,8 @@
           <div class="qmarks" id="qmarks"></div>
           <div class="finishflag" id="finishFlag"></div>
           <div class="mgrfig"><div class="desk" id="mgrRun"></div><div class="nameplate">IM</div></div>
+          <div class="pile" id="bouncePile"><div class="pile-stack" id="bounceStack" aria-hidden="true"></div><div class="pile-label">BOUNCED · <b id="bounceCount">0</b></div></div>
+          <div class="pile" id="unopenedPile"><div class="remstamp" id="remStamp" hidden></div><div class="pile-stack" id="unopenedStack" aria-hidden="true"></div><div class="pile-label">UNOPENED · <b id="unopenedCount">0</b></div></div>
           <div class="stampmsg" id="stampMsg">SENDING…</div>
         </div>
       </div>
@@ -2214,6 +2233,60 @@ function tally(run){
   return c;
 }
 
+/* ================= FALLOUT PILES =================
+   Presentation model for the run screen's two piles, read off the
+   finished run without touching its math: the bounce pile is the
+   tally's own hard + soft count, the unopened pile is delivered minus
+   opened, and each reminder wave's beat is the moment its first
+   recovered open (a sprite tagged via "r1"/"r2" in buildRun) passes
+   the OPENED gate. buildRun already delays reminder opens (+1800 /
+   +3400 on the open time), so the waves land as beats on their own;
+   this model only names when. A wave that recovered nobody has
+   at === null and gets no beat. */
+function pileModel(run){
+  var c = tally(run);
+  var waves = [];
+  for (var r = 1; r <= state.reminders; r++){
+    var at = null, recovered = 0;
+    run.sprites.forEach(function(sp){
+      if (sp.via !== "r" + r) return;
+      var openEv = null;
+      sp.events.forEach(function(e){ if (e.type === "gate" && e.gate === "opened") openEv = e; });
+      if (openEv){ recovered++; if (at === null || openEv.t < at) at = openEv.t; }
+    });
+    waves.push({ wave: r, at: at, recovered: recovered });
+  }
+  return { bounced: c.bouncedHard + c.bouncedSoft, unopened: c.delivered - c.opened, waves: waves };
+}
+/* glyph fan for a pile stack: [left px, bottom px, rotate deg], capped
+   at 12 drawn envelopes while the label keeps the exact count */
+var PILE_SPOTS = [[2,0,-8],[16,0,6],[30,0,-4],[44,0,9],[58,0,-6],[9,10,3],[23,10,-7],[37,10,5],[51,10,-3],[5,20,-5],[19,20,8],[33,20,-6]];
+function pileGlyphsHTML(n){
+  var shown = Math.min(12, n), h = "";
+  for (var i = 0; i < shown; i++){
+    var s = PILE_SPOTS[i];
+    h += '<span class="pile-env" style="left:' + s[0] + 'px;bottom:' + s[1] + 'px;transform:rotate(' + s[2] + 'deg)">\u2709</span>';
+  }
+  return h;
+}
+var pileLive = { bounced: 0, unopened: 0, shownB: -1, shownU: -1 };
+var pileBeats = [], pileBeatIdx = 0, remStampTimer = null;
+function renderPiles(){
+  $("bounceCount").textContent = pileLive.bounced;
+  $("unopenedCount").textContent = pileLive.unopened;
+  var sb = Math.min(12, pileLive.bounced), su = Math.min(12, pileLive.unopened);
+  if (sb !== pileLive.shownB){ pileLive.shownB = sb; $("bounceStack").innerHTML = pileGlyphsHTML(pileLive.bounced); }
+  if (su !== pileLive.shownU){ pileLive.shownU = su; $("unopenedStack").innerHTML = pileGlyphsHTML(pileLive.unopened); }
+}
+function fireRemBeat(beat){
+  var stamp = $("remStamp");
+  stamp.textContent = "REMINDER " + beat.wave + " SENT";
+  stamp.hidden = false;
+  logLine("REMINDER WAVE " + beat.wave + " WENT OUT TO EVERYONE WHO HAD NOT OPENED YET. WATCH THE UNOPENED PILE.");
+  if (remStampTimer) clearTimeout(remStampTimer);
+  remStampTimer = setTimeout(function(){ stamp.hidden = true; }, 2000);
+}
+
 /* ================= RUN ANIMATION ================= */
 var rafId = null, runData = null, runStart = 0, finishedCount = 0, guessShown = 0, tripFired = false;
 var virtualT = 0, lastNow = null;
@@ -2298,6 +2371,18 @@ function setupStage(run){
   $("breakerChip").classList.remove("tripped");
   $("breakerChip").firstChild.textContent = "BREAKER · GOODWILL ";
   $("compCount").textContent = "0"; $("guessCount").textContent = "0";
+  /* fallout piles: reset counts, park each pile at its gate (the
+     unopened pile shifts right on narrow tracks so its label clears
+     the bounce pile's), and arm this run's reminder beats */
+  pileLive = { bounced: 0, unopened: 0, shownB: -1, shownU: -1 };
+  pileBeats = pileModel(run).waves.filter(function(w){ return w.at !== null; });
+  pileBeatIdx = 0;
+  if (remStampTimer){ clearTimeout(remStampTimer); remStampTimer = null; }
+  $("remStamp").hidden = true;
+  $("bouncePile").style.left = "calc(" + GATE_X.delivered + "% + 6px)";
+  var trackW = $("track").clientWidth || 0;
+  $("unopenedPile").style.left = "calc(" + (trackW && trackW < 620 ? 57 : GATE_X.opened) + "% + 6px)";
+  renderPiles();
   $("runLog").textContent = "STAMPING INVITES…";
   $("stampMsg").style.opacity = "1";
 }
@@ -2408,6 +2493,9 @@ function tick(now){
     var cab = $("cabinet"); if (cab){ cab.classList.remove("shaking"); void cab.offsetWidth; cab.classList.add("shaking"); setTimeout(function(){ cab.classList.remove("shaking"); }, 600); }
   }
   $("gwLive").textContent = gwNow;
+  /* reminder beats: fire each bought wave's marker as its first
+     recovered open lands */
+  while (pileBeatIdx < pileBeats.length && t >= pileBeats[pileBeatIdx].at){ fireRemBeat(pileBeats[pileBeatIdx]); pileBeatIdx++; }
   var rmT = repMath();
   $("repLive").textContent = Math.round(rmT.before + (rmT.after - rmT.before) * frac);
   $("repLive").style.color = rmT.atRisk ? "var(--red)" : "";
@@ -2440,10 +2528,11 @@ function tick(now){
       var e = sp.events[sp.evIdx]; sp.evIdx++;
       showRespondentReaction(e,sp);
       if (e.type === "gate"){
-        if (e.gate === "delivered") sndChime();
-        else if (e.gate === "opened") sndPop();
+        if (e.gate === "delivered"){ pileLive.unopened++; renderPiles(); sndChime(); }
+        else if (e.gate === "opened"){ pileLive.unopened--; renderPiles(); sndPop(); }
         else if (e.gate === "started") sndTick();
       } else if (e.type === "drop"){
+        if (e.cause === "bounce"){ pileLive.bounced++; renderPiles(); }
         sp.done = true;
         sp.el.querySelector(".dropicon").textContent = DROP_ICON[e.cause] || "?";
         sp.el.style.top = "calc(" + sp.el.style.top + " + 130px)";
@@ -2887,6 +2976,7 @@ function showReport(){
   html += '<div class="reportcard"><h2>DELIVERABILITY AND DATA</h2>' +
     '<div class="simnote">What the mail system and the data itself did, priced against the prep you bought or skipped. This attempt cost <b>' + (state.launchCost || 0) + " credits</b>; level pool spent so far <b>" + spentAfter + " / " + BUDGET_TOTAL + "</b>, leaving <b>" + remainingAfter + " credits</b>.</div>" +
     "<p style='font-size:15.5px;margin:4px 0'><b>Delivered " + fmt(simDelivered) + " of " + fmt(simSent) + " sent.</b> Bounced " + fmt(simBounced) + " (" + fmt(c.bouncedHard * scale) + " hard, dead addresses; " + fmt(c.bouncedSoft * scale) + " soft, full or failing mailboxes). Bounce rate <b>" + bounceRatePct + "%</b>, hard bounce rate <b>" + hardRatePct + "%</b>.</p>" +
+    "<p style='font-size:15.5px;margin:4px 0'><b>UNOPENED \u00B7 " + fmt((c.delivered - c.opened) * scale) + "</b> sat in inboxes, never opened." + (state.reminders ? " The reminder wave" + (state.reminders > 1 ? "s" : "") + " you bought went out to exactly these inboxes." : " No reminder waves were bought to nudge them.") + "</p>" +
     "<p style='font-size:15.5px;margin:4px 0'><b>Sender reputation: " + rmR.before + " \u2192 " + repA + ".</b> " + openEffectTxt + "</p>" +
     "<p style='font-size:15.5px;margin:4px 0'><b>Validation verdict:</b> " + valVerdict + "</p>" +
     (c.angry ? "<p style='font-size:15.5px;margin:4px 0'><b>Suppression skipped:</b> " + c.angry + " sprite(s) stood for opted-out or recently surveyed people mailed anyway, and goodwill took the hit in the ledger above. <b>Fix:</b> buy the Suppression scrub (4 cr) in PREPARE THE LIST.</p>" : "") +

@@ -853,3 +853,124 @@ test('a run with no bounces renders the clean bounce-backs state', () => {
   assert.equal(g.runData.bounceBacks.sample.length, 0);
   assert.match(element('report').innerHTML, /<b>No bounce-backs\.<\/b> Every address accepted the mail this round\./);
 });
+
+test('fallout piles reconcile with the tally: bounced total and delivered minus opened', () => {
+  const configs = [
+    { segId: 'blast', validation: 'skip', reminders: 2 },
+    { segId: 'fresh', validation: 'full', reminders: 1 },
+    { segId: 'stale', validation: 'partial', reminders: 0 }
+  ];
+  for (const cfg of configs) {
+    const { context: g } = game();
+    const label = `${cfg.segId}+${cfg.validation}+rem${cfg.reminders}`;
+    g.selectLevel(1, false);
+    g.state.seg = g.SEGMENTS.find(s => s.id === cfg.segId);
+    g.state.validation = cfg.validation;
+    g.state.reminders = cfg.reminders;
+    g.startRun();
+    assert.equal(typeof g.pileModel, 'function', label);
+    const pm = g.pileModel(g.runData);
+    const c = g.tally(g.runData);
+    /* The piles are the tally's own numbers, not a second simulation:
+       the bounce pile is hard + soft, the unopened pile is what was
+       delivered and never opened. */
+    assert.equal(pm.bounced, c.bouncedHard + c.bouncedSoft, label);
+    assert.equal(pm.unopened, c.delivered - c.opened, label);
+    assert.equal(pm.waves.length, cfg.reminders, `${label}: one wave entry per bought reminder`);
+  }
+});
+
+test('reminder wave beats land on the first recovered open of each wave', () => {
+  const { context: g } = game();
+  g.selectLevel(1, false);
+  g.state.seg = g.SEGMENTS.find(s => s.id === 'blast');
+  g.state.validation = 'skip';
+  g.state.reminders = 2;
+  g.state.invite = g.INVITES.find(i => i.id === 'generic');
+  g.startRun();
+  const pm = g.pileModel(g.runData);
+  assert.equal(pm.waves.length, 2);
+  for (const w of pm.waves) {
+    /* Independent recount straight off the raw sprite events: a wave's
+       recovered opens are the sprites buildRun tagged via that wave
+       whose OPENED gate event survived into the final event list. */
+    const opens = [];
+    g.runData.sprites.forEach(sp => {
+      if (sp.via !== 'r' + w.wave) return;
+      sp.events.forEach(e => { if (e.type === 'gate' && e.gate === 'opened') opens.push(e.t); });
+    });
+    assert.equal(w.recovered, opens.length, `wave ${w.wave} recovered count`);
+    assert.equal(w.at, opens.length ? Math.min.apply(null, opens) : null, `wave ${w.wave} beat time`);
+  }
+  /* This pinned configuration recovers opens through both waves, so
+     both beats exist and fire in order. */
+  assert.ok(pm.waves[0].recovered > 0 && pm.waves[1].recovered > 0);
+  assert.ok(pm.waves[0].at < pm.waves[1].at, 'wave 1 lands before wave 2');
+});
+
+test('reminder presentation leaves run tallies bit-identical to the pre-change engine', () => {
+  /* Tallies pinned from the engine at HEAD 787658a, before the piles
+     and reminder-presentation change. buildRun, tally, and every
+     scoring input are presentation-untouched, so any drift here means
+     the display work leaked into the simulation. */
+  const pinned = [
+    {
+      name: 'blast/skip/rem2/generic',
+      setup(g) {
+        g.state.seg = g.SEGMENTS.find(s => s.id === 'blast');
+        g.state.validation = 'skip'; g.state.reminders = 2;
+        g.state.invite = g.INVITES.find(i => i.id === 'generic');
+      },
+      expect: { sent: 31, delivered: 24, bouncedHard: 4, bouncedSoft: 1, opened: 9, started: 7, completed: 0 }
+    },
+    {
+      name: 'stale/partial/rem2/escapes',
+      setup(g) {
+        g.state.seg = g.SEGMENTS.find(s => s.id === 'stale');
+        g.state.validation = 'partial'; g.state.reminders = 2; g.state.escapes = true;
+      },
+      expect: { sent: 40, delivered: 37, bouncedHard: 2, bouncedSoft: 1, opened: 26, started: 22, completed: 0 }
+    },
+    {
+      name: 'fresh/full/rem1/default-invite',
+      setup(g) { g.state.validation = 'full'; g.state.reminders = 1; },
+      expect: { sent: 40, delivered: 39, bouncedHard: 1, bouncedSoft: 0, opened: 24, started: 22, completed: 7 }
+    }
+  ];
+  for (const pin of pinned) {
+    const { context: g } = game();
+    g.selectLevel(1, false);
+    pin.setup(g);
+    g.startRun();
+    const c = g.tally(g.runData);
+    for (const key of Object.keys(pin.expect)) {
+      assert.equal(c[key], pin.expect[key], `${pin.name}: tally.${key} must not drift`);
+    }
+  }
+});
+
+test('invite stage names the reminder as an email to people who have not opened yet, and the run screen carries both piles', () => {
+  const html = readFileSync(join(root, 'site', 'index.html'), 'utf8');
+  assert.match(html, /Reminder emails:/);
+  assert.match(html, /goes only to people who have not opened yet/);
+  assert.match(html, /8 cr and −5 goodwill per wave/);
+  assert.match(html, /data-rem="2">2<small>−10 GW · 16 CR<\/small>/);
+  assert.match(html, /id="bouncePile"/);
+  assert.match(html, /id="unopenedPile"/);
+  assert.match(html, /BOUNCED · <b id="bounceCount">/);
+  assert.match(html, /UNOPENED · <b id="unopenedCount">/);
+});
+
+test('report prints the unopened count from the same tally the piles use', () => {
+  const { context: g, element } = game();
+  g.selectLevel(1, false);
+  g.state.seg = g.SEGMENTS.find(s => s.id === 'blast');
+  g.state.validation = 'skip';
+  g.startRun(); g.showReport();
+  const c = g.tally(g.runData);
+  const unopened = Math.round((c.delivered - c.opened) * g.runData.scale);
+  assert.ok(unopened > 0, 'this configuration leaves mail unopened');
+  assert.ok(element('report').innerHTML.includes(`UNOPENED · ${g.fmt(unopened)}`),
+    'the deliverability card prints the tally unopened count');
+  assert.ok(element('report').innerHTML.includes('sat in inboxes, never opened'));
+});
