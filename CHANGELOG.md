@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-11-01 - Moog-first soundtrack: A minor synth funk
+
+- The chiptune soundtrack is replaced with a brand-new composition
+  written for a Minimoog-style synth: A minor synth funk at 120 BPM.
+  A syncopated 64-step bassline (saw plus sine sub-oscillator through
+  an enveloped lowpass) carries the track; the lead is sparse, with
+  portamento between close notes and a resonant filter whose peak
+  opens bar by bar (1500 to 2700 Hz) across the loop.
+- All music voices run through a gentle soft-saturation bus. The run
+  variant's arp is now filtered sawtooth plucks; setup stays sparse
+  (even-step bass, lead in bars 1 and 3, softer filter); run6 keeps
+  its +4 harmony lead, now in the same Moog voice. Drums, the title
+  echo, and every audio function signature are unchanged.
+- Build validation and all 38 tests pass. As always, a human listen
+  on the live site is the real check.
+
 ## 2026-11-01 - Nameplate reads IM only
 
 - The manager desk nameplate now reads just "IM" (never spelled

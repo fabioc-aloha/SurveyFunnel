@@ -2952,17 +2952,30 @@ function spawnConfetti(){
 </script>
 <script>
 "use strict";
-/* ================= v1.3 MUSIC ENGINE + SOUND PANEL =================
-   Original chiptune motif, fully procedural WebAudio. One motif, three
-   intensity variants (title / setup / run; run6 adds a harmony line).
+/* ================= MUSIC ENGINE + SOUND PANEL =================
+   Moog-first soundtrack: A minor synth funk at 120 BPM, fully procedural
+   WebAudio. Minimoog-style voices (saw lead with portamento and a resonant
+   filter that opens bar by bar, saw + sub-oscillator bass, filtered arp
+   plucks) run through a gentle soft-saturation bus. Three intensity
+   variants (title / setup / run; run6 adds a harmony line).
    The AudioContext is created and resumed only after a user gesture. */
-var STEP_DUR = 60 / 132 / 4; /* 132 BPM, 16th notes */
-/* v3 main theme: 32 eighth notes over 4 bars (C G Am F). Bar 4 ends on 79, a pickup back into bar 1. */
-var LEAD32 = [76,79,81,79, 76,72,74,76, 74,79,83,81, 79,76,74,-1, 81,84,83,81, 79,81,76,-1, 77,81,79,77, 76,74,76,79];
-var CHORDS = [ { bassRoot:36, chordRoot:48, tones:[0,4,7] }, { bassRoot:43, chordRoot:55, tones:[0,4,7] }, { bassRoot:45, chordRoot:57, tones:[0,3,7] }, { bassRoot:41, chordRoot:53, tones:[0,4,7] } ]; /* C G Am F, one chord per bar */
-var BASS_PAT = [0, 12, 0, 12, 0, 12, 7, 12]; /* per eighth within a bar; pulsing octave drive from bassRoot */
+var STEP_DUR = 60 / 120 / 4; /* 120 BPM, 16th notes */
+/* Bassline: absolute MIDI notes, 64 sixteenth steps (Am F C G, one bar each). -1 = rest. */
+var BASSLINE = [45,-1,45,-1,57,-1,45,-1,43,-1,45,-1,50,-1,52,-1, 41,-1,41,-1,53,-1,41,-1,48,-1,53,-1,50,-1,48,-1, 48,-1,48,-1,55,-1,48,-1,43,-1,48,-1,55,-1,57,-1, 43,-1,43,-1,55,-1,43,-1,50,-1,55,-1,59,-1,57,-1];
+/* Lead: 32 eighth notes over the same 4 bars. -1 = rest; the previous note rings through. */
+var LEAD = [69,-1,72,-1,76,-1,74,-1, 72,-1,-1,69,-1,67,-1,-1, 76,-1,79,-1,76,-1,74,-1, 81,-1,79,-1,76,74,72,-1];
+var CHORDS = [ { chordRoot:57, tones:[0,3,7] }, { chordRoot:53, tones:[0,4,7] }, { chordRoot:48, tones:[0,4,7] }, { chordRoot:55, tones:[0,4,7] } ]; /* Am F C G, one chord per bar; arp/pad use */
+var BAR_LP = [1500, 1900, 2300, 2700]; /* lead filter peak per bar: the filter opening up is the track's movement */
+var leadPrev = { midi: -1, end: -10 }; /* portamento memory for the lead voice */
 var MUS = { variant: "title", step: 0, next: 0, timer: null, gain: null };
 function mf(m){ return 440 * Math.pow(2, (m - 69) / 12); }
+function musicShape(ctx){
+  /* gentle tanh-style soft saturation: warms the saws so they feel analog, not brittle */
+  var sh = ctx.createWaveShaper(), n = 256, curve = new Float32Array(n), k = 4;
+  for (var i = 0; i < n; i++){ var x = (i / (n - 1)) * 2 - 1; curve[i] = Math.tanh(k * x) / Math.tanh(k); }
+  sh.curve = curve;
+  return sh;
+}
 function musicTarget(){ return (!state.musicOn || state.muted) ? 0 : (state.musicVol * 0.8); }
 function applyMusicGain(ms){
   if (!MUS.gain || !AC) return;
@@ -2995,18 +3008,69 @@ function mhat(time, vol, open){
   var g = AC.createGain(); g.gain.setValueAtTime(vol, time); g.gain.exponentialRampToValueAtTime(0.0001, time + dec);
   src.connect(f); f.connect(g); g.connect(MUS.gain); src.start(time); src.stop(time + dec + 0.02);
 }
-function mlead(midi, time, dur, vol, lpFreq, echo){
+function mlead(midi, time, dur, vol, lpPeak, echo){
+  /* Minimoog-style lead: two detuned saws, one resonant lowpass with a per-note
+     envelope, and portamento from the previous note when the gap is short. */
   if (midi < 0 || !AC || !MUS.gain) return;
-  var f = AC.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = lpFreq || 3800;
-  var o1 = AC.createOscillator(); o1.type = "square"; o1.frequency.value = mf(midi);
-  var o2 = AC.createOscillator(); o2.type = "square"; o2.frequency.value = mf(midi); o2.detune.value = 6;
+  var gate = dur > 0 ? dur : 2 * STEP_DUR;
+  var peak = lpPeak || 1900;
+  var f = AC.createBiquadFilter(); f.type = "lowpass"; f.Q.value = 8;
+  f.frequency.setValueAtTime(peak * 0.55, time);
+  f.frequency.linearRampToValueAtTime(peak, time + 0.03);
+  f.frequency.exponentialRampToValueAtTime(Math.max(120, peak * 0.4), time + gate);
+  var o1 = AC.createOscillator(); o1.type = "sawtooth"; o1.detune.value = -6;
+  var o2 = AC.createOscillator(); o2.type = "sawtooth"; o2.detune.value = 6;
+  var glide = leadPrev.midi > 0 && leadPrev.midi !== midi && (time - leadPrev.end) < 0.35;
+  var fFrom = glide ? mf(leadPrev.midi) : mf(midi);
+  o1.frequency.setValueAtTime(fFrom, time); o2.frequency.setValueAtTime(fFrom, time);
+  if (glide){
+    o1.frequency.exponentialRampToValueAtTime(mf(midi), time + 0.07);
+    o2.frequency.exponentialRampToValueAtTime(mf(midi), time + 0.07);
+  }
   var g1 = AC.createGain(), g2 = AC.createGain();
-  g1.gain.setValueAtTime(vol, time); g1.gain.exponentialRampToValueAtTime(0.0001, time + dur);
-  g2.gain.setValueAtTime(vol * 0.4, time); g2.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+  g1.gain.setValueAtTime(0.0001, time); g1.gain.linearRampToValueAtTime(vol, time + 0.012);
+  g1.gain.setValueAtTime(vol, time + gate * 0.7); g1.gain.linearRampToValueAtTime(0.0001, time + gate);
+  g2.gain.setValueAtTime(0.0001, time); g2.gain.linearRampToValueAtTime(vol * 0.7, time + 0.012);
+  g2.gain.setValueAtTime(vol * 0.7, time + gate * 0.7); g2.gain.linearRampToValueAtTime(0.0001, time + gate);
   o1.connect(g1); g1.connect(f); o2.connect(g2); g2.connect(f);
   f.connect(MUS.gain);
   if (echo && MUS.echoIn) f.connect(MUS.echoIn); /* dotted-eighth feedback echo, title variant only */
-  o1.start(time); o2.start(time); o1.stop(time + dur + 0.02); o2.stop(time + dur + 0.02);
+  o1.start(time); o2.start(time); o1.stop(time + gate + 0.05); o2.stop(time + gate + 0.05);
+  leadPrev.midi = midi; leadPrev.end = time + gate;
+}
+var bassFilt = null; /* one shared lowpass for the bass voice, created in initAudio */
+function mbass(midi, time, gate, vol){
+  /* Moog bass: saw + sine sub an octave down into a shared lowpass whose
+     cutoff pops open per note and settles back. */
+  if (midi < 0 || !AC || !MUS.gain || !bassFilt) return;
+  bassFilt.frequency.cancelScheduledValues(time);
+  bassFilt.frequency.setValueAtTime(850, time);
+  bassFilt.frequency.exponentialRampToValueAtTime(320, time + Math.max(0.06, gate));
+  var o = AC.createOscillator(); o.type = "sawtooth"; o.frequency.value = mf(midi);
+  var sub = AC.createOscillator(); sub.type = "sine"; sub.frequency.value = mf(Math.max(24, midi - 12));
+  var g = AC.createGain(), gs = AC.createGain();
+  g.gain.setValueAtTime(0.0001, time);
+  g.gain.linearRampToValueAtTime(vol, time + 0.006);
+  g.gain.setValueAtTime(vol, time + gate * 0.45);
+  g.gain.exponentialRampToValueAtTime(vol * 0.55, time + gate * 0.8);
+  g.gain.linearRampToValueAtTime(0.0001, time + gate);
+  gs.gain.setValueAtTime(0.0001, time);
+  gs.gain.linearRampToValueAtTime(vol * 0.8, time + 0.006);
+  gs.gain.setValueAtTime(vol * 0.8, time + gate * 0.45);
+  gs.gain.exponentialRampToValueAtTime(vol * 0.44, time + gate * 0.8);
+  gs.gain.linearRampToValueAtTime(0.0001, time + gate);
+  o.connect(g); g.connect(bassFilt); sub.connect(gs); gs.connect(bassFilt);
+  o.start(time); sub.start(time); o.stop(time + gate + 0.03); sub.stop(time + gate + 0.03);
+}
+function marp(midi, time, vol){
+  /* run arp: sawtooth plucks through a lowpass, short decay */
+  if (midi < 0 || !AC || !MUS.gain) return;
+  var f = AC.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = 1700; f.Q.value = 4;
+  var o = AC.createOscillator(); o.type = "sawtooth"; o.frequency.value = mf(midi);
+  var g = AC.createGain();
+  g.gain.setValueAtTime(vol, time); g.gain.exponentialRampToValueAtTime(0.0001, time + 0.11);
+  o.connect(f); f.connect(g); g.connect(MUS.gain);
+  o.start(time); o.stop(time + 0.14);
 }
 function mkick(time){
   if (!AC || !MUS.gain) return;
@@ -3024,26 +3088,34 @@ function msnare(time){
   var g = AC.createGain(); g.gain.setValueAtTime(0.16, time); g.gain.exponentialRampToValueAtTime(0.0001, time + 0.09);
   src.connect(f); f.connect(g); g.connect(MUS.gain); src.start(time); src.stop(time + 0.11);
 }
+function bassGateAt(s){
+  /* tight gate when the next step also plays; looser ring on the last note before a rest */
+  return BASSLINE[(s + 1) % 64] > 0 ? 0.95 * STEP_DUR : 1.8 * STEP_DUR;
+}
 function scheduleStep(s, t){
   var bar = Math.floor(s / 16) % 4;
   var chord = CHORDS[bar];
-  var eighth = (s % 2 === 0), ei = Math.floor(s / 2), bi = ei % 8, inBar = s % 16, v = MUS.variant;
+  var eighth = (s % 2 === 0), ei = Math.floor(s / 2), inBar = s % 16, v = MUS.variant;
+  var bnote = BASSLINE[s];
   if (v === "title"){
-    if (eighth && LEAD32[ei] > 0) mlead(LEAD32[ei], t, 0.26, 0.11, 3800, true);
-    if (eighth) mnote(chord.bassRoot + BASS_PAT[bi], t, 0.24, "triangle", 0.2);
+    if (eighth && LEAD[ei] > 0) mlead(LEAD[ei], t, 2 * STEP_DUR, 0.11, BAR_LP[bar], true);
+    if (bnote > 0) mbass(bnote, t, bassGateAt(s), 0.13);
     if (inBar % 4 === 0) mkick(t);
     if (inBar === 4 || inBar === 12) msnare(t);
     if (!eighth) mhat(t, (s % 8 === 7) ? 0.06 : 0.045, s === 63);
   } else if (v === "setup"){
-    if (eighth && ei % 2 === 0 && LEAD32[ei] > 0) mlead(LEAD32[ei], t, 0.32, 0.075, 2200, false);
-    if (eighth && bi % 2 === 0) mnote(chord.bassRoot + BASS_PAT[bi], t, 0.3, "triangle", 0.13);
+    if (eighth && (bar === 0 || bar === 2) && LEAD[ei] > 0) mlead(LEAD[ei], t, 2 * STEP_DUR, 0.075, BAR_LP[bar] * 0.7, false);
+    if (s % 2 === 0 && bnote > 0) mbass(bnote, t, bassGateAt(s), 0.09);
     if (ei % 4 === 2) mhat(t, 0.02, false);
   } else { /* run / run6 */
-    if (eighth) mnote(chord.bassRoot + BASS_PAT[bi], t, 0.18, "triangle", 0.22);
+    if (bnote > 0) mbass(bnote, t, bassGateAt(s), 0.14);
     var arpTone = chord.chordRoot + 12 + chord.tones[s % 3] + (s % 8 >= 4 ? 12 : 0);
-    mnote(arpTone, t, 0.1, "square", 0.045);
-    if (eighth && ei % 2 === 1 && LEAD32[ei] > 0) mnote(LEAD32[ei], t, 0.2, "square", 0.07);
-    if (v === "run6" && eighth && LEAD32[ei] > 0) mnote(LEAD32[ei] + 4, t, 0.22, "triangle", 0.06);
+    marp(arpTone, t, 0.045);
+    if (eighth && LEAD[ei] > 0) mlead(LEAD[ei], t, 2 * STEP_DUR, 0.08, BAR_LP[bar], false);
+    if (v === "run6" && eighth && LEAD[ei] > 0){
+      leadPrev.end = -10; /* harmony starts clean, no glide from the main line */
+      mlead(LEAD[ei] + 4, t, 2 * STEP_DUR, 0.05, BAR_LP[bar], false);
+    }
     if (inBar % 4 === 0) mkick(t);
     if (inBar === 4 || inBar === 12) msnare(t);
     if (!eighth) mhat(t, 0.04, s === 63);
@@ -3062,8 +3134,11 @@ function schedTick(){
 function initAudio(){
   var ctx = ac(); if (!ctx) return;
   if (!MUS.gain){
-    MUS.gain = ctx.createGain(); MUS.gain.gain.value = musicTarget(); MUS.gain.connect(masterOut(ctx));
-    var dly = ctx.createDelay(1); dly.delayTime.value = 3 * STEP_DUR; /* dotted eighth at 132 BPM */
+    MUS.gain = ctx.createGain(); MUS.gain.gain.value = musicTarget();
+    MUS.shape = musicShape(ctx); /* soft-saturation bus between the music gain and the master */
+    MUS.gain.connect(MUS.shape); MUS.shape.connect(masterOut(ctx));
+    bassFilt = ctx.createBiquadFilter(); bassFilt.type = "lowpass"; bassFilt.frequency.value = 320; bassFilt.Q.value = 2; bassFilt.connect(MUS.gain);
+    var dly = ctx.createDelay(1); dly.delayTime.value = 3 * STEP_DUR; /* dotted eighth at 120 BPM */
     var fb = ctx.createGain(); fb.gain.value = 0.25;
     var wet = ctx.createGain(); wet.gain.value = 0.12;
     MUS.echoIn = ctx.createGain();
