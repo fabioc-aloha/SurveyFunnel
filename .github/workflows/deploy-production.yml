@@ -29,6 +29,8 @@ jobs:
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '22'
+      - name: Build site package
+        run: node scripts/build-site.mjs
       - name: Validate and package
         run: node --test scripts/build-site.test.mjs scripts/game-features.test.mjs
       - name: Check deployment credential

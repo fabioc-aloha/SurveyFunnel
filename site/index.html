@@ -978,6 +978,7 @@ var LEVELS=[
  {id:6,name:"THE BIG QUARTER",difficulty:"HARD",target:0.12,budget:150,desc:"Executive Blast, stakeholder burden, Insight 70+, and 150 credits."}
 ];
 var BUDGET_TOTAL = 120;
+var QUICK_BASE_COST = 34; /* Quick Challenge fixed cost in every attempt: 30 cr send + 4 cr Honest Ask invite. Card edits charge on top of this base. */
 var QUICK_CHALLENGES = [
   { name:"SAY WHAT YOU MEAN", ids:[3,10,24] },
   { name:"LESS WORK, BETTER ANSWERS", ids:[48,55,11] },
@@ -993,6 +994,9 @@ state.instrument = QUESTIONS.slice();
 function hashStr(s){ var h = 2166136261; for (var i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
 function mulberry(seed){ return function(){ seed |= 0; seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 function choiceKey(){
+  /* The draw stream deliberately keys only the levers listed here.
+     Levers not listed still change outcomes through the scoring math;
+     they just do not re-seed the draw. */
   return state.seg.id + "|" + state.invite.id + "|" + state.reminders + "|" + (state.escapes?1:0) + "|" + (state.instrumentSeed || "") + "|" +
     activeQuestions().map(function(q){ return state.qstate[q.id][0]; }).join("") + "|" +
     addBankQuestions().map(function(q){ return state.added[q.id] ? "1" : "0"; }).join("") + "|" + state.validation + "|" + (state.dedupe?1:0) + (state.suppression?1:0);
@@ -1276,9 +1280,7 @@ function validationCostFor(seg, mode){
   return 0;
 }
 function simplifyCount(){ return activeQuestions().filter(function(q){ return state.qstate[q.id] === "simplify"; }).length; }
-function cutCount(){ return activeQuestions().filter(function(q){ return state.qstate[q.id] === "cut"; }).length; }
 function addedCount(){ return addBankQuestions().filter(function(q){ return state.added[q.id]; }).length; }
-function allQuestionPool(){ return QUESTIONS.concat(addBankQuestions().filter(function(q){ return state.added[q.id]; })); }
 var STAKE_CHOICES = {
   pushback:{ title:"SHOW THE EVIDENCE", cost:0, minutes:0, goodwill:0,
     reply:"Let's keep this send focused on the agenda. We can plan the other topics with the audience that can answer them.",
@@ -1313,7 +1315,9 @@ function budgetMath(ov){
   /* New instrument edits this attempt, measured against the baseline the
      chain entered this setup with. Un-editing back to baseline refunds. */
   var nSimp = 0, nCut = 0, nRestore = 0, editCharge = 0;
-  activeQuestions().forEach(function(q){
+  /* Added bank questions price their edits exactly like dealt ones:
+     cutting or restoring an add charges the same 1 cr as a dealt card. */
+  activeQuestions().concat(addBankQuestions()).forEach(function(q){
     var cur = state.qstate[q.id] || "keep", was = base.qstate[q.id] || "keep";
     if (cur === was) return;
     if (was === "cut" && cur !== "cut"){ nRestore++; editCharge += 1; }
@@ -1327,6 +1331,8 @@ function budgetMath(ov){
     editCharge += Math.max(0, ov.simplifyCount - simplifyCount()) * 2;
   }
   var escCharge = (esc && !base.escapes) ? 2 : 0;
+  /* Stakeholder: switching choice charges the new choice's full price
+     per attempt, by design (unlike validation's difference pricing). */
   var stakeCharge = (stakeholder !== base.stakeholder) ? stakeCost(stakeholder) : 0;
   var abCharge = (state.abEnabled && !base.abEnabled) ? 6 : 0;
   var rbCharge = (state.reportBack && !base.reportBack) ? 3 : 0;
@@ -1367,7 +1373,7 @@ function renderBudget(){
   var el = $("budgetPanel"); if (!el) return;
   var b = budgetMath();
   if (state.quickChallenge){
-    el.innerHTML = '<b>QUICK CHALLENGE · 40 CR</b><p>Send 30 + Honest Ask 4 + card edits ' + (b.attemptCost - 34) + ' = <b>' + b.attemptCost + ' credits</b> · <b>' + b.remaining + ' left</b></p><p>List preparation is provided. One launch; retry starts fresh.</p>';
+    el.innerHTML = '<b>QUICK CHALLENGE · 40 CR</b><p>Send 30 + Honest Ask 4 + card edits ' + (b.attemptCost - QUICK_BASE_COST) + ' = <b>' + b.attemptCost + ' credits</b> · <b>' + b.remaining + ' left</b></p><p>List preparation is provided. One launch; retry starts fresh.</p>';
     return;
   }
   function col(items, sub, title){
@@ -2325,6 +2331,13 @@ function showCampaign(){
 function startRun(){
   if (state.running) return;
   if (budgetMath().total > BUDGET_TOTAL){ sndSad(); return; }
+  /* Defense in depth for the cut floor: the launch button already
+     refuses a sub-floor instrument (see renderReadout); this refuses
+     any other caller that reaches startRun in that state, before any
+     state changes or charges. Quick Challenges are exempt: their cards
+     are all core and cannot be cut in play, and their report owns the
+     degenerate states (unrepaired or cut cards) as failed attempts. */
+  if (!state.quickChallenge && keptQuestions().length < instrumentFloor()){ sndError(); renderReadout(); return; }
   if ((state.level===3||state.level===6) && !state.stakeholder) state.stakeholder="pushback";
   state.launchCost = budgetMath().attemptCost;
   state.launchedSnapshot = snapshotCurrent();
@@ -2582,15 +2595,120 @@ function extraReportHTML(c){
   return h;
 }
 function gmEndingForReport(){ return runData ? runData.gm.ending : 0; }
+/* ---- Bounce-backs: the individual undeliverable addresses behind the
+   funnel's DELIVERED gate, listed in the report's deliverability card.
+   Counts mirror the exact numbers the report prints for the funnel (same
+   tally counts, same scale, same rounding points): hard is rounded on its
+   own, the total is rounded on its own, and soft is total minus hard, so
+   the split always sums exactly to the printed total. Causes mirror the
+   validation model in effInvalidRate(): full validation leaves only the
+   catch-all floor (its survivors are 0.15 of the raw invalid rate); partial
+   leaves 0.45, of which the catch-all floor is 0.15/0.45 = 1/3 and the
+   unchecked remainder 2/3. The address sample is drawn from a stream seeded
+   by the run's own choiceKey and attempt, so the same run always lists the
+   same addresses. All domains are fictional .example addresses. ---- */
+var BB_FIRST = ["james","maria","robert","priya","david","wei","sarah","michael","anna","jose","emily","raj","laura","kevin","nadia","tom","grace","omar","julie","peter","meghan","carlos","ingrid","sam"];
+var BB_LAST = ["martinez","johnson","okafor","sharma","novak","garcia","kim","haddad","brown","petrova","wilson","ahmed","taylor","ricci","miller","dubois","anderson","kovacs","thomas","moreau","jackson","petrov","white","larsen"];
+var BB_CATCHALL_DOMAINS = ["meridian-foods.example","castlepoint.example","brightline-media.example","harborview-hotels.example","summitcare.example","openlane.example"];
+var BB_DOMAINS = ["northgate-logistics.example","oldmill-textiles.example","pinnacle-freight.example","riverstone-legal.example","copperfield-print.example","westbrook-foods.example","altair-consulting.example","lakeside-dental.example"];
+var BB_DEAD_DOMAINS = ["quickship-2009.example","faxline-systems.example","pagerplus.example","dialup-depot.example"];
+var BB_ROLES = ["info","support","admin","sales","contact","help","billing","office"];
+var BB_CAUSE_LABEL = {
+  catchall: "Catch-all pass \u00B7 BrightVerify marked it deliverable because the domain accepts all mail",
+  never: "Never checked \u00B7 no validation was bought for this send",
+  partial: "Partial check missed it \u00B7 partial validation scanned only the riskiest half"
+};
+function bbQuotaKeys(counts, rng){
+  var keys = [];
+  Object.keys(counts).forEach(function(k){ for (var i = 0; i < counts[k]; i++) keys.push(k); });
+  for (var i = keys.length - 1; i > 0; i--){ var j = Math.floor(rng() * (i + 1)); var t = keys[i]; keys[i] = keys[j]; keys[j] = t; }
+  return keys;
+}
+function computeBounceBacks(c, scale){
+  var hard = Math.round(c.bouncedHard * scale);
+  var total = Math.round((c.bouncedHard + c.bouncedSoft) * scale);
+  var soft = total - hard;
+  var val = state.validation;
+  var causes = { catchall: 0, never: 0, partial: 0 };
+  if (total > 0){
+    if (val === "full") causes.catchall = total;
+    else if (val === "partial"){ causes.catchall = Math.round(total / 3); causes.partial = total - causes.catchall; }
+    else causes.never = total;
+  }
+  var sampleN = Math.min(8, total);
+  var sample = [];
+  if (sampleN > 0){
+    var rng = mulberry(hashStr(choiceKey() + "|bouncebacks|" + state.attempt));
+    var sHard = Math.max(0, Math.min(hard, Math.round(sampleN * hard / total)));
+    if (sHard < sampleN - soft) sHard = sampleN - soft;
+    var typeKeys = bbQuotaKeys({ HARD: sHard, SOFT: sampleN - sHard }, rng);
+    var causeCounts, sCatch = 0;
+    if (val === "full") causeCounts = { catchall: sampleN };
+    else if (val === "partial"){
+      sCatch = Math.max(0, Math.min(causes.catchall, Math.round(sampleN * causes.catchall / total)));
+      if (sCatch < sampleN - causes.partial) sCatch = sampleN - causes.partial;
+      causeCounts = { catchall: sCatch, partial: sampleN - sCatch };
+    }
+    else causeCounts = { never: sampleN };
+    var causeKeys = bbQuotaKeys(causeCounts, rng);
+    var used = {};
+    for (var i = 0; i < sampleN; i++){
+      var type = typeKeys[i], cause = causeKeys[i];
+      var address = null, reason = null;
+      for (var tries = 0; tries < 12 && !address; tries++){
+        var first = BB_FIRST[Math.floor(rng() * BB_FIRST.length)];
+        var last = BB_LAST[Math.floor(rng() * BB_LAST.length)];
+        var lp = rng();
+        var local = lp < 0.5 ? first + "." + last : lp < 0.68 ? first[0] + last : lp < 0.82 ? first + last[0] : lp < 0.92 ? first + "_" + last : BB_ROLES[Math.floor(rng() * BB_ROLES.length)];
+        var domain, deadDomain = false;
+        if (cause === "catchall") domain = BB_CATCHALL_DOMAINS[Math.floor(rng() * BB_CATCHALL_DOMAINS.length)];
+        else if (type === "HARD" && rng() < 0.3){ domain = BB_DEAD_DOMAINS[Math.floor(rng() * BB_DEAD_DOMAINS.length)]; deadDomain = true; }
+        else domain = BB_DOMAINS[Math.floor(rng() * BB_DOMAINS.length)];
+        var candidate = local + "@" + domain;
+        if (used[candidate]) continue;
+        used[candidate] = true; address = candidate;
+        reason = type === "HARD" ? (deadDomain ? "domain not found" : "mailbox not found") : (rng() < 0.55 ? "mailbox full" : "temporary server failure");
+      }
+      if (!address){ address = "case" + (i + 1) + "@" + BB_DOMAINS[i % BB_DOMAINS.length]; reason = type === "HARD" ? "mailbox not found" : "mailbox full"; }
+      sample.push({ address: address, type: type, reason: reason, cause: cause, causeLabel: BB_CAUSE_LABEL[cause] });
+    }
+  }
+  return { total: total, hard: hard, soft: soft, validation: val, causes: causes, sample: sample, more: total - sampleN };
+}
+function bounceBacksHTML(bb){
+  var h = "<h2 style='margin-top:14px'>BOUNCE-BACKS \u00B7 THE ADDRESSES THAT CAME BACK</h2>";
+  if (!bb.total){
+    return h + "<p style='font-size:15.5px;margin:4px 0'><b>No bounce-backs.</b> Every address accepted the mail this round.</p>";
+  }
+  var causeLine;
+  if (bb.validation === "full") causeLine = "Every one of them passed full BrightVerify validation. Catch-all domains accept mail for any mailbox, real or not, so no validation can confirm these addresses before the send.";
+  else if (bb.validation === "partial") causeLine = fmt(bb.causes.partial) + " sat outside the riskiest half that partial validation scanned. " + fmt(bb.causes.catchall) + " passed as catch-all addresses, which no check can verify.";
+  else causeLine = "None of them was ever checked: no validation was bought, so every dead address on the list went out with the send.";
+  h += "<p style='font-size:15.5px;margin:4px 0'><b>" + fmt(bb.total) + " addresses bounced back</b> (" + fmt(bb.hard) + " hard \u00B7 " + fmt(bb.soft) + " soft). " + causeLine + "</p>";
+  h += "<div class='simnote'>A sample of this send's bounced addresses. Every address is simulated; .example domains cannot receive real mail.</div>";
+  h += "<table class='mini'><tr><th>Address</th><th>Bounce</th><th style='text-align:left'>Why it came back</th></tr>" +
+    bb.sample.map(function(e){
+      return "<tr><td style='overflow-wrap:anywhere'>" + e.address + "</td><td>" + e.type + "</td><td style='text-align:left'>" + e.reason + "<br><span style='color:#5a6478;font-size:13px'>" + e.causeLabel + "</span></td></tr>";
+    }).join("") + "</table>";
+  if (bb.more > 0) h += "<p style='font-size:14.5px;margin:6px 0'>+ " + fmt(bb.more) + " more bounced addresses not shown.</p>";
+  var note;
+  if (bb.validation === "full") note = "Validation removed every address it could verify. What is left is the catch-all residue: real lists keep a small share of these no matter how well they are cleaned, which is why validation shrinks the bounce list but never zeroes it.";
+  else if (bb.validation === "partial") note = "Partial validation checked the riskiest half only. The unchecked half keeps its dead addresses, and the catch-all residue survives any tier of checking.";
+  else note = "Validation would have removed most of this list before it cost sender reputation. The catch-all residue is the part no tier can remove.";
+  h += "<p style='font-size:14.5px;margin:6px 0'>" + note + "</p>";
+  return h;
+}
 function showReport(){
   if (!runData || state.reportShown) return;
   state.reportShown = true;
+  window.__abTooClose = false; /* per-report flag: the A/B section below sets it again only when this run's verdict is too close */
   state.running = false;
   var spentAfter = state.spentBefore + (state.launchCost || budgetMath().attemptCost);
   var remainingAfter = BUDGET_TOTAL - spentAfter;
   var prevUnlocked = state.unlocked;
   var run = runData, c = tally(run), seg = state.seg, gm = run.gm;
   var scale = run.scale;
+  if (!run.bounceBacks) run.bounceBacks = computeBounceBacks(c, scale);
   var simInvites = seg.n;
   var simSent = c.sent * scale, simDelivered = c.delivered * scale, simBounced = (c.bouncedHard + c.bouncedSoft) * scale, simOpened = c.opened * scale, simStarted = c.started * scale, simCompleted = c.completed * scale;
   var respRate = c.sent ? c.completed / c.sent : 0;
@@ -2773,6 +2891,7 @@ function showReport(){
     "<p style='font-size:15.5px;margin:4px 0'><b>Validation verdict:</b> " + valVerdict + "</p>" +
     (c.angry ? "<p style='font-size:15.5px;margin:4px 0'><b>Suppression skipped:</b> " + c.angry + " sprite(s) stood for opted-out or recently surveyed people mailed anyway, and goodwill took the hit in the ledger above. <b>Fix:</b> buy the Suppression scrub (4 cr) in PREPARE THE LIST.</p>" : "") +
     (c.dupEnv ? "<p style='font-size:15.5px;margin:4px 0'><b>No dedupe:</b> duplicate envelopes went out during the run. <b>Fix:</b> buy the Dedupe pass (4 cr).</p>" : "") +
+    bounceBacksHTML(run.bounceBacks) +
     '<h2 style="margin-top:14px">DATA QUALITY FLAGS</h2>' +
     flagRow("Speeders", c.qSpeed, shSpeed, qSpeed, "Clicked through far too fast to have read the questions. Long, low-relevance surveys breed them, and a flagged completion counts half.", "LEVER 1 relevance and LEVER 3 length: shorten the survey and send it while the case is warm.") +
     flagRow("Straight liners", c.qStraight, shStraight, qStraight, "Same answer down every row. That is the GRID BURDEN question doing exactly what grid burden does (Krosnick satisficing).", "LEVER 3: BREAK UP the grid question (3 cr), or CUT it (1 cr). A generic simplify is not offered for this class.") +
@@ -3036,14 +3155,6 @@ function applyMusicGain(ms){
   MUS.gain.gain.setValueAtTime(MUS.gain.gain.value, t);
   MUS.gain.gain.linearRampToValueAtTime(musicTarget(), t + (ms || 200) / 1000);
 }
-function mnote(midi, time, dur, type, vol){
-  if (midi < 0 || !AC || !MUS.gain) return;
-  var o = AC.createOscillator(), g = AC.createGain();
-  o.type = type; o.frequency.value = mf(midi);
-  g.gain.setValueAtTime(vol, time);
-  g.gain.exponentialRampToValueAtTime(0.0001, time + dur);
-  o.connect(g); g.connect(MUS.gain); o.start(time); o.stop(time + dur + 0.02);
-}
 function ensureNoiseBuf(){
   if (noiseBurst.buf || !AC) return;
   var len = AC.sampleRate * 0.5, buf = AC.createBuffer(1, len, AC.sampleRate), d = buf.getChannelData(0);
@@ -3165,8 +3276,10 @@ function scheduleStep(s, t){
     marp(arpTone, t, 0.045);
     if (eighth && LEAD[ei] > 0) mlead(LEAD[ei], t, 2 * STEP_DUR, 0.08, BAR_LP[bar], false);
     if (v === "run6" && eighth && LEAD[ei] > 0){
+      var mainPrev = { midi: leadPrev.midi, end: leadPrev.end };
       leadPrev.end = -10; /* harmony starts clean, no glide from the main line */
       mlead(LEAD[ei] + 4, t, 2 * STEP_DUR, 0.05, BAR_LP[bar], false);
+      leadPrev.midi = mainPrev.midi; leadPrev.end = mainPrev.end; /* restore the main line's portamento memory, so the next main note glides from the main pitch, not the +4 */
     }
     if (inBar % 4 === 0) mkick(t);
     if (inBar === 4 || inBar === 12) msnare(t);

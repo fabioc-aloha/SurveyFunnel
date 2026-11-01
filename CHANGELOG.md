@@ -1,5 +1,57 @@
 # Changelog
 
+## 2026-11-01 - Code review fixes: the proof now matches the game
+
+- The winnability corpus was regenerated from UI-legal lines only:
+  364 verified legal winners (65 per level except Level 4, whose
+  ending-goodwill gate admits 39 of its 65 draws in the searched
+  space). The winnability test now applies every setup through the
+  game's legal action paths, cuts included, and asserts per-level
+  minimums, so a green suite once again means a player can reach
+  the wins it proves. docs/development.md's balance notes were
+  corrected to match shipped behavior.
+- startRun itself now refuses a sub-floor instrument (no state
+  change, no charge), backing the launch button's refusal; Quick
+  Challenges are exempt because their cards are all core and
+  uncuttable, and their report owns degenerate states.
+- Bank adds joined the budget diff: cutting an added question and
+  restoring one cut in an earlier attempt now charge the priced
+  1 cr each, as the cut tray always promised. A regression test
+  covers the add, cut, restore sequence across attempts.
+- Dead code removed (mnote, cutCount, allQuestionPool); the deploy
+  workflow builds the site package explicitly instead of relying on
+  a test side effect; smaller review nits: the A/B too-close flag
+  resets per report, the finale harmony no longer bends the lead's
+  glide, the Quick Challenge base cost is a named constant, and the
+  stakeholder full-price rule and the draw seed's scope are now
+  documented where they live.
+
+## 2026-11-01 - Bounce-backs: the report names the addresses that came back
+
+- The run report's DELIVERABILITY AND DATA card gains a BOUNCE-BACKS
+  section: the header gives the run's bounced total with its hard and
+  soft split, followed by a sample of up to 8 individual bounced
+  addresses, each with its bounce type, its reason (mailbox not found,
+  domain not found, mailbox full, temporary server failure), and the
+  cause from the validation story: a catch-all pass when full
+  BrightVerify validation still let it through, "never checked" when
+  validation was skipped, and a split of the two under partial
+  validation. A "+ N more" line keeps the sample plus remainder
+  exactly equal to the total; a zero-bounce run renders a clean
+  "No bounce-backs" line instead.
+- The counts are not a second simulation: they are rounded from the
+  same sprite tally, at the same scale, with the same rounding the
+  funnel paragraph prints, and soft is total minus hard so the split
+  always sums to the printed total. Partial-validation causes follow
+  the engine's survivor model (survivors are 45% of the raw invalid
+  rate; the 15-point catch-all floor is 1/3 of them, the unchecked
+  remainder 2/3). Addresses are generated deterministically from the
+  run's own seed, stored on the run so re-renders show the same list,
+  and use fictional .example domains throughout.
+- Five new tests (48 total) cover reconciliation against the funnel
+  for skip/full/partial runs, the cause rules, determinism, the
+  8-entry cap with exact remainder, and the zero-bounce clean state.
+
 ## 2026-11-01 - Question buttons: one line when it fits, no overflow when it stacks
 
 - The verb and its price now share one line whenever they fit

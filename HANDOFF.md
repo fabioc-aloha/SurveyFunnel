@@ -1,63 +1,52 @@
 # Handoff
 
-## Current State
+## Current state
 
-UAT fixes, initial-budget winnability checks, approved difficulty labels,
-player terminology corrections, and collapsed QR-border removal deployed
-successfully in gameplay commit `f8b2fac`. Release evidence is preserved in
-[CHANGELOG.md](CHANGELOG.md).
+- Public repository: https://github.com/fabioc-aloha/SurveyFunnel
+- Production URL: https://nice-mushroom-0bdb0ef0f.6.azurestaticapps.net
+- Remote `main` is deployed production: Moog-style soundtrack, IM nameplate on
+  the manager sprite, uniform questionnaire buttons, the cut floor (core
+  questions cannot be cut; launches refuse below six kept, three in Quick
+  Challenges).
+- Local `main` is ahead of remote by the bounce-backs report section and the
+  2026-11-01 code-review fix batch (legal winnability fixtures, startRun floor
+  guard, bank-add charge fix, dead-code removal, explicit CI build step, audio
+  and A/B nits). None of those commits are pushed yet; pushing to `main`
+  deploys to production, so the push waits for the user's go.
+- The deploy workflow runs an explicit `node scripts/build-site.mjs` step
+  before the test suite.
 
-Audio v2 landed locally on 2026-11-01 (4-bar soundtrack, drums, echo, compressor master chain, layered SFX, music ducking; audio APIs unchanged; build and 38 tests pass) and awaits push; the human listen stays open in [TODO.md](TODO.md).
+## Test state
 
-The existing [production workflow](.github/workflows/deploy-production.yml)
-deploys the five-file static package on pushes to `main`.
-[Run 41236593589](https://github.com/fabioc-aloha/SurveyFunnel/actions/runs/41236593589)
-passed deployment and live verification for `f8b2fac`. The following
-documentation-only commit records that verification without changing the
-game package; check its workflow before assuming publication is complete.
-See [deployment guidance](docs/deployment.md) for the hosting target.
+- `npm test` (build-site plus game-features): 49 tests, all passing locally.
+- The winnability corpus (`scripts/fixtures/winning-setups.json`) holds 364
+  UI-legal winning setups: 65 each for Levels 1, 2, 3, 5, 6 and 39 for
+  Level 4, whose ending-goodwill gate rejected the other draws in the searched
+  space. Setups are applied through the game's own card handlers in the test;
+  the suite asserts the recorded per-level minimums.
 
-## Blockers
+## Immediate next actions
 
-The tracked browser-suite proposal still needs approval; human audio, physical-phone QR/touch,
-cross-browser, and screen-reader checks remain open in [TODO.md](TODO.md).
+1. On the user's go, push the local commits to `main` and verify the deploy
+   run and the production byte check (`npm run verify:deployment`).
+2. Integrate the external browser regression harness
+   (`~/workspace/test-harness-survey-funnel/`) into `scripts/harness/` per its
+   README, then run it against the final state.
+3. Continue the queued feature work in `TODO.md` in the user's order: visible
+   bounce-back and unopened piles with reminder drain, then the staged Quick
+   Challenge expansion (bigger drills, BRD variation, second wave).
+4. Final visual pass over every screen once all changes are in.
 
-## Next Action
+## Open items (honest status)
 
-Complete the remaining human audio and physical-device checks and resolve
-the tracked browser-suite approval decision in [TODO.md](TODO.md).
+- The Moog soundtrack is deployed but still awaits the user's own listen; no
+  audio can be verified from the build environment.
+- The browser harness is built and proven (it catches deliberately broken
+  copies) but still lives outside the repository.
+- Azure deployment creation and DNS or custom-domain work remain manual.
 
-## Verification
+## Do not redo
 
-Latest local command:
-`node --test scripts/build-site.test.mjs scripts/game-features.test.mjs`
-passed 38 tests, including 390 winning launches/reports: fixed starts plus
-64 seeded draws per level, all within initial budgets. This is sampled,
-not exhaustive random coverage. Scope and difficulty rationale are in
-[development notes](docs/development.md).
-
-Local browser checks passed an uninterrupted six-level campaign, retry
-recovery, the finale's audience-specific minimum send cost, modal keyboard
-containment and opener restoration, and 390px/1440px layout checks.
-These are manual/session checks, not a tracked browser suite.
-All three inline scripts and the five-file package passed validation.
-
-Independent post-deployment verification matched live HTML, font, license,
-QR bytes, security/MIME headers, and unpublished-document 404s.
-A live uninterrupted six-level campaign reached Season Results with 6/6
-wins and no runtime errors. MPOR/BRD keyboard focus restoration, inert
-background controls, terminology, difficulty labels, the finale's 70+
-Insight HUD, and the collapsed 0px QR border passed live checks.
-
-Default Git authentication failed during the prior release; the existing
-GitHub CLI helper worked when selected for that push only. Git configuration
-was not changed; do not assume the default helper is repaired.
-
-## References
-
-- [Open work and approval decisions](TODO.md)
-- [Completed-change history and release evidence](CHANGELOG.md)
-- [Game structure and balance invariants](docs/development.md)
-- [Current player guidance](docs/player-guide.md)
-- [Deployment and live verification](docs/deployment.md)
-- [Production game](https://nice-mushroom-0bdb0ef0f.6.azurestaticapps.net)
+- Do not restore the deleted private Survey-Respons repository.
+- Do not add a second HTML source of truth; `site/index.html` is the game.
+- Do not commit `dist/`, generated screenshots, or Azure deployment secrets.

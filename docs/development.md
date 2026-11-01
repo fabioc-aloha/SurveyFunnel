@@ -63,36 +63,51 @@ Per round, the model runs in this order:
 3. Unprepared Executive Blast loses, with expensive sends, hard bounces,
    and goodwill loss. It is not uniformly worst on every score.
 4. Gutted survey (only Q9 kept): quality and Insight fail, no win.
-   Fewer than six questions is not itself a loss condition.
+   A gutted instrument is also unreachable through the controls: core
+   questions cannot be cut, the kept count cannot fall below six (or
+   the dealt size in Quick Challenges), and launch refuses a sub-floor
+   instrument.
 5. Validation alone, bad questionnaire kept: still loses.
 6. Identical choices replay identically.
 
 ## Initial-budget winnability and difficulty
 
-The regression suite launches and scores 390 winning setups through the
-actual game: the fixed instrument plus seeds `0000` through `003F` for
-each of the six levels. Fixtures are in
+The regression suite launches and scores 364 UI-legal winning setups
+through the actual game. Fixtures are in
 [`scripts/fixtures/winning-setups.json`](../scripts/fixtures/winning-setups.json).
-Each starts at attempt 1 with zero previous spend, uses only dealt cards
-and the level's available bank, and must pass all scoring gates within
-the initial budget. Level 4 uses the intended Tired audience, not a swap
-to avoid the goodwill constraint; Level 6 uses Executive Blast.
+Levels 1, 2, 3, 5, and 6 each supply the fixed instrument plus all 64
+seeded draws (`0000` through `003F`); Level 4 supplies 39 lines (the
+fixed start plus 38 draws), because its goodwill gate rejected the
+remaining draws in the searched space. Each setup starts at attempt 1
+with zero previous spend, uses only dealt cards and the level's
+available bank, keeps every core question and at least the instrument
+floor, and must pass all scoring gates within the initial budget. The
+test applies each setup through the game's own card handlers (repairs
+via the fix button, cuts via `applyCut`), never by writing question
+state directly, so the corpus proves the scoring engine rewards states
+a player can actually reach. Level 4 uses the intended Tired audience,
+not a swap to avoid the goodwill constraint; Level 6 uses Executive
+Blast.
 
 | Level | Difficulty | Fixed winning cost | Highest winning cost in checked draws | Initial pool |
 | --- | --- | --- | --- | --- |
-| 1 - First Send | Easy | 57 | 80 | 120 |
-| 2 - The Split | Easy | 67 | 80 | 120 |
-| 3 - The Stakeholder | Medium | 60 | 74 | 120 |
-| 4 - The Tired List | Hard | 63 | 76 | 120 |
-| 5 - Global Fieldwork | Medium | 70 | 85 | 120 |
-| 6 - The Big Quarter | Hard | 89 | 103 | 150 |
+| 1 - First Send | Easy | 58 | 83 | 120 |
+| 2 - The Split | Easy | 67 | 83 | 120 |
+| 3 - The Stakeholder | Medium | 59 | 89 | 120 |
+| 4 - The Tired List | Hard | 62 | 82 | 120 |
+| 5 - Global Fieldwork | Medium | 70 | 106 | 120 |
+| 6 - The Big Quarter | Hard | 98 | 113 | 150 |
 
-These are verified strategies, not global minimum costs. The search tried
-short agenda-preserving plans, clean or repaired items, and combinations
-of invitation, reminders, and DK/NA. It excluded role-restricted items
-without a repair: keeping them unnecessarily depleted Level 4 goodwill.
-Dropping an unanswerable core item can be preferable to retaining it;
-the quality penalty must still leave the score above its gate.
+These are verified strategies, not global minimum costs. The corpus was
+regenerated under the cut floor: the previous fixtures were legalized
+(cut core questions restored with class-correct fixes, kept counts
+topped up to the floor), then each seed was searched over legal kept
+sets, bank adds, repairs, and combinations of invitation, reminders,
+and DK/NA (about 5,800 plan evaluations). It excluded role-restricted
+items without a repair: keeping them unnecessarily depleted Level 4
+goodwill. A core item can no longer be dropped at all: an unanswerable
+core item must be repaired where its class has a fix, carried with
+DK/NA escapes, or offset elsewhere in the plan.
 All witnesses were replayed through `startRun()` and `showReport()`.
 No cost, persona, simulation, or acceptance threshold was weakened.
 
