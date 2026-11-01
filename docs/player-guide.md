@@ -26,6 +26,22 @@ and its acceptance line; the report rules on whether it was met.
 The seed is printed in the BRD: the same seed always deals the same
 brief, and a retry draws a new one.
 
+Most runs also draw a **complication** after the first report: the
+list was older than the brief stated (the real invalid rate is 9%,
+and the provided validation does not carry to a second wave), a
+stakeholder adds one required question that cannot be cut (repair
+it, or carry it as written), or the sponsor demands a second push
+to the people who never opened (reminder waves at the usual price).
+Accepting sets up a **second wave** on the credits left in the same
+48; the pool never refills, and only wave 2's own actions are
+charged. Declining is free and makes the wave 1 result final. If
+you accept, the final verdict reads both waves together:
+completions and sends are summed for the response rate, quality
+and Insight are read from the final instrument's wave, and the BRD
+repairs, extras, and twist are re-checked against the instrument
+you end with. A lost wave 1 can be rescued, and a won one can be
+put at risk, by the choices the complication forces.
+
 The send costs 30 credits, the invitation costs 4, and the three
 BRD repairs cost 6. **Retry Challenge** starts fresh with the same cards;
 **Next Challenge** switches scenarios. Neither changes campaign

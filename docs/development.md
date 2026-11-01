@@ -192,6 +192,54 @@ deterministic seeds (`startQCWithVariant`), assert the sweep reaches
 all three variants per challenge, and assert the campaign BRD, gate,
 and floor carry no twist after leaving a challenge.
 
+Stage 3 adds the second wave: a complication round after the wave 1
+report. `quickComplicationDraw` draws from the run seed with the same
+machinery (`"qccomp|<index>|<seed>"`): about one run in four draws
+nothing; the rest draw one of three flavors (LIST REALITY, THE LATE
+QUESTION, SECOND PUSH). The draw lives on `state.quickChallenge`
+(`comp`, plus `wave`, `wave1`, `lateQid`, `compChoice` once played).
+Declining (`declineQuickComplication`) is free and leaves the wave 1
+report final. Accepting (`acceptQuickComplication`) freezes the pool
+at wave 1's launched configuration (baseline = the launched
+snapshot, `spentBefore` = wave 1's cost minus `QUICK_BASE_COST`), so
+wave 2 re-uses the batch already bought and `budgetMath` charges
+only wave 2's own actions (new edits, validation, reminder waves)
+under the same `BUDGET_TOTAL` guard; wave 1's ending goodwill and
+reputation carry, and `attempt` becomes 2 (re-send fatigue applies).
+
+- LIST REALITY: the segment is swapped for a clone at the true 9%
+  invalid rate (`QUICK_TRUE_INVALID`) and the provided validation is
+  voided (state and baseline reset to `skip`), so wave 2 buys its
+  own tier at book prices against the real list. Segment cards lock
+  for all of wave 2: the wave mails the wave 1 list as it stands.
+- THE LATE QUESTION: one defective bank card from `QUICK_LATE_POOL`
+  (rotating named sources: Legal, the sponsor, Support leadership,
+  Compliance; never a card the challenge already dealt) is appended
+  to the instrument. `cutBlockReason` returns `"late"` for it, so it
+  goes out repaired or as written; it is excluded from the scored
+  extras (`quickScoredExtras`) because its cost is carried in wave
+  2's quality and Insight numbers, not in a resolution rule.
+- SECOND PUSH: accepting presets `state.reminders = 1` (8 cr, −5
+  goodwill, the book's reminder-wave constants); a second wave can
+  be added in the invitation step. If the pool cannot fund the first
+  wave, the card says so and accept refuses.
+
+Wave 2 is a genuine second `buildRun` under the updated
+configuration (its `choiceKey` differs through the changed levers).
+`showReport`'s challenge branch records wave 1 (rate, quality,
+Insight, verdict, cost, tally counts) and, on the wave 2 report,
+computes the final verdict: the combined rate (both waves'
+completions over both waves' sends) against the effective target,
+wave 2's quality and Insight against their gates, and the
+structural rules plus `quickVariantCheck(combRate, quality)`
+against the final instrument. `showQuickFinalReport` prints wave 1,
+the complication and the choice made, wave 2, and the combined
+line. Balance follows from the stage-1 arithmetic (a complete
+instrument costs at least 43 of the 48) plus wave 2's invite line:
+tests prove a rescuing line per flavor inside the pool, a losing
+line per flavor, the audit-bar win flipped by a carried late card
+and held by its repair, and the unfunded-push refusal.
+
 Respondent reactions read existing events and question IDs. They draw no
 random numbers and change no simulation outcome. The live bubble is paced
 at most once per 2.5 seconds; report samples contain at most four distinct

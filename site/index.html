@@ -451,6 +451,7 @@
   .choicebtn span{font-size:13px;color:var(--dim);line-height:1.4;display:block}
   .choicebtn:disabled{opacity:.5;cursor:not-allowed}
   .dialogue{margin:12px 0;padding:12px;border-left:4px solid var(--gold);background:#141826;line-height:1.6}
+  #compCard .dialogue{color:#ffe9a3}
   .reaction{position:relative;margin:16px 0 10px;padding:14px 16px;border:3px solid var(--teal);border-radius:14px;background:var(--panel);min-height:92px;line-height:1.5;overflow-wrap:anywhere}
   .reaction b{display:block;color:var(--gold);font-size:13px}
   .reaction p{margin:4px 0;font-size:16px}
@@ -640,7 +641,7 @@
       <h2>MPOR</h2>
       <p>Master Plan of Record</p>
       <h3>QUICK CHALLENGE</h3>
-      <p>Six questions, 48 credits, one launch. The audience, list preparation, and Honest Ask invitation are provided. Three questions are the BRD cards: repair all three to win, and they cannot be cut. Three more arrived unrequested: repair or cut each one, because keeping an unresolved extra leaves the challenge unfinished. Sending costs 30 credits, the invitation costs 4, and the three BRD repairs cost 6 in total. Also reach response above 12%, quality 60+, and Insight 60+. Each run also draws one BRD twist from the run seed: a stakeholder demand (a named extra that must stay in the instrument and be repaired), a raised bar (a higher response threshold or a 95+ quality gate), or a time ceiling on the repaired instrument, read from its estimated minutes. The BRD names the twist and its acceptance line, the challenge banner repeats the acceptance line, and the report rules on whether the twist was met. Retry resets this challenge and draws a new brief; Next Challenge changes the six cards. Neither changes campaign progress.</p>
+      <p>Six questions, 48 credits, one launch. The audience, list preparation, and Honest Ask invitation are provided. Three questions are the BRD cards: repair all three to win, and they cannot be cut. Three more arrived unrequested: repair or cut each one, because keeping an unresolved extra leaves the challenge unfinished. Sending costs 30 credits, the invitation costs 4, and the three BRD repairs cost 6 in total. Also reach response above 12%, quality 60+, and Insight 60+. Each run also draws one BRD twist from the run seed: a stakeholder demand (a named extra that must stay in the instrument and be repaired), a raised bar (a higher response threshold or a 95+ quality gate), or a time ceiling on the repaired instrument, read from its estimated minutes. The BRD names the twist and its acceptance line, the challenge banner repeats the acceptance line, and the report rules on whether the twist was met. Most runs also draw a complication after the first report (a staler list than the brief stated, a question added by a stakeholder, or a sponsor demanding a second push): accept it and a follow-up wave is set up on the credits left in the same 48, or decline it and the first result stands. The final verdict then reads both waves together. Retry resets this challenge and draws a new brief; Next Challenge changes the six cards. Neither changes campaign progress.</p>
       <h3>RESPONDENT REACTIONS</h3>
       <p>Speech bubbles illustrate events in the simulation, such as guessing, a DK/NA escape, or encountering a defective question. They are not real customer quotes and do not change scores. Only a few bubbles appear at a readable pace. The report keeps a short selection, even if you skip the animation.</p>
       <h3>STAKEHOLDER ENCOUNTERS</h3>
@@ -1102,6 +1103,149 @@ function quickVariantCheck(rate, quality){
   }
   return { met:true, detail:"" };
 }
+/* ================= QUICK CHALLENGE STAGE 3 · THE SECOND WAVE ==========
+   After a challenge's first report, a complication may land: an event
+   the wave 1 brief did not promise. The draw reuses the run seed's
+   machinery ("qccomp|<index>|<seed>"), so a seed always deals the
+   same complication and tests can pin one by scanning seeds. About
+   one run in four stays clean. Accepting opens a wave 2 setup on the
+   SAME 48-credit pool: the pool never refills, and wave 2's accounting
+   credits back QUICK_BASE_COST (the batch its send and invite already
+   bought) so only wave 2's own actions are charged on top of wave 1:
+   validation tiers, reminder waves, card repairs and cuts, all at the
+   price book's prices, all enforced by budgetMath as usual. Wave 2 is
+   a genuine second run through buildRun under the updated
+   configuration. The final verdict sums both waves' completions and
+   sends for the response rate, reads quality and Insight from the
+   final instrument's wave, and re-checks the BRD repairs, the scored
+   extras, and the drawn twist against the final instrument state.
+   Declining is free and leaves the wave 1 report as the final result. */
+var QUICK_TRUE_INVALID = 0.09; /* LIST REALITY: the extract behind the send was nine months old, so the list really runs 9% invalid, not the brief's stated 3%. */
+var QUICK_LATE_POOL = [
+  { qid:52, source:"Legal", ask:"The case where a customer shared their password with an agent is the exact behaviour the audit asks about, and wave 1 never asked it. This question goes in." },
+  { qid:8, source:"The sponsor", ask:"Wave 1 counted satisfaction but never separated knowing the answer from saying it kindly. Both halves matter to the read-out. Add the question that asks them." },
+  { qid:15, source:"Support leadership", ask:"Staffing needs the organisation-size split from this study, not a separate ask next month. Put the size question in." },
+  { qid:5, source:"Compliance", ask:"The audit pack needs the contract value behind these cases tied to the responses. Add the value question before the pack closes." }
+];
+function quickComplicationDraw(index, seedStr){
+  var rng = mulberry(hashStr("qccomp|" + index + "|" + seedStr));
+  if (rng() >= 0.75) return null; /* roughly one run in four draws no complication */
+  var flavors = ["list", "late", "wave"];
+  var flavor = flavors[Math.floor(rng() * flavors.length)];
+  var comp = { flavor: flavor };
+  if (flavor === "late"){
+    var dealt = QUICK_CHALLENGES[index].ids.concat(QUICK_CHALLENGES[index].extras);
+    var pool = QUICK_LATE_POOL.filter(function(e){ return dealt.indexOf(e.qid) === -1; });
+    var pick = pool[Math.floor(rng() * pool.length)];
+    comp.qid = pick.qid; comp.source = pick.source; comp.ask = pick.ask;
+  }
+  return comp;
+}
+function quickComplication(){
+  return state.quickChallenge ? state.quickChallenge.comp : null;
+}
+/* The extras the verdict scores: every non-core card except the late
+   complication card, whose cost is carried in wave 2's numbers rather
+   than in a resolution rule. Identical to "all non-core cards"
+   whenever no late card is in play. */
+function quickScoredExtras(){
+  var qc = state.quickChallenge;
+  return activeQuestions().filter(function(q){ return !q.core && (!qc || q.id !== qc.lateQid); });
+}
+function quickComplicationTitle(comp){
+  if (!comp) return "";
+  if (comp.flavor === "list") return "THE LIST WAS OLDER THAN THE BRIEF";
+  if (comp.flavor === "late") return "ONE MORE QUESTION, NON-NEGOTIABLE";
+  return "THE SPONSOR WANTS A SECOND PUSH";
+}
+function quickComplicationCardHTML(){
+  var qc = state.quickChallenge, comp = qc && qc.comp;
+  if (!comp || qc.wave !== 1 || qc.compChoice) return "";
+  var remaining = QUICK_BUDGET - (state.launchCost || 0);
+  var head = '<div class="reportcard" id="compCard"><h2>COMPLICATION · ' + quickComplicationTitle(comp) + '</h2>';
+  var foot = '<p style="font-size:14px;color:var(--dim);margin-top:8px">Accepting spends only what is left of the 48 credits; the pool does not refill. Declining is free and makes the wave 1 result final.</p></div>';
+  function buttons(acceptLabel){
+    return '<div class="againrow"><button class="againbtn" id="compAccept">' + acceptLabel + '</button>' +
+      '<button class="againbtn" id="compDecline">DECLINE · WAVE 1 STANDS</button></div>';
+  }
+  if (comp.flavor === "list"){
+    return head +
+      '<div class="dialogue"><b>LIST OPS:</b> "That bounce profile is not a last-quarter list. We traced the extract: it was pulled nine months ago. The addresses that died in between were never going to arrive."</div>' +
+      '<p style="font-size:15.5px">Wave 1 was mailed against the brief\'s stated 3% invalid, and its report stands. The list as it really is runs <b>9% invalid</b>. A second wave faces the real list. Re-validate it in the prep step at the book prices (partial 6 cr, full 12 cr): the provided validation was run against the stated extract, so it does not carry. Or mail the wave raw and let the bounces land where they land.</p>' +
+      (remaining < 6 ? '<p style="font-size:15px;color:var(--gold)"><b>Pool check:</b> ' + remaining + ' credits left, so even partial re-validation (6 cr) is out of reach. Accepting mails the raw list.</p>' : '') +
+      buttons("SET UP WAVE 2 · FACE THE REAL LIST") + foot;
+  }
+  if (comp.flavor === "late"){
+    var lq = questionById(comp.qid), lv = fixVerbFor(lq), lc = fixCostFor(lq);
+    return head +
+      '<div class="dialogue"><b>' + comp.source.toUpperCase() + ':</b> "' + comp.ask + '"</div>' +
+      '<p style="font-size:15.5px">Q' + comp.qid + ' joins the instrument for wave 2, as drafted: <b>"' + lq.text + '"</b> It carries a ' + defectOf(lq) + ' defect. ' +
+      (lv ? 'Repair it in the questionnaire step (' + lv + ' · ' + lc + ' cr), or carry it as written and let wave 2\'s numbers show what it costs.' : 'There is no wording fix for ' + defectOf(lq) + ': carry it as written, or buy the DK/NA escapes (2 cr) so respondents can say they do not know instead of guessing.') +
+      ' It cannot be cut: ' + comp.source + ' asked for it by name.</p>' +
+      buttons("ADD Q" + comp.qid + " · SET UP WAVE 2") + foot;
+  }
+  var canFund = remaining >= 8;
+  return head +
+    '<div class="dialogue"><b>THE SPONSOR:</b> "We are close, and the read-out is Thursday. Mail the people who never opened again before this goes cold."</div>' +
+    '<p style="font-size:15.5px">The second push fields as reminder waves on a fresh pass over the list: one wave is set when you accept (<b>8 cr, −5 goodwill</b>, the book price for a reminder wave), and a second can be added in the invitation step (8 cr, −5 more) if the pool stretches. The wave re-runs the send with the waves live, so the people who never opened get their extra chances.</p>' +
+    (canFund ? '' : '<p style="font-size:15px;color:var(--gold)"><b>Pool check:</b> the push costs 8 credits and ' + remaining + ' are left. This one cannot be funded; declining is free.</p>') +
+    '<div class="againrow"><button class="againbtn" id="compAccept"' + (canFund ? '' : ' disabled title="The second push costs 8 credits; ' + remaining + ' remain"') + '>SET UP WAVE 2 · SECOND PUSH (8 CR)</button>' +
+    '<button class="againbtn" id="compDecline">DECLINE · WAVE 1 STANDS</button></div>' +
+    '<p style="font-size:14px;color:var(--dim);margin-top:8px">Accepting spends only what is left of the 48 credits; the pool does not refill. Declining is free and makes the wave 1 result final.</p></div>';
+}
+/* Declining is free and changes nothing else: the wave 1 report
+   already on screen stands as the final result, and the card is
+   replaced by the record of the decision. */
+function declineQuickComplication(){
+  var qc = state.quickChallenge;
+  if (!qc || !qc.comp || qc.wave !== 1 || qc.compChoice) return false;
+  qc.compChoice = "declined";
+  var card = $("compCard");
+  if (card) card.innerHTML = '<h2>COMPLICATION · DECLINED</h2><p style="font-size:15.5px">' + quickComplicationTitle(qc.comp) + ' was declined. Nothing was charged, and the wave 1 result above stands as the final result.</p>';
+  sndClick();
+  return true;
+}
+/* Accepting opens the wave 2 setup on the same pool. Accounting: the
+   pool position is frozen at wave 1's launched configuration
+   (baseline = the launched snapshot, spentBefore = wave 1's cost
+   minus QUICK_BASE_COST), so wave 2 charges only what it changes:
+   new edits, validation it buys, reminder waves it fields, priced by
+   budgetMath as usual and capped by the same BUDGET_TOTAL guard. */
+function acceptQuickComplication(){
+  var qc = state.quickChallenge;
+  if (!qc || !qc.comp || qc.wave !== 1 || qc.compChoice) return false;
+  var comp = qc.comp;
+  if (comp.flavor === "wave" && QUICK_BUDGET - (state.launchCost || 0) < 8){ sndError(); return false; }
+  qc.compChoice = "accepted";
+  qc.wave = 2;
+  state.attempt = 2;
+  state.spentBefore = (state.launchCost || 0) - QUICK_BASE_COST;
+  state.baseline = state.launchedSnapshot || snapshotCurrent();
+  if (comp.flavor === "list"){
+    /* The real list replaces the brief's stated one for wave 2, and
+       the provided validation is void: it was run against the stated
+       extract. Wave 2 starts unvalidated and buys its own tier. */
+    state.seg = Object.assign({}, state.seg, { invalidPct: QUICK_TRUE_INVALID, lastCleaned: "Nine months old (revealed after wave 1)" });
+    state.validation = "skip";
+    state.baseline = Object.assign({}, state.baseline, { validation: "skip" });
+  }
+  if (comp.flavor === "late"){
+    var lq = questionById(comp.qid);
+    state.instrument = activeQuestions().concat([Object.assign({}, lq)]);
+    qc.lateQid = comp.qid;
+    if (state.qstate[comp.qid] === undefined) state.qstate[comp.qid] = "keep";
+  }
+  if (comp.flavor === "wave"){
+    state.reminders = 1; /* the sponsor's push: one wave set, a second can be added in the invitation step */
+  }
+  state.reportShown = false;
+  $("report").style.display = "none";
+  $("setup").style.display = "block";
+  renderLevelUI(); renderSegments(); renderInvites(); renderQuestions(); renderPrep(); renderReadout();
+  setMusicVariant("setup");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  return true;
+}
 var quickSession = null;
 var GRADE_RANK = { "S":5, "A":4, "B":3, "C":2, "TRY AGAIN":1 };
 QUESTIONS.forEach(function(q){ state.qstate[q.id] = "keep"; });
@@ -1491,7 +1635,11 @@ function renderBudget(){
   var el = $("budgetPanel"); if (!el) return;
   var b = budgetMath();
   if (state.quickChallenge){
-    el.innerHTML = '<b>QUICK CHALLENGE · ' + QUICK_BUDGET + ' CR</b><p>Send 30 + Honest Ask 4 + card edits ' + (b.attemptCost - QUICK_BASE_COST) + ' = <b>' + b.attemptCost + ' credits</b> · <b>' + b.remaining + ' left</b></p><p>List preparation is provided. One launch; retry starts fresh.</p>';
+    if (state.quickChallenge.wave === 2 && state.quickChallenge.wave1){
+      el.innerHTML = '<b>QUICK CHALLENGE · WAVE 2 · ' + QUICK_BUDGET + ' CR POOL</b><p>Wave 1 spent <b>' + state.quickChallenge.wave1.cost + ' credits</b>. The follow-up wave re-uses the batch already bought, so this wave charges only its actions: <b>' + (b.attemptCost - QUICK_BASE_COST) + ' credits</b> · <b>' + b.remaining + ' left</b> in the pool.</p><p>The pool does not refill. Retry starts the challenge fresh.</p>';
+      return;
+    }
+    el.innerHTML = '<b>QUICK CHALLENGE · ' + QUICK_BUDGET + ' CR</b><p>Send 30 + Honest Ask 4 + card edits ' + (b.attemptCost - QUICK_BASE_COST) + ' = <b>' + b.attemptCost + ' credits</b> · <b>' + b.remaining + ' left</b></p><p>List preparation is provided. One launch, plus one follow-up wave if a complication lands after the report; retry starts fresh.</p>';
     return;
   }
   function col(items, sub, title){
@@ -1553,7 +1701,8 @@ function renderLevelUI(){
   if (state.quickChallenge){
     var tv = quickVariant();
     hl.textContent = "QUICK CHALLENGE · " + L.name;
-    lb.innerHTML = '<div class="lever"><h2>' + L.name + '</h2><p>Repair the three BRD cards for the prepared Fresh audience and Honest Ask invitation. Three more questions arrived that the BRD never asked for: repair or cut each one. Also reach response above ' + targetPct(L.target) + '%, quality ' + quickQualityGate() + '+, and Insight ' + insightGate() + '+.</p>' + (tv ? '<p><b>BRD TWIST · ' + tv.name + ':</b> ' + tv.acceptance + '</p>' : '') + '<p><b>AGENDA:</b> ' + agendaTopics().join(" · ") + '</p></div>';
+    lb.innerHTML = '<div class="lever"><h2>' + L.name + '</h2><p>Repair the three BRD cards for the prepared Fresh audience and Honest Ask invitation. Three more questions arrived that the BRD never asked for: repair or cut each one. Also reach response above ' + targetPct(L.target) + '%, quality ' + quickQualityGate() + '+, and Insight ' + insightGate() + '+.</p>' + (tv ? '<p><b>BRD TWIST · ' + tv.name + ':</b> ' + tv.acceptance + '</p>' : '') + '<p><b>AGENDA:</b> ' + agendaTopics().join(" · ") + '</p>' +
+      (state.quickChallenge.wave === 2 ? '<p><b>WAVE 2 · COMPLICATION: ' + quickComplicationTitle(state.quickChallenge.comp) + '.</b> Same pool, no refill: wave 1 spent ' + (state.quickChallenge.wave1 ? state.quickChallenge.wave1.cost : 0) + ' of the 48 credits. The final verdict reads both waves together.</p>' : '') + '</div>';
   }
   // level grid
   var grid=$("levelGrid"); if(grid){ grid.innerHTML=LEVELS.map(function(lv){ var locked=lv.id>state.unlocked; var best=state.campaignBest[lv.id]; return '<button class="lvlcard'+(locked?" locked":"")+(lv.id===state.level?" sel":"")+'" data-level="'+lv.id+'" '+(locked?"disabled":"")+'>'+'<div class="ln">LEVEL '+lv.id+' · '+lv.difficulty+(locked?" · 🔒 LOCKED":"")+'</div><h3>'+lv.name+'</h3><p>'+lv.desc+'</p>'+(best?'<div class="best">BEST: '+best+'</div>':"")+'</button>';}).join("");
@@ -1661,7 +1810,11 @@ function startQuickChallenge(index, seedStr){
   var topics = challenge.ids.map(function(id){
     return QUESTION_BANK.filter(function(item){ return item.id === id; })[0].topic;
   }).filter(function(topic,i,all){return all.indexOf(topic)===i;});
-  state.quickChallenge = { index:index, name:challenge.name, topics:topics, coreIds:challenge.ids.slice(), extraIds:challenge.extras.slice(), seed:runSeed, variant:variantIndex };
+  state.quickChallenge = { index:index, name:challenge.name, topics:topics, coreIds:challenge.ids.slice(), extraIds:challenge.extras.slice(), seed:runSeed, variant:variantIndex,
+    /* Stage 3: the complication is drawn from the same run seed and
+       revealed only at the wave 1 report. wave/wave1/lateQid carry
+       the second-wave round once accepted. */
+    comp:quickComplicationDraw(index, runSeed), wave:1, wave1:null, lateQid:null, compChoice:null };
   state.instrumentSeed = "QC0" + (index+1); state.lastRound = null;
   state.seg = SEGMENTS[0]; state.invite = INVITES[1]; state.reminders = 0;
   state.validation = "full"; state.dedupe = true; state.suppression = true;
@@ -1699,6 +1852,10 @@ function renderSegments(){
     }).join("");
     var gwCls = sg.goodwill >= 65 ? "" : (sg.goodwill >= 55 ? "low" : "crit");
     var lockedSeg = state.chainActive && state.seg.id !== sg.id;
+    /* Wave 2 of a Quick Challenge mails the wave 1 list as it now
+       stands (a LIST REALITY reveal may have replaced it), so every
+       segment card locks, the current one included. */
+    if (state.quickChallenge && state.quickChallenge.wave === 2) lockedSeg = true;
     var cantSeg = lockedSeg || (state.seg.id !== sg.id && budgetChangeBlocked({seg: sg}));
     return '<button class="card' + (state.seg.id === sg.id ? " sel" : "") + '" data-seg="' + sg.id + '"' + (cantSeg ? " disabled title=\"" + (lockedSeg ? "Segment locked during an attempt chain. Start a New Game to change segment." : "Not enough budget in the remaining pool for this send") + "\"" : "") + '>' + (lockedSeg ? '<div style="font-size:12px;color:var(--gold);font-weight:700">LOCKED · ATTEMPT CHAIN IN PROGRESS</div>' : "") + '<div class="budget-warning" style="font-size:12px;color:var(--red);font-weight:700"'+(!lockedSeg && cantSeg ? "" : " hidden")+'>NOT ENOUGH BUDGET FOR THIS SEND</div>' +
       '<div class="pxname">' + sg.name.toUpperCase() + (sg.trap ? '<span class="trap">RISK</span>' : "") + '</div>' +
@@ -1834,6 +1991,11 @@ function questionById(id){
 function cutBlockReason(q){
   if (!q) return "unknown";
   if (q.core) return "core";
+  /* A late complication card goes out in wave 2, repaired or as
+     written: the stakeholder who added it asked for it by name, so
+     its cut is refused in the action path like a required card. */
+  var qcLate = state.quickChallenge;
+  if (qcLate && qcLate.wave === 2 && qcLate.lateQid === q.id) return "late";
   if (keptQuestions().length <= instrumentFloor()) return "floor";
   /* A mandatory BRD-twist extra is required by this run's brief: it
      must stay in the instrument and be repaired, so its cut is refused
@@ -1851,7 +2013,7 @@ function applyCut(qid){
 function cutButtonHtml(q){
   var reason = cutBlockReason(q);
   if (!reason) return '<button class="qbtn" data-q="' + q.id + '" data-act="cut"><span class="qlabel">CUT</span><span class="qprice"> \u00B7 1</span></button>';
-  var why = reason === "core" ? "Core questions cannot be cut" : reason === "required" ? "Required by this run's BRD twist: keep it and repair it" : "Minimum instrument reached: at least " + instrumentFloor() + " questions must be kept";
+  var why = reason === "core" ? "Core questions cannot be cut" : reason === "required" ? "Required by this run's BRD twist: keep it and repair it" : reason === "late" ? "Added after wave 1 by a stakeholder who asked for it by name: it goes out in wave 2, repaired or as written" : "Minimum instrument reached: at least " + instrumentFloor() + " questions must be kept";
   return '<button class="qbtn" data-q="' + q.id + '" data-act="cut" disabled title="' + why + '" aria-label="Cut unavailable: ' + why + '"><span class="qlabel">CUT</span><span class="qprice"> \u00B7 1</span></button>';
 }
 function renderQuestions(){
@@ -1876,6 +2038,8 @@ function renderQuestions(){
     var tvq = quickVariant();
     var isRequired = !!(tvq && tvq.type === "mandatory" && tvq.qid === q.id);
     if (isRequired) tags += '<span class="tag core">BRD REQUIRED</span>';
+    var isLate = !!(state.quickChallenge && state.quickChallenge.lateQid === q.id);
+    if (isLate) tags += '<span class="tag core">LATE · REQUIRED</span>';
     if (tier === "stupid") tags += '<span class="tag stupid">TURN-OFF RISK</span>' + (q.dup ? '<span class="tag stupid">REDUNDANT</span>' : "");
     else if (tier === "filler") tags += '<span class="tag filler">LOW VALUE</span>';
     else if (d === "CLEAN") tags += '<span class="tag" style="color:var(--blue);border-color:var(--blue)">CLEAN CONTROL</span>';
@@ -1909,7 +2073,8 @@ function renderQuestions(){
               : (d !== "CLEAN" ? '<button class="qbtn wide" disabled title="No wording fix exists for this class">NO WORDING FIX</button>' : "")) +
         cutButtonHtml(q) + '</div>' +
         (q.core ? '<div class="cutlock">LOCKED \u00B7 CORE \u00B7 CANNOT BE CUT</div>' : '') +
-        (isRequired ? '<div class="cutlock">LOCKED \u00B7 REQUIRED BY THE BRD TWIST \u00B7 CANNOT BE CUT</div>' : '');
+        (isRequired ? '<div class="cutlock">LOCKED \u00B7 REQUIRED BY THE BRD TWIST \u00B7 CANNOT BE CUT</div>' : '') +
+        (isLate ? '<div class="cutlock">LOCKED \u00B7 ADDED AFTER WAVE 1 \u00B7 CANNOT BE CUT</div>' : '');
     }
     return html + "</div>";
   }).join("");
@@ -2057,7 +2222,7 @@ $("soundBtn").addEventListener("click", function(){
 function openBRD(){
   var L = curLevel(), quick = !!state.quickChallenge;
   var tv = quick ? quickVariant() : null;
-  var constraints = quick ? "Repair the three BRD cards and resolve the three unrequested extras within " + L.budget + " credits; one launch. Three questions in this drill were not asked for in this BRD: treat them as scope creep and judge each on its merits. The Fresh audience, full validation, dedupe, suppression, and Honest Ask invitation with no reminders are provided. Retry starts fresh without changing campaign progress." :
+  var constraints = quick ? "Repair the three BRD cards and resolve the three unrequested extras within " + L.budget + " credits; one launch. If a complication lands after the report, one follow-up wave may be mailed from the same pool, which does not refill. Three questions in this drill were not asked for in this BRD: treat them as scope creep and judge each on its merits. The Fresh audience, full validation, dedupe, suppression, and Honest Ask invitation with no reminders are provided. Retry starts fresh without changing campaign progress." :
     "One credit pool for the whole level, shared across attempts. Choose an audience that can answer the required topics. Preserve useful coverage while controlling burden and data contamination.";
   if (!quick && state.level === 2) constraints += " A/B testing is available: compare different invitations and report uncertainty rather than assuming a winner.";
   if (!quick && (state.level === 3 || state.level === 6)) constraints += " Resolve the stakeholder request for eight extra questions. Costs and added burden depend on your response; extra-topic answers are not simulated or scored.";
@@ -2067,7 +2232,7 @@ function openBRD(){
   $("brdContent").innerHTML = '<h2>BRD</h2><p>Business Requirement Document</p><h3>'+L.name+(quick?"":" · "+L.difficulty)+'</h3><h3>STUDY PURPOSE</h3><p>Collect credible answers on the required business topics below. A high response rate alone does not establish useful evidence.</p><h3>REQUIRED TOPICS AND RESPONDENTS</h3><ul>'+agendaTopics().map(function(topic){
     var personas=(TOPIC_KEYS[topic]||[]).map(function(key){return PERSONAS[key].name;}).join(" or ");
     return '<li><b>'+topic+'</b>: credible answers from '+personas+'.</li>';
-  }).join("")+'</ul><h3>ACCEPTANCE CRITERIA</h3><ul><li>Response strictly above '+targetPct(L.target)+'% of invitations actually sent.</li><li>Data quality '+quickQualityGate()+' and Insight '+insightGate()+'+.</li><li>Budget: '+L.budget+' credits'+(quick?' for one launch.':' across all attempts.')+'</li>'+(!quick && state.level===4?'<li>Maintain ending goodwill 35 or higher.</li>':"")+(quick?'<li>Repair all three BRD cards and resolve each extra by repair or cut; kept unresolved extras and cuts of BRD cards do not complete the challenge.</li>':"")+(tv?'<li>Twist · '+tv.name+': '+tv.acceptance+'</li>':"")+'</ul><h3>STUDY CONSTRAINTS</h3><p>'+constraints+'</p>'+(tv?'<h3>BRD TWIST · '+tv.name+'</h3><p>'+tv.brief+'</p><p>Drawn for this run from seed <b>'+state.quickChallenge.seed+'</b> with the same seeded draw that deals the instruments: the same seed always deals the same brief. A retry draws a new brief.</p>':"")+'<p>These are the active study requirements, not a forecast. Consult MPOR for game rules, scoring definitions, and simulation limitations.</p>';
+  }).join("")+'</ul><h3>ACCEPTANCE CRITERIA</h3><ul><li>Response strictly above '+targetPct(L.target)+'% of invitations actually sent.</li><li>Data quality '+quickQualityGate()+' and Insight '+insightGate()+'+.</li><li>Budget: '+L.budget+' credits'+(quick?' for one launch, plus a follow-up wave if a complication lands.':' across all attempts.')+'</li>'+(!quick && state.level===4?'<li>Maintain ending goodwill 35 or higher.</li>':"")+(quick?'<li>Repair all three BRD cards and resolve each extra by repair or cut; kept unresolved extras and cuts of BRD cards do not complete the challenge.</li>':"")+(tv?'<li>Twist · '+tv.name+': '+tv.acceptance+'</li>':"")+'</ul><h3>STUDY CONSTRAINTS</h3><p>'+constraints+'</p>'+(tv?'<h3>BRD TWIST · '+tv.name+'</h3><p>'+tv.brief+'</p><p>Drawn for this run from seed <b>'+state.quickChallenge.seed+'</b> with the same seeded draw that deals the instruments: the same seed always deals the same brief. A retry draws a new brief.</p>':"")+'<p>These are the active study requirements, not a forecast. Consult MPOR for game rules, scoring definitions, and simulation limitations.</p>';
   openReference("studyBRD", "brdClose", "brdBtn");
 }
 var activeReference = null;
@@ -2959,6 +3124,69 @@ function bounceBacksHTML(bb){
    defective extra by its class-correct repair or a cut, a low-value
    (stupid or filler) extra by a cut, a clean extra by keeping or cutting
    it. Keeping an unresolved extra never completes the challenge. */
+/* Stage 3 final report: the two-wave verdict. Wave 1 is quoted from
+   its own report; the complication and the choice made are named; the
+   combined response rate sums both waves' sprites, and quality and
+   Insight are the final instrument's wave, which is the dataset the
+   study ends with. The verdict itself was computed in showReport. */
+function showQuickFinalReport(run, c, rate, quality, ins, won){
+  var qc = state.quickChallenge, w1 = qc.wave1, comp = qc.comp;
+  var index = qc.index;
+  var combCompleted = w1.completed + c.completed, combSent = w1.sent + c.sent;
+  var combRate = combSent ? combCompleted / combSent : 0;
+  var totalSpent = state.spentBefore + (state.launchCost || 0);
+  var repaired = quickCoreQuestions().filter(function(q){ return state.qstate[q.id] === "simplify"; }).length;
+  var extras = quickScoredExtras();
+  var resolved = extras.filter(quickExtraResolved).length;
+  var tv = quickVariant();
+  var tcheck = quickVariantCheck(combRate, quality);
+  var twistLine = tv ? '<p>BRD twist · <b>' + tv.name + '</b>: ' + tv.acceptance + ' — <b>' + (tcheck.met ? "MET" : "NOT MET") + '</b> (' + tcheck.detail + ')</p>' : '';
+  var compLine;
+  if (comp.flavor === "list"){
+    compLine = 'The list really ran 9% invalid. Wave 2 mailed it ' + (state.validation === "skip" ? 'raw, with no re-validation bought' : 'after re-validation (' + state.validation + ', ' + validationCostFor(state.seg, state.validation) + ' cr)') + '.';
+  } else if (comp.flavor === "late"){
+    var lq = questionById(comp.qid);
+    compLine = comp.source + ' added Q' + comp.qid + ' (' + defectOf(lq) + ') after wave 1. ' +
+      (state.qstate[comp.qid] === "simplify" ? 'It went out repaired with ' + fixVerbFor(lq) + '.' : 'It went out as written, and its defect rode along in wave 2.');
+  } else {
+    compLine = 'The sponsor\'s second push fielded ' + state.reminders + ' reminder wave' + (state.reminders === 1 ? '' : 's') + ' over the wave 2 pass.';
+  }
+  var lateLine = '';
+  if (comp.flavor === "late"){
+    var lq2 = questionById(comp.qid);
+    lateLine = '<p><b>LATE Q' + comp.qid + ' · ' + defectOf(lq2) + ':</b> ' + (state.qstate[comp.qid] === "simplify" ? 'Repaired with ' + fixVerbFor(lq2) + ' before wave 2' : 'Carried as written into wave 2') + '</p>';
+  }
+  $("report").innerHTML = '<div class="reportcard"><h2>QUICK CHALLENGE · ' + (won ? "WON" : "TRY ANOTHER REPAIR") + ' · FINAL</h2>' +
+    '<p>' + qc.name + ' · two waves · ' + totalSpent + ' / ' + QUICK_BUDGET + ' credits</p>' +
+    '<p><b>WAVE 1</b> · Response <b>' + pct(w1.rate * 100) + '</b> · Quality <b>' + w1.quality + '</b> · Insight <b>' + w1.insight + '</b> · ' + (w1.won ? 'WON' : 'NOT WON') + ' · ' + w1.cost + ' credits · ' + w1.completed + ' of ' + w1.sent + ' sent sprites completed</p>' +
+    '<p><b>COMPLICATION · ' + quickComplicationTitle(comp) + '</b> · ' + compLine + '</p>' +
+    '<p><b>WAVE 2</b> · Response <b>' + pct(rate * 100) + '</b> · Quality <b>' + quality + '</b> · Insight <b>' + ins.score + '</b> · ' + c.completed + ' of ' + c.sent + ' sent sprites completed</p>' +
+    '<p><b>COMBINED</b> · Response <b>' + pct(combRate * 100) + '</b> across both waves (' + combCompleted + ' of ' + combSent + ' sends; bar above ' + targetPct(curLevel().target) + '%) · Quality <b>' + quality + '</b> (' + quickQualityGate() + '+) · Insight <b>' + ins.score + '</b> (' + insightGate() + '+), read from the final instrument\'s wave</p>' +
+    '<p>BRD card repairs <b>' + repaired + ' / 3</b> (all three required) · Extras resolved <b>' + resolved + ' / ' + extras.length + '</b> (repair or cut each one)</p>' + twistLine + lateLine +
+    activeQuestions().filter(function(q){ return q.id !== qc.lateQid; }).map(function(q){
+      var st = state.qstate[q.id];
+      var kind = tierOf(q) === "stupid" ? "LOW-VALUE" : tierOf(q) === "filler" ? "FILLER" : defectOf(q);
+      var verdict;
+      if (q.core) verdict = st === "simplify" ? "Repaired with " + fixVerbFor(q) : st === "cut" ? "Cut; repair still required" : "Kept unrepaired";
+      else if (tv && tv.type === "mandatory" && tv.qid === q.id) verdict = st === "simplify" ? "Resolved with " + fixVerbFor(q) + "; the BRD twist required it" : st === "cut" ? "Cut; the BRD twist required this one kept and repaired" : "Kept unrepaired; the BRD twist requires its repair";
+      else if (st === "simplify") verdict = "Resolved with " + fixVerbFor(q);
+      else if (st === "cut") verdict = "Cut; unrequested scope removed";
+      else if (quickExtraResolved(q)) verdict = "Kept; already sound";
+      else if (tierOf(q) === "stupid" || tierOf(q) === "filler") verdict = "Kept; cut this low-value item";
+      else verdict = "Kept unresolved; repair or cut it";
+      return '<p><b>' + (q.core ? "BRD" : "EXTRA") + ' Q' + q.id + ' · ' + kind + ':</b> ' + verdict + '</p>';
+    }).join("") +
+    ins.topics.map(function(topic){ return '<p><b>' + topic.topic + ':</b> ' + topic.status + '</p>'; }).join("") +
+    '<p>' + (won ? "Two waves, one pool, and the verdict held: the complication was absorbed without breaking the brief." : "The final verdict reads both waves together. Wave 1 alone does not settle it; check which line above fell short.") + '</p></div>' +
+    reactionReportHTML(run) +
+    '<div class="againrow"><button class="againbtn" id="quickRetry">RETRY CHALLENGE</button><button class="againbtn" id="quickNext">NEXT CHALLENGE</button><button class="againbtn" id="quickBack">BACK TO LEVELS</button></div>';
+  $("runStage").style.display = "none"; $("report").style.display = "block";
+  $("quickRetry").addEventListener("click", function(){ sndCoin(); startQuickChallenge(index); });
+  $("quickNext").addEventListener("click", function(){ sndCoin(); startQuickChallenge((index + 1) % QUICK_CHALLENGES.length); });
+  $("quickBack").addEventListener("click", function(){ sndClick(); leaveQuickChallenge(); });
+  if (won) sndFanfare(); else sndSad();
+  setMusicVariant("setup"); window.scrollTo({ top: 0, behavior: "smooth" });
+}
 function quickCoreQuestions(){ return activeQuestions().filter(function(q){ return q.core; }); }
 function quickExtraResolved(q){
   var st = state.qstate[q.id];
@@ -3018,11 +3246,30 @@ function showReport(){
     /* The challenge verdict, recomputed on its own terms: the run's
        effective bars (a ratebar twist raises targetRate through
        curLevel; an audit twist raises the quality gate), every BRD
-       card repaired, every extra resolved, and the drawn twist met. */
-    won = respRate > targetRate && quality >= quickQualityGate() && insight >= insightGate()
-      && quickCoreQuestions().every(function(q){return state.qstate[q.id] === "simplify";})
-      && activeQuestions().filter(function(q){return !q.core;}).every(quickExtraResolved)
-      && quickVariantCheck(respRate, quality).met;
+       card repaired, every scored extra resolved, and the drawn
+       twist met. On a wave 2 report the rate is the combined rate
+       across both waves and the twist is checked against it, while
+       quality and Insight describe the final instrument's wave. */
+    var qcVerdict = state.quickChallenge;
+    var structuralMet = quickCoreQuestions().every(function(q){return state.qstate[q.id] === "simplify";})
+      && quickScoredExtras().every(quickExtraResolved);
+    if (qcVerdict.wave === 2 && qcVerdict.wave1){
+      var combRate = (qcVerdict.wave1.completed + c.completed) / Math.max(1, qcVerdict.wave1.sent + c.sent);
+      won = combRate > targetRate && quality >= quickQualityGate() && insight >= insightGate()
+        && structuralMet && quickVariantCheck(combRate, quality).met;
+    } else {
+      won = respRate > targetRate && quality >= quickQualityGate() && insight >= insightGate()
+        && structuralMet && quickVariantCheck(respRate, quality).met;
+      if (!qcVerdict.wave1){
+        /* Record wave 1 for a possible second wave, and carry its
+           ending goodwill and reputation the way a campaign attempt
+           chain does, so wave 2 starts from wave 1's list health. */
+        qcVerdict.wave1 = { rate: respRate, quality: quality, insight: insight, won: won,
+                            cost: state.launchCost || 0, completed: c.completed, sent: c.sent };
+        state.goodwillCarry = Math.max(0, gm.ending);
+        state.repCarry = repMath().after;
+      }
+    }
     showQuickReport(run,c,respRate,quality,ins,won); return;
   }
   var grade;
@@ -3269,6 +3516,7 @@ function showReport(){
       "Biggest recoverable leak: <b>" + questDrop.gate + "</b>, about " + fmt(questDrop.n) + " simulated people, mostly " + PERSONAS[qp].lower + "s. " + questDrop.quest + "</div></div>";
   }
   function showQuickReport(run,c,rate,quality,ins,won){
+    if (state.quickChallenge.wave === 2 && state.quickChallenge.wave1){ showQuickFinalReport(run,c,rate,quality,ins,won); return; }
     var index=state.quickChallenge.index;
     var repaired = quickCoreQuestions().filter(function(q){return state.qstate[q.id] === "simplify";}).length;
     var extras = activeQuestions().filter(function(q){return !q.core;});
@@ -3276,7 +3524,7 @@ function showReport(){
     var tv = quickVariant();
     var tcheck = quickVariantCheck(rate, quality);
     var twistLine = tv ? '<p>BRD twist · <b>' + tv.name + '</b>: ' + tv.acceptance + ' — <b>' + (tcheck.met ? "MET" : "NOT MET") + '</b> (' + tcheck.detail + ')</p>' : '';
-    $("report").innerHTML='<div class="reportcard"><h2>QUICK CHALLENGE · '+(won?"WON":"TRY ANOTHER REPAIR")+'</h2><p>'+state.quickChallenge.name+' · one launch · '+state.launchCost+' / '+QUICK_BUDGET+' credits</p><p>BRD card repairs <b>'+repaired+' / 3</b> (all three required) · Extras resolved <b>'+resolved+' / '+extras.length+'</b> (repair or cut each one)</p>'+twistLine+'<p>Response <b>'+pct(rate*100)+'</b> (above '+targetPct(curLevel().target)+'%) · Quality <b>'+quality+'</b> ('+quickQualityGate()+'+) · Insight <b>'+ins.score+'</b> ('+insightGate()+'+)</p><p>'+c.completed+' of '+c.sent+' sent sprites completed. All results simulated.</p>'+activeQuestions().map(function(q){
+    $("report").innerHTML='<div class="reportcard"><h2>QUICK CHALLENGE · '+(won?"WON":"TRY ANOTHER REPAIR")+'</h2><p>'+state.quickChallenge.name+' · '+(state.quickChallenge.comp?'wave 1':'one launch')+' · '+state.launchCost+' / '+QUICK_BUDGET+' credits</p><p>BRD card repairs <b>'+repaired+' / 3</b> (all three required) · Extras resolved <b>'+resolved+' / '+extras.length+'</b> (repair or cut each one)</p>'+twistLine+'<p>Response <b>'+pct(rate*100)+'</b> (above '+targetPct(curLevel().target)+'%) · Quality <b>'+quality+'</b> ('+quickQualityGate()+'+) · Insight <b>'+ins.score+'</b> ('+insightGate()+'+)</p><p>'+c.completed+' of '+c.sent+' sent sprites completed. All results simulated.</p>'+activeQuestions().map(function(q){
       var st = state.qstate[q.id];
       var kind = tierOf(q) === "stupid" ? "LOW-VALUE" : tierOf(q) === "filler" ? "FILLER" : defectOf(q);
       var verdict;
@@ -3288,8 +3536,10 @@ function showReport(){
       else if (tierOf(q) === "stupid" || tierOf(q) === "filler") verdict = "Kept; cut this low-value item";
       else verdict = "Kept unresolved; repair or cut it";
       return '<p><b>' + (q.core ? "BRD" : "EXTRA") + ' Q' + q.id + ' · ' + kind + ':</b> ' + verdict + '</p>';
-    }).join("")+ins.topics.map(function(topic){return '<p><b>'+topic.topic+':</b> '+topic.status+'</p>';}).join("")+'<p>'+(won?"You repaired the BRD cards and judged the scope creep instead of mailing it.":"Repair every BRD card, then resolve each extra by repairing or cutting it. Read the weakest score too.")+'</p></div>'+reactionReportHTML(run)+'<div class="againrow"><button class="againbtn" id="quickRetry">RETRY CHALLENGE</button><button class="againbtn" id="quickNext">NEXT CHALLENGE</button><button class="againbtn" id="quickBack">BACK TO LEVELS</button></div>';
+    }).join("")+ins.topics.map(function(topic){return '<p><b>'+topic.topic+':</b> '+topic.status+'</p>';}).join("")+'<p>'+(won?"You repaired the BRD cards and judged the scope creep instead of mailing it.":"Repair every BRD card, then resolve each extra by repairing or cutting it. Read the weakest score too.")+'</p></div>'+quickComplicationCardHTML()+reactionReportHTML(run)+'<div class="againrow"><button class="againbtn" id="quickRetry">RETRY CHALLENGE</button><button class="againbtn" id="quickNext">NEXT CHALLENGE</button><button class="againbtn" id="quickBack">BACK TO LEVELS</button></div>';
     $("runStage").style.display="none"; $("report").style.display="block";
+    var caBtn=$("compAccept"); if(caBtn && state.quickChallenge.comp) caBtn.addEventListener("click",function(){ if(!caBtn.disabled){ sndCoin(); acceptQuickComplication(); } });
+    var cdBtn=$("compDecline"); if(cdBtn && state.quickChallenge.comp) cdBtn.addEventListener("click",function(){ declineQuickComplication(); });
     $("quickRetry").addEventListener("click",function(){sndCoin();startQuickChallenge(index);});
     $("quickNext").addEventListener("click",function(){sndCoin();startQuickChallenge((index+1)%QUICK_CHALLENGES.length);});
     $("quickBack").addEventListener("click",function(){sndClick();leaveQuickChallenge();});

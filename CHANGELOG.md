@@ -1,5 +1,45 @@
 # Changelog
 
+## 2026-11-01 - Quick Challenges, stage 3 of 3: the second wave
+
+- A challenge no longer always ends at its first report. Most runs
+  now draw a complication after the wave 1 report, from the same run
+  seed and machinery as the BRD twist (`quickComplicationDraw`,
+  `"qccomp|<index>|<seed>"`); about one run in four stays clean. The
+  card is a stakeholder interruption with three flavors: LIST
+  REALITY (the extract behind the send was nine months old, so the
+  list really runs 9% invalid, and the provided validation was run
+  against the stated extract and does not carry), THE LATE QUESTION
+  (a named stakeholder — Legal, the sponsor, Support leadership, or
+  Compliance, rotating by draw — adds one real defective bank
+  question that cannot be cut: repair it or carry it as written),
+  and SECOND PUSH (the sponsor wants the non-openers mailed again;
+  it fields as reminder waves at the book's 8 cr and −5 goodwill per
+  wave, and the card says so when the pool cannot fund it).
+- Accepting opens a wave 2 setup on the same 48-credit pool, which
+  never refills: the accounting freezes at wave 1's launched
+  configuration and credits back the bought batch
+  (`QUICK_BASE_COST`), so only wave 2's own actions are charged
+  (repairs, cuts, validation tiers, reminder waves), all priced and
+  capped by the existing budget machinery. Wave 1's ending goodwill
+  and reputation carry into wave 2, and re-send fatigue applies.
+  Declining is free and leaves the wave 1 report as the final
+  result, with the decision recorded on the card.
+- Wave 2 is a genuine second run through the existing simulation
+  under the updated configuration, not a scripted outcome. The
+  final report prints wave 1, the complication and the choice made,
+  wave 2, and a combined line: the verdict sums both waves'
+  completions and sends for the response rate, reads quality and
+  Insight from the final instrument's wave, and re-checks the BRD
+  repairs, the scored extras, and the stage-2 twist (which still
+  gates) against the final instrument. A wave 1 loss can be rescued
+  and a wave 1 win can be put at risk by the player's own choices:
+  the tests prove a rescuing line per flavor inside the pool, a
+  losing line per flavor, an audit-bar win flipped by carrying the
+  late card broken (quality 100 → 83 against the 95 bar) and held
+  by repairing it, exact cross-wave accounting with no double
+  charge, and the unfunded-push refusal. Suite: 71 tests.
+
 ## 2026-11-01 - Quick Challenges, stage 2 of 3: the BRD variation pack
 
 - Every Quick Challenge run now draws one BRD twist from the run

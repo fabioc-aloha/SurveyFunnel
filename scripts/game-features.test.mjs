@@ -1234,3 +1234,293 @@ test('report prints the unopened count from the same tally the piles use', () =>
     'the deliverability card prints the tally unopened count');
   assert.ok(element('report').innerHTML.includes('sat in inboxes, never opened'));
 });
+
+/* Stage 3: the second wave. After the wave 1 report, most runs draw a
+   complication from the run seed (the same hashStr + mulberry
+   machinery as the twist draw, over "qccomp|<index>|<seed>").
+   Tests pin a complication the same way they pin a twist: scan the
+   deterministic seeds through the game's own draw until the wanted
+   variant and flavor pair appears, then play through the card
+   handlers and the real accept/decline paths. */
+function startQCWithComp(g, index, variantIndex, flavor) {
+  for (let n = 0; n < 2000; n++) {
+    const seed = 'V' + String(n).padStart(3, '0');
+    if (variantIndex !== null && g.quickVariantIndex(index, seed) !== variantIndex) continue;
+    const comp = g.quickComplicationDraw(index, seed);
+    if (!comp || comp.flavor !== flavor) continue;
+    g.startQuickChallenge(index, seed);
+    assert.equal(g.state.quickChallenge.comp.flavor, flavor);
+    return seed;
+  }
+  throw new Error(`No seed draws flavor ${flavor} for challenge ${index} variant ${variantIndex}`);
+}
+
+test('complication draw is deterministic per seed and reaches every flavor', () => {
+  const { context: g } = game();
+  assert.equal(typeof g.quickComplicationDraw, 'function');
+  for (let index = 0; index < 3; index++) {
+    /* Same seed, same complication: the draw is a pure function. */
+    assert.deepEqual(g.quickComplicationDraw(index, 'V042'), g.quickComplicationDraw(index, 'V042'));
+    const seen = new Set();
+    const sources = new Set();
+    for (let n = 0; n < 400; n++) {
+      const comp = g.quickComplicationDraw(index, 'V' + String(n).padStart(3, '0'));
+      seen.add(comp ? comp.flavor : 'none');
+      if (comp && comp.flavor === 'late') {
+        sources.add(comp.source);
+        /* The late card is never one the challenge already dealt. */
+        const dealt = g.QUICK_CHALLENGES[index].ids.concat(g.QUICK_CHALLENGES[index].extras);
+        assert.ok(!dealt.includes(comp.qid), `Q${comp.qid} is already dealt in challenge ${index}`);
+        assert.ok(g.questionById(comp.qid), 'the late card is a real bank question');
+        assert.notEqual(g.defectOf(g.questionById(comp.qid)), 'CLEAN', 'the late card arrives defective');
+      }
+    }
+    assert.deepEqual([...seen].sort(), ['late', 'list', 'none', 'wave'],
+      `Challenge ${index} sweep must reach every flavor and clean runs`);
+    assert.ok(sources.size >= 3, `Challenge ${index} late questions rotate their named source`);
+  }
+});
+
+test('a run with no complication drawn reports no card and no wave 2', () => {
+  const { context: g, element } = game();
+  let seed = null;
+  for (let n = 0; n < 500 && !seed; n++) {
+    const candidate = 'V' + String(n).padStart(3, '0');
+    if (g.quickComplicationDraw(0, candidate) === null) seed = candidate;
+  }
+  assert.ok(seed, 'the scan must find a clean seed');
+  g.startQuickChallenge(0, seed);
+  assert.equal(g.state.quickChallenge.comp, null);
+  g.startRun();
+  g.showReport();
+  assert.doesNotMatch(element('report').innerHTML, /COMPLICATION/);
+  assert.equal(g.acceptQuickComplication(), false);
+  assert.equal(g.declineQuickComplication(), false);
+  assert.equal(g.state.quickChallenge.wave, 1);
+});
+
+test('declining a complication keeps the wave 1 result final and charges nothing', () => {
+  const { context: g, element } = game();
+  startQCWithComp(g, 0, 0, 'list');
+  applyQuickLine(g, 0, 'intended');
+  g.startRun();
+  g.showReport();
+  assert.match(element('report').innerHTML, /QUICK CHALLENGE · WON/);
+  assert.match(element('report').innerHTML, /COMPLICATION · THE LIST WAS OLDER THAN THE BRIEF/);
+  const wave1 = JSON.stringify(g.state.quickChallenge.wave1);
+  assert.equal(g.declineQuickComplication(), true);
+  assert.equal(g.state.quickChallenge.compChoice, 'declined');
+  assert.equal(JSON.stringify(g.state.quickChallenge.wave1), wave1, 'the wave 1 record is untouched');
+  assert.match(element('report').innerHTML, /QUICK CHALLENGE · WON/, 'the wave 1 verdict stands');
+  assert.match(element('compCard').innerHTML, /DECLINED/);
+  assert.equal(g.state.spentBefore, 0, 'declining charges nothing');
+  assert.equal(g.acceptQuickComplication(), false, 'a declined complication cannot be accepted after');
+  assert.equal(g.state.quickChallenge.wave, 1);
+});
+
+test('LIST REALITY: wave 2 faces the true list and re-validation rescues the verdict', () => {
+  const { context: g, element } = game();
+  startQCWithComp(g, 0, 0, 'list');
+  /* Wave 1: BRD cards repaired, one extra cut, two left unresolved.
+     It loses on the extras, with 7 credits left in the pool. */
+  for (const id of [3, 10, 24]) clickSimplify(g, id);
+  clickCut(g, 57);
+  assert.equal(g.budgetMath().total, 41);
+  g.startRun();
+  g.showReport();
+  assert.match(element('report').innerHTML, /TRY ANOTHER REPAIR/);
+  assert.equal(g.state.quickChallenge.wave1.won, false);
+  /* Accept: the stated list is replaced by the real one, and the
+     provided validation is void because it ran on the wrong extract. */
+  assert.equal(g.acceptQuickComplication(), true);
+  assert.equal(g.state.quickChallenge.wave, 2);
+  assert.equal(g.state.seg.invalidPct, 0.09);
+  assert.equal(g.state.validation, 'skip');
+  assert.equal(g.state.baseline.validation, 'skip');
+  assert.equal(g.state.spentBefore, 41 - g.QUICK_BASE_COST, 'wave 2 accounting starts from wave 1 net of the bought batch');
+  /* Wave 2 setup: buy partial re-validation at the book price, field
+     the cheaper invite to make room, and resolve the extras. */
+  g.state.validation = 'partial';
+  assert.ok(Math.abs(g.effInvalidRate() - 0.09 * 0.45) < 1e-9, 'partial validation prices the true list');
+  g.state.invite = g.INVITES[0];
+  clickSimplify(g, 26);
+  clickSimplify(g, 22);
+  assert.equal(g.budgetMath().total, 47, 'pool total is exact: 41 + validation 6 + repairs 4, invite downgrade frees 4');
+  assert.ok(g.budgetMath().total <= g.QUICK_BUDGET);
+  const wave1Run = g.runData;
+  g.startRun();
+  assert.notEqual(g.runData, wave1Run, 'wave 2 is a genuine second run');
+  g.showReport();
+  const html = element('report').innerHTML;
+  assert.match(html, /QUICK CHALLENGE · WON · FINAL/);
+  assert.match(html, /COMPLICATION · THE LIST WAS OLDER THAN THE BRIEF/);
+  assert.match(html, /after re-validation \(partial, 6 cr\)/);
+  assert.match(html, /COMBINED/);
+  assert.equal(g.state.spentBefore + g.state.launchCost, 47, 'no double charge across the two waves');
+  assert.equal(g.budgetMath().remaining, 1);
+});
+
+test('LIST REALITY: leaving the extras unresolved still loses the final verdict', () => {
+  const { context: g, element } = game();
+  startQCWithComp(g, 0, 0, 'list');
+  for (const id of [3, 10, 24]) clickSimplify(g, id);
+  g.startRun();
+  g.showReport();
+  assert.equal(g.acceptQuickComplication(), true);
+  g.state.validation = 'partial';
+  assert.equal(g.budgetMath().total, 46);
+  g.startRun();
+  g.showReport();
+  const html = element('report').innerHTML;
+  assert.match(html, /TRY ANOTHER REPAIR · FINAL/);
+  assert.match(html, /Extras resolved <b>0 \/ 3<\/b>/);
+});
+
+test('THE LATE QUESTION: uncuttable, carried or repaired into a genuine second wave', () => {
+  const { context: g, element } = game();
+  const seed = startQCWithComp(g, 0, 0, 'late');
+  const comp = g.state.quickChallenge.comp;
+  assert.equal(typeof comp.qid, 'number');
+  /* Wave 1 loses with one extra unresolved, then the late card lands. */
+  for (const id of [3, 10, 24]) clickSimplify(g, id);
+  clickCut(g, 57);
+  clickCut(g, 22);
+  assert.equal(g.budgetMath().total, 42);
+  g.startRun();
+  g.showReport();
+  assert.match(element('report').innerHTML, /TRY ANOTHER REPAIR/);
+  assert.match(element('report').innerHTML, /COMPLICATION · ONE MORE QUESTION, NON-NEGOTIABLE/);
+  assert.equal(g.acceptQuickComplication(), true);
+  assert.equal(g.state.quickChallenge.lateQid, comp.qid);
+  /* The action path refuses its cut, like a required card. */
+  assert.equal(g.applyCut(comp.qid), 'late');
+  clickCut(g, comp.qid);
+  assert.equal(g.state.qstate[comp.qid], 'keep');
+  g.renderQuestions();
+  assert.match(element('qGrid').innerHTML, /LATE · REQUIRED/);
+  /* Resolve the wave 1 miss; this seed's late card (Q5, BEYOND
+     KNOWLEDGE) has no wording fix, so it rides along and its damage
+     is priced into wave 2's real numbers, which still clear the
+     base gates. */
+  assert.equal(g.fixVerbFor(g.questionById(comp.qid)), null);
+  clickSimplify(g, 26);
+  assert.equal(g.budgetMath().total, 44);
+  g.startRun();
+  g.showReport();
+  const html = element('report').innerHTML;
+  assert.match(html, /QUICK CHALLENGE · WON · FINAL/);
+  assert.match(html, new RegExp(`LATE Q${comp.qid} · BEYOND KNOWLEDGE:</b> Carried as written into wave 2`));
+  assert.equal(g.state.spentBefore + g.state.launchCost, 44);
+  assert.ok(seed);
+});
+
+test('THE LATE QUESTION: carrying it broken past the audit bar flips a win, repairing it holds', () => {
+  /* Risk path: wave 1 wins under QC3's audit twist (quality 95+). */
+  const { context: g, element } = game();
+  startQCWithComp(g, 2, 1, 'late');
+  const comp = g.state.quickChallenge.comp;
+  applyQuickLine(g, 2, 'intended');
+  g.startRun();
+  g.showReport();
+  assert.match(element('report').innerHTML, /QUICK CHALLENGE · WON/);
+  assert.equal(g.state.quickChallenge.wave1.quality, 100);
+  assert.equal(g.acceptQuickComplication(), true);
+  /* Carry the late card as written: its defect symptoms land in wave
+     2's quality, under the audit bar, and the twist rules NOT MET. */
+  g.startRun();
+  g.showReport();
+  let html = element('report').innerHTML;
+  assert.match(html, /TRY ANOTHER REPAIR · FINAL/);
+  assert.match(html, /BRD twist · <b>(.*?)<\/b>.*NOT MET/s);
+  /* Repair path on the same seed: the fix holds the win. */
+  const { context: g2, element: element2 } = game();
+  startQCWithComp(g2, 2, 1, 'late');
+  applyQuickLine(g2, 2, 'intended');
+  g2.startRun();
+  g2.showReport();
+  assert.equal(g2.acceptQuickComplication(), true);
+  clickSimplify(g2, comp.qid);
+  assert.equal(g2.budgetMath().total, 47);
+  g2.startRun();
+  g2.showReport();
+  html = element2('report').innerHTML;
+  assert.match(html, /QUICK CHALLENGE · WON · FINAL/);
+  assert.match(html, /— <b>MET<\/b>/);
+  assert.match(html, new RegExp(`Repaired with ${g2.fixVerbFor(g2.questionById(comp.qid))} before wave 2`));
+});
+
+test('SECOND PUSH: reminder waves rescue a lost wave 1, and a push with nothing repaired still loses', () => {
+  const { context: g, element } = game();
+  startQCWithComp(g, 1, 1, 'wave');
+  /* Wave 1 repairs only the BRD cards: it loses on the extras. */
+  for (const id of [48, 55, 11]) clickSimplify(g, id);
+  assert.equal(g.budgetMath().total, 40);
+  g.startRun();
+  g.showReport();
+  assert.match(element('report').innerHTML, /TRY ANOTHER REPAIR/);
+  assert.equal(g.acceptQuickComplication(), true);
+  assert.equal(g.state.reminders, 1, 'accepting sets the first reminder wave');
+  /* Wave 2: cheaper invite to make room, extras cut, push live. */
+  g.state.invite = g.INVITES[0];
+  clickCut(g, 7);
+  clickCut(g, 51);
+  clickCut(g, 68);
+  assert.equal(g.budgetMath().total, 47);
+  g.startRun();
+  g.showReport();
+  let html = element('report').innerHTML;
+  assert.match(html, /QUICK CHALLENGE · WON · FINAL/);
+  assert.match(html, /second push fielded 1 reminder wave/);
+  /* Losing line on the same seed: two waves bought, nothing repaired. */
+  const { context: g2, element: element2 } = game();
+  startQCWithComp(g2, 1, 1, 'wave');
+  g2.startRun();
+  g2.showReport();
+  assert.equal(g2.acceptQuickComplication(), true);
+  g2.state.reminders = 2;
+  g2.state.invite = g2.INVITES[0];
+  assert.equal(g2.budgetMath().total, 46);
+  g2.startRun();
+  g2.showReport();
+  html = element2('report').innerHTML;
+  assert.match(html, /TRY ANOTHER REPAIR · FINAL/);
+});
+
+test('SECOND PUSH: a wave 1 win that cannot fund the push is told so, and the result stands', () => {
+  const { context: g, element } = game();
+  startQCWithComp(g, 0, 1, 'wave');
+  /* The cut-all line wins QC1's reporting threshold at 43 credits,
+     leaving 5: the 8-credit push cannot be funded from the pool. */
+  applyQuickLine(g, 0, 'cut-extras');
+  assert.equal(g.budgetMath().total, 43);
+  g.startRun();
+  g.showReport();
+  const html = element('report').innerHTML;
+  assert.match(html, /QUICK CHALLENGE · WON/);
+  assert.match(html, /cannot be funded/);
+  assert.equal(g.acceptQuickComplication(), false, 'an unfunded push cannot be accepted');
+  assert.equal(g.state.quickChallenge.wave, 1);
+  assert.equal(g.declineQuickComplication(), true, 'declining stays free');
+  assert.match(element('report').innerHTML, /QUICK CHALLENGE · WON/);
+});
+
+test('wave 2 locks the wave 1 list and never leaks into the campaign', () => {
+  const { context: g, element } = game();
+  g.state.campaignWon[2] = true;
+  startQCWithComp(g, 0, 0, 'list');
+  g.startRun();
+  g.showReport();
+  assert.equal(g.acceptQuickComplication(), true);
+  g.renderSegments();
+  assert.match(element('segGrid').innerHTML, /data-seg="fresh" disabled/,
+    'every segment card locks in wave 2, the mailed list included');
+  g.leaveQuickChallenge();
+  assert.equal(g.state.quickChallenge, null);
+  assert.equal(g.BUDGET_TOTAL, 120);
+  assert.equal(g.state.seg.invalidPct, 0.03, 'the campaign keeps the true Fresh segment');
+  assert.equal(g.state.campaignWon[2], true);
+  g.selectLevel(1, false);
+  assert.equal(g.quickVariant(), null);
+  assert.equal(g.quickQualityGate(), 60);
+  assert.equal(g.instrumentFloor(), 6);
+});
