@@ -220,7 +220,20 @@
   .gate{ position:absolute; top:6px; transform:translateX(-50%); font-family:"Press Start 2P", monospace; font-size:9px; color:var(--dim); white-space:nowrap; }
   .gate::after{ content:""; position:absolute; left:50%; top:20px; width:2px; height:12px; background:var(--line); }
   .track{ position:relative; height:300px; }
-  @media (max-width:620px){ .track{ height:340px; } }
+  /* the run figure stands lower in the track: its head clears the gate
+     label row and the dashed gate line above the track entirely */
+  #track .mgrfig{ margin-top:30px; }
+  @media (max-width:620px){
+    .track{ height:340px; }
+    /* phone widths: five gate labels share ~324px and at 9px the end
+       labels clip and the middle ones collide, so the labels shrink and
+       tighten; INVITED and its pile column shift right by the same
+       amount, keeping the pair aligned while INVITED's left edge stays
+       inside the track */
+    .gate{ font-size:7px; letter-spacing:-1.5px; }
+    .gate:first-child{ translate:8px 0; }
+    .pilecol[data-gate="invited"]{ translate:8px 0; }
+  }
   .qmarks{ position:absolute; left:0; right:0; top:6px; height:16px; }
   .qmark{ position:absolute; transform:translateX(-50%); font-family:"Press Start 2P", monospace; font-size:8px; color:var(--faint); background:#0a0d18; border:1px solid var(--line); border-radius:3px; padding:2px 3px; }
   .qmark.bad{ color:#ffb3ba; border-color:var(--red); }
@@ -348,12 +361,14 @@
   .qbreak{ font-size:14.5px; color:#39415a; margin-top:8px; display:grid; gap:2px; }
   .againrow{ display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
   .againbtn{
-    font-family:"Press Start 2P", monospace; font-size:14px; cursor:pointer; color:#0c2a1e;
+    font-family:"Press Start 2P", monospace; font-size:14px; line-height:1.6; cursor:pointer; color:#0c2a1e;
     background:var(--teal); border:4px solid #b8ffe9; border-radius:10px; padding:15px 22px; box-shadow:0 5px 0 #147a58;
   }
   .againbtn:active{ transform:translateY(4px); box-shadow:0 1px 0 #147a58; }
   .mgrcaption{ font-size:13.5px; color:var(--dim); max-width:180px; }
   .legendrow{ display:flex; flex-wrap:wrap; gap:6px 14px; font-size:13px; color:var(--dim); margin-top:10px; }
+  /* each volume label is one unit: name and slider never split across rows */
+  #soundPanel label{ display:inline-flex; align-items:center; gap:6px; white-space:nowrap; }
   .legendrow .sw{ display:inline-block; width:12px; height:12px; border-radius:3px; border:2px solid #0a0d18; vertical-align:-1px; margin-right:5px; }
   /* polish pass */
   .cabinet.shaking{ animation:cabShake .55s linear; }
@@ -652,7 +667,10 @@
       <h2>MPOR</h2>
       <p>Master Plan of Record</p>
       <h3>QUICK CHALLENGE</h3>
-      <p>Six questions, 48 credits, one launch. The audience, list preparation, and Honest Ask invitation are provided. Three questions are the BRD cards: repair all three to win, and they cannot be cut. Three more arrived unrequested: repair or cut each one, because keeping an unresolved extra leaves the challenge unfinished. Sending costs 30 credits, the invitation costs 4, and the three BRD repairs cost 6 in total. Also reach response above 12%, quality 60+, and Insight 60+. Each run also draws one BRD twist from the run seed: a stakeholder demand (a named extra that must stay in the instrument and be repaired), a raised bar (a higher response threshold or a 95+ quality gate), or a time ceiling on the repaired instrument, read from its estimated minutes. The BRD names the twist and its acceptance line, the challenge banner repeats the acceptance line, and the report rules on whether the twist was met. Most runs also draw a complication after the first report (a staler list than the brief stated, a question added by a stakeholder, or a sponsor demanding a second push): accept it and a follow-up wave is set up on the credits left in the same 48, or decline it and the first result stands. The final verdict then reads both waves together. Retry resets this challenge and draws a new brief; Next Challenge changes the six cards. Neither changes campaign progress.</p>
+      <p>Six questions, 48 credits, one launch. The audience, list preparation, and Honest Ask invitation are provided. Three questions are the BRD cards: repair all three to win, and they cannot be cut. Three more arrived unrequested: repair or cut each one, because an unresolved extra leaves the challenge unfinished.</p>
+      <p>Sending costs 30 credits, the invitation costs 4, and the three BRD repairs cost 6 in total. You also need response above 12%, quality 60+, and Insight 60+. Each run also draws one BRD twist from the run seed: a stakeholder demand (a named extra that must stay in the instrument and be repaired), a raised bar (a higher response threshold or a 95+ quality gate), or a time ceiling on the repaired instrument, read from its estimated minutes. The BRD names the twist and its acceptance line. The challenge banner repeats the acceptance line, and the report rules on whether the twist was met.</p>
+      <p>Most runs also draw a complication after the first report (a staler list than the brief stated, a question added by a stakeholder, or a sponsor demanding a second push): accept it and a follow-up wave is set up on the credits left in the same 48, or decline it and the first result stands. The final verdict then reads both waves together.</p>
+      <p>Retry resets this challenge and draws a new brief. Next Challenge changes the six cards. Neither changes campaign progress.</p>
       <h3>RESPONDENT REACTIONS</h3>
       <p>Speech bubbles illustrate events in the simulation, such as guessing, a DK/NA escape, or encountering a defective question. They are not real customer quotes and do not change scores. Only a few bubbles appear at a readable pace. The report keeps a short selection, even if you skip the animation.</p>
       <h3>STAKEHOLDER ENCOUNTERS</h3>
@@ -780,7 +798,7 @@ var DEFECT_INFO = {
   "JARGON":                 { fix:"DEFINE",           cost:2, symptom:"Guess clusters",              explain:"Undefined acronyms or insider terms (SLA, MTTR, tenant, throttling) for this audience. People who cannot parse the question guess at it." },
   "VAGUE TIMEFRAME":        { fix:"ANCHOR",           cost:2, symptom:"Guess clusters",              explain:"'Recently / often / usually' with no recall window. Each respondent invents their own window, so the answers are not measuring the same period." },
   "RECALL OVERLOAD":        { fix:"SHORTEN WINDOW",   cost:2, symptom:"Estimation guesses",          explain:"Counting or averaging events over 12 months exceeds honest recall. Respondents estimate, round, and invent." },
-  "BEYOND KNOWLEDGE":       { fix:null,               cost:0, symptom:"Guess clusters",              explain:"Asks this respondent for facts they cannot know from their role. No wording fix: this audience cannot know this. CUT it (1 cr) or buy the DK/NA escapes (2 cr) so it stops ending runs." },
+  "BEYOND KNOWLEDGE":       { fix:null,               cost:0, symptom:"Guess clusters",              explain:"Asks this respondent for facts they cannot know from their role." },
   "DOUBLE NEGATIVE":        { fix:"REWORD",           cost:2, symptom:"Misread inconsistency",       explain:"Negation stacked on negation. The item must be parsed twice, and a share of respondents answer the opposite of what they mean." },
   "BROKEN OPTIONS":         { fix:"FIX OPTIONS",      cost:2, symptom:"Junk / Other-box noise",      explain:"Answer ranges overlap, or no option fits. Forced into a wrong box or the Other box, which collects junk instead of data." },
   "GRID BURDEN":            { fix:"BREAK UP",         cost:3, symptom:"Straightlining",              explain:"A long rating matrix. On a phone it means pinch, scroll and mis-tap, and tired respondents straight-line the same answer down every row." },
@@ -1783,7 +1801,7 @@ function renderBudget(){
   var b = budgetMath();
   if (state.quickChallenge){
     if (state.quickChallenge.wave === 2 && state.quickChallenge.wave1){
-      el.innerHTML = '<b>QUICK CHALLENGE · WAVE 2 · ' + QUICK_BUDGET + ' CR POOL</b><p>Wave 1 spent <b>' + state.quickChallenge.wave1.cost + ' credits</b>. The follow-up wave re-uses the batch already bought, so this wave charges only its actions: <b>' + (b.attemptCost - QUICK_BASE_COST) + ' credits</b> · <b>' + b.remaining + ' left</b> in the pool.</p><p>The pool does not refill. Retry starts the challenge fresh.</p>';
+      el.innerHTML = '<b>QUICK CHALLENGE · WAVE 2 · ' + QUICK_BUDGET + ' CR POOL</b><p>Wave 1 spent <b>' + state.quickChallenge.wave1.cost + ' credits</b>. The follow-up wave reuses the batch already bought. This wave charges only its actions: <b>' + (b.attemptCost - QUICK_BASE_COST) + ' credits</b> · <b>' + b.remaining + ' left</b> in the pool.</p><p>The pool does not refill. Retry starts the challenge fresh.</p>';
       return;
     }
     el.innerHTML = '<b>QUICK CHALLENGE · ' + QUICK_BUDGET + ' CR</b><p>Send 30 + Honest Ask 4 + card edits ' + (b.attemptCost - QUICK_BASE_COST) + ' = <b>' + b.attemptCost + ' credits</b> · <b>' + b.remaining + ' left</b></p><p>List preparation is provided. One launch, plus one follow-up wave if a complication lands after the report; retry starts fresh.</p>';
@@ -1820,7 +1838,7 @@ function renderPrep(){
   }).join("");
   el.innerHTML = '<div class="lever-head" style="margin-top:14px"><span class="lever-no" style="background:var(--blue)">STEP 2</span><span class="lever-title" style="font-size:12px">PREPARE THE LIST</span><span class="lever-sub">Bought before launch, paid from the same credits.</span></div>' +
     '<div class="prepgrid">' +
-    '<div class="prow"><span class="pt">Validate emails (BrightVerify)</span><div class="valbtns">' + valBtns + '</div><div class="pe">Full checks the whole list; Partial checks the riskiest half. Validation removes most invalid addresses, but a small share survives, since catch-all domains cannot be verified.</div></div>' +
+    '<div class="prow"><span class="pt">Validate emails (BrightVerify)</span><div class="valbtns">' + valBtns + '</div><div class="pe">Full checks the whole list; Partial checks the riskiest half. Validation removes most invalid addresses. A small share always survives: catch-all domains cannot be verified.</div></div>' +
     tog("dedupe", state.dedupe, 4, "Dedupe pass", "Removes duplicate addresses so nobody gets the survey twice, and no response is counted twice.") +
     tog("suppression", state.suppression, 4, "Suppression scrub", "Removes opt-outs and anyone surveyed in the last 30 days. Skip it and angry people get mailed anyway: \u22126 goodwill.") +
     tog("localization", state.localization, 8, "Localization review", "Plain-language and locale check across the list\u2019s languages. Cleaner answers, +2 data quality.") +
@@ -2305,7 +2323,7 @@ function renderChecklist(){
     ["Agenda coverage seen: check the AGENDA panel in Step 4", !!(reviewDone || t.agenda)],
     ["Instrument size (Step 4): at least " + instrumentFloor() + " questions kept", keptQuestions().length >= instrumentFloor()]
   ];
-  el.innerHTML = '<div class="ct">READY TO LAUNCH? · THIS LIST INFORMS · THE BUTTON CHECKS BUDGET AND THE MINIMUM INSTRUMENT</div>' +
+  el.innerHTML = '<div class="ct">READY TO LAUNCH? · THIS LIST ONLY INFORMS · THE BUTTON ENFORCES THE BUDGET AND THE MINIMUM INSTRUMENT</div>' +
     rows.map(function(r, i){
       return '<div class="crow ' + (r[1] ? "done" : "todo") + '"><span>' + (r[1] ? "✓ " : "○ ") + r[0] + '</span><span class="st">' + (r[1] ? "DONE" : "TO DO") + '</span>' +
         (i === 3 && !r[1] ? '<button class="skipbtn2" id="skipReviewBtn">SKIP REVIEW</button>' : "") + "</div>";
@@ -2709,8 +2727,12 @@ function pileModel(run){
   return { bounced: c.bouncedHard + c.bouncedSoft, unopened: c.delivered - c.opened, waves: waves };
 }
 /* glyph fan for a pile stack: [left px, bottom px, rotate deg], capped
-   at 12 drawn envelopes while the label keeps the exact count */
-var PILE_SPOTS = [[2,0,-8],[16,0,6],[30,0,-4],[44,0,9],[58,0,-6],[9,10,3],[23,10,-7],[37,10,5],[51,10,-3],[5,20,-5],[19,20,8],[33,20,-6]];
+   at 12 drawn envelopes while the label keeps the exact count. Spots are
+   ordered as a heap, not a fan: the first arrivals land center-bottom
+   under the label and later ones flank and stack on top with overlap,
+   so even 2-3 settled figures read as a small pile instead of strays
+   spread across the column. */
+var PILE_SPOTS = [[31,0,-4],[19,0,5],[43,0,-6],[8,0,7],[54,0,-3],[25,9,-5],[37,9,4],[14,9,6],[48,9,-7],[31,17,-3],[23,17,5],[39,17,-5]];
 function pileGlyphsHTML(n){
   var shown = Math.min(12, n), h = "";
   for (var i = 0; i < shown; i++){
@@ -3436,7 +3458,7 @@ function bounceBacksHTML(bb){
   var causeLine;
   if (bb.validation === "full") causeLine = "Every one of them passed full BrightVerify validation. Catch-all domains accept mail for any mailbox, real or not, so no validation can confirm these addresses before the send.";
   else if (bb.validation === "partial") causeLine = fmt(bb.causes.partial) + " sat outside the riskiest half that partial validation scanned. " + fmt(bb.causes.catchall) + " passed as catch-all addresses, which no check can verify.";
-  else causeLine = "None of them was ever checked: no validation was bought, so every dead address on the list went out with the send.";
+  else causeLine = "None of them was ever checked: no validation was bought, so every dead address on the list was mailed.";
   h += "<p style='font-size:15.5px;margin:4px 0'><b>" + fmt(bb.total) + " addresses bounced back</b> (" + fmt(bb.hard) + " hard \u00B7 " + fmt(bb.soft) + " soft). " + causeLine + "</p>";
   h += "<div class='simnote'>A sample of this send's bounced addresses. Every address is simulated; .example domains cannot receive real mail.</div>";
   h += "<table class='mini'><tr><th>Address</th><th>Bounce</th><th style='text-align:left'>Why it came back</th></tr>" +
@@ -3745,11 +3767,11 @@ function showReport(){
   }
   html += '<div class="reportcard"><h2>DELIVERABILITY AND DATA</h2>' +
     '<div class="simnote">What the mail system and the data itself did, priced against the prep you bought or skipped. This attempt cost <b>' + (state.launchCost || 0) + " credits</b>; level pool spent so far <b>" + spentAfter + " / " + BUDGET_TOTAL + "</b>, leaving <b>" + remainingAfter + " credits</b>.</div>" +
-    "<p style='font-size:15.5px;margin:4px 0'><b>Delivered " + fmt(simDelivered) + " of " + fmt(simSent) + " sent.</b> Bounced " + fmt(simBounced) + " (" + fmt(c.bouncedHard * scale) + " hard, dead addresses; " + fmt(c.bouncedSoft * scale) + " soft, full or failing mailboxes). Bounce rate <b>" + bounceRatePct + "%</b>, hard bounce rate <b>" + hardRatePct + "%</b>.</p>" +
+    "<p style='font-size:15.5px;margin:4px 0'><b>Delivered " + fmt(simDelivered) + " of " + fmt(simSent) + " sent.</b> Bounced " + fmt(simBounced) + " (" + fmt(c.bouncedHard * scale) + " hard (dead addresses) and " + fmt(c.bouncedSoft * scale) + " soft (full or failing mailboxes). Bounce rate <b>" + bounceRatePct + "%</b>, hard bounce rate <b>" + hardRatePct + "%</b>.</p>" +
     "<p style='font-size:15.5px;margin:4px 0'><b>UNOPENED \u00B7 " + fmt((c.delivered - c.opened) * scale) + "</b> sat in inboxes, never opened." + (state.reminders ? " The reminder wave" + (state.reminders > 1 ? "s" : "") + " you bought went out to exactly these inboxes." : " No reminder waves were bought to nudge them.") + "</p>" +
     "<p style='font-size:15.5px;margin:4px 0'><b>Sender reputation: " + rmR.before + " \u2192 " + repA + ".</b> " + openEffectTxt + "</p>" +
     "<p style='font-size:15.5px;margin:4px 0'><b>Validation verdict:</b> " + valVerdict + "</p>" +
-    (c.angry ? "<p style='font-size:15.5px;margin:4px 0'><b>Suppression skipped:</b> " + c.angry + " sprite(s) stood for opted-out or recently surveyed people mailed anyway, and goodwill took the hit in the ledger above. <b>Fix:</b> buy the Suppression scrub (4 cr) in PREPARE THE LIST.</p>" : "") +
+    (c.angry ? "<p style='font-size:15.5px;margin:4px 0'><b>Suppression skipped:</b> " + c.angry + " sprite(s) are people who opted out or were surveyed recently, mailed anyway. Goodwill took the hit in the ledger above. <b>Fix:</b> buy the Suppression scrub (4 cr) in PREPARE THE LIST.</p>" : "") +
     (c.dupEnv ? "<p style='font-size:15.5px;margin:4px 0'><b>No dedupe:</b> duplicate envelopes went out during the run. <b>Fix:</b> buy the Dedupe pass (4 cr).</p>" : "") +
     bounceBacksHTML(run.bounceBacks) +
     '<h2 style="margin-top:14px">DATA QUALITY FLAGS</h2>' +
@@ -3768,7 +3790,7 @@ function showReport(){
   /* guesses + quality breakdown */
   html += '<div class="reportcard"><h2>GUESSES FLAGGED · DATA QUALITY</h2>' +
     "<p style='font-size:15.5px;margin:4px 0'>" + (c.guessed
-      ? "<b>" + fmt(c.guessed * scale) + " completions</b> included a guessed answer at a question the respondent's role cannot answer. A guess counts as a completion and still poisons the data: it looks like signal and is not." + (c.guessedAny > c.guessed ? " Another " + fmt((c.guessedAny - c.guessed) * scale) + " respondents guessed too, then quit later anyway." : "")
+      ? "<b>" + fmt(c.guessed * scale) + " completions</b> included a guessed answer on a question the respondent's role cannot answer. A guess counts as a completion and still poisons the data: it looks like signal and is not." + (c.guessedAny > c.guessed ? " Another " + fmt((c.guessedAny - c.guessed) * scale) + " respondents guessed too, then quit later anyway." : "")
       : (c.guessedAny ? fmt(c.guessedAny * scale) + " respondents guessed at a question their role cannot answer, then quit later anyway. No completion carried a guess, so quality is untouched, but the guessing itself is the smoke, not the fire."
         : "No guessed answers this round. Every completion is data you can defend.")) + "</p>" +
     '<div class="qbreak">' +

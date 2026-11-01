@@ -1,5 +1,52 @@
 # Changelog
 
+## 2026-11-01 - Final visual pass: layout and copy fixes
+
+- Gate labels at phone widths: at 9px the five labels clipped and
+  collided at 390px (INVITED lost its first letters off the track's
+  left edge, DELIVERED and OPENED ran together, FINISH touched the
+  right edge). At 620px and under they now render at 7px with
+  tightened letter spacing, and INVITED plus its pile column shift
+  8px right together, keeping the label-to-column alignment the
+  harness measures. All five labels sit fully inside the track with
+  clear gaps; desktop is unchanged.
+- The run-screen manager figure stands 30px lower in the track. Its
+  head used to sit on the dashed gate line under the INVITED label,
+  with the SENDING... stamp across its face. The figure, nameplate,
+  moods, and agitation are unchanged, just lower; the stamp now
+  clears the head at both widths.
+- Report and challenge buttons (.againbtn) gain line-height: 1.6.
+  Wrapped labels (TRY AGAIN with credits left; the complication
+  card's SET UP WAVE 2 and DECLINE buttons at 390px) were clipped
+  against the button's bottom edge; they now fit inside it.
+- The fallout piles read as piles at small counts. PILE_SPOTS was a
+  wide fan: 1-3 settled figures landed as strays spread across the
+  column and did not read as a pile. The spots are now ordered as a
+  heap (center-bottom first, then flanks, then stacked rows with
+  overlap), so 2-6 bounces mound up under the BOUNCED label. The
+  12-figure cap, exact label counts, and strip height are unchanged.
+  A settle audit across Fresh, Stale, and Blast runs confirms every
+  bounced sprite ends the run settled in the strip: the piled count
+  equals min(12, BOUNCED) in every run, with no bounce sprite left
+  standing mid-track.
+- The sound panel's Music and SFX labels are now single flex units,
+  so a label's name and slider can no longer split across rows when
+  the panel wraps.
+- Copy untangles, same facts and numbers throughout: the field
+  guide's Quick Challenge wall of text is now four short paragraphs;
+  the launch checklist header reads "THIS LIST ONLY INFORMS · THE
+  BUTTON ENFORCES THE BUDGET AND THE MINIMUM INSTRUMENT"; the
+  deliverability line parenthesizes its hard/soft bounce causes; the
+  suppression-skipped, bounce-backs, and wave-2 banner sentences are
+  split shorter; the validation sub-line splits at the catch-all
+  clause; the GUESSES card says "on a question"; and the BEYOND
+  KNOWLEDGE card no longer states its no-wording-fix resolution
+  twice (the class explain dropped the sentence the card tail
+  already carries).
+- No gameplay, economy, scoring, or audio changes. Build validation,
+  the node suite (83/83), and the browser harness (90/90 checks,
+  PASS 3/3) stay green.
+
 ## 2026-11-01 - IM character redrawn at 3x resolution
 
 - The manager's four mood maps (NORMAL, PUMP, SAD, AGITATED) are
