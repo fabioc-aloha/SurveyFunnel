@@ -225,17 +225,33 @@
     position:absolute; left:8px; top:8px; font-family:"Press Start 2P", monospace; font-size:9px; color:var(--gold);
     opacity:0; transition:opacity .2s; z-index:6; max-width:150px; line-height:1.7;
   }
-  /* fallout piles: returned mail at the DELIVERED gate, unopened mail at
-     the OPENED gate. Glyphs appear/update instantly (no animation), so
-     reduced-motion needs nothing extra here. */
-  .pile{ position:absolute; bottom:4px; z-index:3; pointer-events:none; }
-  .pile-stack{ position:relative; width:76px; height:32px; }
+  /* fallout piles live in a strip along the bottom of the track: five
+     columns aligned under the five gates across the top. Returned mail
+     piles under DELIVERED, unopened mail under OPENED; the other
+     columns stay empty. Glyphs appear/update instantly (no animation),
+     so reduced-motion needs nothing extra here. */
+  .pilestrip{ position:relative; height:62px; border-top:2px dashed var(--line); background:#0b0f1e; }
+  .pilecol{ position:absolute; top:0; bottom:0; transform:translateX(-50%); }
+  .pilecol .pile{ position:absolute; left:50%; transform:translateX(-50%); bottom:3px; z-index:3; pointer-events:none; }
+  .pile-stack{ position:relative; width:76px; height:32px; margin:0 auto; }
   .pile-env{ position:absolute; font-size:14px; line-height:1; }
   #bouncePile .pile-env{ color:#ff8f9a; }
   #unopenedPile .pile-env{ color:var(--gold); }
   .pile-label{
-    font-family:"Press Start 2P", monospace; font-size:8px; color:var(--dim); white-space:nowrap;
+    font-family:"Press Start 2P", monospace; font-size:8px; color:var(--dim); white-space:nowrap; text-align:center;
     background:#0a0d18; border:1px solid var(--line); border-radius:3px; padding:3px 4px; margin-top:2px;
+  }
+  @media (max-width:620px){
+    /* phone widths: the DELIVERED and OPENED columns sit ~62px apart,
+       less than a one-line label, so the strip grows a little and the
+       unopened pile staggers: its label rides above its stack and the
+       whole pile lifts one label-height, which puts both glyph fans
+       on the bounce label's line or above it, never across it. The
+       fans also scale down so the two stacks cannot touch. */
+    .pilestrip{ height:74px; }
+    .pilestrip .pile-label{ font-size:7px; padding:3px 2px; }
+    .pilestrip .pile-stack{ transform:scale(.79); transform-origin:50% 100%; }
+    #unopenedPile{ display:flex; flex-direction:column-reverse; align-items:center; margin-bottom:21px; }
   }
   .pile-label b{ color:var(--ink); font-weight:normal; }
   .remstamp{
@@ -258,6 +274,10 @@
   }
   .sprite.dropping{ transition:top 1.1s ease-in, opacity 1.1s; opacity:0; z-index:2; }
   .sprite.dropping .dropicon{ display:block; }
+  /* bounced / never-opened sprites travel down into their strip pile
+     and fade as they settle into the stack */
+  .sprite.piling{ transition:left .55s ease-in, top .55s ease-in, opacity .3s ease-in .4s; opacity:0; z-index:2; }
+  .sprite.piling .dropicon{ display:block; }
   .sprite.escaped .dropicon{ display:block; }
   @keyframes cheer{ 0%{ margin-top:0; } 40%{ margin-top:-16px; } 100%{ margin-top:0; } }
   .sprite.cheer{ animation:cheer .45s ease-out 2; }
@@ -383,6 +403,7 @@
   .report-title b{ color:var(--gold); }
   @media (prefers-reduced-motion: reduce){
     .sprite.cheer, .sprite.shake, .breaker.tripped, .cabinet.shaking, .gradebox.stamp, #countdownNum.pop{ animation:none; }
+    .sprite.piling{ transition:none; }
     .confetti-bit{ display:none !important; }
   }
   /* ---- v1.5 novice learning layer ---- */
@@ -586,9 +607,14 @@
           <div class="qmarks" id="qmarks"></div>
           <div class="finishflag" id="finishFlag"></div>
           <div class="mgrfig"><div class="desk" id="mgrRun"></div><div class="nameplate">IM</div></div>
-          <div class="pile" id="bouncePile"><div class="pile-stack" id="bounceStack" aria-hidden="true"></div><div class="pile-label">BOUNCED · <b id="bounceCount">0</b></div></div>
-          <div class="pile" id="unopenedPile"><div class="remstamp" id="remStamp" hidden></div><div class="pile-stack" id="unopenedStack" aria-hidden="true"></div><div class="pile-label">UNOPENED · <b id="unopenedCount">0</b></div></div>
           <div class="stampmsg" id="stampMsg">SENDING…</div>
+        </div>
+        <div class="pilestrip" id="pileStrip">
+          <div class="pilecol" data-gate="invited"></div>
+          <div class="pilecol" data-gate="delivered"><div class="pile" id="bouncePile"><div class="pile-stack" id="bounceStack" aria-hidden="true"></div><div class="pile-label">BOUNCED · <b id="bounceCount">0</b></div></div></div>
+          <div class="pilecol" data-gate="opened"><div class="pile" id="unopenedPile"><div class="remstamp" id="remStamp" hidden></div><div class="pile-stack" id="unopenedStack" aria-hidden="true"></div><div class="pile-label">UNOPENED · <b id="unopenedCount">0</b></div></div></div>
+          <div class="pilecol" data-gate="started"></div>
+          <div class="pilecol" data-gate="finish"></div>
         </div>
       </div>
       <div class="reaction" id="respondentBubble" role="status" aria-live="polite" aria-atomic="true" hidden><b id="reactionPerson"></b><p id="reactionText"></p></div>
@@ -2297,6 +2323,28 @@ function renderPiles(){
   if (sb !== pileLive.shownB){ pileLive.shownB = sb; $("bounceStack").innerHTML = pileGlyphsHTML(pileLive.bounced); }
   if (su !== pileLive.shownU){ pileLive.shownU = su; $("unopenedStack").innerHTML = pileGlyphsHTML(pileLive.unopened); }
 }
+/* Bounced and never-opened sprites do not drop where they stand:
+   they travel down into their pile in the bottom strip (bounce pile
+   under DELIVERED, unopened pile under OPENED) and fade as they
+   settle onto the stack. The counts were already updated by the gate
+   events; this is only the body catching up with its envelope. The
+   landing slot reuses the pile's own glyph fan, so the sprite lands
+   where its envelope appears. */
+function routeSpriteToPile(sp, cause){
+  var isBounce = cause === "bounce";
+  var n = isBounce ? pileLive.bounced : pileLive.unopened;
+  var slot = Math.max(0, n - 1) % PILE_SPOTS.length;
+  /* Measure the target stack as rendered (the phone layout scales
+     and lifts the piles) and land the sprite on its fan slot. */
+  var stackEl = isBounce ? $("bounceStack") : $("unopenedStack");
+  var tr = $("track").getBoundingClientRect(), sr = stackEl.getBoundingClientRect();
+  var sx = sr.width / 76, sy = sr.height / 32;
+  var gx = sr.left - tr.left + (PILE_SPOTS[slot][0] + 7) * sx;
+  var gy = sr.bottom - tr.top - (PILE_SPOTS[slot][1] + 7) * sy;
+  sp.el.style.left = (gx - 11) + "px";
+  sp.el.style.top = (gy - 15) + "px";
+  sp.el.classList.add("piling");
+}
 function fireRemBeat(beat){
   var stamp = $("remStamp");
   stamp.textContent = "REMINDER " + beat.wave + " SENT";
@@ -2390,17 +2438,17 @@ function setupStage(run){
   $("breakerChip").classList.remove("tripped");
   $("breakerChip").firstChild.textContent = "BREAKER · GOODWILL ";
   $("compCount").textContent = "0"; $("guessCount").textContent = "0";
-  /* fallout piles: reset counts, park each pile at its gate (the
-     unopened pile shifts right on narrow tracks so its label clears
-     the bounce pile's), and arm this run's reminder beats */
+  /* fallout piles: reset counts, align the bottom strip's columns
+     under their gates (same GATE_X source as the labels across the
+     top), and arm this run's reminder beats */
   pileLive = { bounced: 0, unopened: 0, shownB: -1, shownU: -1 };
   pileBeats = pileModel(run).waves.filter(function(w){ return w.at !== null; });
   pileBeatIdx = 0;
   if (remStampTimer){ clearTimeout(remStampTimer); remStampTimer = null; }
   $("remStamp").hidden = true;
-  $("bouncePile").style.left = "calc(" + GATE_X.delivered + "% + 6px)";
-  var trackW = $("track").clientWidth || 0;
-  $("unopenedPile").style.left = "calc(" + (trackW && trackW < 620 ? 57 : GATE_X.opened) + "% + 6px)";
+  Array.prototype.forEach.call(document.querySelectorAll(".pilecol"), function(col){
+    col.style.left = GATE_X[col.getAttribute("data-gate")] + "%";
+  });
   renderPiles();
   $("runLog").textContent = "STAMPING INVITES…";
   $("stampMsg").style.opacity = "1";
@@ -2554,8 +2602,14 @@ function tick(now){
         if (e.cause === "bounce"){ pileLive.bounced++; renderPiles(); }
         sp.done = true;
         sp.el.querySelector(".dropicon").textContent = DROP_ICON[e.cause] || "?";
-        sp.el.style.top = "calc(" + sp.el.style.top + " + 130px)";
-        sp.el.classList.add("dropping");
+        if (e.cause === "bounce" || e.cause === "noopen"){
+          /* these two settle into their strip piles instead of
+             dropping on the spot */
+          routeSpriteToPile(sp, e.cause);
+        } else {
+          sp.el.style.top = "calc(" + sp.el.style.top + " + 130px)";
+          sp.el.classList.add("dropping");
+        }
         logLine(e.cause === "bounce" ? DROP_LOG.bounce + "." : PERSONAS[sp.persona].name.toUpperCase() + " " + DROP_LOG[e.cause].toUpperCase() + ".");
         if (e.cause === "bounce") sndThud(); else if (sfxGate("wander", 240)) sndWander();
       } else if (e.type === "guess"){

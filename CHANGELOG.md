@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-11-01 - Fallout piles move to a bottom strip under their funnel steps
+
+- The bounce and unopened piles no longer sit up at the funnel
+  gates inside the sprite traffic. The run track keeps its five
+  step labels across the top, and a new PILE STRIP runs along the
+  bottom of the track: five quiet columns positioned from the same
+  GATE_X gate map, so each column lines up under its step label at
+  every width. The BOUNCED pile lives in the DELIVERED column, the
+  UNOPENED pile in the OPENED column; the other columns stay empty.
+- Sprite routing now matches the layout: a sprite that bounces at
+  the DELIVERED gate slides down into the bounce pile and settles
+  onto its glyph fan, and a delivered-but-unopened envelope drops
+  the same way into the unopened pile. The landing point is measured
+  from the rendered stack, so the phone layout (scaled-down fans,
+  the unopened pile lifted one label-height with its label above
+  its stack) lands sprites correctly too. Opens still draw the
+  unopened pile down, and the REMINDER SENT stamp still anchors
+  over the unopened pile, now in the strip.
+- Counts and model are unchanged: bounced = hard + soft bounces,
+  unopened = delivered minus opened, glyph cap 12, exact counts in
+  the labels. The strip fits the track at desktop and 390px with
+  zero horizontal overflow; at phone widths the two labels measure
+  clear of each other and of both glyph fans. Under
+  prefers-reduced-motion, sprites settle into the piles instantly.
+
 ## 2026-11-01 - Quick Challenges, stage 1 of 3: six-card drills with real cut decisions
 
 - Each Quick Challenge now deals six questions instead of three: its

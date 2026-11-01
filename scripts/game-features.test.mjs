@@ -1050,6 +1050,29 @@ test('invite stage names the reminder as an email to people who have not opened 
   assert.match(html, /UNOPENED · <b id="unopenedCount">/);
 });
 
+test('fallout piles sit in a bottom strip whose columns align with the five gates', () => {
+  const html = readFileSync(join(root, 'site', 'index.html'), 'utf8');
+  assert.match(html, /id="pileStrip"/);
+  for (const gate of ['invited', 'delivered', 'opened', 'started', 'finish'])
+    assert.match(html, new RegExp(`data-gate="${gate}"`), `strip has a ${gate} column`);
+  const deliveredCol = html.indexOf('data-gate="delivered"');
+  const openedCol = html.indexOf('data-gate="opened"');
+  const startedCol = html.indexOf('data-gate="started"');
+  const bouncePile = html.indexOf('id="bouncePile"');
+  const unopenedPile = html.indexOf('id="unopenedPile"');
+  assert.ok(deliveredCol < bouncePile && bouncePile < openedCol,
+    'the bounce pile lives inside the delivered column');
+  assert.ok(openedCol < unopenedPile && unopenedPile < startedCol,
+    'the unopened pile lives inside the opened column');
+  /* the strip is a band under the track, not an overlay inside it:
+     in source order it follows the track element entirely */
+  assert.ok(html.indexOf('id="pileStrip"') > html.indexOf('id="track"'),
+    'the pile strip renders after the track');
+  /* column positions come from the same GATE_X table as the gate
+     labels across the top, set in setupStage */
+  assert.match(html, /GATE_X\[col\.getAttribute\("data-gate"\)\]/);
+});
+
 test('report prints the unopened count from the same tally the piles use', () => {
   const { context: g, element } = game();
   g.selectLevel(1, false);
