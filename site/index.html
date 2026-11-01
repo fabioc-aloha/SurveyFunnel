@@ -237,6 +237,18 @@
   .qmarks{ position:absolute; left:0; right:0; top:6px; height:16px; }
   .qmark{ position:absolute; transform:translateX(-50%); font-family:"Press Start 2P", monospace; font-size:8px; color:var(--faint); background:#0a0d18; border:1px solid var(--line); border-radius:3px; padding:2px 3px; }
   .qmark.bad{ color:#ffb3ba; border-color:var(--red); }
+  /* phone widths swap the fan for this one summary strip (same counts,
+     no per-question identities); it only ever displays under the
+     620px breakpoint, so it is styled at gate-label phone sizes. It
+     hangs from the fan's right end (translateX(-100%)) so however
+     long the counts get, it grows left and never reaches the
+     finish flag */
+  .qsummary{ position:absolute; transform:translateX(-100%); font-family:"Press Start 2P", monospace; font-size:8px; color:var(--faint); background:#0a0d18; border:1px solid var(--line); border-radius:3px; padding:2px 5px; white-space:nowrap; display:none; }
+  .qsummary.bad{ color:#ffb3ba; border-color:var(--red); }
+  @media (max-width:620px){
+    .qmark{ display:none; }
+    .qsummary{ display:block; font-size:7px; letter-spacing:-1px; }
+  }
   .finishflag{ position:absolute; top:0; bottom:0; width:8px; background:repeating-conic-gradient(#eef1ff 0 25%, #141826 0 50%) 0 0/8px 8px; opacity:.85; }
   .desk{ position:absolute; left:4px; bottom:6px; z-index:5; }
   .stampmsg{
@@ -3032,11 +3044,20 @@ function setupStage(run){
   if (rm2.atRisk) logLineSoon();
   $("finishFlag").style.left = "calc(" + GATE_X.finish + "% + 14px)";
   var n = run.kept.length, stretch = GATE_X.finish - GATE_X.started - 6;
-  $("qmarks").innerHTML = run.kept.map(function(q, qi){
+  var badCount = 0;
+  var marksHtml = run.kept.map(function(q, qi){
     var x = GATE_X.started + 4 + (n === 1 ? stretch/2 : (qi/(n-1)) * stretch);
     var bad = state.qstate[q.id] === "keep" && (q.answerBy || defectOf(q) !== "CLEAN");
+    if (bad) badCount++;
     return '<span class="qmark' + (bad ? " bad" : "") + '" style="left:' + x + '%">Q' + q.id + "</span>";
   }).join("");
+  /* the summary strip carries the fan's counts (questions kept,
+     questions still flagged) for phone widths, where the fan itself
+     overlaps into mush; CSS decides which of the two shows. It is
+     anchored to the fan's right end and grows left from there */
+  $("qmarks").innerHTML = marksHtml +
+    '<span class="qsummary' + (badCount ? " bad" : "") + '" style="left:' + (GATE_X.started + 4 + stretch) + '%">' +
+    n + (n === 1 ? " QUESTION" : " QUESTIONS") + " · " + badCount + " FLAGGED</span>";
   moodReset(run);
   personaLegend();
   $("gwLive").textContent = run.gm.start;
@@ -3059,7 +3080,11 @@ function setupStage(run){
   $("runLog").textContent = "STAMPING INVITES…";
   $("stampMsg").style.opacity = "1";
 }
-var DROP_ICON = { noopen:"\u2709", nostart:"\u21A9", patience:"\u23F1", knowledge:"?", mobile:"\u25A4", bounce:"\u21A9", breaker:"\u26A1" };
+/* \u21A9 is the email bounce-back's mark and only the bounce-back's:
+   the opened-then-bounced drop gets the envelope crossed out instead
+   (saw the mail, gave up), so a return arrow on the track always
+   means the address died at the DELIVERED gate */
+var DROP_ICON = { noopen:"\u2709", nostart:"\u2709\u2717", patience:"\u23F1", knowledge:"?", mobile:"\u25A4", bounce:"\u21A9", breaker:"\u26A1" };
 var DROP_LOG = {
   noopen: "never opened the invite", nostart: "opened, then bounced",
   patience: "ran out of patience mid-survey", knowledge: "hit a question they cannot answer",
@@ -3209,7 +3234,12 @@ function tick(now){
         if (e.cause === "bounce"){ pileLive.bounced++; renderPiles(); if (moodMachine) moodMachine.noteBounce(t, pileLive.bounced); }
         if (moodMachine && (e.cause === "patience" || e.cause === "knowledge" || e.cause === "mobile")) moodMachine.noteAbandon(t);
         sp.done = true;
-        sp.el.querySelector(".dropicon").textContent = DROP_ICON[e.cause] || "?";
+        var dropEl = sp.el.querySelector(".dropicon");
+        dropEl.textContent = DROP_ICON[e.cause] || "?";
+        /* the gave-up mark is two glyphs (envelope + cross), so it runs
+           smaller like the two-envelope duplicate mark; resetting the
+           size also clears any size an earlier event set on this sprite */
+        dropEl.style.fontSize = e.cause === "nostart" ? "11px" : "";
         if (e.cause === "bounce" || e.cause === "noopen"){
           /* these two settle into their strip piles instead of
              dropping on the spot */

@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-11-01 - Run screen: distinct gave-up glyph; phone question chips collapse
+
+- The opened-then-bounced drop has its own mark. The return arrow
+  (↩) meant two events at once: an email bounce-back at the DELIVERED
+  gate (which piles in the strip) and a respondent who opened the
+  invite, never started, and dropped on the spot mid-track. In a
+  zero-bounce run the second kind's arrows read as bounce-backs
+  refusing to pile. The drop now shows the envelope crossed out
+  (✉✗, sized like the two-envelope duplicate mark): saw the mail,
+  gave up. ↩ appears only on bounced sprites, in flight and settled
+  in the pile. Event names, causes, counts, and copy are unchanged;
+  only the icon moved.
+- Phone widths (620px and under) no longer fan the question chips.
+  A dozen Q-chips spread across the survey stretch overlapped into
+  unreadable mush at 390px. The fan is still rendered, and CSS swaps
+  it for one summary strip in the same header zone: "12 QUESTIONS ·
+  7 FLAGGED", carrying the fan's counts (questions kept, questions
+  still flagged, in the fan's red when any are). The strip hangs
+  from the fan's right end and grows left, so it never reaches the
+  finish flag. What the summary drops: the per-question identities
+  and positions along the stretch. The chips were never interactive,
+  and neither is the strip. Desktop keeps the fan exactly as it was;
+  the header zone height is unchanged, with no overflow and no page
+  errors at 390px.
+
 ## 2026-11-01 - Final visual pass: layout and copy fixes
 
 - Gate labels at phone widths: at 9px the five labels clipped and
