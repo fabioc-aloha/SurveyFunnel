@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-11-01 - Nameplate reads IM only
+
+- The manager desk nameplate now reads just "IM" (never spelled
+  out) in all three placements: setup launch bar, run track, and
+  the round report.
+- The plate shrinks to fit the short text (a 48px minimum so it
+  still reads as a plate); the brass styling, border, pixel font,
+  and letter-spacing are unchanged. Build validation and all 38
+  tests pass.
+
+## 2026-11-01 - Questionnaire action buttons: tidy, even rows
+
+- The per-question action row (KEEP, the class fix verb, CUT, and
+  the disabled NO WORDING FIX) no longer wraps raggedly. The pixel
+  font now gets an explicit line-height on these buttons (wrapped
+  labels previously overlapped and clipped), buttons share a
+  uniform 60px height, and flex min-width no longer lets the
+  longest word steal width from its neighbours.
+- The fix button takes a deliberately wider share of the row, and
+  the price suffix (for example "· 2") sits on its own smaller
+  line under the verb instead of wrapping mid-label. Button text,
+  prices, and behaviour are unchanged.
+- Verified in headless Chrome at 390px and 1000px before and
+  after. Build validation and all 38 tests pass.
+
 ## 2026-11-01 - Manager legibility: headset sprite and IM nameplate
 
 - The three manager mood sprites (normal, pumped, sad) now wear a
