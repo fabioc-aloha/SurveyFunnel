@@ -1591,21 +1591,28 @@ test('wave 2 locks the wave 1 list and never leaks into the campaign', () => {
 
 test('agitated manager map keeps the headset and only reworks the face', () => {
   const { context: g } = game();
-  const R = map => map.map(row => [...row].map((c, x) => c === 'R' ? x : -1).filter(x => x >= 0).join(',')).join('|');
-  assert.equal(g.MGR_NORMAL.length, 13);
-  assert.equal(g.MGR_PUMP.length, 13);
-  assert.equal(g.MGR_SAD.length, 11);
-  assert.equal(g.MGR_AGITATED.length, 13, 'agitated matches NORMAL/PUMP height');
+  /* The headset region is the R-family cells (R and its dark shade r)
+     in the head rows (0..21, above neck and desk); the desk's red mug
+     in NORMAL/AGITATED is furniture, not headset. */
+  const R = map => map.slice(0, 22).map((row, y) => [...row].map((c, x) => (c === 'R' || c === 'r') ? `${x},${y}` : null).filter(Boolean).join(' ')).join('|');
+  assert.equal(g.MGR_NORMAL.length, 39);
+  assert.equal(g.MGR_PUMP.length, 39);
+  assert.equal(g.MGR_SAD.length, 33);
+  assert.equal(g.MGR_AGITATED.length, 39, 'agitated matches NORMAL/PUMP height');
   for (const map of [g.MGR_NORMAL, g.MGR_PUMP, g.MGR_SAD, g.MGR_AGITATED]) {
-    for (const row of map) assert.equal(row.length, 14, 'every mood map is 14 cells wide');
+    for (const row of map) assert.equal(row.length, 42, 'every mood map is 42 cells wide');
   }
-  assert.equal(R(g.MGR_AGITATED), R(g.MGR_NORMAL), 'headset cells are exactly NORMAL\u2019s');
+  for (const map of [g.MGR_PUMP, g.MGR_SAD, g.MGR_AGITATED]) {
+    assert.equal(R(map), R(g.MGR_NORMAL), 'headset cells sit at NORMAL\u2019s coordinates in every mood');
+  }
+  const FACE_ROWS = new Set([9, 10, 11, 13, 14, 17, 18, 19, 20]); /* brows, stare, teeth */
   g.MGR_AGITATED.forEach((row, y) => {
-    if (y === 3 || y === 4 || y === 6) return; /* brows and mouth rows carry the expression */
+    if (FACE_ROWS.has(y)) return;
     assert.equal(row, g.MGR_NORMAL[y], `row ${y} is byte-identical to NORMAL`);
   });
-  assert.notEqual(g.MGR_AGITATED[3], g.MGR_NORMAL[3], 'brow row differs');
-  assert.notEqual(g.MGR_AGITATED[6], g.MGR_NORMAL[6], 'mouth row differs');
+  assert.notEqual(g.MGR_AGITATED[11], g.MGR_NORMAL[11], 'scowl brow row differs');
+  assert.notEqual(g.MGR_AGITATED[18], g.MGR_NORMAL[18], 'teeth row differs');
+  assert.notEqual(g.MGR_AGITATED[19], g.MGR_NORMAL[19], 'teeth row differs');
 });
 
 test('mood machine baseline follows pace against the target', () => {
@@ -1761,7 +1768,7 @@ test('mood parameters come off real runs: needed count and finish window', () =>
   assert.equal(bp.lastFinishT, g.RUN_MS);
   assert.ok(g.moodMachine, 'setupStage armed a mood machine for the run');
   assert.equal(g.moodMachine.params.needed, 4);
-  assert.equal(element('mgrRun').innerHTML, g.pixelHTML(g.MGR_NORMAL, 4).html, 'the run figure starts NORMAL');
+  assert.equal(element('mgrRun').innerHTML, g.pixelHTML(g.MGR_NORMAL, 4 / 3).html, 'the run figure starts NORMAL (hi-res maps render at a third of the legacy cell size)');
   assert.equal(element('mgrRun').className, 'pixelbox', 'no shake class at rest');
 
   const second = game();

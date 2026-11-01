@@ -1461,75 +1461,186 @@ function sndUnlock(){ [659, 784, 988, 1319].forEach(function(f, i){ tone(f, 0.14
 function sndSeason(){ duckMusic(1300); [523,659,784,1047,784,1047,1319,1047,1319,1568].forEach(function(f, i){ tone(f, i >= 8 ? 0.35 : 0.14, "square", 0.055, i * 0.13); tone(f/2, i >= 8 ? 0.35 : 0.14, "triangle", 0.016, i * 0.13); }); }
 
 /* ================= PIXEL ART ================= */
-var PAL = { H:"#241f31", S:"#f2c29b", E:"#241f31", B:"#1f8a8a", D:"#8a5a33", d:"#6e4525", P:"#f4f1e6", R:"#ff5d6c", T:"#141826" };
+var PAL = { H:"#241f31", S:"#f2c29b", E:"#241f31", B:"#1f8a8a", D:"#8a5a33", d:"#6e4525", P:"#f4f1e6", R:"#ff5d6c", T:"#141826", h:"#463a5e", s:"#d99e73", r:"#d63d4c", b:"#176f6f" };
+/* The manager maps are drawn at 3x the old resolution (42 cells
+   wide) and rendered through setPixelMgr at a third of the old cell
+   size, so the figure keeps the same on-screen footprint the
+   14-wide maps had while the face carries real detail. The headset
+   (R/r cells in the head rows) sits at identical coordinates in
+   all four maps; only the face and pose change with the mood. */
 var MGR_NORMAL = [
-"..RRRRRRRRR...",
-".RHHHHHHHHHR..",
-".RRSSSSSSSHRR.",
-"..RSSSSSSSHR..",
-"..RSESSESSR...",
-"..HSSSSSSSRR..",
-"...SSSSSSR....",
-"..BBBBBBBBB...",
-".BBBBBBBBBBB..",
-".BBBBBBBBBBB..",
-"DDDDDDDDDDDDD.",
-"DDPPDDDDRDDDD.",
-"DDDDDDDDDDDDD."
+"...............RRRRRRRRRRRR...............",
+"............RRRRRRRRRRRRRRRRRR............",
+"...........RRHHHHHHHHHHHHHHHHRR...........",
+".........RRHHHhhHHHHHHHHHHHHHHHRR.........",
+".......RR.HHHHHHHHHHhhHHHHHHHHHH.RR.......",
+"......RRR.HHHHHHHHHHHHHHHHhhHHHH.RRR......",
+"....RRRRRRHHHHHHhhHHHHHHHHHHHHHHRRRRRR....",
+"....RRrrRRHHHSSSSSSSHHSSSSSSSHHHRRrrRR....",
+"....RRrrRRHHSSSSSSSSSSSSSSSSSSHHRRrrRR....",
+"....RRrrRRHHSSSSSSSSSSSSSSSSSSHHRRrrRR....",
+"....RRrrRRHHSHHHHSSSSSSSSHHHHSHHRRrrRR....",
+"....RRrrRRHHSSEPESSSSSSSSEPESSHHRRrrRR....",
+"....RRrrRRHHSSEEESSSSSSSSEEESSHHRRrrRR....",
+"....RRRRRRSSSSSSSSSSSSSSSSSSSSSSRRRRRR....",
+".....RRRR.SSSSSSSSSSSsSSSSSSSSSS.RRRR.....",
+"......RR..SSSSSSSSSSSsSSSSSSSSSS..RR......",
+"...........SSSSSSSSSssSSSSSSSSS..R........",
+"............SSSSSESSSSSSESSSSS.RR.........",
+".............SSSSSEEEEEESSSSS.RR..........",
+"..............SSSSSSSSSSSSSS.R............",
+"...............SSSSSSSSSSSSRR.............",
+"................sSSSSSSSSs................",
+"..................ssssss..................",
+"..................sSSSSs..................",
+".............bBBBPPPSSPPPBBBb.............",
+"...........bBBBBBBPBBBBPBBBBBBb...........",
+".........bbBBBBBBBBBBBBBBBBBBBBbb.........",
+".......bbBBBBBPBBBBBBBBBBBBBBBBBBbb.......",
+".......bbBBBBbBbbBBBBBBBBBBBBBBBBbb.......",
+".......bbBBBBbBBbBBBBBBBBBBBBBBBBbb.......",
+".......bbBBBBbbbbBBBBBBBBBBBBBBBBbb.......",
+".......bbBBBBBBBBBBBBBBBBBBBBBBBBbb.......",
+"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD...",
+"DDDDDDPPPPPPDDDDDDDDDDDDRRRDDDDDDDDDDDD...",
+"DDDDDDPEEEEPDDDDDDDDDDDDRRRRDDDDDDDDDDD...",
+"DDDDDDPEEEPPDDDDDDDDDDDDrrrDDDDDDDDDDDD...",
+"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD...",
+"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD...",
+"ddddddddddddddddddddddddddddddddddddddd..."
 ];
 var MGR_PUMP = [
-".BB.......BB..",
-".BBB.....BBB..",
-"..BB.BB.BBB...",
-"..RRRRRRRRR...",
-".RRSSSSSSSHRR.",
-"..RSSSSSSSHR..",
-"..RSESSESSR...",
-"..HSSSSSSSRR..",
-"...SSSSSSR....",
-"..BBBBBBBBB...",
-".BBBBBBBBBBB..",
-"DDDDDDDDDDDDD.",
-"DDDDDDDDDDDDD."
+"...............RRRRRRRRRRRR...............",
+"............RRRRRRRRRRRRRRRRRR............",
+"SSS........RRHHHHHHHHHHHHHHHHRR........SSS",
+"SSS......RRHHHhhHHHHHHHHHHHHHHHRR......SSS",
+"SSSS...RR.HHHHHHHHHHhhHHHHHHHHHH.RR...SSSS",
+"BBB...RRR.HHHHHHHHHHHHHHHHhhHHHH.RRR...BBB",
+"BBB.RRRRRRHHHHHHhhHHHHHHHHHHHHHHRRRRRR.BBB",
+"BBB.RRrrRRHHHSSSSSSSHHSSSSSSSHHHRRrrRR.BBB",
+"BBB.RRrrRRHHSSSSSSSSSSSSSSSSSSHHRRrrRR.BBB",
+"BBB.RRrrRRHHSHHHHSSSSSSSSHHHHSHHRRrrRR.BBB",
+"BBB.RRrrRRHHSSSSSSSSSSSSSSSSSSHHRRrrRR.BBB",
+"BBB.RRrrRRHHSSEPESSSSSSSSEPESSHHRRrrRR.BBB",
+"BBB.RRrrRRHHSSEEESSSSSSSSEEESSHHRRrrRR.BBB",
+"BBB.RRRRRRSSSSEEESSSSSSSSEEESSSSRRRRRR.BBB",
+"BBB..RRRR.SSSSSSSSSSSsSSSSSSSSSS.RRRR..BBB",
+"BBB...RR..SSSSSSSSSSSsSSSSSSSSSS..RR...BBB",
+"BBB........SSSSSSSSSssSSSSSSSSS..R.....BBB",
+"BBB.........SSSSSSSSSSSSSSSSSS.RR......BBB",
+"BBBB.........SSSEEEEEEEEEESSS.RR......BBBB",
+"..............SSEPPPPPPPPESS.R............",
+"BBBBB..........SETTTTTTTTESRR........BBBBB",
+"................sSEEEEEESs................",
+"BBBBBB............ssssss............BBBBBB",
+"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+"......BBBBBBBBBBBPPPSSPPPBBBBBBBBBBB......",
+"......BBBBBBBBBBBBPBBBBPBBBBBBBBBBBB......",
+"......bbBBBBBBBBBBBBBBBBBBBBBBBBBBbb......",
+"......bbBBBBBBBBBBBBBBBBBBBBBBBBBBbb......",
+"......bbBBBBBBBBBBBBBBBBBBBBBBBBBBbb......",
+"......bbBBBBBBBBBBBBBBBBBBBBBBBBBBbb......",
+"......bbBBBBBBBBBBBBBBBBBBBBBBBBBBbb......",
+"......bbBBBBBBBBBBBBBBBBBBBBBBBBBBbb......",
+"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD...",
+"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD...",
+"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD...",
+"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD...",
+"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD...",
+"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD...",
+"ddddddddddddddddddddddddddddddddddddddd..."
 ];
 var MGR_SAD = [
-"..............",
-"...RRRRRRR....",
-"..RHHHHHHHR...",
-".RRHHHHHHHRR..",
-".RRSSSSSSSHRR.",
-"..SSSSSSSRRR..",
-".BBBBBBBBBBB..",
-"BBBBBBBBBBBBB.",
-"DDDDDDDDDDDDD.",
-"DDPPDDDDDDDDD.",
-"DDDDDDDDDDDDD."
+"...............RRRRRRRRRRRR...............",
+"............RRRRRRRRRRRRRRRRRR............",
+"...........RRHHHHHHHHHHHHHHHHRR...........",
+".........RRHHHhhHHHHHHHHHHHHHHHRR.........",
+".......RR.HHHHHHHHHHhhHHHHHHHHHH.RR.......",
+"......RRR.HHHHHHHHHHHHHHHHhhHHHH.RRR......",
+"....RRRRRRHHHHHHhhHHHHHHHHHHHHHHRRRRRR....",
+"....RRrrRRHHHHHHHHHHHHHHHHHHHHHHRRrrRR....",
+"....RRrrRRHHHHHHHHHHHHHHHHHHHHHHRRrrRR....",
+"....RRrrRR.HHHSHHHHHHSHHHHHSHHH.RRrrRR....",
+"....RRrrRR...SSSSSSSSSSSSSSSS...RRrrRR....",
+"....RRrrRRHHSSSSHHSSSSSSHHSSSSHHRRrrRR....",
+"....RRrrRRHHSSHHSSSSSSSSSSHHSSHHRRrrRR....",
+"....RRRRRRSSSSSSSSSSSSSSSSSSSSSSRRRRRR....",
+".....RRRR.SSSESSESSSSSSSSESSESSS.RRRR.....",
+"......RR..SSSSEESSSSSSSSSSEESSSS..RR......",
+"...........SSSSSSSSSSsSSSSSSSSS..R........",
+"............SSSSSSSSssSSSSSSSS.RR.........",
+".............SSSSSSSSSSSSSSSS.RR..........",
+"..............SSSSSEEEESSSSS.R............",
+"...............SSSESSSSESSSRR.............",
+"................SSssssssSS................",
+"..................ssssss..................",
+"..........BBBBBBBBPPBBPPBBBBBBBB..........",
+"........BBBBBBBBBBBBBBBBBBBBBBBBBB........",
+".......bbBBBBBBBBBBBBBBBBBBBBBBBBbb.......",
+".......bbBBBBBBBBBBBBBBBBBBBBBBBBbb.......",
+".......bbBBBBBBBBBBBBBBBBBBBBBBBBbb.......",
+"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD...",
+"DDDDDDPPPPPPDDDDDDDDDDDDDDDDDDDDDDDDDDD...",
+"DDDDDDPEEEEPDDDDDDDDDDDDDDDDDDDDDDDDDDD...",
+"DDDDDDPEEEPPDDDDDDDDDDDDDDDDDDDDDDDDDDD...",
+"ddddddddddddddddddddddddddddddddddddddd..."
 ];
-/* AGITATED: MGR_NORMAL with only face cells reworked — furrowed
-   brows (segments over each eye, inner tips dropped between the
-   eyes) and a gritted-teeth mouth. Headset, body, and desk cells
-   are identical to NORMAL, so the nameplate character never
-   changes; the expression does. */
+/* AGITATED: MGR_NORMAL with only face cells reworked — segmented
+   scowl brows descending toward a center notch, a hard stare with
+   shadowed bags, and a gritted-teeth mouth. Headset, body, and
+   desk cells are identical to NORMAL, so the nameplate character
+   never changes; the expression does. */
 var MGR_AGITATED = [
-"..RRRRRRRRR...",
-".RHHHHHHHHHR..",
-".RRSSSSSSSHRR.",
-"..RHHSSHHSHR..",
-"..RSEHHESSR...",
-"..HSSSSSSSRR..",
-"...SPHPHPR....",
-"..BBBBBBBBB...",
-".BBBBBBBBBBB..",
-".BBBBBBBBBBB..",
-"DDDDDDDDDDDDD.",
-"DDPPDDDDRDDDD.",
-"DDDDDDDDDDDDD."
+"...............RRRRRRRRRRRR...............",
+"............RRRRRRRRRRRRRRRRRR............",
+"...........RRHHHHHHHHHHHHHHHHRR...........",
+".........RRHHHhhHHHHHHHHHHHHHHHRR.........",
+".......RR.HHHHHHHHHHhhHHHHHHHHHH.RR.......",
+"......RRR.HHHHHHHHHHHHHHHHhhHHHH.RRR......",
+"....RRRRRRHHHHHHhhHHHHHHHHHHHHHHRRRRRR....",
+"....RRrrRRHHHSSSSSSSHHSSSSSSSHHHRRrrRR....",
+"....RRrrRRHHSSSSSSSSSSSSSSSSSSHHRRrrRR....",
+"....RRrrRRHHHHHHSSSSSSSSSSHHHHHHRRrrRR....",
+"....RRrrRRHHSHHHHHSSHHSSHHHHHSHHRRrrRR....",
+"....RRrrRRHHSSSSHHHHSSHHHHSSSSHHRRrrRR....",
+"....RRrrRRHHSSEEESSSSSSSSEEESSHHRRrrRR....",
+"....RRRRRRSSSSEEESSSSSSSSEEESSSSRRRRRR....",
+".....RRRR.SSSSsssSSSSsSSSsssSSSS.RRRR.....",
+"......RR..SSSSSSSSSSSsSSSSSSSSSS..RR......",
+"...........SSSSSSSSSssSSSSSSSSS..R........",
+"............SSSSSSSSSSSSSSSSSS.RR.........",
+".............SSSEPPHPPHPPESSS.RR..........",
+"..............SSEPPHPPHPPESS.R............",
+"...............SSEEEEEEEESSRR.............",
+"................sSSSSSSSSs................",
+"..................ssssss..................",
+"..................sSSSSs..................",
+".............bBBBPPPSSPPPBBBb.............",
+"...........bBBBBBBPBBBBPBBBBBBb...........",
+".........bbBBBBBBBBBBBBBBBBBBBBbb.........",
+".......bbBBBBBPBBBBBBBBBBBBBBBBBBbb.......",
+".......bbBBBBbBbbBBBBBBBBBBBBBBBBbb.......",
+".......bbBBBBbBBbBBBBBBBBBBBBBBBBbb.......",
+".......bbBBBBbbbbBBBBBBBBBBBBBBBBbb.......",
+".......bbBBBBBBBBBBBBBBBBBBBBBBBBbb.......",
+"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD...",
+"DDDDDDPPPPPPDDDDDDDDDDDDRRRDDDDDDDDDDDD...",
+"DDDDDDPEEEEPDDDDDDDDDDDDRRRRDDDDDDDDDDD...",
+"DDDDDDPEEEPPDDDDDDDDDDDDrrrDDDDDDDDDDDD...",
+"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD...",
+"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD...",
+"ddddddddddddddddddddddddddddddddddddddd..."
 ];
 function pixelHTML(map, px){
+  /* Cell edges snap to whole device pixels (left = round(x*px), size
+     = the gap to the next snapped edge) so fractional cell sizes —
+     the hi-res manager renders at 4/3 and 5/3 — tile crisply instead
+     of antialiasing into mush. At integer px this is the identity. */
   var html = "", w = map[0].length;
   for (var y=0; y<map.length; y++) for (var x=0; x<map[y].length; x++){
     var c = map[y][x]; if (c === "." || c === " ") continue;
-    html += '<div style="left:' + (x*px) + 'px;top:' + (y*px) + 'px;width:' + px + 'px;height:' + px + 'px;background:' + (PAL[c] || "#888") + '"></div>';
+    var lx = Math.round(x*px), ty = Math.round(y*px);
+    html += '<div style="left:' + lx + 'px;top:' + ty + 'px;width:' + (Math.round((x+1)*px) - lx) + 'px;height:' + (Math.round((y+1)*px) - ty) + 'px;background:' + (PAL[c] || "#888") + '"></div>';
   }
   return { html: html, w: w*px, h: map.length*px };
 }
@@ -1537,6 +1648,11 @@ function setPixel(el, map, px){
   var p = pixelHTML(map, px);
   el.className = "pixelbox"; el.style.width = p.w + "px"; el.style.height = p.h + "px"; el.innerHTML = p.html;
 }
+/* The manager maps are 3x resolution, so the manager figure renders
+   at a third of the legacy cell size for the same display footprint
+   (px 4 -> 56x52 setup/run, px 5 -> 70x65 report, as the 14-wide
+   maps measured). */
+function setPixelMgr(el, map, px){ setPixel(el, map, px / 3); }
 var SPRITE_MAP = [
 ".HHHH.",
 "HSSSSH",
@@ -2302,7 +2418,7 @@ document.addEventListener("keydown", function(e){
     }
   }
 });
-setPixel($("mgrSetup"), MGR_NORMAL, 4);
+setPixelMgr($("mgrSetup"), MGR_NORMAL, 4);
 renderLevelUI(); renderSegments(); renderInvites(); renderQuestions(); renderPrep(); renderReadout();
 $("startBtn").addEventListener("click", function(){ initAudio(); sndCoin(); selectLevel(state.level,true); setMusicVariant("setup"); });
 $("campaignBtn").addEventListener("click", function(){ initAudio(); sndClick(); showCampaign(); });
@@ -2817,7 +2933,7 @@ function moodRender(t){
   if (mood === moodShown) return;
   moodShown = mood;
   var el = $("mgrRun");
-  setPixel(el, mood === "PUMP" ? MGR_PUMP : mood === "SAD" ? MGR_SAD : mood === "AGITATED" ? MGR_AGITATED : MGR_NORMAL, 4);
+  setPixelMgr(el, mood === "PUMP" ? MGR_PUMP : mood === "SAD" ? MGR_SAD : mood === "AGITATED" ? MGR_AGITATED : MGR_NORMAL, 4);
   el.className = "pixelbox" + (mood === "AGITATED" ? " mgr-shake" : "");
 }
 
@@ -3807,7 +3923,7 @@ function showReport(){
   $("report").innerHTML = html;
   $("runStage").style.display = "none";
   $("report").style.display = "block";
-  setPixel($("mgrReport"), gm.trips ? MGR_SAD : (won ? MGR_PUMP : MGR_NORMAL), 5);
+  setPixelMgr($("mgrReport"), gm.trips ? MGR_SAD : (won ? MGR_PUMP : MGR_NORMAL), 5);
   state.lastRound = prevRound;
   updateBestDisplay();
   setMusicVariant("setup");

@@ -1,5 +1,41 @@
 # Changelog
 
+## 2026-11-01 - IM character redrawn at 3x resolution
+
+- The manager's four mood maps (NORMAL, PUMP, SAD, AGITATED) are
+  redrawn at 3x resolution: 42x39 cells (42x33 for SAD), up from
+  14x13 (14x11). Same character throughout: same hair, skin tone,
+  teal shirt, desk, and the same red headset in the same position,
+  with the mic boom ending beside the mouth. The extra resolution
+  goes into the face: shaped hair with strand highlights and a
+  widow's peak, eyebrows, eyes with a glint, a nose, sideburns and
+  ears under the cups, a polo collar, and a chest pocket with a pen
+  on the desk side, a paper sheet with text lines and the red mug.
+- Expressions carry more detail per mood: NORMAL keeps a slight
+  closed-mouth smile; PUMP keeps its arms-up pose with raised brows
+  and an open grin; SAD bows the face under a fringe with grief
+  brows, closed eyes, and a downturned mouth; AGITATED keeps the
+  segmented scowl with its center notch and gritted teeth, now with
+  a hard stare and shadowed bags. AGITATED still derives from
+  NORMAL: only the brow, stare, and teeth rows differ.
+- Consistency is asserted in the suite: exact dimensions and uniform
+  row widths, and headset parity - the R-family cells (R plus its
+  new dark shade r) in the head rows occupy identical coordinates
+  in all four maps, so the head and headset sit at the same top
+  rows in every mood.
+- PAL gains four shade letters (h hair highlight, s skin shadow,
+  r headset dark red, b teal shade); every existing letter's color
+  is unchanged.
+- Rendering keeps the figure's on-screen footprint identical
+  (56x52 at setup and run, 70x65 at report): a new setPixelMgr
+  renders the manager maps at a third of the legacy cell size, and
+  pixelHTML now snaps cell edges to whole device pixels so the
+  fractional cells tile crisply instead of antialiasing (the
+  identity at integer cell sizes). Respondent sprites and every
+  other pixel map are untouched. Node suite 83/83 and the browser
+  harness (90/90 checks, nameplate and agitated-class assertions
+  included) stay green.
+
 ## 2026-11-01 - Browser regression harness integrated
 
 - The browser regression harness is now tracked in the repository at
