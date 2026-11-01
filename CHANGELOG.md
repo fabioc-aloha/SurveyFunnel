@@ -1,5 +1,45 @@
 # Changelog
 
+## 2026-11-01 - The IM reacts live to run events
+
+- The run-screen manager now reacts to the blast while it happens,
+  driven by a mood state machine fed only by quantities the run
+  already tracks; nothing feeds back into the simulation, the tally,
+  or scoring. The baseline is pace: the run's own finish schedule
+  sets the window, the finishes needed to beat the target are
+  floor(target x sent) + 1 from the tally and the level target, and
+  the face leans PUMP when ahead, SAD when behind late in the
+  window, and settles on the outcome as the window closes.
+- Event reactions on top of the baseline: a cluster of three
+  finishes inside 1600 ms or a reminder wave recovering several of
+  the unopened cheers (PUMP); five seconds without a finish
+  mid-window while still short sours (SAD); the bounce pile
+  crossing 4 settled bounces agitates, crossing 8 escalates, as do
+  DOMAIN REPUTATION AT RISK, bursts of mid-survey abandonments,
+  guesser and speeder/straight-liner bursts, an opted-out
+  respondent mailed anyway, and duplicate envelopes (AGITATED).
+  Holds run 1.5 / 2 / 2.5 s by severity; higher severity interrupts
+  at once, otherwise a 1000 ms dwell stops flicker, and expiry
+  returns to the pace baseline. A breaker trip locks the face on
+  SAD for the rest of the run, matching the report's end-state face.
+- AGITATED is a fourth pixel map in the same 14 x 13 frame as
+  NORMAL and PUMP: furrowed brows and a gritted-teeth mouth, with
+  the headset, body, and desk cells identical to NORMAL (the three
+  existing maps are byte-unchanged), plus a small jitter on the
+  figure while agitated. Under prefers-reduced-motion the jitter
+  is off and the face alone carries it. The IM nameplate stays
+  attached in every mood, and the report keeps its existing
+  end-state faces.
+- Tests: the machine is covered as a unit (pace baseline, exact
+  bounce thresholds at 4 and 8, cluster and drought, burst
+  detection, reminder and reputation reactions, arbitration,
+  trip lock) and against real built runs (needed count and finish
+  window read off the pinned configurations); the pinned tally
+  test passes unmodified. Verified in headless Chrome against the
+  built package: PUMP, SAD, and AGITATED captured from real runs
+  (Fresh/full, Stale/partial, Executive Blast with validation
+  skipped), each face reading distinctly with zero page errors.
+
 ## 2026-11-01 - Bounce pile: bounced sprites stay and pile up
 
 - Fixed a live-play defect: bounced sprites travelled down into the

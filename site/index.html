@@ -191,6 +191,11 @@
     padding:4px 7px; min-width:48px; text-align:center; box-sizing:border-box;
     box-shadow:0 2px 0 rgba(0,0,0,.45), inset 0 1px 0 rgba(255,240,200,.35);
   }
+  /* agitated manager: a tight jitter on the figure while the mood
+     machine holds AGITATED; under reduced motion the face alone
+     carries the mood (see the prefers-reduced-motion block) */
+  #mgrRun.mgr-shake{ animation:mgrShake .24s linear infinite; }
+  @keyframes mgrShake{ 0%,100%{ transform:translate(0,0); } 20%{ transform:translate(-2px,1px); } 40%{ transform:translate(2px,0); } 60%{ transform:translate(-2px,-1px); } 80%{ transform:translate(2px,1px); } }
 
   /* ---------- run stage ---------- */
   #runStage{ display:none; }
@@ -407,7 +412,7 @@
   .repchip b{ color:var(--blue); }
   .report-title b{ color:var(--gold); }
   @media (prefers-reduced-motion: reduce){
-    .sprite.cheer, .sprite.shake, .breaker.tripped, .cabinet.shaking, .gradebox.stamp, #countdownNum.pop{ animation:none; }
+    .sprite.cheer, .sprite.shake, .breaker.tripped, .cabinet.shaking, .gradebox.stamp, #countdownNum.pop, #mgrRun.mgr-shake{ animation:none; }
     .sprite.piling{ transition:none; }
     .sprite.piling.pilefade{ transition:none; }
     .confetti-bit{ display:none !important; }
@@ -1498,6 +1503,26 @@ var MGR_SAD = [
 "BBBBBBBBBBBBB.",
 "DDDDDDDDDDDDD.",
 "DDPPDDDDDDDDD.",
+"DDDDDDDDDDDDD."
+];
+/* AGITATED: MGR_NORMAL with only face cells reworked — furrowed
+   brows (segments over each eye, inner tips dropped between the
+   eyes) and a gritted-teeth mouth. Headset, body, and desk cells
+   are identical to NORMAL, so the nameplate character never
+   changes; the expression does. */
+var MGR_AGITATED = [
+"..RRRRRRRRR...",
+".RHHHHHHHHHR..",
+".RRSSSSSSSHRR.",
+"..RHHSSHHSHR..",
+"..RSEHHESSR...",
+"..HSSSSSSSRR..",
+"...SPHPHPR....",
+"..BBBBBBBBB...",
+".BBBBBBBBBBB..",
+".BBBBBBBBBBB..",
+"DDDDDDDDDDDDD.",
+"DDPPDDDDRDDDD.",
 "DDDDDDDDDDDDD."
 ];
 function pixelHTML(map, px){
@@ -2636,6 +2661,166 @@ function fireRemBeat(beat){
   remStampTimer = setTimeout(function(){ stamp.hidden = true; }, 2000);
 }
 
+/* ================= MANAGER MOOD MACHINE =================
+   The run-screen manager reacts to the blast while it happens.
+   Pure presentation: every input is a quantity the run already
+   tracks (the live finish count, the bounce pile's settled total,
+   the event stream the tick loop already dispatches, repMath's
+   risk flag, pileModel's per-wave recovery counts), and nothing
+   here feeds back into the simulation, the tally, or scoring.
+
+   Baseline (pace): the run's own finish schedule sets the window
+   [firstFinishT, lastFinishT]; the finishes needed to beat the
+   target are floor(target x sent) + 1, from the run's tally and
+   curLevel().target. Pace ratio = finishes so far divided by
+   (window fraction x needed): >= 1.12 is ahead (PUMP-leaning),
+   < 0.88 is behind (SAD-leaning once the window is a fifth gone),
+   anything between is NORMAL. At the end of the window the
+   baseline settles on the outcome: needed met = PUMP, missed =
+   SAD, the same story the report card tells.
+
+   Reactions (event-driven; holds are 1.5 / 2 / 2.5 s by severity):
+     PUMP sev 2    3 finishes inside 1600 ms: a cluster landing
+     PUMP sev 2/1  a reminder wave recovering >= 2 / exactly 1 of
+                   the unopened (pileModel's wave counts)
+     PUMP sev 1    the pace crossing into ahead-of-target
+     SAD sev 1     a finish drought: 5000 ms without a finish in
+                   the middle of the window while still short of
+                   the needed count (re-arms after 6000 ms)
+     AGITATED sev 2  the bounce pile crossing 4 settled bounces
+     AGITATED sev 3  the bounce pile crossing 8 settled bounces,
+                   or DOMAIN REPUTATION AT RISK (repMath().atRisk)
+     AGITATED sev 2  3 mid-survey abandonments (patience /
+                   knowledge / mobile drops) inside 2000 ms
+     AGITATED sev 2  3 guesses inside 2500 ms, or 2 finishes
+                   carrying speeder / straight-liner / duplicate
+                   quality flags inside 2500 ms
+     AGITATED sev 1  an opted-out respondent mailed anyway
+                   (angry event), or a duplicate envelope (dupe)
+   Arbitration: a higher severity interrupts at once; otherwise a
+   reaction must dwell 1000 ms before another may replace it, so
+   the face never flickers. When a hold expires, the pace baseline
+   resumes. The goodwill breaker tripping locks the machine on
+   SAD for the rest of the run, matching the report's end-state
+   face for a tripped run. */
+var MOOD_HOLD_MS = { 1: 1500, 2: 2000, 3: 2500 };
+var MOOD_MIN_DWELL_MS = 1000;
+var MOOD_BOUNCE_T1 = 4, MOOD_BOUNCE_T2 = 8;
+function moodParamsForRun(run){
+  var c = tally(run);
+  var needed = Math.floor(curLevel().target * c.sent) + 1;
+  var first = null, last = null;
+  run.sprites.forEach(function(sp){
+    sp.events.forEach(function(e){
+      if (e.type !== "finish") return;
+      if (first === null || e.t < first) first = e.t;
+      if (last === null || e.t > last) last = e.t;
+    });
+  });
+  if (first === null){ first = RUN_MS; last = RUN_MS; }
+  return { needed: needed, sent: c.sent, firstFinishT: first, lastFinishT: last };
+}
+function createMoodMachine(params){
+  var m = {
+    params: params,
+    reaction: null, locked: null, repRiskFired: false,
+    prevCategory: "ON", lastFinishAt: null, droughtFiredAt: -Infinity,
+    lastBounceTotal: 0,
+    finishTimes: [], abandonTimes: [], guessTimes: [], qualityTimes: []
+  };
+  function windowFrac(t){
+    var p = m.params;
+    if (p.lastFinishT > p.firstFinishT) return Math.max(0, Math.min(1, (t - p.firstFinishT) / (p.lastFinishT - p.firstFinishT)));
+    return Math.max(0, Math.min(1, t / RUN_MS));
+  }
+  function recent(times, t, windowMs){
+    while (times.length && times[0] < t - windowMs) times.shift();
+    return times.length;
+  }
+  function react(t, mood, sev){
+    if (m.locked) return;
+    var r = m.reaction;
+    if (r && t < r.until && sev <= r.sev && t - r.since < MOOD_MIN_DWELL_MS) return;
+    m.reaction = { mood: mood, sev: sev, since: t, until: t + MOOD_HOLD_MS[sev] };
+  }
+  m.baselineAt = function(t, finished){
+    var p = m.params, wf = windowFrac(t);
+    if (wf <= 0.03) return { mood: "NORMAL", category: "ON", ratio: 1, wf: wf };
+    var expected = wf * p.needed;
+    var ratio = expected > 0 ? finished / expected : (finished > 0 ? 2 : 0);
+    var category = ratio >= 1.12 ? "AHEAD" : (ratio < 0.88 ? "BEHIND" : "ON");
+    var mood = category === "AHEAD" ? "PUMP" : (category === "BEHIND" && wf >= 0.2 ? "SAD" : "NORMAL");
+    if (wf >= 0.97) mood = finished >= p.needed ? "PUMP" : "SAD";
+    return { mood: mood, category: category, ratio: ratio, wf: wf };
+  };
+  m.noteFinish = function(t, qualityFlag){
+    m.finishTimes.push(t); m.lastFinishAt = t;
+    if (recent(m.finishTimes, t, 1600) >= 3) react(t, "PUMP", 2);
+    if (qualityFlag){
+      m.qualityTimes.push(t);
+      if (recent(m.qualityTimes, t, 2500) >= 2) react(t, "AGITATED", 2);
+    }
+  };
+  m.noteBounce = function(t, total){
+    if (m.lastBounceTotal < MOOD_BOUNCE_T1 && total >= MOOD_BOUNCE_T1) react(t, "AGITATED", 2);
+    if (m.lastBounceTotal < MOOD_BOUNCE_T2 && total >= MOOD_BOUNCE_T2) react(t, "AGITATED", 3);
+    m.lastBounceTotal = total;
+  };
+  m.noteAbandon = function(t){
+    m.abandonTimes.push(t);
+    if (recent(m.abandonTimes, t, 2000) >= 3) react(t, "AGITATED", 2);
+  };
+  m.noteGuess = function(t){
+    m.guessTimes.push(t);
+    if (recent(m.guessTimes, t, 2500) >= 3) react(t, "AGITATED", 2);
+  };
+  m.noteAngry = function(t){ react(t, "AGITATED", 1); };
+  m.noteDupe = function(t){ react(t, "AGITATED", 1); };
+  m.noteReminder = function(t, recovered){
+    if (recovered >= 2) react(t, "PUMP", 2);
+    else if (recovered === 1) react(t, "PUMP", 1);
+  };
+  m.noteRepRisk = function(t){
+    if (m.repRiskFired) return;
+    m.repRiskFired = true;
+    react(t, "AGITATED", 3);
+  };
+  m.noteTrip = function(){ m.locked = "SAD"; m.reaction = null; };
+  m.moodAt = function(t, finished){
+    if (m.locked) return m.locked;
+    var base = m.baselineAt(t, finished);
+    /* pace crossing into ahead-of-target: one cheer as it happens */
+    if (base.category === "AHEAD" && m.prevCategory !== "AHEAD" && base.wf > 0.02 && base.wf < 0.97 && finished >= 2) react(t, "PUMP", 1);
+    m.prevCategory = base.category;
+    /* finish drought in the middle of the window, still short */
+    if (base.wf >= 0.2 && base.wf <= 0.97 && finished < m.params.needed){
+      var lastFin = m.lastFinishAt === null ? m.params.firstFinishT : m.lastFinishAt;
+      if (t - lastFin >= 5000 && t - m.droughtFiredAt >= 6000){ m.droughtFiredAt = t; react(t, "SAD", 1); }
+    }
+    if (m.reaction){
+      if (t < m.reaction.until) return m.reaction.mood;
+      m.reaction = null;
+    }
+    return base.mood;
+  };
+  return m;
+}
+var moodMachine = null, moodShown = null;
+function moodReset(run){
+  moodMachine = createMoodMachine(moodParamsForRun(run));
+  moodShown = null;
+  moodRender(0);
+}
+function moodRender(t){
+  if (!moodMachine) return;
+  var mood = moodMachine.moodAt(t, finishedCount);
+  if (mood === moodShown) return;
+  moodShown = mood;
+  var el = $("mgrRun");
+  setPixel(el, mood === "PUMP" ? MGR_PUMP : mood === "SAD" ? MGR_SAD : mood === "AGITATED" ? MGR_AGITATED : MGR_NORMAL, 4);
+  el.className = "pixelbox" + (mood === "AGITATED" ? " mgr-shake" : "");
+}
+
 /* ================= RUN ANIMATION ================= */
 var rafId = null, runData = null, runStart = 0, finishedCount = 0, guessShown = 0, tripFired = false;
 var virtualT = 0, lastNow = null;
@@ -2714,7 +2899,7 @@ function setupStage(run){
     var bad = state.qstate[q.id] === "keep" && (q.answerBy || defectOf(q) !== "CLEAN");
     return '<span class="qmark' + (bad ? " bad" : "") + '" style="left:' + x + '%">Q' + q.id + "</span>";
   }).join("");
-  setPixel($("mgrRun"), MGR_NORMAL, 4);
+  moodReset(run);
   personaLegend();
   $("gwLive").textContent = run.gm.start;
   $("breakerChip").classList.remove("tripped");
@@ -2837,7 +3022,7 @@ function tick(now){
     tripFired = true;
     $("breakerChip").classList.add("tripped");
     $("breakerChip").firstChild.textContent = "BREAKER TRIPPED · GOODWILL ";
-    setPixel($("mgrRun"), MGR_SAD, 4);
+    if (moodMachine) moodMachine.noteTrip();
     logLine("THE BREAKER TRIPPED. GOODWILL HIT ZERO. NEW SENDS AND ANYONE STILL IN THE FUNNEL STOPPED.");
     sndBuzz(); sndPowerDown();
     var cab = $("cabinet"); if (cab){ cab.classList.remove("shaking"); void cab.offsetWidth; cab.classList.add("shaking"); setTimeout(function(){ cab.classList.remove("shaking"); }, 600); }
@@ -2845,10 +3030,11 @@ function tick(now){
   $("gwLive").textContent = gwNow;
   /* reminder beats: fire each bought wave's marker as its first
      recovered open lands */
-  while (pileBeatIdx < pileBeats.length && t >= pileBeats[pileBeatIdx].at){ fireRemBeat(pileBeats[pileBeatIdx]); pileBeatIdx++; }
+  while (pileBeatIdx < pileBeats.length && t >= pileBeats[pileBeatIdx].at){ var beat = pileBeats[pileBeatIdx]; fireRemBeat(beat); if (moodMachine) moodMachine.noteReminder(t, beat.recovered); pileBeatIdx++; }
   var rmT = repMath();
   $("repLive").textContent = Math.round(rmT.before + (rmT.after - rmT.before) * frac);
   $("repLive").style.color = rmT.atRisk ? "var(--red)" : "";
+  if (rmT.atRisk && moodMachine) moodMachine.noteRepRisk(t);
   if (t > 3000) $("stampMsg").style.opacity = "0";
 
   run.sprites.forEach(function(sp){
@@ -2882,7 +3068,8 @@ function tick(now){
         else if (e.gate === "opened"){ pileLive.unopened--; renderPiles(); sndPop(); }
         else if (e.gate === "started") sndTick();
       } else if (e.type === "drop"){
-        if (e.cause === "bounce"){ pileLive.bounced++; renderPiles(); }
+        if (e.cause === "bounce"){ pileLive.bounced++; renderPiles(); if (moodMachine) moodMachine.noteBounce(t, pileLive.bounced); }
+        if (moodMachine && (e.cause === "patience" || e.cause === "knowledge" || e.cause === "mobile")) moodMachine.noteAbandon(t);
         sp.done = true;
         sp.el.querySelector(".dropicon").textContent = DROP_ICON[e.cause] || "?";
         if (e.cause === "bounce" || e.cause === "noopen"){
@@ -2898,6 +3085,7 @@ function tick(now){
       } else if (e.type === "guess"){
         sp.el.classList.add("guessed", "shake");
         guessShown++; $("guessCount").textContent = guessShown;
+        if (moodMachine) moodMachine.noteGuess(t);
         sndWrong();
         logLine(PERSONAS[sp.persona].name.toUpperCase() + " GUESSED AT Q" + e.qid + ". THAT ANSWER IS NOISE.");
       } else if (e.type === "angry"){
@@ -2905,6 +3093,7 @@ function tick(now){
         ai.textContent = "\u26A0"; ai.style.fontSize = "11px";
         sp.el.classList.add("escaped");
         setTimeout(function(){ sp.el.classList.remove("escaped"); }, 1400);
+        if (moodMachine) moodMachine.noteAngry(t);
         logLine(PERSONAS[sp.persona].name.toUpperCase() + " WAS MAILED ANYWAY (OPTED OUT / SURVEYED LAST MONTH). GOODWILL HIT.");
       } else if (e.type === "dupe"){
         sndDoubleThud();
@@ -2912,6 +3101,7 @@ function tick(now){
         di.textContent = "\u2709\u2709"; di.style.fontSize = "9px";
         sp.el.classList.add("escaped");
         setTimeout(function(){ sp.el.classList.remove("escaped"); }, 1400);
+        if (moodMachine) moodMachine.noteDupe(t);
         logLine("DUPLICATE: ONE PERSON, TWO ENVELOPES. NO DEDUPE PASS WAS BOUGHT.");
       } else if (e.type === "escape"){
         var ic = sp.el.querySelector(".dropicon");
@@ -2924,6 +3114,7 @@ function tick(now){
         sp.el.classList.add("cheer");
         sp.el.classList.remove("in-survey");
         finishedCount++; $("compCount").textContent = finishedCount;
+        if (moodMachine) moodMachine.noteFinish(t, !!(sp.qSpeed || sp.qStraight || sp.qDup));
         /* combo: finishes landing close together climb in pitch (sndDing
            already steps up with the count); quality flags get signatures */
         sndDing(finishedCount);
@@ -2935,6 +3126,7 @@ function tick(now){
     }
     if (sp.evIdx >= sp.events.length && !sp.done){ sp.done = true; }
   });
+  moodRender(t);
   if (t < RUN_MS && !allDone){ rafId = requestAnimationFrame(tick); }
   else { rafId = null; var completedRun = runData; setTimeout(function(){ if (state.running && runData === completedRun) showReport(); }, 700); }
 }

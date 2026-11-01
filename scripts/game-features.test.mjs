@@ -1584,3 +1584,197 @@ test('wave 2 locks the wave 1 list and never leaks into the campaign', () => {
   assert.equal(g.quickQualityGate(), 60);
   assert.equal(g.instrumentFloor(), 6);
 });
+
+/* ---- Manager mood machine: presentation only. The machine reads
+   quantities the run already tracks; these tests drive it as a unit
+   with synthetic pace parameters, then against real built runs. ---- */
+
+test('agitated manager map keeps the headset and only reworks the face', () => {
+  const { context: g } = game();
+  const R = map => map.map(row => [...row].map((c, x) => c === 'R' ? x : -1).filter(x => x >= 0).join(',')).join('|');
+  assert.equal(g.MGR_NORMAL.length, 13);
+  assert.equal(g.MGR_PUMP.length, 13);
+  assert.equal(g.MGR_SAD.length, 11);
+  assert.equal(g.MGR_AGITATED.length, 13, 'agitated matches NORMAL/PUMP height');
+  for (const map of [g.MGR_NORMAL, g.MGR_PUMP, g.MGR_SAD, g.MGR_AGITATED]) {
+    for (const row of map) assert.equal(row.length, 14, 'every mood map is 14 cells wide');
+  }
+  assert.equal(R(g.MGR_AGITATED), R(g.MGR_NORMAL), 'headset cells are exactly NORMAL\u2019s');
+  g.MGR_AGITATED.forEach((row, y) => {
+    if (y === 3 || y === 4 || y === 6) return; /* brows and mouth rows carry the expression */
+    assert.equal(row, g.MGR_NORMAL[y], `row ${y} is byte-identical to NORMAL`);
+  });
+  assert.notEqual(g.MGR_AGITATED[3], g.MGR_NORMAL[3], 'brow row differs');
+  assert.notEqual(g.MGR_AGITATED[6], g.MGR_NORMAL[6], 'mouth row differs');
+});
+
+test('mood machine baseline follows pace against the target', () => {
+  const { context: g } = game();
+  const m = g.createMoodMachine({ needed: 5, sent: 40, firstFinishT: 10000, lastFinishT: 22000 });
+  assert.equal(m.baselineAt(0, 0).mood, 'NORMAL', 'no signal before the window');
+  assert.equal(m.baselineAt(9000, 0).mood, 'NORMAL');
+  assert.equal(m.baselineAt(16000, 3).mood, 'PUMP', 'half the window, 3 of 5 needed: ahead');
+  assert.equal(m.baselineAt(16000, 3).category, 'AHEAD');
+  assert.equal(m.baselineAt(16000, 1).mood, 'SAD', 'half the window, 1 of 5 needed: behind');
+  assert.equal(m.baselineAt(11200, 0).mood, 'NORMAL', 'behind this early still reads NORMAL');
+  assert.equal(m.baselineAt(11200, 0).category, 'BEHIND');
+  assert.equal(m.baselineAt(22000, 5).mood, 'PUMP', 'window over, target count met');
+  assert.equal(m.baselineAt(22000, 4).mood, 'SAD', 'window over, target count missed');
+  const m2 = g.createMoodMachine({ needed: 5, sent: 40, firstFinishT: 10000, lastFinishT: 22000 });
+  assert.equal(m2.moodAt(22000, 5), 'PUMP');
+  assert.equal(g.createMoodMachine({ needed: 5, sent: 40, firstFinishT: 10000, lastFinishT: 22000 }).moodAt(22000, 4), 'SAD');
+});
+
+test('mood machine: bounce thresholds are exact and escalate', () => {
+  const { context: g } = game();
+  const m = g.createMoodMachine({ needed: 5, sent: 40, firstFinishT: 10000, lastFinishT: 22000 });
+  m.noteBounce(1000, 1); m.noteBounce(1100, 2); m.noteBounce(1200, 3);
+  assert.equal(m.moodAt(1300, 0), 'NORMAL', 'three settled bounces do not agitate');
+  m.noteBounce(1400, 4);
+  assert.equal(m.moodAt(1400, 0), 'AGITATED', 'the fourth settled bounce agitates');
+  assert.equal(m.moodAt(3300, 0), 'AGITATED', 'severity 2 holds 2 s');
+  assert.equal(m.moodAt(3500, 0), 'NORMAL', 'then decays back to the baseline');
+  m.noteBounce(3600, 5); m.noteBounce(3700, 6); m.noteBounce(3800, 7);
+  assert.equal(m.moodAt(3900, 0), 'NORMAL', 'bounces 5-7 do not re-fire');
+  m.noteBounce(4000, 8);
+  assert.equal(m.moodAt(4000, 0), 'AGITATED', 'the eighth bounce escalates');
+  assert.equal(m.moodAt(6400, 0), 'AGITATED', 'severity 3 holds 2.5 s');
+  assert.equal(m.moodAt(6600, 0), 'NORMAL');
+});
+
+test('mood machine: finish clusters cheer and expire', () => {
+  const { context: g } = game();
+  /* window parked late so the baseline stays NORMAL and only the
+     reaction can produce PUMP */
+  const m = g.createMoodMachine({ needed: 5, sent: 40, firstFinishT: 20000, lastFinishT: 26000 });
+  m.noteFinish(12000, false); m.noteFinish(12400, false);
+  assert.equal(m.moodAt(12500, 2), 'NORMAL', 'two finishes are not a cluster');
+  m.noteFinish(12800, false);
+  assert.equal(m.moodAt(13000, 3), 'PUMP', 'three finishes inside 1600 ms cheer');
+  assert.equal(m.moodAt(15000, 3), 'NORMAL', 'the cheer expires back to baseline');
+});
+
+test('mood machine: a mid-window finish drought sours the baseline', () => {
+  const { context: g } = game();
+  const m = g.createMoodMachine({ needed: 6, sent: 40, firstFinishT: 10000, lastFinishT: 22000 });
+  m.noteFinish(10600, false); m.noteFinish(11600, false); m.noteFinish(12600, false); m.noteFinish(13600, false);
+  assert.equal(m.moodAt(18000, 4), 'NORMAL', 'on pace and only 4.4 s since the last finish: no drought yet');
+  assert.equal(m.moodAt(18600, 4), 'SAD', '5 s without a finish, still short of the needed 6: drought');
+});
+
+test('mood machine: abandonment, guess, and quality bursts agitate; singles do not', () => {
+  const { context: g } = game();
+  const P = { needed: 5, sent: 40, firstFinishT: 20000, lastFinishT: 26000 };
+  const a = g.createMoodMachine(P);
+  a.noteAbandon(1000); a.noteAbandon(1500);
+  assert.equal(a.moodAt(1600, 0), 'NORMAL', 'two mid-survey abandonments are not a burst');
+  a.noteAbandon(2000);
+  assert.equal(a.moodAt(2000, 0), 'AGITATED', 'three inside 2000 ms are');
+  const spread = g.createMoodMachine(P);
+  spread.noteAbandon(1000); spread.noteAbandon(3500); spread.noteAbandon(6000);
+  assert.equal(spread.moodAt(6100, 0), 'NORMAL', 'spread-out abandonments never burst');
+  const gu = g.createMoodMachine(P);
+  gu.noteGuess(1000); gu.noteGuess(2000); gu.noteGuess(3000);
+  assert.equal(gu.moodAt(3000, 0), 'AGITATED', 'three guesses inside 2500 ms agitate');
+  const q = g.createMoodMachine(P);
+  q.noteFinish(1000, true);
+  assert.equal(q.moodAt(1100, 1), 'NORMAL', 'one quality-flagged finish is not a burst');
+  q.noteFinish(2000, true);
+  assert.equal(q.moodAt(2100, 2), 'AGITATED', 'two speeder/straight-liner/duplicate finishes inside 2500 ms are');
+  const an = g.createMoodMachine(P);
+  an.noteAngry(1000);
+  assert.equal(an.moodAt(2400, 0), 'AGITATED', 'an opted-out mailing agitates at severity 1');
+  assert.equal(an.moodAt(2600, 0), 'NORMAL', 'severity 1 holds 1.5 s');
+  const du = g.createMoodMachine(P);
+  du.noteDupe(1000);
+  assert.equal(du.moodAt(1000, 0), 'AGITATED', 'a duplicate envelope agitates');
+});
+
+test('mood machine: reminder waves cheer by how much they recovered', () => {
+  const { context: g } = game();
+  const P = { needed: 5, sent: 40, firstFinishT: 20000, lastFinishT: 26000 };
+  const none = g.createMoodMachine(P);
+  none.noteReminder(1000, 0);
+  assert.equal(none.moodAt(1000, 0), 'NORMAL', 'a wave that recovered nobody does not cheer');
+  const one = g.createMoodMachine(P);
+  one.noteReminder(1000, 1);
+  assert.equal(one.moodAt(1000, 0), 'PUMP', 'one recovery is a mild cheer');
+  assert.equal(one.moodAt(2600, 0), 'NORMAL');
+  const many = g.createMoodMachine(P);
+  many.noteReminder(1000, 3);
+  assert.equal(many.moodAt(2900, 0), 'PUMP', 'several recoveries cheer at severity 2');
+  assert.equal(many.moodAt(3100, 0), 'NORMAL');
+});
+
+test('mood machine: reputation risk agitates once, at full severity', () => {
+  const { context: g } = game();
+  const m = g.createMoodMachine({ needed: 5, sent: 40, firstFinishT: 20000, lastFinishT: 26000 });
+  m.noteRepRisk(1000);
+  assert.equal(m.moodAt(3499, 0), 'AGITATED', 'severity 3 holds the full 2.5 s');
+  assert.equal(m.moodAt(3501, 0), 'NORMAL');
+  m.noteRepRisk(5000);
+  assert.equal(m.moodAt(5000, 0), 'NORMAL', 'the risk warning fires once per run');
+});
+
+test('mood machine: arbitration holds, interrupts by severity, and the trip locks SAD', () => {
+  const { context: g } = game();
+  const P = { needed: 5, sent: 40, firstFinishT: 20000, lastFinishT: 26000 };
+  const m = g.createMoodMachine(P);
+  m.noteReminder(1000, 1);
+  assert.equal(m.moodAt(1000, 0), 'PUMP');
+  m.noteAngry(1100);
+  assert.equal(m.moodAt(1100, 0), 'PUMP', 'equal severity inside the dwell cannot flicker the face');
+  m.noteRepRisk(1200);
+  assert.equal(m.moodAt(1200, 0), 'AGITATED', 'higher severity interrupts at once');
+  m.noteReminder(1500, 1);
+  assert.equal(m.moodAt(1500, 0), 'AGITATED', 'lower severity waits out the dwell');
+  const swap = g.createMoodMachine(P);
+  swap.noteAngry(1000);
+  swap.noteReminder(2100, 1);
+  assert.equal(swap.moodAt(2100, 0), 'PUMP', 'after the dwell a new reaction may take over');
+  const trip = g.createMoodMachine(P);
+  trip.noteTrip();
+  trip.noteBounce(1100, 9); trip.noteReminder(1200, 3);
+  assert.equal(trip.moodAt(1300, 0), 'SAD', 'a tripped breaker locks the face on SAD');
+  assert.equal(trip.moodAt(9000, 0), 'SAD');
+});
+
+test('mood machine: pace crossing into ahead cheers once as it happens', () => {
+  const { context: g } = game();
+  const m = g.createMoodMachine({ needed: 5, sent: 40, firstFinishT: 10000, lastFinishT: 22000 });
+  assert.equal(m.moodAt(13000, 2), 'PUMP', 'crossing into ahead-of-target');
+  assert.equal(m.moodAt(14400, 2), 'PUMP', 'pace fell back to on-par, the cheer still holds');
+  assert.equal(m.moodAt(14600, 2), 'NORMAL', 'then the baseline resumes');
+});
+
+test('mood parameters come off real runs: needed count and finish window', () => {
+  const { context: g, element } = game();
+  g.selectLevel(1, false);
+  g.state.seg = g.SEGMENTS.find(s => s.id === 'blast');
+  g.state.validation = 'skip'; g.state.reminders = 2;
+  g.state.invite = g.INVITES.find(i => i.id === 'generic');
+  g.startRun();
+  const bp = g.moodParamsForRun(g.runData);
+  assert.equal(bp.sent, 31);
+  assert.equal(bp.needed, 4, 'floor(0.12 x 31) + 1 finishes beat the Level 1 target');
+  assert.equal(bp.firstFinishT, g.RUN_MS, 'the pinned blast run finishes nobody: the window collapses to RUN_MS');
+  assert.equal(bp.lastFinishT, g.RUN_MS);
+  assert.ok(g.moodMachine, 'setupStage armed a mood machine for the run');
+  assert.equal(g.moodMachine.params.needed, 4);
+  assert.equal(element('mgrRun').innerHTML, g.pixelHTML(g.MGR_NORMAL, 4).html, 'the run figure starts NORMAL');
+  assert.equal(element('mgrRun').className, 'pixelbox', 'no shake class at rest');
+
+  const second = game();
+  const g2 = second.context;
+  g2.selectLevel(1, false);
+  g2.state.validation = 'full'; g2.state.reminders = 1;
+  g2.startRun();
+  const fp = g2.moodParamsForRun(g2.runData);
+  assert.equal(fp.sent, 40);
+  assert.equal(fp.needed, 5, 'floor(0.12 x 40) + 1');
+  const times = [];
+  g2.runData.sprites.forEach(sp => sp.events.forEach(e => { if (e.type === 'finish') times.push(e.t); }));
+  assert.equal(times.length, 7, 'the pinned fresh run finishes seven');
+  assert.equal(fp.firstFinishT, Math.min.apply(null, times));
+  assert.equal(fp.lastFinishT, Math.max.apply(null, times));
+});
