@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-11-01 - New main theme: 132 BPM animated composition
+
+- The v2 main theme was replaced wholesale after the first human
+  listen rejected it: a new 32-eighth-note lead over C, G, Am, F
+  (one chord per bar), with bar 4 ending on a pickup back into
+  bar 1.
+- Tempo up from 112 to 132 BPM. The bass is now a pulsing octave
+  drive in title and run, thinned to slots 0, 2, 4, 6 in setup,
+  and the title echo is retimed to a dotted eighth at the new
+  tempo.
+- The v2 machinery is unchanged: drums, echo, compressor chain,
+  scheduler, and the title/setup/run/run6 variants. No SFX,
+  gameplay, or API changes. Build validation and all 38 tests
+  pass. The second human listen remains open (see TODO).
+
 ## 2026-11-01 - Audio v2: soundtrack and SFX improvement
 
 - Music loop doubled to 4 bars (C, F, Am, G) with an A/B lead phrase

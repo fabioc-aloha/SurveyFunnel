@@ -2944,12 +2944,11 @@ function spawnConfetti(){
    Original chiptune motif, fully procedural WebAudio. One motif, three
    intensity variants (title / setup / run; run6 adds a harmony line).
    The AudioContext is created and resumed only after a user gesture. */
-var STEP_DUR = 60 / 112 / 4; /* 112 BPM, 16th notes */
-var LEAD8 = [72,76,79,76, 81,79,76,74, 72,76,79,76, 74,76,72,-1];
-/* v2: 32 eighth notes over 4 bars. A = LEAD8 (bars 1-2); B = answer phrase (bars 3-4) ending on a pickup. */
-var LEAD32 = LEAD8.concat([81,84,81,79, 81,79,76,74, 74,78,81,79, 76,74,71,76]);
-var CHORDS = [ { root:48, tones:[0,4,7] }, { root:53, tones:[0,4,7] }, { root:45, tones:[0,3,7] }, { root:55, tones:[0,4,7] } ]; /* C F Am G, one chord per bar */
-var BASS_PAT = [0, 0, 7, 0, 12, 7, 0, -1]; /* per eighth within a bar; -1 = the chord's third */
+var STEP_DUR = 60 / 132 / 4; /* 132 BPM, 16th notes */
+/* v3 main theme: 32 eighth notes over 4 bars (C G Am F). Bar 4 ends on 79, a pickup back into bar 1. */
+var LEAD32 = [76,79,81,79, 76,72,74,76, 74,79,83,81, 79,76,74,-1, 81,84,83,81, 79,81,76,-1, 77,81,79,77, 76,74,76,79];
+var CHORDS = [ { bassRoot:36, chordRoot:48, tones:[0,4,7] }, { bassRoot:43, chordRoot:55, tones:[0,4,7] }, { bassRoot:45, chordRoot:57, tones:[0,3,7] }, { bassRoot:41, chordRoot:53, tones:[0,4,7] } ]; /* C G Am F, one chord per bar */
+var BASS_PAT = [0, 12, 0, 12, 0, 12, 7, 12]; /* per eighth within a bar; pulsing octave drive from bassRoot */
 var MUS = { variant: "title", step: 0, next: 0, timer: null, gain: null };
 function mf(m){ return 440 * Math.pow(2, (m - 69) / 12); }
 function musicTarget(){ return (!state.musicOn || state.muted) ? 0 : (state.musicVol * 0.8); }
@@ -3019,17 +3018,17 @@ function scheduleStep(s, t){
   var eighth = (s % 2 === 0), ei = Math.floor(s / 2), bi = ei % 8, inBar = s % 16, v = MUS.variant;
   if (v === "title"){
     if (eighth && LEAD32[ei] > 0) mlead(LEAD32[ei], t, 0.26, 0.11, 3800, true);
-    if (eighth) mnote(chord.root + (BASS_PAT[bi] < 0 ? chord.tones[1] : BASS_PAT[bi]), t, 0.24, "triangle", 0.2);
+    if (eighth) mnote(chord.bassRoot + BASS_PAT[bi], t, 0.24, "triangle", 0.2);
     if (inBar % 4 === 0) mkick(t);
     if (inBar === 4 || inBar === 12) msnare(t);
     if (!eighth) mhat(t, (s % 8 === 7) ? 0.06 : 0.045, s === 63);
   } else if (v === "setup"){
     if (eighth && ei % 2 === 0 && LEAD32[ei] > 0) mlead(LEAD32[ei], t, 0.32, 0.075, 2200, false);
-    if (ei % 4 === 0) mnote(chord.root, t, 0.5, "triangle", 0.15);
+    if (eighth && bi % 2 === 0) mnote(chord.bassRoot + BASS_PAT[bi], t, 0.3, "triangle", 0.13);
     if (ei % 4 === 2) mhat(t, 0.02, false);
   } else { /* run / run6 */
-    if (eighth) mnote(chord.root + (bi % 2 ? 12 : 0), t, 0.18, "triangle", 0.22);
-    var arpTone = chord.root + 24 + chord.tones[s % 3] + (s % 8 >= 4 ? 12 : 0);
+    if (eighth) mnote(chord.bassRoot + BASS_PAT[bi], t, 0.18, "triangle", 0.22);
+    var arpTone = chord.chordRoot + 12 + chord.tones[s % 3] + (s % 8 >= 4 ? 12 : 0);
     mnote(arpTone, t, 0.1, "square", 0.045);
     if (eighth && ei % 2 === 1 && LEAD32[ei] > 0) mnote(LEAD32[ei], t, 0.2, "square", 0.07);
     if (v === "run6" && eighth && LEAD32[ei] > 0) mnote(LEAD32[ei] + 4, t, 0.22, "triangle", 0.06);
@@ -3052,7 +3051,7 @@ function initAudio(){
   var ctx = ac(); if (!ctx) return;
   if (!MUS.gain){
     MUS.gain = ctx.createGain(); MUS.gain.gain.value = musicTarget(); MUS.gain.connect(masterOut(ctx));
-    var dly = ctx.createDelay(1); dly.delayTime.value = 0.402; /* dotted eighth at 112 BPM */
+    var dly = ctx.createDelay(1); dly.delayTime.value = 3 * STEP_DUR; /* dotted eighth at 132 BPM */
     var fb = ctx.createGain(); fb.gain.value = 0.25;
     var wet = ctx.createGain(); wet.gain.value = 0.12;
     MUS.echoIn = ctx.createGain();
