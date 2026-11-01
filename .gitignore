@@ -1,3 +1,4 @@
 .vscode/*
 !.vscode/settings.json
 dist/
+scripts/harness/results/

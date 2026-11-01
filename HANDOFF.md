@@ -17,7 +17,11 @@
 
 ## Test state
 
-- `npm test` (build-site plus game-features): 57 tests, all passing locally.
+- `npm test` (build-site plus game-features): 83 tests, all passing locally.
+- Browser harness (`node scripts/harness/run-all.mjs`): PASS, 3/3 sections
+  (build validation, the 83-test Node suite, and the browser suite at
+  90/90 checks). Negative controls (`node scripts/harness/self-test.mjs`):
+  PASS, 2/2 deliberate defects caught.
 - The winnability corpus (`scripts/fixtures/winning-setups.json`) holds 364
   UI-legal winning setups: 65 each for Levels 1, 2, 3, 5, 6 and 39 for
   Level 4, whose ending-goodwill gate rejected the other draws in the searched
@@ -28,17 +32,12 @@
 
 1. Continue the staged Quick Challenge expansion from `TODO.md`: stage 2
    (BRD variation pack), then stage 3 (second-wave complication).
-2. Integrate the external browser regression harness
-   (`~/workspace/test-harness-survey-funnel/`) into `scripts/harness/` per its
-   README, then run it against the final state.
-3. Final visual pass over every screen once all changes are in.
+2. Final visual pass over every screen once all changes are in.
 
 ## Open items (honest status)
 
 - The Moog soundtrack is deployed but still awaits the user's own listen; no
   audio can be verified from the build environment.
-- The browser harness is built and proven (it catches deliberately broken
-  copies) but still lives outside the repository.
 - Azure deployment creation and DNS or custom-domain work remain manual.
 
 ## Do not redo

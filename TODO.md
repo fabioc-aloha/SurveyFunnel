@@ -1,11 +1,19 @@
 # Open work
 
-## Regression checks - proposed, awaiting approval
+## Regression checks
 
-- Decide whether to add a tracked browser regression suite.
-  Production CI now includes inline-script syntax and package checks,
-  but no browser automation dependencies. The release workflow also
-  runs the dependency-free gameplay tests.
+- Done: the browser regression suite is tracked at `scripts/harness/`
+  and run with `node scripts/harness/run-all.mjs`; negative controls
+  run with `node scripts/harness/self-test.mjs`. It covers build
+  validation, the Node suite, the Level 1 browser journeys at 390x844
+  and 1280x800, the cut floor, the pile strip and mood scenarios, and
+  the campaign BOUNCE-BACKS section. Puppeteer and Chrome are external
+  test tooling, provisioned as documented in
+  `scripts/harness/README.md`; the game stays framework-free and gains
+  no runtime dependency. Remaining manual checks are physical devices,
+  other browsers, screen reader, and human audio.
+- The checks below are still proposed and are not covered by the
+  integrated harness yet.
 - Cover breaker cutoff accounting, interrupted participants, question
   repairs, distinct A/B invitations, local font loading, and MPOR
   first-open/reopen scrolling, focus, and close behavior.
@@ -14,9 +22,8 @@
 - Checks should fail with explicit assertions and preserve the
   framework-free game. Include a guide reopened after scrolling and
   a completion on each side of the breaker cutoff.
-- Next decision: approve browser test files, tooling, and any
-  dependencies before implementation. Earlier gameplay checks were
-  session browser evaluations, not saved tests.
+- Earlier gameplay checks for these topics were session browser
+  evaluations, not saved tests.
 - Include BRD level/challenge content and focus, QR mouse/keyboard
   expansion, and independent decoding of the rendered full QR.
 - Include an uninterrupted Level 1-to-6 campaign using actual controls,
@@ -31,8 +38,8 @@
   Negative cases: an over-budget setup cannot launch, and owned prep and
   audience locks remain enforced. Node fixtures already cover scoring;
   the proposed browser checks cover rendered controls and event wiring.
-  Approve test files, tooling/dependencies, and any workflow changes
-  separately before implementation.
+  Extending the tracked harness to these topics still needs its own
+  scope and workflow decision.
 
 ## Release verification
 

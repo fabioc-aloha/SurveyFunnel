@@ -1,5 +1,46 @@
 # Changelog
 
+## 2026-11-01 - Browser regression harness integrated
+
+- The browser regression harness is now tracked in the repository at
+  `scripts/harness/` (`run-all.mjs`, `browser-suite.mjs`,
+  `self-test.mjs`, and a README adapted to the in-repo location). The
+  external copy at `~/workspace/test-harness-survey-funnel/` stays in
+  place as the historical original; the repo copy is canonical.
+  Generated output under `scripts/harness/results/` is git-ignored.
+- The Level 1 browser fixture was legalized for the cut floor: Q3 is
+  core, so the scripted playthrough repairs it with ANCHOR and cuts
+  Q5, Q7, Q8, Q10, Q11, and Q12, keeping exactly the six core
+  questions (the legal fixed winning line, 58 of 120 credits).
+- New browser coverage for what shipped after the harness was built:
+  a cut-floor scenario (core CUT controls locked and disabled, cutting
+  stops at the six-question floor, the floor note announces the locked
+  minimum, and a locked cut attempt changes nothing); a Quick
+  Challenge second-wave scenario pinned to seed 6666 (LIST REALITY,
+  wave 2 mailed raw against the true 9%-invalid list) proving the
+  pile strip's five columns sit under the funnel step labels, settled
+  bounced figures accumulate and persist late in the run in step with
+  the BOUNCED count and envelope fan, and the manager figure turns
+  agitated during the high-bounce run; and a campaign scenario proving
+  the report's BOUNCE-BACKS section lists simulated bounced addresses
+  on a bouncing run. The Quick Challenge final report is a two-wave
+  summary and carries no BOUNCE-BACKS section, so that check lives on
+  the campaign report.
+- Provisioning is explicit, never assumed: Puppeteer and Chrome are
+  test tooling only, resolved by environment override first
+  (`PUPPETEER_MODULE`, `PUPPETEER_EXECUTABLE_PATH`), then known
+  workspace installs and Puppeteer cache builds, with fresh-machine
+  install commands documented in `scripts/harness/README.md` and
+  `docs/development.md`. No game dependency was added.
+- Official verdict against the shipped game: `node
+  scripts/harness/run-all.mjs` PASS, 3/3 sections (build validation;
+  Node suite 83/83; browser suite 90/90 checks at 390x844 and
+  1280x800 plus the feature scenarios). `node
+  scripts/harness/self-test.mjs` PASS, 2/2: the deliberately broken
+  copies (2000px horizontal overflow and a throwing page-error script)
+  were both caught with the expected failed checks. No defect in the
+  shipped game was found; `site/index.html` is unchanged.
+
 ## 2026-11-01 - The IM reacts live to run events
 
 - The run-screen manager now reacts to the blast while it happens,

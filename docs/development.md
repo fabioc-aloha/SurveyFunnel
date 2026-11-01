@@ -15,6 +15,63 @@ The package contains only the
 game, static-host configuration, font, license, and mobile QR code. See
 [deployment guidance](deployment.md) for CI/CD and live verification.
 
+## Regression harness
+
+The tracked browser regression harness lives in `scripts/harness/` (the
+external copy at `~/workspace/test-harness-survey-funnel/` is the
+historical original). Run the full harness from the repository root:
+
+```bash
+node scripts/harness/run-all.mjs
+```
+
+It runs three sections in order: the build validation above, the Node
+suite (83 tests), and a headless-Chrome browser suite. The browser suite
+drives the real game at 390x844 and 1280x800: the title, setup, run, and
+report screens with no console or page errors and no horizontal
+overflow, questionnaire button geometry, the manager nameplate, and a
+scripted legal Level 1 playthrough that wins. Feature scenarios at the
+mobile viewport cover the cut floor (cutting stops at the six core
+questions with core CUT controls locked), the Quick Challenge second
+wave against the revealed stale list (pile strip columns aligned under
+the funnel steps, settled bounced figures accumulating and persisting,
+and the manager figure turning agitated in a high-bounce run), and the
+campaign report's BOUNCE-BACKS section on a bouncing run. Negative
+controls are separate:
+
+```bash
+node scripts/harness/self-test.mjs
+```
+
+The self-test copies the game, deliberately breaks the copies (a
+2000px-wide overflow element and a throwing script), and passes only if
+the browser suite catches each defect with the expected failed check.
+
+Puppeteer and Chrome are test tooling only, never game dependencies.
+The harness resolves the Puppeteer module by `PUPPETEER_MODULE` first,
+then known workspace installs, then `scripts/harness/node_modules/`;
+it resolves Chrome by `PUPPETEER_EXECUTABLE_PATH` first, then the
+Puppeteer cache builds, then `/opt/meta-chromium/chrome`. A fresh
+machine needs its own pinned install in a separate tools directory
+(Puppeteer 25.16.0 was the version observed working on 2026-11-01):
+
+```bash
+mkdir -p ~/tools/surveyfunnel-harness
+cd ~/tools/surveyfunnel-harness
+npm init -y
+npm install puppeteer@25.16.0
+cd /path/to/SurveyFunnel
+PUPPETEER_MODULE=$HOME/tools/surveyfunnel-harness/node_modules/puppeteer/lib/puppeteer/puppeteer.js \
+node scripts/harness/run-all.mjs
+```
+
+Installing the full `puppeteer` package also downloads a Chrome build
+into `~/.cache/puppeteer/`, which the harness finds on its own. With
+`puppeteer-core` instead, also set `PUPPETEER_EXECUTABLE_PATH` to a
+Chrome or Chromium executable you provide. Run results and failure
+screenshots land in `scripts/harness/results/`, which is git-ignored.
+See `scripts/harness/README.md` for the full check list.
+
 Campaign state lives in page memory and resets on reload. Sound and
 hint preferences are saved in local storage; the game does not use
 cookies or store survey responses.
@@ -252,8 +309,11 @@ remain modeled burden, not new cards or scored agenda topics.
 
 `scripts/game-features.test.mjs` executes the first two inline scripts in
 a Node VM with a minimal DOM facade. It checks game behavior, not rendered
-layout, synthesized audio, or browser accessibility. Manual browser checks
-remain necessary for those surfaces.
+layout, synthesized audio, or browser accessibility. The tracked browser
+harness (see Regression harness above) covers rendered layout and event
+wiring in headless Chrome. Manual checks remain necessary only for the
+surfaces automation cannot judge: physical phones, iOS Safari and
+Android Chrome, screen-reader passes, and a human listen to the audio.
 
 The setup BRD dialog derives study topics and required personas from
 `agendaTopics()` and `TOPIC_KEYS`, and acceptance gates from `curLevel()`
