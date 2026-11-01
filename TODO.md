@@ -36,8 +36,8 @@
 
 ## Release verification
 
-- A human must listen to WebAudio on the live site. Automated checks
-  cannot establish that music and effects sound correct.
+- A human must listen to WebAudio on the live site. Audio v2 shipped 2026-11-01;
+  automated checks still cannot establish that music and effects sound correct.
 - Scan the expanded QR with a physical phone and repeat key journeys on
   iOS Safari and Android Chrome. Cross-browser and screen-reader UAT
   remain unverified.

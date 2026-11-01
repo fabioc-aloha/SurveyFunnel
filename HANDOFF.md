@@ -7,6 +7,8 @@ player terminology corrections, and collapsed QR-border removal deployed
 successfully in gameplay commit `f8b2fac`. Release evidence is preserved in
 [CHANGELOG.md](CHANGELOG.md).
 
+Audio v2 landed locally on 2026-11-01 (4-bar soundtrack, drums, echo, compressor master chain, layered SFX, music ducking; audio APIs unchanged; build and 38 tests pass) and awaits push; the human listen stays open in [TODO.md](TODO.md).
+
 The existing [production workflow](.github/workflows/deploy-production.yml)
 deploys the five-file static package on pushes to `main`.
 [Run 41236593589](https://github.com/fabioc-aloha/SurveyFunnel/actions/runs/41236593589)

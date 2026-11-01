@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-11-01 - Audio v2: soundtrack and SFX improvement
+
+- Music loop doubled to 4 bars (C, F, Am, G) with an A/B lead phrase
+  (detuned dual square through a lowpass), a moving bass line, kick,
+  snare, and accent hats, a dotted-eighth echo on the title variant,
+  and the setup/run/run6 variants kept distinct.
+- All audio now routes through a shared compressor master chain and
+  an SFX bus. Signatures gained click-free attacks, bell partials on
+  the ding and chime, layered coin/spend/buzz/fanfare/alarm/stamp
+  voices, and music ducking under the biggest effects.
+- No gameplay, balance, or API changes: every audio function kept
+  its name and call semantics. Build validation and all 38 tests
+  pass. The human listen on the live site remains open (see TODO).
+
 ## 2026-10-31 - UAT fixes, difficulty and terminology release
 
 - Gameplay commit `f8b2fac` deployed successfully in
