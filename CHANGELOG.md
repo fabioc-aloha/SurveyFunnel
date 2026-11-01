@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-11-01 - Report verdict messages in plain words
+
+- The three manager captions on the round report now state the
+  facts first, in plain words. The win caption ("Clean send. The
+  manager approves, and so does the breaker panel.") left a
+  first-time player asking what it meant, and whether the campaign
+  had been stopped by a detected condition; it now reads: "The send
+  finished and met every target: the response rate beat the level
+  target, data quality and Insight passed their gates, and the
+  audience's goodwill never hit zero, so nothing was cut short.
+  That is a clean send." The breaker-trip caption now names the
+  cause ("Goodwill reached zero mid-send, so the breaker tripped
+  and the send stopped... The goodwill ledger below shows what
+  spent it."), and the loss caption drops the leak metaphor ("The
+  send finished, but it missed its targets. The report below shows
+  where responses were lost and which fix recovers the most.").
+  The grade stamp for a lost round now reads TARGET MISSED instead
+  of NOT YET. No numbers, thresholds, or rules changed; the rest
+  of the report's verdict lines were audited against the same
+  first-read test and already state their facts plainly (the FAST
+  AND USELESS verdict paragraph defines its own stamp, the twist
+  lines print the bar and the measured value, the bounce-backs
+  lines explain catch-all in place), so they are unchanged.
+
 ## 2026-11-01 - Run screen: distinct gave-up glyph; phone question chips collapse
 
 - The opened-then-bounced drop has its own mark. The return arrow
