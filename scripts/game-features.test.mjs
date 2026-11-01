@@ -1221,6 +1221,66 @@ test('fallout piles sit in a bottom strip whose columns align with the five gate
   assert.match(html, /GATE_X\[col\.getAttribute\("data-gate"\)\]/);
 });
 
+test('bounced sprites settle into the strip pile and stay; only never-opened sprites fade', () => {
+  const html = readFileSync(join(root, 'site', 'index.html'), 'utf8');
+  /* The settled state must not hide the figure: the base .piling
+     travel rule carries no fade, and opacity:0 survives only on the
+     never-opened route's pilefade modifier. This is the regression
+     test for the live-play report "bounce backs are not piling up:
+     I see the bounce back animation, it should pile up" — the old
+     rule faded every routed sprite to opacity 0, so the pile never
+     accumulated anything but the envelope glyphs. */
+  const pilingRule = html.match(/\.sprite\.piling\{[^}]*\}/)[0];
+  assert.ok(!/opacity\s*:\s*0/.test(pilingRule),
+    'the piling travel rule must not fade the sprite out');
+  assert.match(html, /\.sprite\.piling\.pilefade\{[^}]*opacity\s*:\s*0/,
+    'the fade is scoped to the never-opened pilefade modifier');
+
+  const { context: g, element, timers } = game();
+  element('track').getBoundingClientRect = () => ({ left: 0, top: 0, width: 1100, height: 300, bottom: 300, right: 1100 });
+  element('bounceStack').getBoundingClientRect = () => ({ left: 200, top: 560, width: 76, height: 32, bottom: 592, right: 276 });
+  element('unopenedStack').getBoundingClientRect = () => ({ left: 420, top: 560, width: 76, height: 32, bottom: 592, right: 496 });
+  function fakeSprite() {
+    const el = {
+      style: {}, removed: false, classes: new Set(),
+      classList: {
+        add(...names) { names.forEach(n => el.classes.add(n)); },
+        contains(name) { return el.classes.has(name); }
+      },
+      remove() { el.removed = true; }
+    };
+    return { el };
+  }
+  /* Thirteen bounces: the twelve fan slots fill with settled figures,
+     the thirteenth lands on slot 0 again and buries its first
+     occupant — the visible pile caps at the fan size while the label
+     count (pileLive, untouched here) keeps the exact total. */
+  const settled = [];
+  const timersBefore = timers.length;
+  for (let i = 1; i <= 13; i++) {
+    g.pileLive.bounced = i;
+    const sp = fakeSprite();
+    g.routeSpriteToPile(sp, 'bounce');
+    assert.ok(sp.el.classes.has('piling'), `bounce ${i} travels to the pile`);
+    assert.ok(sp.el.classes.has('piled'), `bounce ${i} settles persistently`);
+    assert.ok(!sp.el.classes.has('pilefade'), `bounce ${i} must not fade`);
+    assert.ok(!sp.el.removed, `bounce ${i} figure stays in the strip`);
+    assert.ok(parseFloat(sp.el.style.top) > 300, `bounce ${i} lands below the track, in the strip`);
+    settled.push(sp);
+  }
+  timers.slice(timersBefore).forEach(fn => fn());
+  assert.ok(settled[0].el.removed, 'the thirteenth bounce buries the figure it lands on');
+  assert.equal(settled.filter(sp => !sp.el.removed).length, 12,
+    'the settled pile caps at the twelve fan slots');
+  /* The never-opened route keeps its fade into the envelope fan: the
+     fan is that pile, growing and draining with the live count. */
+  g.pileLive.unopened = 1;
+  const noopen = fakeSprite();
+  g.routeSpriteToPile(noopen, 'noopen');
+  assert.ok(noopen.el.classes.has('pilefade'),
+    'never-opened sprites still fade into their envelope fan');
+});
+
 test('report prints the unopened count from the same tally the piles use', () => {
   const { context: g, element } = game();
   g.selectLevel(1, false);

@@ -274,10 +274,15 @@
   }
   .sprite.dropping{ transition:top 1.1s ease-in, opacity 1.1s; opacity:0; z-index:2; }
   .sprite.dropping .dropicon{ display:block; }
-  /* bounced / never-opened sprites travel down into their strip pile
-     and fade as they settle into the stack */
-  .sprite.piling{ transition:left .55s ease-in, top .55s ease-in, opacity .3s ease-in .4s; opacity:0; z-index:2; }
+  /* bounced / never-opened sprites travel down into their strip pile.
+     A bounced sprite then STAYS there: the bounce pile is the settled
+     figures themselves, return markers up, growing bounce by bounce.
+     A never-opened sprite still fades into its envelope (pilefade):
+     the unopened pile is the envelope fan, which grows on deliveries
+     and drains on opens — the body just catches up with its mail. */
+  .sprite.piling{ transition:left .55s ease-in, top .55s ease-in; z-index:2; }
   .sprite.piling .dropicon{ display:block; }
+  .sprite.piling.pilefade{ transition:left .55s ease-in, top .55s ease-in, opacity .3s ease-in .4s; opacity:0; }
   .sprite.escaped .dropicon{ display:block; }
   @keyframes cheer{ 0%{ margin-top:0; } 40%{ margin-top:-16px; } 100%{ margin-top:0; } }
   .sprite.cheer{ animation:cheer .45s ease-out 2; }
@@ -404,6 +409,7 @@
   @media (prefers-reduced-motion: reduce){
     .sprite.cheer, .sprite.shake, .breaker.tripped, .cabinet.shaking, .gradebox.stamp, #countdownNum.pop{ animation:none; }
     .sprite.piling{ transition:none; }
+    .sprite.piling.pilefade{ transition:none; }
     .confetti-bit{ display:none !important; }
   }
   /* ---- v1.5 novice learning layer ---- */
@@ -2583,11 +2589,20 @@ function renderPiles(){
 }
 /* Bounced and never-opened sprites do not drop where they stand:
    they travel down into their pile in the bottom strip (bounce pile
-   under DELIVERED, unopened pile under OPENED) and fade as they
-   settle onto the stack. The counts were already updated by the gate
-   events; this is only the body catching up with its envelope. The
-   landing slot reuses the pile's own glyph fan, so the sprite lands
-   where its envelope appears. */
+   under DELIVERED, unopened pile under OPENED). The counts were
+   already updated by the gate events; this is only the body catching
+   up with its mail. The landing slot reuses the pile's own glyph
+   fan, so the sprite lands where its envelope appears.
+   A bounced body then STAYS in the strip for the rest of the run:
+   the bounce pile is the settled figures themselves, so it visibly
+   grows bounce by bounce. One figure per fan slot — a later bounce
+   on an occupied slot lands on top of the figure already there and
+   buries it (the buried element leaves the DOM once the landing
+   finishes), so the strip never holds more figures than the fan has
+   slots (12) while the label keeps the exact count. A never-opened
+   body instead fades into its envelope: the unopened pile is the
+   fan itself, which grows on deliveries and drains on opens. */
+var piledBySlot = {};
 function routeSpriteToPile(sp, cause){
   var isBounce = cause === "bounce";
   var n = isBounce ? pileLive.bounced : pileLive.unopened;
@@ -2601,7 +2616,16 @@ function routeSpriteToPile(sp, cause){
   var gy = sr.bottom - tr.top - (PILE_SPOTS[slot][1] + 7) * sy;
   sp.el.style.left = (gx - 11) + "px";
   sp.el.style.top = (gy - 15) + "px";
-  sp.el.classList.add("piling");
+  if (!isBounce){ sp.el.classList.add("piling", "pilefade"); return; }
+  sp.el.classList.add("piling", "piled");
+  var buried = piledBySlot[slot];
+  piledBySlot[slot] = sp.el;
+  if (buried && buried !== sp.el){
+    /* the new figure covers the slot's previous occupant as it
+       lands; once the travel finishes, the buried figure is under
+       the pile and comes out of the DOM */
+    setTimeout(function(){ buried.remove(); }, 600);
+  }
 }
 function fireRemBeat(beat){
   var stamp = $("remStamp");
@@ -2700,6 +2724,7 @@ function setupStage(run){
      under their gates (same GATE_X source as the labels across the
      top), and arm this run's reminder beats */
   pileLive = { bounced: 0, unopened: 0, shownB: -1, shownU: -1 };
+  piledBySlot = {};
   pileBeats = pileModel(run).waves.filter(function(w){ return w.at !== null; });
   pileBeatIdx = 0;
   if (remStampTimer){ clearTimeout(remStampTimer); remStampTimer = null; }

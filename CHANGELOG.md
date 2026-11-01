@@ -1,5 +1,33 @@
 # Changelog
 
+## 2026-11-01 - Bounce pile: bounced sprites stay and pile up
+
+- Fixed a live-play defect: bounced sprites travelled down into the
+  run screen's pile strip and then faded to invisible (`.sprite.piling`
+  transitioned opacity to 0), so the bounce pile never accumulated
+  anything but the small envelope glyphs and did not read as a pile.
+  Bounced sprites now settle into the BOUNCED column and stay for the
+  rest of the run, return markers up: the pile is the settled figures
+  themselves and visibly grows bounce by bounce.
+- One settled figure per glyph-fan slot. A later bounce on an occupied
+  slot lands on top of the figure already there and buries it (the
+  buried element leaves the DOM once the landing finishes), so the
+  strip never holds more than the fan's twelve figures while the
+  BOUNCED · N label keeps the exact count. Pile counts, the tally, and
+  every other engine number are untouched.
+- Never-opened sprites keep the old fade, now scoped to a `.pilefade`
+  modifier: the unopened pile is its envelope fan, which already grows
+  on deliveries and drains on opens, so the body fading into its
+  envelope reads correctly there. Under prefers-reduced-motion both
+  routes land instantly; settled figures persist at full opacity.
+- A regression test pins the behaviour (the settled rule carries no
+  fade, thirteen routed bounces leave twelve settled figures with the
+  first buried, the never-opened route keeps its fade); it fails on
+  the pre-fix file and passes now. Verified in headless Chrome at
+  desktop and 390 px: a 10-bounce Executive Blast run's pile grows
+  from 4 settled figures to all 10, both labels stay legible, zero
+  horizontal overflow.
+
 ## 2026-11-01 - Quick Challenges, stage 3 of 3: the second wave
 
 - A challenge no longer always ends at its first report. Most runs
