@@ -1,5 +1,41 @@
 # Changelog
 
+## 2026-11-01 - Question buttons: one line when it fits, no overflow when it stacks
+
+- The verb and its price now share one line whenever they fit
+  (desktop CUT · 1, ANCHOR · 2), instead of the price always being
+  forced onto its own line by the column layout. The button is a
+  wrapping row: at phone width a long verb wraps between its words
+  and the price drops below it, centered.
+- This also fixes the worst case the browser harness caught: Q12's
+  ADD PRIVACY LINE (three label lines plus the price) overflowed its
+  60px button's content box by 2px. Measured after the fix at 390px,
+  every questionnaire action button has scrollHeight within 1px of
+  clientHeight, and every button keeps the uniform 60px height.
+
+## 2026-11-01 - Questionnaire cut floor: the instrument cannot be emptied
+
+- A player could CUT every question and still launch an empty
+  instrument. That is now impossible: CORE questions can never be cut
+  (their CUT button renders disabled with the reason on the button and
+  a LOCKED · CORE line on the card), and cutting stops at a floor of
+  6 kept questions (the floor is the dealt size itself in modes that
+  deal fewer, so the 3-card Quick Challenges are fully locked).
+- The guard lives in the cut action itself, not only in the buttons,
+  so no caller can bypass it; a refused cut changes nothing and
+  charges nothing. RESTORE and ADD FROM BANK lift the instrument off
+  the floor and re-enable cutting.
+- A stage-level note states the minimum and flags the at-minimum
+  state; the launch checklist gains an instrument-size row, and a
+  sub-floor instrument (reachable only by direct state edits) leaves
+  the LAUNCH button disabled with "TOO FEW QUESTIONS · MIN 6".
+- Five regression tests drive the game's own CUT handler: core
+  lockout, the floor holding under repeated attempts, restore/add
+  re-enabling cuts, the checklist/launch refusal, the floor branch
+  itself on a low-core instrument, and the Quick Challenge floor
+  formula. They fail on the pre-fix game and pass now (43 tests
+  total).
+
 ## 2026-11-01 - Moog-first soundtrack: A minor synth funk
 
 - The chiptune soundtrack is replaced with a brand-new composition

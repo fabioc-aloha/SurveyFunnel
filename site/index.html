@@ -134,13 +134,18 @@
   .qbtns{ display:flex; gap:6px; align-items:stretch; }
   .qbtn{
     flex:1 1 0; min-width:0; height:60px;
-    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
-    font-family:"Press Start 2P", monospace; font-size:9px; line-height:1.5; text-align:center;
-    cursor:pointer; padding:6px 4px;
+    display:flex; flex-direction:row; flex-wrap:wrap; align-items:center; align-content:center; justify-content:center;
+    column-gap:2px; row-gap:1px;
+    font-family:"Press Start 2P", monospace; font-size:9px; line-height:1.35; text-align:center;
+    cursor:pointer; padding:4px;
     background:#0a0d18; color:var(--dim); border:2px solid var(--line); border-radius:5px;
   }
   .qbtn.wide{ flex-grow:1.8; }
-  .qbtn .qprice{ font-size:8px; line-height:1.4; opacity:.78; }
+  .qbtn .qlabel{ min-width:0; }
+  .qbtn .qprice{ font-size:8px; line-height:1.2; opacity:.78; }
+  .cutlock{ margin-top:6px; font-family:"Press Start 2P", monospace; font-size:8px; line-height:1.5; color:var(--teal); text-align:center; }
+  .floornote{ margin:0 0 10px; padding:8px 10px; border:2px dashed var(--line); border-radius:6px; font-size:13px; color:var(--dim); text-align:center; }
+  .floornote.atmin{ border:2px solid var(--gold); background:#2e2a12; color:#ffe9a3; font-weight:600; }
   .qbtn.sel{ color:#0c2a1e; background:var(--teal); border-color:var(--teal); }
   .qbtn[data-act="simplify"].sel{ background:var(--gold); border-color:var(--gold); color:#231a00; }
   .qbtn[data-act="cut"].sel{ background:var(--red); border-color:var(--red); color:#2b0006; }
@@ -533,8 +538,9 @@
       <section class="lever" aria-label="Question cards">
         <div class="lever-head">
           <span class="lever-title" style="font-size:12px;">THE INSTRUMENT · AS DEALT INTO THE SKELETON</span>
-          <span class="lever-sub" id="instrumentHelp">KEEP, apply the class-correct repair on the card (SPLIT, NEUTRALIZE, DEFINE, ANCHOR and the rest, each at its price), or CUT for 1 credit. SIMPLIFY repairs a WORDY STEM. Low-value items contribute no agenda insight: CUT removes their burden. Sections run A outcome core, B drivers, C diagnostics, D sensitive, E open-text closer, F demographics last.</span>
+          <span class="lever-sub" id="instrumentHelp">KEEP, apply the class-correct repair on the card (SPLIT, NEUTRALIZE, DEFINE, ANCHOR and the rest, each at its price), or CUT for 1 credit. Core questions cannot be cut, and the instrument always keeps at least 6 questions. SIMPLIFY repairs a WORDY STEM. Low-value items contribute no agenda insight: CUT removes their burden. Sections run A outcome core, B drivers, C diagnostics, D sensitive, E open-text closer, F demographics last.</span>
         </div>
+        <div id="qFloorNote" class="floornote" role="note"></div>
         <div class="qgrid" id="qGrid"></div><div id="cutTray"></div><div id="bankPanel"></div>
       </section>
 
@@ -1663,7 +1669,44 @@ function renderAgenda(){
   el.innerHTML = '<div class="at">LEVEL AGENDA · INSIGHT VALUE NEEDS ' + insightGate() + '+ · EACH TOPIC MUST BE ASKED, SOUND, ANSWERABLE, AND ANSWERED BY ITS KEY PERSONAS</div>' + rows +
     '<div class="fineprint" style="font-size:12.5px;color:var(--faint);margin-top:6px">Coverage is the pre-run signal. Insight itself is scored from the actual run: who finished matters as much as how many (Groves &amp; Peytcheva 2008).</div>';
 }
+/* Cut floor: CORE questions are the instrument's spine and can never be
+   cut, and the kept count can never fall below the floor for the dealt
+   instrument: 6, or the dealt size itself when a mode deals fewer (the
+   3-card Quick Challenges). The guard lives in applyCut, the action path,
+   not only in button rendering, so no caller can bypass it. A refused cut
+   changes no state, so it charges nothing. */
+var MIN_QUESTIONS = 6;
+function instrumentFloor(){ return Math.min(MIN_QUESTIONS, activeQuestions().length); }
+function questionById(id){
+  var pools = [activeQuestions(), addBankQuestions(), QUESTION_BANK, OPTIONAL_QUESTIONS];
+  for (var i = 0; i < pools.length; i++){ var hit = pools[i].filter(function(q){ return q.id === id; })[0]; if (hit) return hit; }
+  return null;
+}
+function cutBlockReason(q){
+  if (!q) return "unknown";
+  if (q.core) return "core";
+  if (keptQuestions().length <= instrumentFloor()) return "floor";
+  return null;
+}
+function applyCut(qid){
+  var reason = cutBlockReason(questionById(qid));
+  if (reason){ sndError(); return reason; }
+  state.qstate[qid] = "cut";
+  return null;
+}
+function cutButtonHtml(q){
+  var reason = cutBlockReason(q);
+  if (!reason) return '<button class="qbtn" data-q="' + q.id + '" data-act="cut"><span class="qlabel">CUT</span><span class="qprice"> \u00B7 1</span></button>';
+  var why = reason === "core" ? "Core questions cannot be cut" : "Minimum instrument reached: at least " + instrumentFloor() + " questions must be kept";
+  return '<button class="qbtn" data-q="' + q.id + '" data-act="cut" disabled title="' + why + '" aria-label="Cut unavailable: ' + why + '"><span class="qlabel">CUT</span><span class="qprice"> \u00B7 1</span></button>';
+}
 function renderQuestions(){
+  var fnote = $("qFloorNote");
+  if (fnote){
+    var keptN = keptQuestions().length, fl = instrumentFloor();
+    if (keptN <= fl){ fnote.className = "floornote atmin"; fnote.innerHTML = "\u26A0 MINIMUM INSTRUMENT REACHED \u00B7 " + keptN + " KEPT, MINIMUM IS " + fl + " \u00B7 CUT IS LOCKED \u00B7 RESTORE A CUT QUESTION OR ADD FROM THE BANK TO CUT AGAIN"; }
+    else { fnote.className = "floornote"; fnote.innerHTML = "MINIMUM INSTRUMENT: " + fl + " QUESTIONS \u00B7 CORE QUESTIONS CANNOT BE CUT \u00B7 " + keptN + " KEPT"; }
+  }
   var displayQs = activeQuestions().concat(addBankQuestions().filter(function(q){ return state.added[q.id]; }));
   $("qGrid").innerHTML = displayQs.filter(function(q){ return state.qstate[q.id] !== "cut"; }).map(function(q){
     var st = state.qstate[q.id];
@@ -1701,9 +1744,10 @@ function renderQuestions(){
     if (st !== "cut"){
       html += '<div class="qbtns">' +
         '<button class="qbtn' + (st === "keep" ? " sel" : "") + '" data-q="' + q.id + '" data-act="keep">KEEP</button>' +
-        (verb ? '<button class="qbtn wide' + (st === "simplify" ? " sel" : "") + '" data-q="' + q.id + '" data-act="simplify"' + (st !== "simplify" && budgetMath().total + fcost > BUDGET_TOTAL ? " disabled title=\"Not enough budget for " + verb + " (" + fcost + " cr)\"" : "") + '>' + verb + '<span class="qprice"> \u00B7 ' + fcost + '</span></button>'
+        (verb ? '<button class="qbtn wide' + (st === "simplify" ? " sel" : "") + '" data-q="' + q.id + '" data-act="simplify"' + (st !== "simplify" && budgetMath().total + fcost > BUDGET_TOTAL ? " disabled title=\"Not enough budget for " + verb + " (" + fcost + " cr)\"" : "") + '><span class="qlabel">' + verb + '</span><span class="qprice"> \u00B7 ' + fcost + '</span></button>'
               : (d !== "CLEAN" ? '<button class="qbtn wide" disabled title="No wording fix exists for this class">NO WORDING FIX</button>' : "")) +
-        '<button class="qbtn" data-q="' + q.id + '" data-act="cut">CUT<span class="qprice"> \u00B7 1</span></button></div>';
+        cutButtonHtml(q) + '</div>' +
+        (q.core ? '<div class="cutlock">LOCKED \u00B7 CORE \u00B7 CANNOT BE CUT</div>' : '');
     }
     return html + "</div>";
   }).join("");
@@ -1712,8 +1756,8 @@ function renderQuestions(){
     b.addEventListener("click", function(){
       var qid = parseInt(b.getAttribute("data-q"), 10), act = b.getAttribute("data-act");
       if (act === "cut"){
+        if (applyCut(qid)) return; /* refused: core question, or the floor is reached; no state changed, no charge */
         var instrument = state.instrument;
-        state.qstate[qid] = "cut";
         var card = $("qc" + qid);
         card.style.transform = "translateX(70px) rotate(8deg)"; card.style.opacity = "0";
         sndCut();
@@ -1784,9 +1828,10 @@ function renderChecklist(){
     ["List prep decided (Step 2): validation, dedupe, suppression", !!prepDone],
     ["Invite chosen (Step 3)", !!(t.invite || state.chainActive)],
     ["Defects reviewed (Step 4): at least one fix or cut, or skip below", !!reviewDone],
-    ["Agenda coverage seen: check the AGENDA panel in Step 4", !!(reviewDone || t.agenda)]
+    ["Agenda coverage seen: check the AGENDA panel in Step 4", !!(reviewDone || t.agenda)],
+    ["Instrument size (Step 4): at least " + instrumentFloor() + " questions kept", keptQuestions().length >= instrumentFloor()]
   ];
-  el.innerHTML = '<div class="ct">READY TO LAUNCH? · THIS LIST INFORMS, IT NEVER BLOCKS THE BUTTON</div>' +
+  el.innerHTML = '<div class="ct">READY TO LAUNCH? · THIS LIST INFORMS · THE BUTTON CHECKS BUDGET AND THE MINIMUM INSTRUMENT</div>' +
     rows.map(function(r, i){
       return '<div class="crow ' + (r[1] ? "done" : "todo") + '"><span>' + (r[1] ? "✓ " : "○ ") + r[0] + '</span><span class="st">' + (r[1] ? "DONE" : "TO DO") + '</span>' +
         (i === 3 && !r[1] ? '<button class="skipbtn2" id="skipReviewBtn">SKIP REVIEW</button>' : "") + "</div>";
@@ -1813,7 +1858,14 @@ function renderReadout(){
   updateAffordability();
   if (state.level===3 || state.level===6) renderStakeholder();
   var lb = $("launchBtn");
-  if (lb){ var over = budgetMath().total > BUDGET_TOTAL; lb.disabled = over; lb.style.opacity = over ? ".45" : ""; lb.textContent = over ? "OVER BUDGET" : "\u25B6 LAUNCH"; }
+  if (lb){
+    var over = budgetMath().total > BUDGET_TOTAL;
+    var tooFew = kept.length < instrumentFloor();
+    lb.disabled = over || tooFew;
+    lb.style.opacity = (over || tooFew) ? ".45" : "";
+    lb.textContent = over ? "OVER BUDGET" : (tooFew ? "TOO FEW QUESTIONS \u00B7 MIN " + instrumentFloor() : "\u25B6 LAUNCH");
+    lb.title = tooFew ? "The instrument must keep at least " + instrumentFloor() + " questions. Restore a cut question or add one from the bank." : "";
+  }
   var escB = $("escBtn");
   if (escB && !state.escapes && budgetMath({escapes:true}).total > BUDGET_TOTAL){ escB.disabled = true; escB.title = "Not enough budget"; }
   else if (escB){ escB.disabled = false; escB.title = ""; }

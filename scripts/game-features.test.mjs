@@ -186,9 +186,12 @@ test('stakeholder cost forecasts use the same baseline-aware budget as a real ch
 
 test('a cut is applied before launch and its animation cannot edit the restored campaign', () => {
   const { context: g, timers } = game();
-  const original = JSON.stringify(g.state);
-  g.startQuickChallenge(0);
-  const qid = g.activeQuestions()[0].id;
+  /* Adapted for the cut floor: Quick Challenge cards are all core, so their
+     CUT buttons are locked by design now. The animation scenario therefore
+     runs on a legal Level 1 non-core cut, then crosses into and out of a
+     Quick Challenge exactly as before. */
+  g.selectLevel(1, false);
+  const qid = 5; /* Q5 is non-core on the Level 1 deal */
   let handler;
   const button = {
     getAttribute(key) { return key === 'data-q' ? String(qid) : 'cut'; },
@@ -198,10 +201,142 @@ test('a cut is applied before launch and its animation cannot edit the restored 
   g.renderQuestions();
   handler();
   assert.equal(g.state.qstate[qid], 'cut');
-  assert.equal(g.keptQuestions().length, 2);
+  assert.equal(g.keptQuestions().length, 11);
+  const campaign = JSON.stringify(g.state);
+  g.startQuickChallenge(0);
   g.leaveQuickChallenge();
   timers.forEach(callback => callback());
-  assert.equal(JSON.stringify(g.state), original);
+  assert.equal(JSON.stringify(g.state), campaign);
+});
+
+/* Drive the game's own question-card CUT handler for one question id,
+   exactly as a click on its CUT button would. */
+function clickCut(g, qid) {
+  let handler;
+  const button = {
+    getAttribute(key) { return key === 'data-q' ? String(qid) : 'cut'; },
+    addEventListener(type, listener) { handler = listener; }
+  };
+  g.document.querySelectorAll = selector => selector === '[data-q]' ? [button] : [];
+  g.renderQuestions();
+  handler();
+}
+
+test('core questions cannot be cut through the question card controls', () => {
+  const { context: g, element } = game();
+  g.selectLevel(1, false);
+  assert.equal(g.instrumentFloor(), 6);
+  const core = g.activeQuestions().filter(q => q.core);
+  assert.ok(core.length >= 6);
+  for (const q of core) {
+    clickCut(g, q.id);
+    assert.equal(g.state.qstate[q.id], 'keep', `Q${q.id} is core and must stay`);
+  }
+  assert.equal(g.keptQuestions().length, g.activeQuestions().length);
+  g.renderQuestions();
+  const grid = element('qGrid').innerHTML;
+  const cutTag = id => grid.match(new RegExp(`<button[^>]*data-q="${id}"[^>]*data-act="cut"[^>]*>`))[0];
+  for (const q of core) {
+    assert.match(cutTag(q.id), /disabled/, `Q${q.id} CUT button must render disabled`);
+    assert.match(cutTag(q.id), /aria-label="Cut unavailable: Core questions cannot be cut"/);
+  }
+  const nonCore = g.activeQuestions().find(q => !q.core);
+  assert.doesNotMatch(cutTag(nonCore.id), /disabled/, 'non-core CUT stays available above the floor');
+  assert.match(grid, /LOCKED · CORE · CANNOT BE CUT/);
+});
+
+test('cutting stops at the six-question floor and resumes after a restore or an add', () => {
+  const { context: g, element } = game();
+  g.selectLevel(1, false);
+  const nonCore = g.activeQuestions().filter(q => !q.core);
+  assert.equal(nonCore.length, 6);
+  for (const q of nonCore) clickCut(g, q.id);
+  assert.equal(g.keptQuestions().length, 6);
+  /* Further cut attempts through the path change nothing, however often repeated. */
+  for (let round = 0; round < 2; round++) {
+    for (const q of g.keptQuestions()) {
+      clickCut(g, q.id);
+      assert.equal(g.state.qstate[q.id], 'keep', `Q${q.id} must not be cut at the floor`);
+    }
+  }
+  assert.equal(g.keptQuestions().length, 6);
+  /* Floor state renders explained: every CUT disabled, stage note at the minimum. */
+  g.renderQuestions();
+  const grid = element('qGrid').innerHTML;
+  const cutTags = grid.match(/<button[^>]*data-act="cut"[^>]*>/g);
+  assert.ok(cutTags.length >= 6);
+  assert.ok(cutTags.every(tag => /disabled/.test(tag)), 'every CUT button is disabled at the floor');
+  assert.match(element('qFloorNote').innerHTML, /MINIMUM INSTRUMENT REACHED/);
+  assert.match(element('qFloorNote').innerHTML, /MINIMUM IS 6/);
+  /* RESTORE (the tray handler's own assignment) lifts the instrument off
+     the floor, and cutting that question works again. */
+  const restored = nonCore[0];
+  g.state.qstate[restored.id] = 'keep';
+  assert.equal(g.keptQuestions().length, 7);
+  clickCut(g, restored.id);
+  assert.equal(g.state.qstate[restored.id], 'cut');
+  assert.equal(g.keptQuestions().length, 6);
+  /* ADD FROM BANK (the bank button's own toggle) does the same. */
+  const addable = g.addBankQuestions().filter(q => !q.core);
+  assert.ok(addable.length > 0, 'the dealt bank offers a non-core question to add');
+  const added = addable[0];
+  g.state.added[added.id] = true;
+  assert.equal(g.keptQuestions().length, 7);
+  clickCut(g, added.id);
+  assert.equal(g.state.qstate[added.id], 'cut');
+  assert.equal(g.keptQuestions().length, 6);
+});
+
+test('a sub-floor instrument is flagged in the checklist and the launch button refuses', () => {
+  const { context: g, element } = game();
+  g.selectLevel(1, false);
+  g.renderReadout();
+  assert.notEqual(element('launchBtn').disabled, true);
+  /* Force a sub-floor state directly, as a legacy or edge path could:
+     the cut path itself can no longer produce this. */
+  g.state.qstate[1] = 'cut'; g.state.qstate[2] = 'cut'; g.state.qstate[3] = 'cut';
+  for (const q of g.activeQuestions().filter(q => !q.core)) g.state.qstate[q.id] = 'cut';
+  assert.equal(g.keptQuestions().length, 3);
+  g.renderReadout();
+  assert.match(element('launchCheck').innerHTML, /at least 6 questions kept[\s\S]*?TO DO/);
+  assert.equal(element('launchBtn').disabled, true);
+  assert.match(element('launchBtn').textContent, /TOO FEW QUESTIONS · MIN 6/);
+});
+
+test('the floor itself refuses a cut at six kept on a low-core instrument', () => {
+  const { context: g, element } = game();
+  g.selectLevel(1, false);
+  /* Current deals always carry exactly 6 core questions, so the core rule
+     alone bounds them; the floor branch guards any deal with fewer core.
+     Construct one directly: 2 core + 6 non-core from the bank. */
+  const core = g.QUESTION_BANK.filter(q => q.core).slice(0, 2);
+  const nonCore = g.QUESTION_BANK.filter(q => !q.core).slice(0, 6);
+  g.state.instrument = core.concat(nonCore);
+  for (const q of g.state.instrument) g.state.qstate[q.id] = 'keep';
+  assert.equal(g.instrumentFloor(), 6);
+  assert.equal(g.keptQuestions().length, 8);
+  clickCut(g, nonCore[0].id);
+  clickCut(g, nonCore[1].id);
+  assert.equal(g.keptQuestions().length, 6);
+  clickCut(g, nonCore[2].id);
+  assert.equal(g.state.qstate[nonCore[2].id], 'keep', 'the floor, not the core rule, must refuse this cut');
+  assert.equal(g.keptQuestions().length, 6);
+  g.renderQuestions();
+  const tag = element('qGrid').innerHTML.match(new RegExp(`<button[^>]*data-q="${nonCore[2].id}"[^>]*data-act="cut"[^>]*>`))[0];
+  assert.match(tag, /disabled/);
+  assert.match(tag, /aria-label="Cut unavailable: Minimum instrument reached/);
+});
+
+test('quick challenge floor equals its three dealt questions, so cutting is fully locked', () => {
+  const { context: g } = game();
+  g.startQuickChallenge(0);
+  assert.equal(g.activeQuestions().length, 3);
+  assert.equal(g.instrumentFloor(), 3);
+  for (const q of g.activeQuestions()) {
+    clickCut(g, q.id);
+    assert.equal(g.state.qstate[q.id], 'keep', `challenge Q${q.id} must not be cut`);
+  }
+  assert.equal(g.keptQuestions().length, 3);
 });
 
 test('Quick Challenge restores a previously prepared campaign attempt chain', () => {
