@@ -33,7 +33,10 @@ dist/assets/play-mobile-qr.svg     production URL QR code
 
 Deploy `dist/` as the web root, not `site/` or the repository root.
 The font URL resolves to `/assets/press-start-2p.ttf`. Repository
-documentation, agent guidance, and the README banner are not published.
+documentation, agent guidance, and the README banner are not included
+in the hosted web root. The GitHub repository and tracked documentation
+are public; excluding a file from `dist/` does not make it private.
+Private local notes must remain ignored and unstaged.
 
 ## Continuous deployment
 
@@ -41,18 +44,28 @@ documentation, agent guidance, and the README banner are not published.
 every push to `main`, or manually through GitHub Actions on `main`.
 
 1. Check out the commit and set up Node 22.
-2. Run `node --test scripts/build-site.test.mjs scripts/game-features.test.mjs`.
-   Tests cover Quick Challenge rules and campaign isolation, event-based
-   reactions, stakeholder forecasts, and default replay behavior. They also
+2. Explicitly build with `node scripts/build-site.mjs`, then run
+   `node --test scripts/build-site.test.mjs scripts/game-features.test.mjs`.
+   Tests cover the independent evidence gates, sample/role/account boundaries,
+   audience carryover, continuous campaign, legal winning fixtures,
+   Quick Challenge rules and campaign isolation, event-based reactions,
+   stakeholder forecasts, and default replay behavior. They also
    validate all inline scripts, reject missing/external scripts, and check
    the exact package contents, normalized source bytes, font path, and license. Text files
    use LF line endings on every platform; the font remains binary.
-3. Upload the prebuilt `dist/` package using Azure's deployment action.
+3. Check that the production deployment credential is present without
+   printing its value.
+4. Upload the prebuilt `dist/` package using Azure's deployment action.
    No Oryx build or API deployment runs.
-4. Verify the live HTML, font, license, and QR code against the packaged bytes,
+5. Verify the live HTML, font, license, and QR code against the packaged bytes,
    check response headers and MIME types, and confirm repository docs
    return HTTP 404. Retry transient deployment propagation failures;
    persistent failures mark the workflow failed.
+
+   CI does not run the Puppeteer browser harness. A green deployment
+   workflow establishes build, Node-test, and live-package verification;
+   it does not establish a passing browser suite, physical-device review,
+   screen-reader review, or human audio check.
 
 The workflow has read-only repository permissions. Actions are pinned to
 commit SHAs, and production deployments are serialized. The GitHub
@@ -95,9 +108,14 @@ If the production hostname changes, regenerate the QR and update its link.
 ## Updating the game
 
 1. Edit the game or assets and run the local gameplay and packaging tests.
-2. Update `CHANGELOG.md` and push to `main`.
-3. Wait for the production workflow to succeed.
-4. Play a round on the live URL and check sound in a real browser.
+2. Run the [browser harness](../scripts/harness/README.md) and negative
+   controls where approved tooling is available. If blocked, record the
+   exact limitation; do not report the suite as passed.
+3. Update current documentation and `CHANGELOG.md`, inspect staged files
+   for private notes or generated output, then commit and push to `main`.
+4. Match the production workflow to the pushed commit and wait for its
+   live-package verification to succeed.
+5. Play a round on the live URL and check sound in a real browser.
 
 To roll back, revert the faulty commit and push the revert to `main`.
 The same workflow validates and deploys the restored version. A failed
@@ -110,5 +128,7 @@ post-deployment check reports failure but does not automatically roll back.
       scrolling.
 - [ ] Sound on and mute toggle both checked in a real browser (the
       build sandbox cannot hear WebAudio; a human ear is required).
-- [ ] Report text readable; all results labeled simulated.
+- [ ] Report text readable; all five evidence checks and post-response
+      stages present; response is a benchmark, not a campaign win gate.
+- [ ] Context note explains the usable response base and simulation limits.
 - [ ] README banner renders on the repo home page.

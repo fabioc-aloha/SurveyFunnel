@@ -26,7 +26,7 @@ node scripts/harness/run-all.mjs
 ```
 
 It runs three sections in order: the build validation above, the Node
-suite (83 tests), and a headless-Chrome browser suite. The browser suite
+suite, and a headless-Chrome browser suite. The browser suite
 drives the real game at 390x844 and 1280x800: the title, setup, run, and
 report screens with no console or page errors and no horizontal
 overflow, questionnaire button geometry, the manager nameplate, and a
@@ -43,34 +43,25 @@ controls are separate:
 node scripts/harness/self-test.mjs
 ```
 
+The standard Level 1 journeys also assert all five evidence checks,
+the FINISH-to-ACT pipeline, the publication/context note, diagnostic
+response benchmark, and audience history on the next instrument.
+These assertions are tracked in the harness, not substitutes for the
+Node tests of gate boundaries and a continuous six-level campaign.
+
 The self-test copies the game, deliberately breaks the copies (a
 2000px-wide overflow element and a throwing script), and passes only if
 the browser suite catches each defect with the expected failed check.
 
-Puppeteer and Chrome are test tooling only, never game dependencies.
-The harness resolves the Puppeteer module by `PUPPETEER_MODULE` first,
-then known workspace installs, then `scripts/harness/node_modules/`;
-it resolves Chrome by `PUPPETEER_EXECUTABLE_PATH` first, then the
-Puppeteer cache builds, then `/opt/meta-chromium/chrome`. A fresh
-machine needs its own pinned install in a separate tools directory
-(Puppeteer 25.16.0 was the version observed working on 2026-11-01):
-
-```bash
-mkdir -p ~/tools/surveyfunnel-harness
-cd ~/tools/surveyfunnel-harness
-npm init -y
-npm install puppeteer@25.16.0
-cd /path/to/SurveyFunnel
-PUPPETEER_MODULE=$HOME/tools/surveyfunnel-harness/node_modules/puppeteer/lib/puppeteer/puppeteer.js \
-node scripts/harness/run-all.mjs
-```
-
-Installing the full `puppeteer` package also downloads a Chrome build
-into `~/.cache/puppeteer/`, which the harness finds on its own. With
-`puppeteer-core` instead, also set `PUPPETEER_EXECUTABLE_PATH` to a
-Chrome or Chromium executable you provide. Run results and failure
-screenshots land in `scripts/harness/results/`, which is git-ignored.
-See `scripts/harness/README.md` for the full check list.
+Puppeteer and a compatible Chromium browser are test tooling only,
+never game dependencies. The [harness guide](../scripts/harness/README.md)
+owns provisioning, Windows commands, environment overrides, and exact
+coverage. Fresh machines should provide explicit module and executable
+paths rather than rely on historical Linux discovery locations.
+Results and failure screenshots land in the ignored
+`scripts/harness/results/` directory. Missing or policy-blocked tooling
+is a failed/blocked browser section, not a skip or a pass; see the
+[changelog](../CHANGELOG.md) for dated verification.
 
 Campaign state lives in page memory and resets on reload. Sound and
 hint preferences are saved in local storage; the game does not use
@@ -104,19 +95,72 @@ Per round, the model runs in this order:
    `mechanics-update-v1.1.md`. If goodwill reaches zero, the breaker
    stops new invitations and ends the run for anyone still in the
    funnel. Only completions before the trip count.
-6. **Scoring.** Response score scaled to a 20% stretch goal, data
-   quality from the deduction table, and Insight Value from agenda
-   coverage. Winning requires response strictly above the level target, quality 60+,
-   and Insight 60+ (70+ in Level 6); Level 4 also requires ending
-   goodwill 35+.
+6. **Evidence processing.** After FINISH, remove duplicate, junk, speeder,
+   straight-lined, and guessed completions in that order, counting each
+   rejection once. MATCH then excludes forwarded responses, whose invited
+   account is unknown. Non-forwarded completions receive synthetic account
+   identifiers; this is a teaching model, not an external account lookup.
+   Recompute Insight using the matched records, so rejected roles cannot
+   earn credit.
+7. **Scoring and action.** `evaluateEvidence` returns five independent
+   checks: funnel execution, evidence fitness, data integrity, audience
+   sustainability, and operational trust. The campaign wins only if every
+   check passes. The report follows CLEAN, MATCH, INTERPRET, PUBLISH,
+   and ACT; failures withhold publication and name corrective actions.
+   Passing reports disclose their baseline and simulation limits.
+
+## Evidence fitness and audience continuity
+
+`evidenceMission()` defines each mission's required audience pool,
+minimum usable sample, and role shares. Mission minima are 750, 1,000,
+1,000, 675, 900, and 1,500 simulated responses for Levels 1-6.
+Levels 1-4 require the Support pool, Level 5 Global, and Level 6
+Leadership. Levels 1-5 require technicians and end users each at 10%+
+of the usable base; the finale requires executives and IT decision
+makers together at 50%+. Each required group needs at least one sprite.
+Account matching must retain at least 80% of cleaned completions.
+
+Quality still uses the original raw-run deduction table and must be 60+.
+At least 60% of completions must survive cleaning; excluding damaged
+responses does not erase the quality penalties. Usable Insight must
+be 60+ (70+ in the finale). Validation and dedupe are operational
+requirements; a Global audience also requires localization review and
+a localized invitation. The breaker must hold. Goodwill must remain
+above zero, or at least 35 in Level 4. Response rate is diagnostic,
+never a campaign win gate. Winning grades use the weakest of quality,
+usable Insight, and cleaning retention rather than averaging rate.
+
+`state.audiencePortfolio` records health, sends, instruments, suppression
+overrides, and completed response-sprite totals by role. Fresh, Stale,
+and Tired share Support; Global and Executive Blast are separate pools.
+This models cohort exposure, not individual repeat respondents, account
+hierarchies, or overlapping membership between pools. All records are
+synthetic page-memory state. A new level or instrument retains them;
+`resetCampaignNewGame()` and page reload clear them. Quick Challenges
+neither read nor modify the campaign portfolio.
+
+The next instrument starts from the lower of its segment's baseline
+and the pool's saved health, minus contact fatigue: one per previous
+send with suppression, two without, capped at eight. A retry instead
+keeps the existing four-point fatigue charge. Recontacting a pool
+without suppression fails sustainability. Health scales campaign open
+propensity by `clamp(start / segmentBaseline, 0.5, 1)` without reseeding
+the RNG. Only report finalization records a send; previews and repeated
+report calls do not consume audience health.
+
+These are explicit game rules. A sprite represents many simulated
+people, not many independent observations; passing the thresholds does
+not establish statistical adequacy, population representativeness,
+privacy compliance, or construct validity. Detailed governance and
+compliance gates remain separate roadmap work in `TODO.md`.
 
 ## Balance invariants (test these after any tuning)
 
 1. Lazy Level 1 default run: 2 completions from 40 sent (5%),
-   below the 12% target, with a visible bounce problem. This is a
+   below the 12% benchmark, with a visible bounce problem. This is a
    clear miss, not a near miss.
-2. Prepared mid budget run (validation, dedupe, Honest Ask, trim):
-   wins inside 120 credits.
+2. The recorded fixed Level 1 strategy passes every evidence check
+   within its initial budget, through the real card handlers.
 3. Unprepared Executive Blast loses, with expensive sends, hard bounces,
    and goodwill loss. It is not uniformly worst on every score.
 4. Gutted survey (only Q9 kept): quality and Insight fail, no win.
@@ -148,25 +192,24 @@ Blast.
 
 | Level | Difficulty | Fixed winning cost | Highest winning cost in checked draws | Initial pool |
 | --- | --- | --- | --- | --- |
-| 1 - First Send | Easy | 58 | 83 | 120 |
-| 2 - The Split | Easy | 67 | 83 | 120 |
-| 3 - The Stakeholder | Medium | 59 | 89 | 120 |
-| 4 - The Tired List | Hard | 62 | 82 | 120 |
+| 1 - First Send | Easy | 58 | 91 | 120 |
+| 2 - The Split | Easy | 67 | 93 | 120 |
+| 3 - The Stakeholder | Medium | 69 | 89 | 120 |
+| 4 - The Tired List | Hard | 76 | 82 | 120 |
 | 5 - Global Fieldwork | Medium | 70 | 106 | 120 |
-| 6 - The Big Quarter | Hard | 98 | 113 | 150 |
+| 6 - The Big Quarter | Hard | 98 | 114 | 150 |
 
-These are verified strategies, not global minimum costs. The corpus was
-regenerated under the cut floor: the previous fixtures were legalized
-(cut core questions restored with class-correct fixes, kept counts
-topped up to the floor), then each seed was searched over legal kept
-sets, bank adds, repairs, and combinations of invitation, reminders,
-and DK/NA (about 5,800 plan evaluations). It excluded role-restricted
-items without a repair: keeping them unnecessarily depleted Level 4
-goodwill. A core item can no longer be dropped at all: an unanswerable
-core item must be repaired where its class has a fix, carried with
-DK/NA escapes, or offset elsewhere in the plan.
-All witnesses were replayed through `startRun()` and `showReport()`.
-No cost, persona, simulation, or acceptance threshold was weakened.
+These are verified strategies, not global minimum costs. The corpus
+was regenerated under the evidence checks without dropping any of the
+364 previously sampled instruments. Repairs, kept sets, bank additions,
+invitations, reminders, and DK/NA were searched again. Every witness is
+replayed through the card handlers, `startRun()`, and `showReport()`,
+with exact assertions for cost, rate, quality, usable Insight, usable
+sample, goodwill, and every gate. Independent witnesses start with an
+empty portfolio; a separate uninterrupted six-level test preserves it.
+The continuous Level 4 line uses Honest Ask and one reminder rather
+than weakening its 35-goodwill rule. Budgets, the instrument floor,
+core locks, and Quick Challenge objectives remain unchanged.
 
 Difficulty describes decision complexity: introductory levers and optional
 A/B comparison are Easy; added burden or multilingual fieldwork is Medium;
@@ -182,10 +225,12 @@ The A/B verdict changes feedback only, not scores.
 
 ## Tuning
 
-All rates, costs, and persona numbers sit in one configuration
-block at the top of the script. Change numbers there, never inside
-the funnel logic. After any change, re run the six invariants above
-and record the results in `CHANGELOG.md`.
+Start with the data tables in `site/index.html` and the mission rules
+in `evidenceMission()`. Some simulation and acceptance constants remain
+inside their calculation helpers; keep the player guide, BRD, HUD,
+report, and tests aligned when changing them. After tuning, replay
+the invariants and recorded winners, the continuous campaign, and the
+applicable browser journeys. Record actual verification in `CHANGELOG.md`.
 
 ## Quick Challenge and feedback
 
@@ -196,7 +241,8 @@ suppression, and Honest Ask with no reminders. Its 48-credit budget
 repairs (6), and the priciest intended extras line (6), with 2 credits
 of headroom; cutting every extra instead totals 43. A win requires all
 three BRD repairs, every extra resolved by repair or cut, plus the
-usual response, quality, and Insight gates. The challenge floor is its
+drill-specific response, quality, and Insight gates, not the campaign
+evidence checks. The challenge floor is its
 core count (3), so extras can be cut down to the BRD set and no
 further. Unique topics of the three BRD cards form its agenda; the
 extras are scope creep and never carry agenda topics.
@@ -310,14 +356,17 @@ remain modeled burden, not new cards or scored agenda topics.
 `scripts/game-features.test.mjs` executes the first two inline scripts in
 a Node VM with a minimal DOM facade. It checks game behavior, not rendered
 layout, synthesized audio, or browser accessibility. The tracked browser
-harness (see Regression harness above) covers rendered layout and event
-wiring in headless Chrome. Manual checks remain necessary only for the
-surfaces automation cannot judge: physical phones, iOS Safari and
-Android Chrome, screen-reader passes, and a human listen to the audio.
+harness (see Regression harness above) defines rendered layout and
+event-wiring checks in headless Chromium. Coverage must be distinguished
+from a successful run on the current source; missing tooling can block it.
+Manual checks also remain necessary for physical phones, iOS Safari,
+Android Chrome, screen readers, cold-player comprehension, and audio.
 
 The setup BRD dialog derives study topics and required personas from
 `agendaTopics()` and `TOPIC_KEYS`, and acceptance gates from `curLevel()`
-and `insightGate()`. It includes level constraints and the Quick Challenge
+and `insightGate()`, with campaign sample, pool, and role requirements
+from `evidenceMission()` aligned to `evaluateEvidence()`.
+It includes level constraints and the Quick Challenge
 repair requirement without modifying campaign or setup state. Keep its
 criteria aligned with scoring when adding or changing a level.
 
@@ -349,12 +398,14 @@ decoding uses `zxingcpp`. Neither is a game or CI runtime dependency.
 
 ## Adding a level
 
-A level is data, not code: a brief, a target rate, a segment set,
-an instrument variant, an event (stakeholder demand, fatigue,
-localization), and a Detective voice line set. Follow the shape of
-the existing six in `requirements-game-design.md` section 7, and
-add the level's own invariant (what a correct strategy must score,
-what the trap strategy must score) before shipping it.
+Adding a level requires more than a data entry. Update `LEVELS`,
+`LEVEL_AGENDA`, `evidenceMission()`, audience availability, and any
+level-specific budget or event rules. Navigation, unlocking, and season
+completion currently contain six-level boundaries; update those too
+before extending the campaign. Keep response benchmarks separate from
+evidence acceptance requirements. Add legal winning fixtures,
+wrong-population and failed-control cases, continuous-campaign coverage,
+and rendered navigation checks before shipping.
 
 ## Known limits
 

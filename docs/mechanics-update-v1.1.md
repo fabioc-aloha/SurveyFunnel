@@ -1,5 +1,12 @@
 # Respons - Mechanics Update v1.1
 
+> Historical mechanics addendum. Preserve the rationale and earlier
+> prices here, but use the [player guide](player-guide.md) for current
+> controls, prices, and evidence checks. The old rate-based win rule
+> and random-instrument description below are superseded; see the
+> [implemented update](evidence-fitness.md) and
+> [development notes](development.md).
+
 Addendum to `requirements-game-design.md` v1.0.
 Requested by Fabio, 2026-10-31: add data quality issues, email
 bounces, email validation (BrightVerify), and a limited campaign

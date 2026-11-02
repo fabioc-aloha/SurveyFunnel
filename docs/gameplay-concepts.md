@@ -1,7 +1,12 @@
 # Respons - Gameplay Concepts
 
-Draft for Fabio's review, 2026-10-30. Nothing built yet.
-Supersedes the competitive tile framing in `game-concept.md` where the
+> Historical brainstorm, 2026-10-30. Features and scoring below were
+> proposals at that time, not a description of today's build. See the
+> [implemented update](evidence-fitness.md), [player guide](player-guide.md),
+> and [development notes](development.md) for current behavior.
+
+Draft for Fabio's review, 2026-10-30; nothing had been built at that stage.
+It superseded the competitive tile framing in `game-concept.md` where the
 two differ. The circuit and breaker imagery stays, as visual language
 for goodwill and drop off.
 

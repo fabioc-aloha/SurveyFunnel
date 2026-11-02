@@ -2,9 +2,14 @@
 
 ## Current state
 
+- The evidence-fitness first release is implemented. Its public summary
+  is `docs/evidence-fitness.md`; preserved release history is in
+  `CHANGELOG.md`, and remaining roadmap work is in `TODO.md`.
+- Direct publication to `main` was requested. Check the production
+  workflow for the current commit before assuming deployment succeeded.
 - Public repository: https://github.com/fabioc-aloha/SurveyFunnel
 - Production URL: https://nice-mushroom-0bdb0ef0f.6.azurestaticapps.net
-- Remote `main` is deployed production: Moog-style soundtrack, IM nameplate on
+- Preserved features include the Moog-style soundtrack, IM nameplate on
   the manager sprite, uniform questionnaire buttons, the cut floor (core
   questions cannot be cut; launches refuse below six kept, three in Quick
   Challenges), the bounce-backs report section, the 2026-11-01 code-review fix
@@ -17,11 +22,21 @@
 
 ## Test state
 
-- `npm test` (build-site plus game-features): 83 tests, all passing locally.
-- Browser harness (`node scripts/harness/run-all.mjs`): PASS, 3/3 sections
-  (build validation, the 83-test Node suite, and the browser suite at
-  90/90 checks). Negative controls (`node scripts/harness/self-test.mjs`):
-  PASS, 2/2 deliberate defects caught.
+- Run `node --test scripts/build-site.test.mjs scripts/game-features.test.mjs`
+  for packaging, gate boundaries, all recorded winners, and a continuous
+  six-level campaign. All 94 tests pass locally, including all 364
+  recorded legal winners.
+- Full browser harness: build and Node sections pass; browser section is
+  BLOCKED, not passed. Puppeteer is absent on this Windows machine, and
+  installing external test-only tooling was refused by the package-fetch
+  policy. The historical 90/90 browser result and negative controls
+  predate these gameplay changes.
+- Integrated-browser checks passed real-control Level 1 winners at
+  390px and 1280px, all five checks, publication pipeline, history
+  on the next instrument, BRD requirements, and restored keyboard focus.
+  No horizontal overflow or runtime errors occurred; a screenshot
+  confirmed the mobile scorecard layout. This is not the tracked harness
+  or a cross-browser sign-off.
 - The winnability corpus (`scripts/fixtures/winning-setups.json`) holds 364
   UI-legal winning setups: 65 each for Levels 1, 2, 3, 5, 6 and 39 for
   Level 4, whose ending-goodwill gate rejected the other draws in the searched
@@ -30,9 +45,12 @@
 
 ## Immediate next actions
 
-1. Continue the staged Quick Challenge expansion from `TODO.md`: stage 2
-   (BRD variation pack), then stage 3 (second-wave complication).
-2. Final visual pass over every screen once all changes are in.
+1. Check the current commit's production workflow and live-package
+   verification. Run the extended browser harness and negative controls
+   in an approved environment with Puppeteer available; the recorded
+   limitation remains open. Quick Challenge stages 2 and 3 are implemented.
+2. Choose the next feedback-roadmap item from `TODO.md`; governance,
+   localization, and AI changes are not included in this first release.
 
 ## Open items (honest status)
 
@@ -44,4 +62,5 @@
 
 - Do not restore the deleted private Survey-Respons repository.
 - Do not add a second HTML source of truth; `site/index.html` is the game.
-- Do not commit `dist/`, generated screenshots, or Azure deployment secrets.
+- Do not commit `dist/`, generated screenshots, deployment secrets, or
+  ignored local feedback.

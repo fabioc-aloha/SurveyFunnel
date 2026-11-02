@@ -1,9 +1,10 @@
 # Dear Valued Customer - Player Guide
 
-You are an Instrument Manager. Your job: choose who gets an invitation
-and help those who receive it complete the questionnaire, without
-burning the audience or wrecking the data. One round is one survey
-launch, 3 to 5 minutes.
+You are an Instrument Manager. Your job: produce evidence stakeholders
+can trust and use, while protecting the audience. A completed questionnaire
+is only the start: the evidence must survive cleaning, account matching,
+sample and role checks, and interpretation. One round is one simulated
+survey launch, 3 to 5 minutes.
 
 ## Quick Challenge
 
@@ -76,14 +77,27 @@ progress or spends the campaign's credits.
    credit ledgers, deliverability and data quality, and one fix
    quest. Then TRY AGAIN if credits permit, open LEVEL SELECT, or
    choose NEXT LEVEL after a win. Level 6 offers SEASON RESULTS.
+   The Evidence Fitness Scorecard checks all five dimensions independently.
+   FINISH continues through CLEAN, MATCH, INTERPRET, PUBLISH, and ACT.
+   Failed checks withhold publication and name the next actions; passing
+   results include a context note with the response base and limitations.
 
 ## The two budgets
 
-**Goodwill (0 to 100 per segment).** Questions beyond a lean core,
+**Goodwill (0 to 100 per audience pool).** Questions beyond a lean core,
 reminders, and unanswerable questions spend it. Short surveys, an
 honest time ask, a why me line, and closing the loop earn it back.
 At zero the breaker stops new invitations and ends the run for anyone
 still in the funnel. Only completions before the trip count.
+Fresh, Stale, and Tired share the Support pool; Global and Executive Blast
+have separate pools. Starting another level or questionnaire retains pool
+health and contact history. Additional campaign sends reduce starting
+goodwill by one per previous send with suppression, or two without, capped
+at eight; retries retain their four-point fatigue charge instead.
+Lower health also reduces opens. Suppression is required when recontacting
+a pool; it reduces fatigue but does not restore health. This is a cohort
+model, not individual customer tracking. It resets on page reload or a
+whole-campaign New Game, not on a new instrument.
 
 **Credits (120 per level, 150 in Level 6, one pool across all your
 attempts).**
@@ -120,7 +134,7 @@ An over-budget setup cannot launch; reduce costs before sending.
   intact, and goodwill where you left it. Each new send costs its
   send price again, new edits cost their action prices, and
   re-sending costs 4 goodwill: the audience remembers. Improve the
-  process until an attempt beats the target, or the money runs
+  process until an attempt passes all five evidence checks, or the money runs
   out. If the remaining budget cannot cover another send and the
   target is unmet, the level is failed.
   The minimum batch costs 30 credits, or 45 for Executive Blast.
@@ -128,10 +142,12 @@ An over-budget setup cannot launch; reduce costs before sending.
   reductions to make the inherited setup affordable. Owning preparation
   does not pay for a new batch, invitation, or reminders.
 - **New Game.** A fresh start on the level with a new random
-  questionnaire: new draw of questions, new traps, the level's default
-  segment and the same target. The instrument's seed code identifies
+  questionnaire and a fresh credit pool: new questions and the level's
+  default segment, but the campaign's audience history remains.
+  The instrument's seed code identifies
   the draw; there is no player-facing seed-entry control. From the start screen, New
-  Game starts a whole fresh campaign.
+  Game starts a whole fresh campaign, as does New Game on a LEVEL FAILED
+  report. Those whole-campaign resets clear audience history.
 
 ## Stakeholder encounters
 
@@ -185,17 +201,19 @@ The Detective only blames a defect for damage it actually saw in
 your run; the rest are flagged as risks. The full field guide is
 `docs/question-defects.md`.
 
-## The third score: Insight Value
+## Insight Value after cleaning
 
 Each level brief lists an agenda: the business topics the survey
 exists to answer. Insight Value (0-100) credits a topic only when
 its question is in your final survey, with credit adjusted for observed
 measurement risks, answerability, and the mix of completing respondent
 groups. Low-value items
-earn nothing and cost Insight and goodwill. Winning takes all
-three gates: rate strictly above target, quality 60+, Insight 60+ (70+ in the
-finale). Pass the first two and fail Insight and the run is
-stamped FAST AND USELESS: plenty of answers, nothing learned.
+earn nothing and cost Insight and goodwill. In the campaign, Insight
+is recomputed using only cleaned, account-linked responses. Excluded
+respondents cannot satisfy persona coverage or earn agenda credit.
+Insight must reach 60+ (70+ in the finale), alongside the other
+evidence checks. A high-rate run with inadequate Insight can still
+be stamped FAST AND USELESS.
 
 ## Learning the trade
 
@@ -208,7 +226,7 @@ decided so far; it never blocks you.
 
 **? Consult BRD** opens the **Business Requirement Document** for the
 active study from setup. It lists required topics and respondent groups,
-response/quality/Insight acceptance gates, credit budget, and level-specific
+sample, role, quality, and Insight requirements, credit budget, and level-specific
 constraints. Quick Challenge has its own BRD. Unlike MPOR's shared rules,
 the BRD changes with the level; consulting it does not change your choices.
 
@@ -242,17 +260,44 @@ verified.
 - **Response rate:** completed questionnaires divided by invitations
   actually sent, including bounces. This simplified game measure is
   not an AAPOR response rate; eligibility and full case dispositions
-  are not modeled. Response score scales that rate to a 20% stretch goal.
+  are not modeled. Campaign response benchmarks are diagnostic;
+  Quick Challenges still enforce their specified response thresholds.
 - **Data quality score:** starts at 100. Guesses, speeders, straight
   liners, duplicates, forwarded responses, and missing core
   questions subtract. Escapes used add a small bonus.
 - **Insight Value:** agenda coverage adjusted for simulated measurement
   risks, answerability, and the completing respondent groups.
-- **Win:** beat the rate target AND hold quality at 60 or higher
-  AND Insight at 60 or higher (70 in Level 6). Level 4 also requires
-  ending goodwill of at least 35.
-  Cutting the survey to almost nothing can post a huge rate and
-  still fail. Grades run S, A, B, C, TRY AGAIN.
+- **Campaign win:** pass every check below. Scores are never averaged
+  to override a failed check. Winning grades S, A, and B use the
+  weakest of quality, usable Insight, and cleaning retention, not rate.
+  Non-winning grades remain C or TRY AGAIN.
+
+| Check | Requirement |
+| --- | --- |
+| Funnel execution | At least one sent invitation and completion, without a breaker trip |
+| Evidence fitness | Correct audience pool; mission minimum usable N; every required role; at least 80% of cleaned responses matched to the invited account |
+| Data integrity | Quality 60+; at least 60% of completions survive cleaning; at least one retained response |
+| Audience sustainability | Ending goodwill above zero (35+ in Level 4); suppression on repeat contact |
+| Operational trust | List validation and dedupe; usable Insight 60+ (70+ in Level 6); localization review and localized invitation for Global |
+
+| Mission | Required pool | Minimum usable simulated N | Required role coverage |
+| --- | --- | --- | --- |
+| First Send | Support | 750 | Technicians and end users, each at least 10% |
+| The Split | Support | 1,000 | Technicians and end users, each at least 10% |
+| The Stakeholder | Support | 1,000 | Technicians and end users, each at least 10% |
+| The Tired List | Support | 675 | Technicians and end users, each at least 10% |
+| Global Fieldwork | Global | 900 | Technicians and end users, each at least 10% |
+| The Big Quarter | Leadership | 1,500 | Executives and IT decision makers together at least 50% |
+
+Each required role group must contain at least one usable sprite.
+Every sprite represents the audience size divided by 40, so the displayed
+sample is simulated volume, not that many independent observations.
+Cleaning excludes duplicate, junk, speeder, straight-lined, and guessed
+responses, once each in that order. Forwarded responses have no verified
+invited-account association and are excluded at MATCH. The original quality
+score still diagnoses fieldwork defects; cleaning does not erase their
+penalties. Publication requires all five checks, and the ACT step names
+the corrections needed or the decision the evidence can support.
 
 Data quality and Insight Value are game indices, not validated research
 metrics. Neither a high rate nor a winning score establishes construct
@@ -277,9 +322,11 @@ starting state. A retry changes credits, goodwill, reputation, and owned prep.
    and the higher Insight gate.
 
 These labels describe scenario complexity, not automatic wins or separate
-difficulty modes. Every fixed start and the 64 checked seeded draws per
-level have a winning strategy within the initial budget. The random check
-is a sample, not a guarantee for every possible seed.
+difficulty modes. The recorded corpus includes a legal winner for each
+fixed start, plus the sampled seeded instruments listed in the
+[development notes](development.md#initial-budget-winnability-and-difficulty).
+The Tired List has a smaller recorded sample than the other levels.
+These fixtures do not guarantee that every possible seed is winnable.
 
 ## Tips from the Detective
 

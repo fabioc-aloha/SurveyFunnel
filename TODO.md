@@ -1,5 +1,33 @@
 # Open work
 
+## Feedback roadmap
+
+Implementation summary: [evidence-fitness update](docs/evidence-fitness.md).
+The approved first release implements the five-part scorecard, usable
+sample/role/audience-pool gates, cohort health across instruments, and
+the post-response cleaning-to-action pipeline. The later roadmap items
+below are not implemented.
+
+- P1: Agree metric definitions, baselines, owners, QC checkpoints, and
+  prospective versus retroactive segment changes as playable decisions.
+- P1: Add explicit privacy, security, accessibility, and approval gates;
+  the current operational-trust check is not a compliance assessment.
+- P1: Expand localization beyond the existing review/invitation controls:
+  terminology, translation memory, human linguistic review, disputed
+  translations, cultural fit, and response-option validation.
+- P1: Design the One Number scenario and a player-authored context note.
+- P2: Add a governed AI adviser with acceptance criteria, human approval,
+  audit trail, and deterministic measures kept separate from interpretation.
+- P2: Expand cohort health into cross-instrument portfolio decisions:
+  individual synthetic contact/response histories, overlaps between
+  pools, account hierarchies, and finer sampling/role-specific missions.
+- P2: Add causal decision review, rejected-alternative consequences,
+  learning assessment, and an optional local scorecard export.
+- Release checks: run the extended tracked browser harness and its negative
+  controls in an environment with Puppeteer available. This Windows run
+  was blocked by the package-fetch policy; integrated-browser checks are
+  separate evidence, not a passing harness run.
+
 ## Regression checks
 
 - Done: the browser regression suite is tracked at `scripts/harness/`

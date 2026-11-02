@@ -1,5 +1,10 @@
 # Respons - Game Concept
 
+> Historical concept snapshot, superseded by the arcade implementation.
+> The tile game, capacities, scoring, and pilot below are design history,
+> not current features. See the [implemented update](evidence-fitness.md),
+> [player guide](player-guide.md), and [development notes](development.md).
+
 Code name: Respons
 Working subtitle: Close the Circuit
 Owner context: GCX (Global Customer Experience), Microsoft surveys in
@@ -129,7 +134,8 @@ completions and a healthy panel. That is by design.
 
 ## Pilot
 
-1. Paper prototype inside GCX. See `docs/prototype-v1.md`.
+1. Paper prototype inside GCX was proposed; no prototype document
+   accompanies this snapshot.
 2. Fix balance: trips should hurt, and recovery should be possible.
 3. A/B test two respondent facing elements in one live survey: the
    circuit progress bar and the closing screen.

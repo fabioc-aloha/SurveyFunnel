@@ -716,7 +716,8 @@ test('BRD describes the active study requirements without changing the setup', (
     assert.ok(text.includes(g.curLevel().name));
     assert.ok(g.agendaTopics().every(topic => text.includes(topic)));
     assert.ok(text.includes(`${g.curLevel().budget} credits`));
-    assert.ok(text.includes(`above ${Math.round(g.curLevel().target * 100)}%`));
+    assert.ok(text.includes(`Response benchmark: ${Math.round(g.curLevel().target * 100)}%`));
+    assert.match(text, /Pass all five evidence checks/);
     assert.ok(text.includes(`Insight ${g.insightGate()}+`));
     if (level === 4) assert.match(text, /ending goodwill 35/);
     if (level === 3 || level === 6) assert.match(text, /extra-topic answers are not simulated or scored/i);
@@ -889,16 +890,11 @@ test('preparation and audience controls recover affordability without losing own
 });
 
 const winningSetups = JSON.parse(readFileSync(join(root, 'scripts', 'fixtures', 'winning-setups.json'), 'utf8'));
-/* UI-legal winning corpus, regenerated under the cut floor (2026-11-01).
-   Every line keeps all core questions and at least the instrument floor,
-   and the winnability test below applies each setup through the game's
-   own card handlers. Generation: the old fixtures were legalized (cut
-   core questions restored with class-correct fixes, kept counts topped
-   up to the floor), then each seed was searched over legal kept sets,
-   bank adds, repairs, invitation, reminders, and escapes (about 5,800
-   plan evaluations in total). Levels 1, 2, 3, 5, and 6 supply a winner
-   for the fixed start and all 64 seeded draws; Level 4's goodwill gate
-   rejected the remaining draws in the searched space, so it supplies 39. */
+/* The evidence-fitness corpus retains all 364 previously sampled instruments.
+   Repairs, bank additions, invitation, reminders, and escapes were searched
+   again under the five independent checks. Every witness is replayed through
+   the card handlers, startRun, and showReport below. Each is an independent
+   campaign start; the separate continuous-campaign test checks carryover. */
 const LEGAL_WINNER_MINIMUMS = { 1: 65, 2: 65, 3: 65, 4: 39, 5: 65, 6: 65 };
 test('goodwill ledger identifies report-back rewards and stakeholder penalties', () => {
   const { context: g, element } = game();
@@ -929,6 +925,8 @@ for (let level = 1; level <= 6; level++) {
     assert.ok(setups.some(setup => setup.seed === 'fixed'));
     for (const setup of setups) {
       const label = `Level ${level}, instrument ${setup.seed}`;
+      g.state.audiencePortfolio = {};
+      g.state.campaignWon = {};
       g.state.randomMode = false;
       g.state.levelSeeds = setup.seed === 'fixed' ? {} : { [level]: setup.seed };
       g.selectLevel(level, false);
@@ -966,7 +964,13 @@ for (let level = 1; level <= 6; level++) {
       assert.ok(g.budgetMath().total <= g.BUDGET_TOTAL, label);
       g.startRun(); g.showReport();
       assert.equal(g.state.campaignWon[level], true, label);
-      assert.ok(g.state.lastRound.rate > g.curLevel().target, label);
+      assert.equal(g.state.lastRound.evidence.won, true, label);
+      assert.ok(g.state.lastRound.evidence.checks.every(check => check.met), label);
+      assert.equal(g.state.lastRound.rate, setup.rate, label);
+      assert.equal(g.state.lastRound.quality, setup.quality, label);
+      assert.equal(g.state.lastRound.insight, setup.insight, label);
+      assert.equal(g.state.lastRound.evidence.usableN, setup.usableN, label);
+      assert.equal(g.state.goodwillCarry, setup.goodwill, label);
       assert.ok(g.state.lastRound.quality >= 60, label);
       assert.ok(g.state.lastRound.insight >= g.insightGate(), label);
       if (level === 4) assert.ok(g.state.goodwillCarry >= 35, label);
@@ -975,6 +979,233 @@ for (let level = 1; level <= 6; level++) {
     }
   });
 }
+
+function evidenceScenario(level = 1) {
+  const instance = game();
+  const g = instance.context;
+  const setup = winningSetups.find(candidate => candidate.level === level && candidate.seed === 'fixed');
+  g.selectLevel(level, false);
+  Object.assign(g.state, {
+    validation: 'full', dedupe: true, suppression: true, reportBack: level === 4,
+    localization: level === 5, langChoice: level === 5 ? 'localized' : 'en'
+  });
+  for (const q of g.addBankQuestions()) g.state.added[q.id] = setup.added.includes(q.id);
+  for (const q of g.activeQuestions().concat(g.addBankQuestions().filter(q => setup.added.includes(q.id)))) {
+    g.state.qstate[q.id] = setup.repaired.includes(q.id) ? 'simplify' :
+      setup.kept.includes(q.id) || setup.added.includes(q.id) ? 'keep' : 'cut';
+  }
+  return instance;
+}
+
+function evidenceRun(g, personas, flags = {}) {
+  return {
+    scale: g.state.seg.n / 40, kept: g.keptQuestions(), gm: { ending: 72, trips: false },
+    sprites: Array.from({ length: 40 }, (_, i) => ({
+      i, persona: personas[i] || 'end', lang: 'en', abGroup: i % 2 ? 'B' : 'A',
+      fate: i < personas.length ? 'finish' : 'noopen', events: [],
+      accountId: `SIM-ACCOUNT-${i}`, ...flags[i]
+    }))
+  };
+}
+
+test('campaign can win below the response benchmark with sufficient usable evidence', () => {
+  const { context: g, element } = evidenceScenario();
+  const run = evidenceRun(g, ['tech', 'end', 'itdm']);
+  const counts = g.tally(run);
+  assert.ok(counts.completed / counts.sent < g.curLevel().target);
+  const evidence = g.evaluateEvidence(run, counts, 100);
+  assert.equal(evidence.usableN, 750);
+  assert.equal(evidence.won, true);
+  g.runData = run;
+  g.showReport();
+  assert.match(element('report').innerHTML, /ROUND WON/);
+  assert.match(element('report').innerHTML, /READY WITH LIMITS/);
+  assert.equal(g.state.lastRound.evidence.won, true);
+});
+
+test('high response from the wrong population cannot pass evidence fitness', () => {
+  const { context: g, element } = evidenceScenario();
+  const run = evidenceRun(g, Array(12).fill('tech'));
+  const counts = g.tally(run);
+  assert.ok(counts.completed / counts.sent > g.curLevel().target);
+  const evidence = g.evaluateEvidence(run, counts, 100);
+  assert.equal(evidence.checks.find(check => check.id === 'fitness').met, false);
+  assert.equal(evidence.roles.find(role => role.label === 'End users').met, false);
+  assert.equal(evidence.won, false);
+  g.runData = run; g.showReport();
+  assert.match(element('report').innerHTML, /WITHHOLD/);
+  assert.equal(g.state.campaignWon[1], undefined);
+});
+
+test('sample, quality, retention, and matching thresholds are inclusive and independent', () => {
+  const { context: g } = evidenceScenario();
+  let run = evidenceRun(g, ['tech', 'end', 'itdm']);
+  let evidence = g.evaluateEvidence(run, g.tally(run), 60);
+  assert.equal(evidence.won, true, '750 at the minimum with quality 60 passes');
+  assert.equal(g.evaluateEvidence(run, g.tally(run), 59).won, false);
+  run = evidenceRun(g, ['tech', 'end']);
+  assert.equal(g.evaluateEvidence(run, g.tally(run), 100).checks.find(check => check.id === 'fitness').met, false);
+  run = evidenceRun(g, ['tech', 'end', 'itdm', 'tech', 'end'], {
+    3: { qSpeed: true }, 4: { qStraight: true }
+  });
+  evidence = g.evaluateEvidence(run, g.tally(run), 100);
+  assert.equal(evidence.retained, 0.6);
+  assert.equal(evidence.won, true);
+  run.sprites[2].qDup = true;
+  assert.equal(g.evaluateEvidence(run, g.tally(run), 100).checks.find(check => check.id === 'integrity').met, false);
+  run = evidenceRun(g, ['tech', 'end', 'itdm', 'tech', 'end'], { 4: { accountId: null } });
+  evidence = g.evaluateEvidence(run, g.tally(run), 100);
+  assert.equal(evidence.associated, 0.8);
+  assert.equal(evidence.won, true);
+  run.sprites[3].accountId = null;
+  assert.equal(g.evaluateEvidence(run, g.tally(run), 100).checks.find(check => check.id === 'fitness').met, false);
+});
+
+test('cleaning removes overlapping flags once and never gives rejected roles Insight credit', () => {
+  const { context: g } = evidenceScenario();
+  const run = evidenceRun(g, ['tech', 'end', 'itdm', 'tech', 'end', 'tech', 'end'], {
+    2: { qSpeed: true, qStraight: true, qDup: true, qJunk: true, guessed: true },
+    3: { qSpeed: true }, 4: { qStraight: true }, 5: { qJunk: true }, 6: { guessed: true }
+  });
+  const counts = g.tally(run);
+  const evidence = g.evaluateEvidence(run, counts, 100);
+  assert.equal(evidence.cleaned, 2);
+  assert.equal(Object.values(evidence.removed).reduce((sum, n) => sum + n, 0), 5);
+  assert.ok(evidence.insight.score < g.computeInsight(counts, run).score);
+  assert.ok(evidence.insight.topics.some(topic => /Missing persona/.test(topic.reason)));
+  assert.equal(JSON.stringify(g.evaluateEvidence(run, counts, 100)), JSON.stringify(evidence));
+});
+
+test('no responses, unmatched responses, and breaker interruption cannot yield publishable evidence', () => {
+  const { context: g } = evidenceScenario();
+  for (const run of [
+    evidenceRun(g, []),
+    evidenceRun(g, ['tech', 'end', 'itdm'], { 0: { accountId: null }, 1: { accountId: null }, 2: { accountId: null } }),
+    { ...evidenceRun(g, ['tech', 'end', 'itdm']), gm: { ending: 0, trips: true } }
+  ]) {
+    const evidence = g.evaluateEvidence(run, g.tally(run), 100);
+    assert.equal(evidence.won, false);
+    assert.ok(evidence.checks.every(check => !/NaN|Infinity/.test(check.detail)));
+  }
+});
+
+test('operational trust enforces existing preparation and Global language checks', () => {
+  const { context: g } = evidenceScenario();
+  const run = evidenceRun(g, ['tech', 'end', 'itdm']);
+  for (const change of [{ validation: 'skip' }, { dedupe: false }]) {
+    Object.assign(g.state, { validation: 'full', dedupe: true }, change);
+    assert.equal(g.evaluateEvidence(run, g.tally(run), 100).checks.find(check => check.id === 'trust').met, false);
+  }
+  const global = evidenceScenario(5).context;
+  const globalRun = evidenceRun(global, ['tech', 'end', 'itdm']);
+  assert.equal(global.evaluateEvidence(globalRun, global.tally(globalRun), 100).won, true);
+  global.state.langChoice = 'en';
+  assert.equal(global.evaluateEvidence(globalRun, global.tally(globalRun), 100).checks.find(check => check.id === 'trust').met, false);
+  global.state.langChoice = 'localized'; global.state.localization = false;
+  assert.equal(global.evaluateEvidence(globalRun, global.tally(globalRun), 100).won, false);
+});
+
+test('finale requires decision-maker evidence rather than a high response from implementers', () => {
+  const { context: g } = evidenceScenario(6);
+  let run = evidenceRun(g, ['exec', 'itdm', 'itdm', 'admin', 'end']);
+  assert.equal(g.evaluateEvidence(run, g.tally(run), 100).won, true);
+  run = evidenceRun(g, ['tech', 'tech', 'tech', 'admin', 'end']);
+  assert.equal(g.evaluateEvidence(run, g.tally(run), 100).checks.find(check => check.id === 'fitness').met, false);
+});
+
+test('role shares and the tired-audience goodwill gate enforce their exact boundaries', () => {
+  const { context: g } = evidenceScenario();
+  let run = evidenceRun(g, ['tech', 'end', ...Array(8).fill('itdm')]);
+  assert.equal(g.evaluateEvidence(run, g.tally(run), 100).won, true, 'each required role is exactly 10%');
+  run = evidenceRun(g, ['tech', 'end', ...Array(9).fill('itdm')]);
+  assert.equal(g.evaluateEvidence(run, g.tally(run), 100).won, false, 'one in eleven is below 10%');
+  const finale = evidenceScenario(6).context;
+  run = evidenceRun(finale, ['exec', 'itdm', 'admin', 'end']);
+  assert.equal(finale.evaluateEvidence(run, finale.tally(run), 100).won, true, 'decision makers are exactly 50%');
+  run = evidenceRun(finale, ['exec', 'admin', 'end', 'tech']);
+  assert.equal(finale.evaluateEvidence(run, finale.tally(run), 100).won, false);
+  const tired = evidenceScenario(4).context;
+  run = evidenceRun(tired, ['tech', 'end', 'itdm']);
+  run.gm.ending = 35;
+  assert.equal(tired.evaluateEvidence(run, tired.tally(run), 100).won, true);
+  run.gm.ending = 34;
+  assert.equal(tired.evaluateEvidence(run, tired.tally(run), 100).checks.find(check => check.id === 'audience').met, false);
+});
+
+test('a healthy local segment cannot stand in for the required Global audience', () => {
+  const { context: g } = evidenceScenario(5);
+  g.state.seg = g.SEGMENTS.find(segment => segment.id === 'fresh');
+  const run = evidenceRun(g, ['tech', 'end', 'itdm', 'tech', 'end', 'itdm']);
+  const evidence = g.evaluateEvidence(run, g.tally(run), 100);
+  assert.ok(evidence.usableN >= evidence.mission.minimumN);
+  assert.equal(evidence.checks.find(check => check.id === 'fitness').met, false);
+  assert.equal(evidence.won, false);
+});
+
+test('campaign audience health survives level and instrument changes but not a full campaign reset', () => {
+  const { context: g, element } = evidenceScenario();
+  const run = evidenceRun(g, ['tech', 'end', 'itdm']);
+  run.gm.ending = 50;
+  g.runData = run; g.showReport();
+  const saved = JSON.stringify(g.state.audiencePortfolio);
+  g.showReport();
+  assert.equal(JSON.stringify(g.state.audiencePortfolio), saved, 'opening a report twice does not charge the audience twice');
+  assert.equal(g.state.audiencePortfolio.support.contacts, 1);
+  g.selectLevel(2, false);
+  assert.equal(g.goodwillStart().carry, 50);
+  assert.ok(g.goodwillStart().fatigue > 0);
+  g.renderSegments();
+  assert.match(element('segGrid').innerHTML, /48 \/ 100/);
+  g.newGameSameLevel();
+  assert.equal(JSON.stringify(g.state.audiencePortfolio), saved);
+  assert.equal(g.goodwillStart().carry, 50);
+  const repeat = evidenceRun(g, ['tech', 'end', 'itdm', 'tech']);
+  g.state.suppression = false;
+  assert.equal(g.evaluateEvidence(repeat, g.tally(repeat), 100).checks.find(check => check.id === 'audience').met, false);
+  const withoutSuppression = g.goodwillStart().fatigue;
+  g.state.suppression = true;
+  assert.ok(g.goodwillStart().fatigue < withoutSuppression);
+  g.startQuickChallenge(0, 'V000');
+  assert.equal(g.audienceHistory(), null);
+  g.startRun(); g.showReport(); g.leaveQuickChallenge();
+  assert.equal(JSON.stringify(g.state.audiencePortfolio), saved);
+  g.resetCampaignNewGame();
+  assert.equal(JSON.stringify(g.state.audiencePortfolio), '{}');
+});
+
+test('a continuous six-level campaign remains winnable with audience carryover', () => {
+  const { context: g, element } = game();
+  for (let level = 1; level <= 6; level++) {
+    const setup = winningSetups.find(candidate => candidate.level === level && candidate.seed === 'fixed');
+    g.selectLevel(level, true);
+    Object.assign(g.state, {
+      validation: 'full', dedupe: true, suppression: true, abEnabled: level === 2,
+      stakeholder: level === 3 || level === 6 ? 'pushback' : null,
+      reportBack: level === 4, localization: level === 5,
+      langChoice: level === 5 ? 'localized' : 'en', reminders: setup.reminders, escapes: setup.escapes
+    });
+    g.state.invite = g.INVITES.find(invite => invite.id === setup.invite);
+    g.state.abInvite = g.INVITES.find(invite => invite.id !== setup.invite).id;
+    for (const q of g.addBankQuestions()) g.state.added[q.id] = setup.added.includes(q.id);
+    for (const q of g.activeQuestions().concat(g.addBankQuestions().filter(q => g.state.added[q.id]))) {
+      if (setup.repaired.includes(q.id)) clickSimplify(g, q.id);
+    }
+    for (const q of g.activeQuestions()) {
+      if (!setup.kept.includes(q.id)) clickCut(g, q.id);
+    }
+    assert.ok(g.budgetMath().total <= g.BUDGET_TOTAL);
+    g.startRun(); g.showReport();
+    assert.equal(g.state.lastRound.evidence.won, true,
+      `Level ${level}: ${JSON.stringify(g.state.lastRound.evidence.checks.filter(check => !check.met))}`);
+    assert.match(element('report').innerHTML, /ROUND WON/);
+  }
+  assert.equal(g.state.audiencePortfolio.support.contacts, 4);
+  assert.equal(g.state.audiencePortfolio.support.instruments.length, 4);
+  assert.equal(g.state.audiencePortfolio.global.contacts, 1);
+  assert.equal(g.state.audiencePortfolio.leadership.contacts, 1);
+  g.showCampaign();
+  assert.match(element('campaignScreen').innerHTML, /Levels won: 6 \/ 6/);
+});
 
 test('bounce-backs reconcile with the funnel totals for skip, full, and partial validation', () => {
   const configs = [

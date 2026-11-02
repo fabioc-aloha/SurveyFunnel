@@ -1,8 +1,11 @@
-# Question Bank and Insight Value (v1.5 design)
+# Question Bank and Insight Value (historical v1.5 design)
 
 These are design notes, not the current scoring specification.
 See the [player guide](player-guide.md) for current rules and
 [development notes](development.md) for tested balance and implementation limits.
+The [evidence-fitness update](evidence-fitness.md) supersedes this
+snapshot's rate-based win condition: campaign Insight now uses cleaned,
+account-linked responses, alongside independent sample and role gates.
 
 Fabio's direction, 2026-10-31: the survey structure stays similar
 from game to game, but the question bank behind it must be very
@@ -71,7 +74,7 @@ Duplicates of a topic add a small increment the second time and
 near zero the third. Non-required topics add small bonus credit.
 Low-value questions add none and can subtract.
 
-**Current win condition:** response strictly above target AND
+**Win condition at this design stage (superseded):** response strictly above target AND
 Data Quality at 60+ AND Insight Value at 60+ (70+ in Level 6).
 Level 4 also requires ending goodwill 35+.
 These are game indices, not validated research metrics; response rate

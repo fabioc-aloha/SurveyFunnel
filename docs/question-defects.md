@@ -10,7 +10,7 @@ Drop-off Detective diagnostics, and its fix buttons.
 ## The defect classes
 
 | # | Defect | What it looks like | Symptom in the funnel | Correct fix (price) |
-|---|--------|--------------------|-----------------------|---------------------|
+| --- | --- | --- | --- | --- |
 | 1 | Double-barreled | Two judgments, one answer ("support was fast and knowledgeable") | Hesitation, mid-scale mush, guesses | SPLIT into two questions (3) or cut one clause |
 | 2 | Leading | Wording pushes an answer ("How excellent was...") | Inflated top-box scores, acquiescence | NEUTRALIZE the wording (2) |
 | 3 | Jargon / acronym | Undefined terms (SLA, MTTR) a respondent may not share | Guesses from whoever lacks the term | DEFINE in plain words (2) |
@@ -23,8 +23,9 @@ Drop-off Detective diagnostics, and its fix buttons.
 | 10 | Sensitive, no assurance | Performance or security question, no confidentiality line | Refusals, socially desirable answers | ADD a privacy line (2) |
 | 11 | Wordy stem | A paragraph where a sentence would do | Reading fatigue, satisficing | SIMPLIFY (2) |
 
-Some questions are clean controls. They still impose respondent burden,
-and cutting a core item can reduce coverage and the game's quality score.
+Some questions are clean controls. They still impose respondent burden.
+Core questions cannot be cut through the controls, and launches require
+the minimum instrument size. Non-core cuts can lose agenda coverage.
 Low-value items are a separate gameplay tier, not a claim that their
 wording is methodologically sound.
 
@@ -49,6 +50,17 @@ wording is methodologically sound.
   jargon, and vagueness; straightlining points at grid burden;
   speeding points at total length; junk open text points at broken
   options; suspect top-box points at leading wording.
+- In the campaign, cleaning removes duplicate, junk, speeder,
+  straight-lined, and guessed responses once each, in that order.
+  Account matching then excludes unmatched forwarded responses.
+  Removed responses cannot satisfy role coverage or earn Insight.
+- Other observed flags still affect the raw quality score and
+  question-level diagnostics; not every flag removes a whole response.
+  A repair cannot make an excluded response usable retroactively.
+  See the [player guide](player-guide.md#scoring-and-winning) for the
+  independent quality, retention, matching, and sample requirements.
+- Quick Challenges retain their own response, quality, Insight, and
+  BRD objectives rather than the campaign's evidence scorecard.
 
 ## Sources
 

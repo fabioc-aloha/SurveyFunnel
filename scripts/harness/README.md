@@ -80,11 +80,15 @@ node --test \
   <GAME_DIR>/scripts/game-features.test.mjs
 ```
 
-At integration time this suite contains 83 tests covering packaging,
+The Node suite covers packaging,
 gameplay behavior, scoring fixtures, all six levels' legal winnability
 corpus, Quick Challenges (cards, twists, and second-wave complications),
 the cut floor, fallout piles, the mood machine, modal behavior,
-terminology, budgets, and reports.
+terminology, budgets, and reports. Evidence-fitness regressions cover
+exact sample, matching, retention, role, and goodwill boundaries;
+high-rate wrong-population failures; below-benchmark usable evidence;
+cross-instrument history; and an uninterrupted six-level campaign.
+Use runner output for the current test count.
 
 ### 3. Browser regression suite
 
@@ -128,6 +132,12 @@ For each viewport it asserts:
   **Skip to Report** works, and the report contains a grade box and
   verdict.
 - The scripted playthrough's verdict is `ROUND WON`.
+- The report contains all five independent evidence checks, each PASS
+  for the recorded winner, and the FINISH-to-ACT processing stages.
+- The publication result is ready with a context note disclosing
+  simulation limits. Response is a benchmark, not the primary score.
+- NEXT LEVEL retains the campaign audience history, with no overflow
+  on the new instrument's setup.
 - The complete journey ends with no console errors, page errors, or
   failed local requests recorded as evidence.
 
@@ -189,45 +199,34 @@ and should be re-run after the edit settles.
 
 ## Browser and Puppeteer provisioning
 
-Puppeteer and Chrome are test tooling only. They are never game runtime
+Puppeteer and a compatible Chromium browser are test tooling only. They are never game runtime
 dependencies, and no package is added to the game for them. Resolution is
 explicit: environment override first, then known locations.
 
-The browser suite resolves the Puppeteer module in this order:
+The portable configuration is explicit:
 
-1. `PUPPETEER_MODULE`, if set.
-2. The TDD workspace's existing Puppeteer installation
-   (`~/workspace/tdd-2e-build/root2/applied-ai/defensible-decision-2e/node_modules/puppeteer`).
-3. `~/workspace/le-2e/node_modules/puppeteer`, if present.
-4. `scripts/harness/node_modules/puppeteer`, if later installed there.
+- `PUPPETEER_MODULE`: absolute path to the installed package's entry file,
+  not its directory. Both `puppeteer` and `puppeteer-core` must expose
+  `launch()`.
+- `PUPPETEER_EXECUTABLE_PATH`: absolute path to a compatible browser.
 
-Chrome discovery uses, in order:
-
-1. `PUPPETEER_EXECUTABLE_PATH`, if set.
-2. The Puppeteer cache's Chrome 149 build
-   (`~/.cache/puppeteer/chrome/linux-149.0.7827.22/chrome-linux64/chrome`).
-3. The Puppeteer cache's Chrome 155 build
-   (`~/.cache/puppeteer/chrome/linux-155.0.8059.79/chrome-linux64/chrome`).
-4. `/opt/meta-chromium/chrome`.
-
-Overrides look like this:
-
-```bash
-PUPPETEER_MODULE=/path/to/node_modules/puppeteer/lib/puppeteer/puppeteer.js \
-PUPPETEER_EXECUTABLE_PATH=/path/to/chrome \
-node scripts/harness/run-all.mjs
-```
+The code also probes historical Linux workspace installations, the
+repository's optional `scripts/harness/node_modules/puppeteer` location,
+and fixed Linux browser paths. These are compatibility fallbacks, not
+automatic discovery of every user's browser cache. See
+[`loadPuppeteer` and `findChrome`](browser-suite.mjs) for the actual list.
+Fresh machines should set both overrides.
 
 If Puppeteer or Chrome is unavailable, the browser section reports that
 exact blocker rather than silently skipping the suite.
 
 ### What a fresh machine needs
 
-Install Puppeteer into a separate, pinned tools directory (not into this
-repository) and point the harness at it. The version observed working in
-this environment on 2026-11-01 is Puppeteer 25.16.0, with Puppeteer
-Chrome cache builds `linux-149.0.7827.22` and `linux-155.0.8059.79`
-present:
+Where package installation is permitted, provision a pinned Puppeteer
+installation in a separate tools directory, not in this repository.
+The historical Linux integration used Puppeteer 25.16.0; that receipt
+does not establish that the current gameplay passed the browser suite.
+For example:
 
 ```bash
 mkdir -p ~/tools/surveyfunnel-harness
@@ -236,18 +235,41 @@ npm init -y
 npm install puppeteer@25.16.0
 ```
 
-Installing the full `puppeteer` package also downloads a Chrome build
-into `~/.cache/puppeteer/`, which the harness then finds on its own. Run
-from the repository root with the module override:
+The full `puppeteer` package downloads a browser unless configured not
+to. Resolve the module and its executable from the tools installation,
+then set both overrides before running from the repository root.
+`puppeteer-core` downloads no browser; provide a compatible executable.
 
-```bash
-PUPPETEER_MODULE=$HOME/tools/surveyfunnel-harness/node_modules/puppeteer/lib/puppeteer/puppeteer.js \
-node scripts/harness/run-all.mjs
+### Windows with an existing approved installation
+
+Adjust the external tools directory and executable to the installed
+locations. This example assumes `puppeteer-core` is already available
+there; `require.resolve` returns its actual entry file.
+
+```powershell
+Push-Location 'C:\test-tools\surveyfunnel-harness'
+$env:PUPPETEER_MODULE = node -p "require.resolve('puppeteer-core')"
+Pop-Location
+$env:PUPPETEER_EXECUTABLE_PATH = 'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe'
+node scripts\harness\run-all.mjs
+node scripts\harness\self-test.mjs
 ```
 
-If you install `puppeteer-core` instead, it downloads no browser: also
-set `PUPPETEER_EXECUTABLE_PATH` to a Chrome or Chromium executable you
-provide.
+Check browser/Puppeteer compatibility rather than assuming any installed
+browser version will work. If installation is blocked by organizational
+policy, use an approved test environment; do not change package-fetch or
+security policy to make the harness run.
+
+### Verification boundary for the evidence-fitness update
+
+On 2026-11-01 the Windows build and Node sections passed, but the browser
+section could not import Puppeteer and its external installation was
+refused by package-fetch policy. The extended harness and negative
+controls have not passed on this source in that environment.
+Integrated-browser checks separately passed the mobile and desktop
+Level 1 journey, evidence scorecard, pipeline, next-instrument history,
+and BRD focus behavior. These are not a passing CLI harness result;
+see the [changelog](../../CHANGELOG.md) for the dated evidence.
 
 ## Negative controls: proving failures are real
 

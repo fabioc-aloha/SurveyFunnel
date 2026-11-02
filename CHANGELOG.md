@@ -1,5 +1,64 @@
 # Changelog
 
+## 2026-11-01 - Documentation and publication audit
+
+- Updated the README and every design/play/development/deployment guide
+  for the evidence-fitness release, including a public
+  [implementation summary](docs/evidence-fitness.md).
+- Distinguished historical concepts and contracts from current rules
+  without rewriting the original design rationale. Corrected stale
+  coaching, fixture-coverage, core-cutting, CI-build, and browser-tooling
+  claims, and added Windows harness configuration.
+- Kept source feedback local and excluded from publication. Public
+  documentation describes implemented behavior and its limits only.
+- Direct publication to `main` was requested with the full CLI browser
+  limitation recorded. Deployment success must still be checked against
+  the pushed commit's production workflow and live-package verification.
+
+## 2026-11-01 - Evidence fitness: first feedback release
+
+- Implemented the [evidence-fitness first release](docs/evidence-fitness.md).
+  The campaign now
+  requires five independent checks: funnel execution, evidence fitness,
+  data integrity, audience sustainability, and operational trust.
+  Response rate is a mission-specific diagnostic benchmark, not a
+  campaign win gate. Winning grades use the weakest quality, usable
+  Insight, or cleaning-retention result rather than averaged rate.
+- Added minimum usable samples, required audience pools and role shares,
+  and invited-account matching. Post-response processing removes
+  duplicate, junk, speeder, straight-lined, and guessed responses once
+  each, excludes unmatched forwarded responses, then recomputes Insight.
+  Rejected responses cannot satisfy coverage or agenda requirements.
+- The report continues FINISH, CLEAN, MATCH, INTERPRET, PUBLISH, ACT.
+  Failed checks withhold publication and name next actions; ready
+  evidence includes a baseline and limitations note. HUD, setup, BRD,
+  MPOR, README banner, and the player/development guides describe the same goal.
+  Sample thresholds are simulation rules, not statistical guarantees.
+- Campaign audience pools now retain health, send/instrument history,
+  suppression overrides, and role response counts across instruments.
+  Repeated contact costs goodwill and can reduce opens. Changing the
+  instrument does not clear history; a whole-campaign reset does.
+  Quick Challenges retain their own objectives and isolated state.
+- Regenerated all 364 existing UI-legal winning witnesses without reducing
+  the sampled instrument set. Added gate-boundary, wrong-population,
+  below-benchmark usable-evidence, cleaning, account matching, persistence,
+  Quick Challenge isolation, and continuous six-level campaign tests.
+  The continuous Level 4 strategy changed to preserve its 35-goodwill
+  gate; no budget, core lock, or instrument floor was relaxed.
+- Extended the tracked browser journeys with five-check, pipeline,
+  disclosure, benchmark, and cross-instrument history assertions.
+  All 94 Node tests passed, including the 364 witnesses and continuous
+  campaign. Browser-tool checks passed real-control Level 1 winners
+  at 390px and 1280px, the scorecard layout, pipeline, next-instrument
+  history, BRD requirements, and keyboard focus restoration, without
+  overflow or runtime errors. The full CLI browser harness remains blocked here: Puppeteer
+  was absent and the external test-only install was refused by the
+  environment's package-fetch policy. No runtime dependency was added.
+- Governance, detailed compliance, richer localization, portfolio
+  granularity, AI advice, and learning assessment remain explicitly
+  tracked in [TODO.md](TODO.md). The verification above was local;
+  production confirmation is a separate publishing-workflow result.
+
 ## 2026-11-01 - Report verdict messages in plain words
 
 - The three manager captions on the round report now state the

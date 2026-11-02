@@ -1,9 +1,15 @@
 # Respons - Requirements and Game Design Description
 
+> Historical v1.0 contract. The original response-rate objective,
+> scoring, scope limits, and proof-of-concept assumptions below have
+> been superseded. Current requirements are documented in the
+> [implemented update](evidence-fitness.md), [player guide](player-guide.md),
+> and [development notes](development.md).
+
 Version 1.0, 2026-10-30. Approved direction: Fabio Correa, by voice,
 2026-10-30. Status: POC build authorized on this spec.
 Companion doc: `gameplay-concepts.md` (the brainstorm record). Where
-the two differ, this document governs the build.
+the two differed at that stage, this document governed the build.
 
 ## 1. Concept
 

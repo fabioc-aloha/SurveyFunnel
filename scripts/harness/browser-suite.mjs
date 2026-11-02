@@ -469,6 +469,36 @@ async function runViewport(browser, gameUrl, viewport, options) {
     await nameplateCheck(run, '#report', 'report');
     await checkOverflow(run, 'report screen');
 
+    const evidence = await page.evaluate(() => {
+      const checks = [...document.querySelectorAll('#report [data-evidence]')];
+      const card = document.querySelector('#report .evidence-grid')?.closest('.reportcard');
+      const pipeline = card?.nextElementSibling;
+      return {
+        ids: checks.map(check => check.dataset.evidence),
+        passed: checks.every(check => check.querySelector('h3')?.textContent.endsWith(': PASS')),
+        stages: [...(pipeline?.querySelectorAll('p > b') || [])].map(label => label.textContent),
+        ready: pipeline?.textContent.includes('READY WITH LIMITS'),
+        limits: pipeline?.textContent.includes('do not establish statistical precision'),
+        benchmark: document.querySelector('#hudTarget')?.textContent,
+        oldResponseScore: [...document.querySelectorAll('#report .scorebox .lbl')]
+          .some(label => label.textContent === 'RESPONSE SCORE')
+      };
+    });
+    await run.check('report has all five independent evidence checks',
+      JSON.stringify(evidence.ids) === JSON.stringify(['funnel', 'fitness', 'integrity', 'audience', 'trust']), evidence);
+    await run.check('legal Level 1 winner passes every evidence check', evidence.passed, evidence);
+    await run.check('post-response pipeline reaches publication and action',
+      JSON.stringify(evidence.stages) === JSON.stringify(['FINISH', 'CLEAN', 'MATCH', 'INTERPRET', 'PUBLISH', 'ACT'])
+        && evidence.ready, evidence);
+    await run.check('context note discloses simulation limitations', evidence.limits, evidence);
+    await run.check('response is a benchmark rather than the primary score',
+      evidence.benchmark?.includes('RESPONSE BENCHMARK') && !evidence.oldResponseScore, evidence);
+    await clickAndWait(page, '#nextLevelBtn', 300);
+    const carryover = await page.$eval('#readout', el => el.textContent);
+    await run.check('next instrument retains campaign audience history',
+      carryover.includes('1 previous sends across 1 instrument(s)'), { carryover });
+    await checkOverflow(run, 'next level with audience carryover');
+
     await run.check('no console or page errors during the complete journey',
       run.consoleErrors.length === 0 && run.pageErrors.length === 0,
       {
