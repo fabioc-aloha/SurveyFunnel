@@ -11,9 +11,14 @@
   claims, and added Windows harness configuration.
 - Kept source feedback local and excluded from publication. Public
   documentation describes implemented behavior and its limits only.
-- Direct publication to `main` was requested with the full CLI browser
-  limitation recorded. Deployment success must still be checked against
-  the pushed commit's production workflow and live-package verification.
+- Gameplay release `3661c23` was pushed directly to `main`.
+  [Production workflow 41366863464](https://github.com/fabioc-aloha/SurveyFunnel/actions/runs/41366863464)
+  passed build, Node tests, deployment, and live-package verification.
+  An independent `node scripts/verify-deployment.mjs` run also matched
+  live HTML, font, license, QR, headers, and unpublished-document checks.
+- This documentation-only follow-up records that receipt without changing
+  the game package. The full CLI browser limitation remains open; a green
+  deployment does not close it or the remaining human checks.
 
 ## 2026-11-01 - Evidence fitness: first feedback release
 

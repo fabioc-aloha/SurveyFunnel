@@ -106,6 +106,9 @@ docs/                  Design, play, development, deployment docs
 - Current update: five-part evidence fitness, usable-sample and role
   requirements, audience health across instruments, and reporting
   beyond completion. See the [release summary](docs/evidence-fitness.md).
+- Gameplay release `3661c23` passed the
+  [production workflow](https://github.com/fabioc-aloha/SurveyFunnel/actions/runs/41366863464)
+  and independent live-package verification on 2026-11-01.
 - Local Node and integrated-browser checks are recorded in the
   [changelog](CHANGELOG.md). The full CLI browser suite remains unverified
   on this Windows machine because Puppeteer installation was blocked by

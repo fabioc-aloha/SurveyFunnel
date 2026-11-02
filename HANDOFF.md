@@ -5,8 +5,12 @@
 - The evidence-fitness first release is implemented. Its public summary
   is `docs/evidence-fitness.md`; preserved release history is in
   `CHANGELOG.md`, and remaining roadmap work is in `TODO.md`.
-- Direct publication to `main` was requested. Check the production
-  workflow for the current commit before assuming deployment succeeded.
+- Gameplay release `3661c23` was pushed to `main` and deployed:
+  [workflow 41366863464](https://github.com/fabioc-aloha/SurveyFunnel/actions/runs/41366863464)
+  passed build, Node tests, deployment, and live-package verification.
+  Independent local verification also matched the live package and headers.
+  This documentation-only follow-up does not change the game package;
+  later gameplay changes need their own deployment verification.
 - Public repository: https://github.com/fabioc-aloha/SurveyFunnel
 - Production URL: https://nice-mushroom-0bdb0ef0f.6.azurestaticapps.net
 - Preserved features include the Moog-style soundtrack, IM nameplate on
@@ -45,12 +49,13 @@
 
 ## Immediate next actions
 
-1. Check the current commit's production workflow and live-package
-   verification. Run the extended browser harness and negative controls
-   in an approved environment with Puppeteer available; the recorded
-   limitation remains open. Quick Challenge stages 2 and 3 are implemented.
-2. Choose the next feedback-roadmap item from `TODO.md`; governance,
-   localization, and AI changes are not included in this first release.
+1. Run the extended browser harness and negative controls in an approved
+   environment with Puppeteer available, and complete the remaining human
+   checks in `TODO.md`. The recorded tooling limitation remains open;
+   production verification does not close these checks.
+2. Choose the next roadmap item from `TODO.md`; governance, localization,
+   and AI changes are not included in this first release. Quick Challenge
+   stages 2 and 3 are already implemented.
 
 ## Open items (honest status)
 
