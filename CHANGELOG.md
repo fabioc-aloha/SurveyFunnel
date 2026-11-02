@@ -19,6 +19,10 @@
 - This documentation-only follow-up records that receipt without changing
   the game package. The full CLI browser limitation remains open; a green
   deployment does not close it or the remaining human checks.
+- Documentation receipt `f57b0c7` also passed
+  [production workflow 41367108944](https://github.com/fabioc-aloha/SurveyFunnel/actions/runs/41367108944),
+  including live-package verification. Independent production verification
+  passed again afterward; no additional gameplay changes were pending.
 
 ## 2026-11-01 - Evidence fitness: first feedback release
 

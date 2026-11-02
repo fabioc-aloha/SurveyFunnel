@@ -1,78 +1,88 @@
 # Open work
 
+## Verification blocker
+
+- Run the extended tracked browser harness and negative controls in an
+  approved environment with Puppeteer available:
+  `node scripts/harness/run-all.mjs` and
+  `node scripts/harness/self-test.mjs`.
+- The Windows run was blocked by missing tooling and package-fetch policy.
+  Integrated-browser checks and a green deployment do not close this item.
+  Use the [harness guide](scripts/harness/README.md) for provisioning and
+  current coverage; completed integration and dated results remain in the
+  [changelog](CHANGELOG.md).
+
+## Browser regression expansion
+
+These are proposed saved checks, not claims that earlier session-browser
+evaluations are automated. Extending the tracked harness to this scope
+still requires a scope/workflow decision.
+
+- Breaker cutoff accounting, interrupted participants, and completions
+  on both sides of the cutoff.
+- Question repairs, distinct A/B invitations, and local font loading.
+- MPOR first-open/reopen scrolling, including reopening after scrolling;
+  focus and close behavior.
+- BRD level/challenge content and focus; QR mouse/keyboard expansion and
+  independent decoding of the rendered full QR.
+- An uninterrupted Level 1-to-6 journey through actual controls to Season
+  Results; a 35-credit Level 2 retry recovered through successive cost
+  reductions; a Level 6 report with 35 credits left that offers no retry.
+- Tab/Shift-Tab containment, inert background controls, Escape, opener-focus
+  restoration, and cleared affordability warnings.
+- Negative cases: over-budget launch refusal, owned-preparation locks,
+  and attempt-chain audience locks.
+
+Acceptance conditions: use explicit failing assertions and freshly loaded
+pages with expected-screen guards; a stale/reset page must fail rather than
+continue. Reuse existing gameplay witnesses rather than duplicate scoring.
+Keep the game framework-free, without runtime test dependencies; the browser
+checks own rendered controls and event wiring, not a second scoring model.
+
+## Human release checks
+
+- Listen to deployed WebAudio music and effects; automated checks cannot
+  establish that the Moog soundtrack sounds correct.
+- Scan the expanded QR with a physical phone and repeat key touch journeys
+  on iOS Safari and Android Chrome. Cross-browser and screen-reader UAT
+  remain unverified.
+
 ## Feedback roadmap
 
-Implementation summary: [evidence-fitness update](docs/evidence-fitness.md).
-The approved first release implements the five-part scorecard, usable
-sample/role/audience-pool gates, cohort health across instruments, and
-the post-response cleaning-to-action pipeline. The later roadmap items
-below are not implemented.
+The [evidence-fitness first release](docs/evidence-fitness.md) is deployed.
+The following features remain unimplemented:
 
 - P1: Agree metric definitions, baselines, owners, QC checkpoints, and
   prospective versus retroactive segment changes as playable decisions.
 - P1: Add explicit privacy, security, accessibility, and approval gates;
   the current operational-trust check is not a compliance assessment.
-- P1: Expand localization beyond the existing review/invitation controls:
-  terminology, translation memory, human linguistic review, disputed
-  translations, cultural fit, and response-option validation.
+- P1: Expand localization: terminology, translation memory, human linguistic
+  review, disputed translations, cultural fit, and response-option validation.
 - P1: Design the One Number scenario and a player-authored context note.
 - P2: Add a governed AI adviser with acceptance criteria, human approval,
-  audit trail, and deterministic measures kept separate from interpretation.
+  audit trail, and deterministic measures separate from interpretation.
 - P2: Expand cohort health into cross-instrument portfolio decisions:
-  individual synthetic contact/response histories, overlaps between
-  pools, account hierarchies, and finer sampling/role-specific missions.
+  individual synthetic contact/response histories, overlaps between pools,
+  account hierarchies, and finer sampling/role-specific missions.
 - P2: Add causal decision review, rejected-alternative consequences,
-  learning assessment, and an optional local scorecard export.
-- Release checks: run the extended tracked browser harness and its negative
-  controls in an environment with Puppeteer available. This Windows run
-  was blocked by the package-fetch policy; integrated-browser checks are
-  separate evidence, not a passing harness run.
+  learning assessment, and optional local scorecard export.
 
-## Regression checks
+## Proposed automation - approval required
 
-- Done: the browser regression suite is tracked at `scripts/harness/`
-  and run with `node scripts/harness/run-all.mjs`; negative controls
-  run with `node scripts/harness/self-test.mjs`. It covers build
-  validation, the Node suite, the Level 1 browser journeys at 390x844
-  and 1280x800, the cut floor, the pile strip and mood scenarios, and
-  the campaign BOUNCE-BACKS section. Puppeteer and Chrome are external
-  test tooling, provisioned as documented in
-  `scripts/harness/README.md`; the game stays framework-free and gains
-  no runtime dependency. Remaining manual checks are physical devices,
-  other browsers, screen reader, and human audio.
-- The checks below are still proposed and are not covered by the
-  integrated harness yet.
-- Cover breaker cutoff accounting, interrupted participants, question
-  repairs, distinct A/B invitations, local font loading, and MPOR
-  first-open/reopen scrolling, focus, and close behavior.
-- Run against a freshly loaded page: the first post-edit guide check
-  used the old document and failed until the page was reloaded.
-- Checks should fail with explicit assertions and preserve the
-  framework-free game. Include a guide reopened after scrolling and
-  a completion on each side of the breaker cutoff.
-- Earlier gameplay checks for these topics were session browser
-  evaluations, not saved tests.
-- Include BRD level/challenge content and focus, QR mouse/keyboard
-  expansion, and independent decoding of the rendered full QR.
-- Include an uninterrupted Level 1-to-6 campaign using actual controls,
-  a 35-credit Level 2 retry recovered through successive cost reductions,
-  and a Level 6 report with 35 credits left that offers no retry.
-- Exercise Tab/Shift-Tab containment, inert background controls, Escape,
-  opener-focus restoration, and cleared affordability warnings.
-  Start from a freshly loaded game and assert the expected screen before
-  interacting; a stale/reset browser page must fail explicitly.
-- Reuse the existing gameplay witnesses rather than duplicating scoring.
-  Positive case: navigate all six winning reports to Season Results.
-  Negative cases: an over-budget setup cannot launch, and owned prep and
-  audience locks remain enforced. Node fixtures already cover scoring;
-  the proposed browser checks cover rendered controls and event wiring.
-  Extending the tracked harness to these topics still needs its own
-  scope and workflow decision.
-
-## Release verification
-
-- A human must listen to WebAudio on the live site. Audio v2 shipped 2026-11-01;
-  automated checks still cannot establish that music and effects sound correct.
-- Scan the expanded QR with a physical phone and repeat key journeys on
-  iOS Safari and Android Chrome. Cross-browser and screen-reader UAT
-  remain unverified.
+- Decision: approve or reject a reproducible winning-fixture generator.
+  The ad hoc generator changed inactive, unadded bank questions; existing
+  card-handler replay caught the resulting cost mismatch. Reproducible
+  generation would reduce this risk during future rebalancing.
+- Prior art: `game()`, `clickCut()`, `clickSimplify()`, and exact witness
+  assertions in [game-features.test.mjs](scripts/game-features.test.mjs).
+  Those checks already work; another instruction or skill is not needed.
+- Proposed scope, not authorized creation: extract shared VM/action helpers
+  into `scripts/game-test-helpers.mjs`, add
+  `scripts/generate-winning-setups.mjs`, and update the existing tests.
+- Contract: accept levels/seeds and the current corpus; emit only a complete,
+  UI-legal corpus with exact report metadata. Preserve coverage, budgets,
+  core locks, floors, and every acceptance gate; fail before replacing
+  fixtures if any required winner is missing.
+- Validate the current corpus and deterministic repeat generation; prove
+  that inactive bank items stay unchanged and a failed search leaves the
+  existing fixture file intact. No tooling files have been created.
