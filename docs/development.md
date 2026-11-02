@@ -31,12 +31,14 @@ drives the real game at 390x844 and 1280x800: the title, setup, run, and
 report screens with no console or page errors and no horizontal
 overflow, questionnaire button geometry, the manager nameplate, and a
 scripted legal Level 1 playthrough that wins. Feature scenarios at the
-mobile viewport cover the cut floor (cutting stops at the six core
-questions with core CUT controls locked), the Quick Challenge second
+mobile viewport cover the one-question floor (all questions can be cut
+until the final CUT becomes gray and disabled, with restore/bank recovery), the Quick Challenge second
 wave against the revealed stale list (pile strip columns aligned under
-the funnel steps, settled bounced figures accumulating and persisting,
-and the manager figure turning agitated in a high-bounce run), and the
-campaign report's BOUNCE-BACKS section on a bouncing run. Negative
+the funnel steps, settled bounced figures accumulating and persisting),
+and a raw Executive Blast that crosses the recipient-based 10% bounce
+threshold, agitates the manager, finishes naturally, and renders the
+campaign report's BOUNCE-BACKS section. Observers parse comma-formatted
+individual counts. Negative
 controls are separate:
 
 ```bash
@@ -74,6 +76,41 @@ starting state, a round replays to the same funnel. Credits, goodwill,
 reputation, and owned preparation change on retry, so a retry is not
 the same starting state.
 
+### Population and animation contracts
+
+`buildRun()` generates `run.respondents`: one record per member of the
+selected segment, including recipients stopped before sending by the
+breaker. `tally`, evidence processing, A/B/language reports, and portfolio
+response totals read these records. There is no `n / 40` result multiplier.
+Population sizes must be positive integers.
+
+`run.sprites` is a separate display model. `groupRespondents()` groups
+matching personas, A/B arms, outcomes, drop causes/questions, reminder
+routes, and visible quality/behavior cues. Latent response flags stay
+in the individual records rather than multiplying otherwise identical
+visual groups. Large cohorts split at
+`ceil(population / targetUnits)`, with a default target of 160; this is
+not a hard group limit. Behavioral diversity can produce more groups.
+Each cohort lists its members and count and animates a median member's
+example trajectory. Every recipient belongs to exactly one cohort.
+Unsent cohorts do not enter the track.
+
+The `×N` badge is a cohort size, not a statistical expansion factor.
+Changing the display target must not change respondent data, outcomes,
+sample size, quality, Insight, or verdict. Cohort motion is illustrative;
+it is not the event time of every member. Pixel art reuses a cached
+inline SVG image per persona color rather than one DOM element per
+pixel, so larger cohort counts do not multiply pixel-node layout work.
+No new runtime dependency or hosted image asset is needed.
+
+`buildProgressTimeline()` sorts individual statistical events into
+cumulative snapshots. `populationProgress()` reads the exact state at a
+virtual time; live completion, send, guess, bounce, and unopened counters
+do not depend on visual arrivals. Skip/report uses the final snapshot.
+The breaker removes events after its cutoff before either model is built.
+Mood thresholds use recipient rates, not fixed counts of rendered sprites.
+Percentages display up to three decimals; verdicts use unrounded ratios.
+
 Per round, the model runs in this order:
 
 1. **Delivery.** Segment invalid rate, reduced by validation
@@ -85,14 +122,14 @@ Per round, the model runs in this order:
    why me line, and language match.
 3. **Starts.** Click to start conversion, adjusted by the honesty
    of the stated time ask versus the real instrument length.
-4. **Completions.** Each persona walks the instrument against two
+4. **Completions.** Each recipient follows their persona through the instrument against two
    clocks: patience (minutes) and knowledge (per question tags).
    Outcomes per question: continue, abandon, escape (if escapes are
    on), or guess. Late survey effects add speeders and straight
    liners; skipped dedupe adds duplicates; open rates can add a
    forwarded response share.
-5. **Goodwill and budget.** Spends and earns apply as specified in
-   `mechanics-update-v1.1.md`. If goodwill reaches zero, the breaker
+5. **Goodwill and budget.** Spends and earns use `goodwillMath()` and
+   the current [player guide](player-guide.md). If goodwill reaches zero, the breaker
    stops new invitations and ends the run for anyone still in the
    funnel. Only completions before the trip count.
 6. **Evidence processing.** After FINISH, remove duplicate, junk, speeder,
@@ -117,10 +154,15 @@ minimum usable sample, and role shares. Mission minima are 750, 1,000,
 Levels 1-4 require the Support pool, Level 5 Global, and Level 6
 Leadership. Levels 1-5 require technicians and end users each at 10%+
 of the usable base; the finale requires executives and IT decision
-makers together at 50%+. Each required group needs at least one sprite.
+makers together at 50%+. Each required group needs at least one respondent.
 Account matching must retain at least 80% of cleaned completions.
 
-Quality still uses the original raw-run deduction table and must be 60+.
+Quality must be 60+. `qualityAssessment()` uses the guessed-completion
+rate per invited recipient with weight 160, and the duplicate-completion
+rate with weight 120, rounded to points. These preserve per-capita game
+calibration without making larger populations automatically fail.
+Other respondent-quality deductions remain completion-share based;
+instrument deductions, including 10 per missing core item, are unchanged.
 At least 60% of completions must survive cleaning; excluding damaged
 responses does not erase the quality penalties. Usable Insight must
 be 60+ (70+ in the finale). Validation and dedupe are operational
@@ -131,7 +173,7 @@ never a campaign win gate. Winning grades use the weakest of quality,
 usable Insight, and cleaning retention rather than averaging rate.
 
 `state.audiencePortfolio` records health, sends, instruments, suppression
-overrides, and completed response-sprite totals by role. Fresh, Stale,
+overrides, and completed individual-response totals by role. Fresh, Stale,
 and Tired share Support; Global and Executive Blast are separate pools.
 This models cohort exposure, not individual repeat respondents, account
 hierarchies, or overlapping membership between pools. All records are
@@ -148,26 +190,26 @@ propensity by `clamp(start / segmentBaseline, 0.5, 1)` without reseeding
 the RNG. Only report finalization records a send; previews and repeated
 report calls do not consume audience health.
 
-These are explicit game rules. A sprite represents many simulated
-people, not many independent observations; passing the thresholds does
+These are explicit game rules. Counts are individual simulated records,
+not extrapolations from avatars or empirical observations; passing the thresholds does
 not establish statistical adequacy, population representativeness,
 privacy compliance, or construct validity. Detailed governance and
 compliance gates remain separate roadmap work in `TODO.md`.
 
 ## Balance invariants (test these after any tuning)
 
-1. Lazy Level 1 default run: 2 completions from 40 sent (5%),
-   below the 12% benchmark, with a visible bounce problem. This is a
-   clear miss, not a near miss.
+1. The default Level 1 full-audience run remains below its response
+   benchmark and fails evidence acceptance. Do not preserve a lucky
+   forty-person draw as the balancing target.
 2. The recorded fixed Level 1 strategy passes every evidence check
    within its initial budget, through the real card handlers.
 3. Unprepared Executive Blast loses, with expensive sends, hard bounces,
    and goodwill loss. It is not uniformly worst on every score.
-4. Gutted survey (only Q9 kept): quality and Insight fail, no win.
-   A gutted instrument is also unreachable through the controls: core
-   questions cannot be cut, the kept count cannot fall below six (or
-   the three BRD cards in Quick Challenges), and launch refuses a
-   sub-floor instrument.
+4. A one-question instrument is reachable and can launch in either mode.
+   The final CUT is gray and disabled; restoring or adding a question
+   enables cuts again. Missing core and BRD coverage still penalizes
+   quality/Insight, and unmet mandatory requirements prevent a challenge
+   win. Both the cut action and launch path refuse an empty instrument.
 5. Validation alone, bad questionnaire kept: still loses.
 6. Identical choices replay identically.
 
@@ -181,8 +223,9 @@ seeded draws (`0000` through `003F`); Level 4 supplies 39 lines (the
 fixed start plus 38 draws), because its goodwill gate rejected the
 remaining draws in the searched space. Each setup starts at attempt 1
 with zero previous spend, uses only dealt cards and the level's
-available bank, keeps every core question and at least the instrument
-floor, and must pass all scoring gates within the initial budget. The
+available bank, respects the one-question floor, and must pass all
+scoring gates within the initial budget. Core cuts are permitted and
+retain their quality deduction; the fixture records the actual kept set. The
 test applies each setup through the game's own card handlers (repairs
 via the fix button, cuts via `applyCut`), never by writing question
 state directly, so the corpus proves the scoring engine rewards states
@@ -192,24 +235,26 @@ Blast.
 
 | Level | Difficulty | Fixed winning cost | Highest winning cost in checked draws | Initial pool |
 | --- | --- | --- | --- | --- |
-| 1 - First Send | Easy | 58 | 91 | 120 |
+| 1 - First Send | Easy | 58 | 93 | 120 |
 | 2 - The Split | Easy | 67 | 93 | 120 |
 | 3 - The Stakeholder | Medium | 69 | 89 | 120 |
 | 4 - The Tired List | Hard | 76 | 82 | 120 |
 | 5 - Global Fieldwork | Medium | 70 | 106 | 120 |
-| 6 - The Big Quarter | Hard | 98 | 114 | 150 |
+| 6 - The Big Quarter | Hard | 98 | 120 | 150 |
 
 These are verified strategies, not global minimum costs. The corpus
-was regenerated under the evidence checks without dropping any of the
+was regenerated under the full-population evidence checks without dropping any of the
 364 previously sampled instruments. Repairs, kept sets, bank additions,
 invitations, reminders, and DK/NA were searched again. Every witness is
 replayed through the card handlers, `startRun()`, and `showReport()`,
-with exact assertions for cost, rate, quality, usable Insight, usable
-sample, goodwill, and every gate. Independent witnesses start with an
+with exact assertions for cost, individual sends/completions, rate,
+quality, usable Insight, usable sample, goodwill, and every gate. Independent witnesses start with an
 empty portfolio; a separate uninterrupted six-level test preserves it.
 The continuous Level 4 line uses Honest Ask and one reminder rather
-than weakening its 35-goodwill rule. Budgets, the instrument floor,
-core locks, and Quick Challenge objectives remain unchanged.
+than weakening its 35-goodwill rule. Strategies may trade a core-cut
+quality penalty for other useful coverage; core cuts are not forbidden. The current
+floor is one question in both modes; budgets and study objectives remain
+unchanged.
 
 Difficulty describes decision complexity: introductory levers and optional
 A/B comparison are Easy; added burden or multilingual fieldwork is Medium;
@@ -242,9 +287,9 @@ repairs (6), and the priciest intended extras line (6), with 2 credits
 of headroom; cutting every extra instead totals 43. A win requires all
 three BRD repairs, every extra resolved by repair or cut, plus the
 drill-specific response, quality, and Insight gates, not the campaign
-evidence checks. The challenge floor is its
-core count (3), so extras can be cut down to the BRD set and no
-further. Unique topics of the three BRD cards form its agenda; the
+evidence checks. The challenge floor is one question, just like the
+campaign. Core and required cards may be cut, but their acceptance
+requirements remain. Unique topics of the three BRD cards form its agenda; the
 extras are scope creep and never carry agenda topics.
 
 Each scenario has a curated deterministic seed (`QC01`, `QC02`, `QC03`).
@@ -265,10 +310,10 @@ resolves the active twist. The twist never reseeds the run simulation
 (`instrumentSeed` is unchanged), so every stage-1 line keeps its exact
 scores; it only tightens acceptance:
 
-- `mandatory` (one extra id): `cutBlockReason` returns `"required"`
-  for that card after the core and floor checks, `quickExtraResolved`
-  accepts only `simplify` for it, and the card renders a BRD REQUIRED
-  tag with a cut lock line.
+- `mandatory` (one extra id): the card renders a BRD REQUIRED tag.
+  Its cut is permitted above the one-question floor, but
+  `quickExtraResolved` accepts only `simplify` for it and
+  `quickVariantCheck` marks a cut NOT MET.
 - `ratebar` (a target above 0.12): `curLevel()` returns the raised
   target, so the HUD, the BRD acceptance line, and the verdict all
   read the same bar. Percentages print through `targetPct`, which
@@ -284,13 +329,12 @@ scores; it only tightens acceptance:
 effective bars plus `quickVariantCheck(rate, quality).met`, and
 `showQuickReport` prints a BRD twist line (name, acceptance, MET or
 NOT MET, and the measured detail) next to the repairs and extras
-lines. Twist balance was measured against the engine before the
-numbers were fixed: every variant has a winning line inside the
-unchanged 48-credit budget, and for each variant a line that wins
-under the base rules loses on the twist alone (the intended line
-reaches exactly 17.5% against QC1's 17.5% bar and exactly 20%
-against QC2's 20% bar; cutting every extra scores quality 93
-against QC3's audit bar of 95). Tests pin twists by scanning the
+lines. Every variant has a full-population winning line inside the
+unchanged 48-credit budget. Rate/quality negative cases construct
+individual records at the strict rate boundary or below the audit
+gate, rather than depending on random flags in a forty-person draw.
+Time-ceiling negatives still use the actual instrument length.
+Tests pin twists by scanning the
 deterministic seeds (`startQCWithVariant`), assert the sweep reaches
 all three variants per challenge, and assert the campaign BRD, gate,
 and floor carry no twist after leaving a challenge.
@@ -318,10 +362,12 @@ reputation carry, and `attempt` becomes 2 (re-send fatigue applies).
 - THE LATE QUESTION: one defective bank card from `QUICK_LATE_POOL`
   (rotating named sources: Legal, the sponsor, Support leadership,
   Compliance; never a card the challenge already dealt) is appended
-  to the instrument. `cutBlockReason` returns `"late"` for it, so it
-  goes out repaired or as written; it is excluded from the scored
-  extras (`quickScoredExtras`) because its cost is carried in wave
-  2's quality and Insight numbers, not in a resolution rule.
+  to the instrument. Cutting it is permitted above the one-question
+  floor, but the final structural acceptance check requires it to be
+  fielded, repaired or as written. The report explicitly marks a cut
+  required late item NOT MET. It remains outside `quickScoredExtras`;
+  repairs are optional, but omission is not a successful response to
+  the request.
 - SECOND PUSH: accepting presets `state.reminders = 1` (8 cr, −5
   goodwill, the book's reminder-wave constants); a second wave can
   be added in the invitation step. If the pool cannot fund the first

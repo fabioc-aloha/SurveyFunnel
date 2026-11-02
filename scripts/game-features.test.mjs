@@ -43,6 +43,193 @@ function game() {
   return { context, element, timers };
 }
 
+test('population model: simulates every recipient rather than forty proxies', () => {
+  const { context: g } = game();
+  for (const segment of g.SEGMENTS) {
+    g.selectLevel(segment.id === 'multi' ? 5 : segment.id === 'blast' ? 6 : 1, false);
+    g.state.seg = segment;
+    g.state.suppression = true;
+    const run = g.buildRun();
+    assert.ok(Array.isArray(run.respondents), 'the simulation must expose individual respondent records');
+    assert.equal(run.respondents.length, segment.n);
+    assert.equal(new Set(run.respondents.map(person => person.i)).size, segment.n);
+    assert.equal(g.tally(run).invited, segment.n);
+  }
+});
+
+test('population model: animation cohorts account for every recipient exactly once', () => {
+  const { context: g } = game();
+  const run = g.buildRun();
+  assert.ok(Array.isArray(run.respondents));
+  assert.ok(run.sprites.length > 40, 'visual groups are not limited to forty units');
+  assert.ok(run.sprites.length < run.respondents.length);
+  assert.equal(run.sprites.reduce((sum, group) => sum + group.count, 0), run.respondents.length);
+  const ids = run.sprites.flatMap(group => Array.from(group.memberIds));
+  assert.equal(ids.length, run.respondents.length);
+  assert.equal(new Set(ids).size, run.respondents.length);
+  for (const group of run.sprites) {
+    assert.equal(group.count, group.memberIds.length);
+    assert.ok(group.memberIds.every(id =>
+      run.respondents[id].persona === group.persona &&
+      run.respondents[id].fate === group.fate &&
+      run.respondents[id].dropQ === group.dropQ));
+  }
+});
+
+test('population model: changing animation density cannot change respondents or statistics', () => {
+  const { context: g } = game();
+  assert.equal(typeof g.groupRespondents, 'function');
+  const sparse = g.buildRun(40);
+  const dense = g.buildRun(240);
+  assert.notEqual(sparse.sprites.length, dense.sprites.length);
+  assert.equal(JSON.stringify(sparse.respondents), JSON.stringify(dense.respondents));
+  assert.equal(JSON.stringify(g.tally(sparse)), JSON.stringify(g.tally(dense)));
+  const counts = g.tally(dense);
+  const quality = g.qualityAssessment(dense, counts).quality;
+  const evidence = JSON.stringify(g.evaluateEvidence(dense, counts, quality));
+  dense.sprites = [];
+  assert.equal(JSON.stringify(g.tally(dense)), JSON.stringify(counts));
+  assert.equal(JSON.stringify(g.evaluateEvidence(dense, counts, quality)), evidence);
+});
+
+test('population model: latent response flags do not split otherwise identical visual behavior', () => {
+  const { context: g } = game();
+  const respondents = Array.from({ length: 8 }, (_, i) => ({
+    i, persona: 'tech', lang: 'en', abGroup: 'A', fate: 'finish', dropQ: 0, via: 'base',
+    events: [], qTopBox: !!(i & 1), qMush: !!(i & 2), qJunk: !!(i & 4)
+  }));
+  const before = JSON.stringify(g.tally({ respondents }));
+  const groups = g.groupRespondents(respondents, 1);
+  assert.equal(groups.length, 1, 'nonvisual flags must not create exponential animation buckets');
+  assert.equal(groups[0].count, respondents.length);
+  assert.equal(JSON.stringify(g.tally({ respondents })), before, 'all individual flags remain available to statistics');
+});
+
+test('population model: live statistical progress agrees with the full population', () => {
+  const { context: g } = game();
+  assert.equal(typeof g.populationProgress, 'function');
+  for (const breaker of [false, true]) {
+    g.selectLevel(1, false);
+    if (breaker) {
+      g.state.seg = g.SEGMENTS.find(segment => segment.id === 'blast');
+      g.state.invite = g.INVITES.find(invite => invite.id === 'generic');
+      g.state.reminders = 2;
+    }
+    const run = g.buildRun();
+    const counts = g.tally(run);
+    const before = g.populationProgress(run, 0);
+    assert.equal(before.sent, 0);
+    assert.equal(before.completed, 0);
+    for (const time of [1000, 5000, g.BREAKER_STOP_T, 15000]) {
+      const progress = g.populationProgress(run, time);
+      assert.equal(progress.sent, run.respondents.filter(person => person.fate !== 'notsent' && person.spawnAt <= time).length);
+      assert.equal(progress.completed, run.respondents.filter(person =>
+        person.events.some(event => event.type === 'finish' && event.t <= time)).length);
+      assert.equal(progress.opened, run.respondents.filter(person =>
+        person.events.some(event => event.type === 'gate' && event.gate === 'opened' && event.t <= time)).length);
+    }
+    const final = g.populationProgress(run, Infinity);
+    assert.equal(final.sent, counts.sent);
+    assert.equal(final.completed, counts.completed);
+    assert.equal(final.bounced, counts.bouncedHard + counts.bouncedSoft);
+    assert.equal(final.delivered - final.opened, counts.delivered - counts.opened);
+    const guessEvents = run.respondents.reduce((sum, person) =>
+      sum + person.events.filter(event => event.type === 'guess').length, 0);
+    assert.equal(final.guesses, guessEvents);
+    if (breaker) {
+      assert.equal(run.gm.trips, true);
+      assert.ok(final.sent < run.respondents.length);
+      const cutoff = g.populationProgress(run, g.BREAKER_STOP_T);
+      assert.equal(JSON.stringify(cutoff), JSON.stringify(final), 'no recipient contributes after the breaker');
+    }
+  }
+});
+
+test('population model: quality penalties use rates rather than population-sized raw counts', () => {
+  const { context: g } = game();
+  assert.equal(typeof g.qualityAssessment, 'function');
+  const run = g.buildRun();
+  const quality = g.qualityAssessment(run, g.tally(run)).quality;
+  const doubled = { ...run, respondents: [...run.respondents, ...run.respondents] };
+  assert.equal(g.qualityAssessment(doubled, g.tally(doubled)).quality, quality);
+});
+
+test('population model: usable samples count individual records without animation weights', () => {
+  const { context: g } = game();
+  const run = g.buildRun();
+  assert.ok(Array.isArray(run.respondents));
+  const counts = g.tally(run);
+  const evidence = g.evaluateEvidence(run, counts, 100);
+  assert.equal(evidence.usableN, evidence.matched);
+  assert.ok(evidence.usableN <= counts.completed);
+  assert.ok(evidence.roles.every(role => Number.isInteger(role.count)));
+});
+
+test('population model: run counters and reports use recipient totals', () => {
+  const { context: g, element } = game();
+  g.startRun();
+  g.showReport();
+  const counts = g.tally(g.runData);
+  assert.equal(Number(element('compCount').textContent.replaceAll(',', '')), counts.completed);
+  assert.equal(Number(element('sentCount').textContent.replaceAll(',', '')), counts.sent);
+  const text = element('report').innerHTML;
+  assert.doesNotMatch(text, /sent sprites|people per sprite|usable sprites|40 sprites/);
+  assert.ok(text.includes(String(g.state.seg.n)) || text.includes(g.state.seg.n.toLocaleString('en-US')));
+});
+
+test('population model: invalid population sizes fail explicitly', () => {
+  const { context: g } = game();
+  for (const n of [0, -1, 1.5, NaN]) {
+    g.state.seg = { ...g.SEGMENTS[0], n };
+    assert.throws(() => g.buildRun(), /population.*positive integer/i);
+  }
+});
+
+test('population model: rate labels retain a single recipient at twenty thousand', () => {
+  const { context: g } = game();
+  assert.equal(g.pct(1 / 20000 * 100), '0.005%');
+  assert.equal(g.pct(2401 / 20000 * 100), '12.005%');
+});
+
+test('population model: cohort pixel art uses one cached image without changing its pixels', () => {
+  const { context: g } = game();
+  const color = '#3fa7f5';
+  const html = g.spriteHTML(color);
+  assert.equal((html.match(/<(?!\/)[a-z]+/g) || []).length, 1, 'hundreds of groups must not create one DOM node per pixel');
+  const palette = { H: '#241f31', S: '#f2c29b', E: '#241f31', B: color, T: '#241f31' };
+  const image = html.match(/src="data:image\/svg\+xml,([^"]+)"/);
+  assert.ok(image, 'cohort art must reuse a rasterizable image instead of repainting every pixel');
+  const expected = [];
+  for (let y = 0; y < g.SPRITE_MAP.length; y++) {
+    for (let x = 0; x < g.SPRITE_MAP[y].length; x++) {
+      const cell = g.SPRITE_MAP[y][x];
+      if (palette[cell]) expected.push([x * 2, y * 2, palette[cell]]);
+    }
+  }
+  const svg = decodeURIComponent(image[1]);
+  const pixels = [...svg.matchAll(/<rect x="(\d+)" y="(\d+)" width="2" height="2" fill="([^"]+)"/g)]
+    .map(match => [Number(match[1]), Number(match[2]), match[3]]);
+  assert.deepEqual(pixels, expected);
+});
+
+test('population model: a frame of cohort landings shares one geometry measurement', () => {
+  const { context: g, element } = game();
+  let reads = 0;
+  for (const id of ['track', 'bounceStack', 'unopenedStack']) {
+    element(id).getBoundingClientRect = () => {
+      reads++;
+      return { left: 0, top: 0, bottom: 32, width: 76, height: 32 };
+    };
+  }
+  assert.equal(typeof g.measurePileGeometry, 'function');
+  g.pileFrameGeometry = g.measurePileGeometry();
+  assert.equal(reads, 3);
+  const sprite = () => ({ el: { style: {}, classList: { add() {} } } });
+  g.routeSpriteToPile(sprite(), 'bounce');
+  g.routeSpriteToPile(sprite(), 'noopen');
+  assert.equal(reads, 3, 'landing cohorts must not force another read after each DOM write');
+});
+
 /* The intended line per challenge: repair the three BRD cards, then
    resolve each extra as curated (repair what is worth saving, cut the
    rest). Costs are the full launch totals at QUICK_BUDGET. */
@@ -183,23 +370,17 @@ test('BRD twist draw is deterministic per seed and reaches every variant', () =>
   }
 });
 
-test('a mandatory BRD twist makes its extra uncuttable and repair-only', () => {
+test('a mandatory BRD question can be cut but still requires repair to win', () => {
   for (let index = 0; index < 3; index++) {
     const { context: g, element } = game();
     startQCWithVariant(g, index, 0);
     const variant = g.quickVariant();
     assert.equal(variant.type, 'mandatory');
-    /* The action path refuses the cut, exactly like a core card. */
-    assert.equal(g.applyCut(variant.qid), 'required');
-    clickCut(g, variant.qid);
-    assert.equal(g.state.qstate[variant.qid], 'keep', `Q${variant.qid} must refuse its cut`);
     g.renderQuestions();
     assert.match(element('qGrid').innerHTML, /BRD REQUIRED/);
-    /* The verdict re-checks: even a state set past the guard (the
-       cut applied directly) cannot win with the required extra cut,
-       although the identical line wins under other briefs. */
     applyQuickLine(g, index, 'intended');
-    g.state.qstate[variant.qid] = 'cut';
+    clickCut(g, variant.qid);
+    assert.equal(g.state.qstate[variant.qid], 'cut', `Q${variant.qid} may be removed`);
     g.startRun();
     g.showReport();
     assert.match(element('report').innerHTML, /TRY ANOTHER REPAIR/);
@@ -215,21 +396,22 @@ test('a mandatory BRD twist makes its extra uncuttable and repair-only', () => {
   }
 });
 
-/* The raised bars and time ceilings. Each enforcement line below is a
-   line that wins under the base rules (the companion tests prove the
-   same shapes win under briefs they satisfy); it must lose here on
-   the twist alone, with the report ruling NOT MET. Each winning line
-   stays inside the unchanged 48-credit budget. */
+/* Rate/quality boundaries use individual synthetic records rather than
+   an unusually good or bad forty-person draw. Winning lines still
+   run the real full-population model within 48 credits. */
 const QC_TWIST_LINES = [
   /* challenge, variant, winning actions, violating actions */
-  [0, 1, 'cut-extras', 'intended'],   /* reporting threshold 17.5%: intended reaches exactly 17.5% */
+  [0, 1, 'cut-extras', 'rate-boundary'],
   [0, 2, { 26: 'simplify', 57: 'cut', 22: 'cut' }, 'intended'], /* short shift 1.5 min: intended reads 1.88 */
   [1, 1, 'cut-extras', 'intended'],   /* four-minute ceiling: intended reads 5.0 min */
-  [1, 2, { 7: 'cut', 51: 'simplify', 68: 'cut' }, 'intended'],  /* reach bar 20%: intended reaches exactly 20% */
-  [2, 1, 'intended', 'cut-extras'],   /* audit bar 95: cutting every extra scores quality 93 */
+  [1, 2, { 7: 'cut', 51: 'simplify', 68: 'cut' }, 'rate-boundary'],
+  [2, 1, 'intended', 'quality-boundary'],
   [2, 2, 'cut-extras', 'intended']    /* one-minute rule 1.1 min: intended reads 1.25 */
 ];
 function applyTwistLine(g, index, line) {
+  if (line === 'rate-boundary' || line === 'quality-boundary') {
+    applyQuickLine(g, index, 'intended'); return;
+  }
   if (typeof line === 'string') { applyQuickLine(g, index, line); return; }
   const challenge = g.QUICK_CHALLENGES[index];
   for (const id of challenge.ids) clickSimplify(g, id);
@@ -243,7 +425,16 @@ test('raised bars and time ceilings are enforced and winnable within budget', ()
     startQCWithVariant(g, index, variantIndex);
     applyTwistLine(g, index, loseLine);
     assert.ok(g.budgetMath().total <= g.QUICK_BUDGET);
-    g.startRun();
+    if (loseLine === 'rate-boundary' || loseLine === 'quality-boundary') {
+      const count = loseLine === 'rate-boundary' ? Math.round(g.curLevel().target * 40) : 10;
+      const roles = Array.from({ length: count }, (_, i) => g.PKEYS[i % g.PKEYS.length]);
+      g.runData = evidenceRun(g, roles);
+      if (loseLine === 'quality-boundary') {
+        const completed = g.runData.respondents.filter(person => person.fate === 'finish');
+        for (const person of completed.slice(0, Math.round(completed.length * 0.1))) person.qSpeed = true;
+      }
+      g.state.launchCost = g.budgetMath().attemptCost;
+    } else g.startRun();
     g.showReport();
     assert.match(element('report').innerHTML, /TRY ANOTHER REPAIR/,
       `Challenge ${index} variant ${variantIndex}: the base-winning line must fail the twist`);
@@ -272,7 +463,7 @@ test('BRD twists never leak into the campaign', () => {
   assert.equal(g.quickVariant(), null);
   assert.equal(g.quickQualityGate(), 60);
   assert.equal(g.curLevel().target, 0.12);
-  assert.equal(g.instrumentFloor(), 6);
+  assert.equal(g.instrumentFloor(), 1);
   g.openBRD();
   assert.doesNotMatch(element('brdContent').innerHTML, /BRD TWIST/);
 });
@@ -322,7 +513,7 @@ test('reaction sampling stays bounded and references only simulated events', () 
   const run = g.buildRun();
   const examples = g.sampleReactions(run);
   assert.ok(examples.length > 0 && examples.length <= 4);
-  assert.ok(examples.every(example => run.sprites.some(sp =>
+  assert.ok(examples.every(example => run.respondents.some(sp =>
     sp.persona === example.persona && sp.events.some(event =>
       g.respondentReaction(event, sp) === example.text))));
 });
@@ -365,7 +556,11 @@ test('skipping a challenge countdown cannot restart animation after a fresh retr
 test('cutting every challenge topic cannot win on response rate alone', () => {
   const { context: g, element } = game();
   g.startQuickChallenge(0);
-  g.activeQuestions().forEach(q => { g.state.qstate[q.id] = 'cut'; });
+  const extra = g.activeQuestions().find(q => !q.core);
+  for (const q of g.activeQuestions()) {
+    if (q.id !== extra.id) clickCut(g, q.id);
+  }
+  assert.equal(g.keptQuestions().length, 1);
   g.startRun();
   g.showReport();
   assert.match(element('report').innerHTML, /TRY ANOTHER REPAIR/);
@@ -395,10 +590,8 @@ test('stakeholder cost forecasts use the same baseline-aware budget as a real ch
 
 test('a cut is applied before launch and its animation cannot edit the restored campaign', () => {
   const { context: g, timers } = game();
-  /* Adapted for the cut floor: Quick Challenge cards are all core, so their
-     CUT buttons are locked by design now. The animation scenario therefore
-     runs on a legal Level 1 non-core cut, then crosses into and out of a
-     Quick Challenge exactly as before. */
+  /* The delayed animation must not re-render after entering and leaving
+     a different instrument. */
   g.selectLevel(1, false);
   const qid = 5; /* Q5 is non-core on the Level 1 deal */
   let handler;
@@ -443,92 +636,97 @@ function clickSimplify(g, qid) {
   handler();
 }
 
-test('core questions cannot be cut through the question card controls', () => {
+test('any campaign question can be cut through the question card controls', () => {
   const { context: g, element } = game();
   g.selectLevel(1, false);
-  assert.equal(g.instrumentFloor(), 6);
+  assert.equal(g.instrumentFloor(), 1);
   const core = g.activeQuestions().filter(q => q.core);
-  assert.ok(core.length >= 6);
+  assert.ok(core.length > 1);
   for (const q of core) {
     clickCut(g, q.id);
-    assert.equal(g.state.qstate[q.id], 'keep', `Q${q.id} is core and must stay`);
+    assert.equal(g.state.qstate[q.id], 'cut', `core Q${q.id} may be removed`);
   }
-  assert.equal(g.keptQuestions().length, g.activeQuestions().length);
+  assert.equal(g.keptQuestions().length, g.activeQuestions().length - core.length);
   g.renderQuestions();
   const grid = element('qGrid').innerHTML;
-  const cutTag = id => grid.match(new RegExp(`<button[^>]*data-q="${id}"[^>]*data-act="cut"[^>]*>`))[0];
-  for (const q of core) {
-    assert.match(cutTag(q.id), /disabled/, `Q${q.id} CUT button must render disabled`);
-    assert.match(cutTag(q.id), /aria-label="Cut unavailable: Core questions cannot be cut"/);
-  }
-  const nonCore = g.activeQuestions().find(q => !q.core);
-  assert.doesNotMatch(cutTag(nonCore.id), /disabled/, 'non-core CUT stays available above the floor');
-  assert.match(grid, /LOCKED · CORE · CANNOT BE CUT/);
+  assert.ok((grid.match(/<button[^>]*data-act="cut"[^>]*>/g)).every(tag => !/disabled/.test(tag)));
+  assert.doesNotMatch(grid, /CANNOT BE CUT/);
 });
 
-test('cutting stops at the six-question floor and resumes after a restore or an add', () => {
+test('the one-question floor disables the final cut and recovers after restore or add', () => {
   const { context: g, element } = game();
   g.selectLevel(1, false);
-  const nonCore = g.activeQuestions().filter(q => !q.core);
-  assert.equal(nonCore.length, 6);
-  for (const q of nonCore) clickCut(g, q.id);
-  assert.equal(g.keptQuestions().length, 6);
-  /* Further cut attempts through the path change nothing, however often repeated. */
+  const last = g.activeQuestions().find(q => q.core);
+  const removed = g.activeQuestions().filter(q => q.id !== last.id);
+  for (const q of removed) clickCut(g, q.id);
+  assert.equal(g.keptQuestions().length, 1);
+  const cost = g.budgetMath().total;
   for (let round = 0; round < 2; round++) {
-    for (const q of g.keptQuestions()) {
-      clickCut(g, q.id);
-      assert.equal(g.state.qstate[q.id], 'keep', `Q${q.id} must not be cut at the floor`);
-    }
+    assert.equal(g.applyCut(last.id), 'floor');
+    clickCut(g, last.id);
+    assert.equal(g.state.qstate[last.id], 'keep');
+    assert.equal(g.budgetMath().total, cost, 'a refused cut charges nothing');
   }
-  assert.equal(g.keptQuestions().length, 6);
-  /* Floor state renders explained: every CUT disabled, stage note at the minimum. */
   g.renderQuestions();
   const grid = element('qGrid').innerHTML;
   const cutTags = grid.match(/<button[^>]*data-act="cut"[^>]*>/g);
-  assert.ok(cutTags.length >= 6);
-  assert.ok(cutTags.every(tag => /disabled/.test(tag)), 'every CUT button is disabled at the floor');
+  assert.equal(cutTags.length, 1);
+  assert.match(cutTags[0], /disabled/);
+  assert.match(cutTags[0], /aria-label="Cut unavailable: Keep at least one question/);
   assert.match(element('qFloorNote').innerHTML, /MINIMUM INSTRUMENT REACHED/);
-  assert.match(element('qFloorNote').innerHTML, /MINIMUM IS 6/);
-  /* RESTORE (the tray handler's own assignment) lifts the instrument off
-     the floor, and cutting that question works again. */
-  const restored = nonCore[0];
+  assert.match(element('qFloorNote').innerHTML, /MINIMUM IS 1/);
+  const restored = removed[0];
   g.state.qstate[restored.id] = 'keep';
-  assert.equal(g.keptQuestions().length, 7);
+  g.renderQuestions();
+  assert.ok((element('qGrid').innerHTML.match(/<button[^>]*data-act="cut"[^>]*>/g)).every(tag => !/disabled/.test(tag)));
+  assert.equal(g.keptQuestions().length, 2);
   clickCut(g, restored.id);
   assert.equal(g.state.qstate[restored.id], 'cut');
-  assert.equal(g.keptQuestions().length, 6);
-  /* ADD FROM BANK (the bank button's own toggle) does the same. */
+  assert.equal(g.keptQuestions().length, 1);
   const addable = g.addBankQuestions().filter(q => !q.core);
   assert.ok(addable.length > 0, 'the dealt bank offers a non-core question to add');
   const added = addable[0];
   g.state.added[added.id] = true;
-  assert.equal(g.keptQuestions().length, 7);
-  clickCut(g, added.id);
-  assert.equal(g.state.qstate[added.id], 'cut');
-  assert.equal(g.keptQuestions().length, 6);
+  assert.equal(g.keptQuestions().length, 2);
+  clickCut(g, last.id);
+  assert.equal(g.keptQuestions()[0].id, added.id);
+  assert.equal(g.applyCut(added.id), 'floor', 'a bank question can be the last protected question');
 });
 
-test('a sub-floor instrument is flagged in the checklist and the launch button refuses', () => {
-  const { context: g, element } = game();
-  g.selectLevel(1, false);
-  g.renderReadout();
-  assert.notEqual(element('launchBtn').disabled, true);
-  /* Force a sub-floor state directly, as a legacy or edge path could:
-     the cut path itself can no longer produce this. */
-  g.state.qstate[1] = 'cut'; g.state.qstate[2] = 'cut'; g.state.qstate[3] = 'cut';
-  for (const q of g.activeQuestions().filter(q => !q.core)) g.state.qstate[q.id] = 'cut';
-  assert.equal(g.keptQuestions().length, 3);
-  g.renderReadout();
-  assert.match(element('launchCheck').innerHTML, /at least 6 questions kept[\s\S]*?TO DO/);
-  assert.equal(element('launchBtn').disabled, true);
-  assert.match(element('launchBtn').textContent, /TOO FEW QUESTIONS · MIN 6/);
-  /* Defense in depth: a direct startRun call in the same state is also
-     refused, with no run started and no charge taken. */
-  const spentBefore = g.state.spentBefore, attemptBefore = g.state.attempt;
-  g.startRun();
-  assert.equal(g.state.running, false);
-  assert.equal(g.state.spentBefore, spentBefore);
-  assert.equal(g.state.attempt, attemptBefore);
+test('the one-question floor rejects an empty launch in both modes', () => {
+  for (const quick of [false, true]) {
+    const { context: g, element } = game();
+    if (quick) g.startQuickChallenge(0); else g.selectLevel(1, false);
+    g.activeQuestions().forEach(q => { g.state.qstate[q.id] = 'cut'; });
+    g.renderReadout();
+    assert.equal(g.keptQuestions().length, 0);
+    assert.match(element('launchCheck').innerHTML, /at least one question[\s\S]*?TO DO/);
+    assert.equal(element('launchBtn').disabled, true);
+    assert.match(element('launchBtn').textContent, /TOO FEW QUESTIONS · MIN 1/);
+    const before = [g.state.spentBefore, g.state.attempt, g.state.launchCost];
+    g.startRun();
+    assert.equal(g.state.running, false);
+    assert.deepEqual([g.state.spentBefore, g.state.attempt, g.state.launchCost], before);
+  }
+});
+
+test('a one-question questionnaire can launch without bypassing study requirements', () => {
+  for (const quick of [false, true]) {
+    const { context: g, element } = game();
+    if (quick) g.startQuickChallenge(0); else g.selectLevel(1, false);
+    const kept = g.activeQuestions()[0];
+    for (const q of g.activeQuestions()) {
+      if (q.id !== kept.id) clickCut(g, q.id);
+    }
+    assert.equal(g.keptQuestions().length, 1);
+    g.renderReadout();
+    assert.equal(element('launchBtn').disabled, false);
+    g.startRun();
+    assert.equal(g.state.running, true);
+    g.showReport();
+    if (quick) assert.match(element('report').innerHTML, /TRY ANOTHER REPAIR/);
+    else assert.equal(g.state.lastRound.evidence.won, false);
+  }
 });
 
 test('cutting and later restoring an added bank question charges 1 cr each', () => {
@@ -555,67 +753,39 @@ test('cutting and later restoring an added bank question charges 1 cr each', () 
   assert.equal(g.budgetMath().attemptCost, attemptCostBeforeRestore + 1);
 });
 
-test('the floor itself refuses a cut at six kept on a low-core instrument', () => {
+test('the one-question floor protects an instrument with no core cards', () => {
   const { context: g, element } = game();
   g.selectLevel(1, false);
-  /* Current deals always carry exactly 6 core questions, so the core rule
-     alone bounds them; the floor branch guards any deal with fewer core.
-     Construct one directly: 2 core + 6 non-core from the bank. */
-  const core = g.QUESTION_BANK.filter(q => q.core).slice(0, 2);
-  const nonCore = g.QUESTION_BANK.filter(q => !q.core).slice(0, 6);
-  g.state.instrument = core.concat(nonCore);
+  const nonCore = g.QUESTION_BANK.filter(q => !q.core).slice(0, 4);
+  g.state.instrument = nonCore;
   for (const q of g.state.instrument) g.state.qstate[q.id] = 'keep';
-  assert.equal(g.instrumentFloor(), 6);
-  assert.equal(g.keptQuestions().length, 8);
-  clickCut(g, nonCore[0].id);
-  clickCut(g, nonCore[1].id);
-  assert.equal(g.keptQuestions().length, 6);
-  clickCut(g, nonCore[2].id);
-  assert.equal(g.state.qstate[nonCore[2].id], 'keep', 'the floor, not the core rule, must refuse this cut');
-  assert.equal(g.keptQuestions().length, 6);
+  assert.equal(g.instrumentFloor(), 1);
+  for (const q of nonCore.slice(0, -1)) clickCut(g, q.id);
+  assert.equal(g.keptQuestions().length, 1);
+  const last = nonCore.at(-1);
+  assert.equal(g.applyCut(last.id), 'floor');
   g.renderQuestions();
-  const tag = element('qGrid').innerHTML.match(new RegExp(`<button[^>]*data-q="${nonCore[2].id}"[^>]*data-act="cut"[^>]*>`))[0];
+  const tag = element('qGrid').innerHTML.match(new RegExp(`<button[^>]*data-q="${last.id}"[^>]*data-act="cut"[^>]*>`))[0];
   assert.match(tag, /disabled/);
-  assert.match(tag, /aria-label="Cut unavailable: Minimum instrument reached/);
+  assert.match(tag, /aria-label="Cut unavailable: Keep at least one question/);
 });
 
-test('quick challenge floor is its core count: extras cut down to the BRD set and no further', () => {
+test('the one-question floor allows Quick Challenge BRD and extra cuts', () => {
   const { context: g, element } = game();
-  /* A non-mandatory twist, so every extra's cut is judged by the
-     floor alone, exactly as this test intends. */
-  startQCWithVariant(g, 0, 1);
+  startQCWithVariant(g, 0, 0);
   assert.equal(g.activeQuestions().length, 6);
-  assert.equal(g.instrumentFloor(), 3);
-  /* Core (BRD) cards refuse with reason "core" through the action path. */
-  for (const q of g.activeQuestions().filter(q => q.core)) {
-    assert.equal(g.applyCut(q.id), 'core');
+  assert.equal(g.instrumentFloor(), 1);
+  const last = g.activeQuestions()[0];
+  for (const q of g.activeQuestions().filter(q => q.id !== last.id)) {
     clickCut(g, q.id);
-    assert.equal(g.state.qstate[q.id], 'keep', `BRD Q${q.id} must not be cut`);
+    assert.equal(g.state.qstate[q.id], 'cut');
   }
-  /* Extras cut freely until only the core set remains. */
-  const extras = g.activeQuestions().filter(q => !q.core);
-  for (const q of extras) {
-    clickCut(g, q.id);
-    assert.equal(g.state.qstate[q.id], 'cut', `extra Q${q.id} must be cuttable`);
-  }
-  assert.equal(g.keptQuestions().length, 3);
-  assert.ok(g.keptQuestions().every(q => q.core));
-  /* The floor note states the challenge's actual minimum. */
+  assert.equal(g.keptQuestions().length, 1);
+  assert.equal(g.applyCut(last.id), 'floor');
   g.renderQuestions();
-  assert.match(element('qFloorNote').innerHTML, /MINIMUM IS 3 \(THE THREE BRD CARDS\)/);
-  /* The floor branch itself: swap one kept card synthetically (legal
-     play cannot cut a core card) so a non-core card is kept at the
-     floor; its cut must be refused with reason "floor". */
-  const core0 = g.activeQuestions().find(q => q.core);
-  g.state.qstate[core0.id] = 'cut';
-  g.state.qstate[extras[0].id] = 'keep';
-  assert.equal(g.keptQuestions().length, 3);
-  assert.equal(g.applyCut(extras[0].id), 'floor');
-  assert.equal(g.state.qstate[extras[0].id], 'keep');
-  /* Campaign behavior is untouched: leaving restores a Level 1
-     instrument whose floor is still six. */
+  assert.match(element('qFloorNote').innerHTML, /MINIMUM IS 1/);
   g.leaveQuickChallenge();
-  assert.equal(g.instrumentFloor(), 6);
+  assert.equal(g.instrumentFloor(), 1);
 });
 
 test('Quick Challenge restores a previously prepared campaign attempt chain', () => {
@@ -642,13 +812,13 @@ test('Quick Challenge restores a previously prepared campaign attempt chain', ()
   assert.equal(g.budgetMath().total, cost);
 });
 
-test('Level 1 default still misses the target with two completions from forty sends', () => {
+test('Level 1 default still misses the response benchmark for the full audience', () => {
   const { context: g } = game();
   g.selectLevel(1, false);
   const run = g.buildRun();
   const count = g.tally(run);
-  assert.equal(count.sent, 40);
-  assert.equal(count.completed, 2);
+  assert.equal(count.sent, g.state.seg.n);
+  assert.ok(count.completed / count.sent < g.curLevel().target);
   assert.equal(JSON.stringify(g.buildRun()), JSON.stringify(run));
 });
 
@@ -917,13 +1087,14 @@ test('goodwill ledger identifies report-back rewards and stakeholder penalties',
 
 for (let level = 1; level <= 6; level++) {
   test(`Level ${level} is winnable from UI-legal recorded setups within the initial budget`, () => {
-    const { context: g, element } = game();
+    const { context: g, element, timers } = game();
     const setups = winningSetups.filter(setup => setup.level === level);
     assert.ok(setups.length >= LEGAL_WINNER_MINIMUMS[level],
       `Level ${level} corpus supplies ${setups.length} legal winners, expected at least ${LEGAL_WINNER_MINIMUMS[level]}`);
     assert.equal(new Set(setups.map(setup => setup.seed)).size, setups.length);
     assert.ok(setups.some(setup => setup.seed === 'fixed'));
     for (const setup of setups) {
+      timers.length = 0;
       const label = `Level ${level}, instrument ${setup.seed}`;
       g.state.audiencePortfolio = {};
       g.state.campaignWon = {};
@@ -941,9 +1112,8 @@ for (let level = 1; level <= 6; level++) {
       g.state.invite = g.INVITES.find(invite => invite.id === setup.invite);
       g.state.abInvite = g.INVITES.find(invite => invite.id !== setup.invite).id;
       g.state.reminders = setup.reminders; g.state.escapes = setup.escapes;
-      /* Corpus legality: every core question is kept, so no recorded
-         setup can require a cut the UI would refuse. */
-      assert.ok(g.activeQuestions().every(q => !q.core || setup.kept.includes(q.id)), label);
+      assert.ok(setup.kept.length + setup.added.length >= 1, label);
+      assert.ok(setup.repaired.every(id => setup.kept.includes(id) || setup.added.includes(id)), label);
       for (const q of g.addBankQuestions()) {
         g.state.added[q.id] = setup.added.includes(q.id);
       }
@@ -956,7 +1126,8 @@ for (let level = 1; level <= 6; level++) {
       for (const q of g.activeQuestions()) {
         if (!setup.kept.includes(q.id)) clickCut(g, q.id);
       }
-      assert.ok(g.activeQuestions().every(q => !q.core || g.state.qstate[q.id] !== 'cut'), label);
+      assert.deepEqual(Array.from(g.activeQuestions().filter(q => g.state.qstate[q.id] !== 'cut'), q => q.id).sort((a, b) => a - b),
+        [...setup.kept].sort((a, b) => a - b), label);
       assert.ok(g.keptQuestions().length >= g.instrumentFloor(), label);
       assert.ok(setup.kept.every(id => g.activeQuestions().some(q => q.id === id)), label);
       assert.ok(setup.added.every(id => g.addBankQuestions().some(q => q.id === id)), label);
@@ -967,6 +1138,8 @@ for (let level = 1; level <= 6; level++) {
       assert.equal(g.state.lastRound.evidence.won, true, label);
       assert.ok(g.state.lastRound.evidence.checks.every(check => check.met), label);
       assert.equal(g.state.lastRound.rate, setup.rate, label);
+      assert.equal(g.tally(g.runData).sent, setup.sent, label);
+      assert.equal(g.tally(g.runData).completed, setup.completed, label);
       assert.equal(g.state.lastRound.quality, setup.quality, label);
       assert.equal(g.state.lastRound.insight, setup.insight, label);
       assert.equal(g.state.lastRound.evidence.usableN, setup.usableN, label);
@@ -998,15 +1171,44 @@ function evidenceScenario(level = 1) {
 }
 
 function evidenceRun(g, personas, flags = {}) {
+  const block = g.state.seg.n / 40;
+  const respondents = Array.from({ length: g.state.seg.n }, (_, i) => {
+    const template = Math.floor(i / block);
+    const finished = template < personas.length;
+    const spawnAt = 400 + i / g.state.seg.n * 13000;
+    const person = {
+      i, persona: personas[template] || 'end', lang: 'en', abGroup: i % 2 ? 'B' : 'A', spawnAt,
+      fate: finished ? 'finish' : 'noopen', accountId: `SIM-ACCOUNT-${i}`, ...flags[template]
+    };
+    person.events = [{ type: 'gate', gate: 'delivered', t: spawnAt + 650 }];
+    if (finished) {
+      person.events.push({ type: 'gate', gate: 'opened', t: spawnAt + 1000 },
+        { type: 'gate', gate: 'started', t: spawnAt + 2000 }, { type: 'finish', t: spawnAt + 5000 });
+      if (person.guessed) person.events.push({ type: 'guess', qid: g.keptQuestions()[0].id, t: spawnAt + 3000 });
+    } else person.events.push({ type: 'drop', cause: 'noopen', t: spawnAt + 1100 });
+    return person;
+  });
   return {
-    scale: g.state.seg.n / 40, kept: g.keptQuestions(), gm: { ending: 72, trips: false },
-    sprites: Array.from({ length: 40 }, (_, i) => ({
-      i, persona: personas[i] || 'end', lang: 'en', abGroup: i % 2 ? 'B' : 'A',
-      fate: i < personas.length ? 'finish' : 'noopen', events: [],
-      accountId: `SIM-ACCOUNT-${i}`, ...flags[i]
-    }))
+    respondents, sprites: [], kept: g.keptQuestions(), gm: { ending: 72, trips: false }
   };
 }
+
+test('missing BRD coverage penalizes quality and Insight after a permitted cut', () => {
+  const { context: complete } = evidenceScenario();
+  complete.runData = evidenceRun(complete, ['tech', 'end', 'itdm']);
+  complete.showReport();
+  const { context: cut } = evidenceScenario();
+  const required = cut.keptQuestions().filter(q => q.topic === 'renewal risk');
+  assert.ok(required.length > 0);
+  for (const q of required) clickCut(cut, q.id);
+  assert.ok(required.every(q => cut.state.qstate[q.id] === 'cut'));
+  cut.runData = evidenceRun(cut, ['tech', 'end', 'itdm']);
+  cut.showReport();
+  assert.equal(complete.state.lastRound.quality, 100);
+  assert.equal(cut.state.lastRound.quality, 90);
+  assert.ok(cut.state.lastRound.insight < complete.state.lastRound.insight);
+  assert.equal(cut.state.lastRound.evidence.insight.topics.find(topic => topic.topic === 'renewal risk').status, 'LOST');
+});
 
 test('campaign can win below the response benchmark with sufficient usable evidence', () => {
   const { context: g, element } = evidenceScenario();
@@ -1051,13 +1253,13 @@ test('sample, quality, retention, and matching thresholds are inclusive and inde
   evidence = g.evaluateEvidence(run, g.tally(run), 100);
   assert.equal(evidence.retained, 0.6);
   assert.equal(evidence.won, true);
-  run.sprites[2].qDup = true;
+  run.respondents[2].qDup = true;
   assert.equal(g.evaluateEvidence(run, g.tally(run), 100).checks.find(check => check.id === 'integrity').met, false);
   run = evidenceRun(g, ['tech', 'end', 'itdm', 'tech', 'end'], { 4: { accountId: null } });
   evidence = g.evaluateEvidence(run, g.tally(run), 100);
   assert.equal(evidence.associated, 0.8);
   assert.equal(evidence.won, true);
-  run.sprites[3].accountId = null;
+  run.respondents[3].accountId = null;
   assert.equal(g.evaluateEvidence(run, g.tally(run), 100).checks.find(check => check.id === 'fitness').met, false);
 });
 
@@ -1069,8 +1271,8 @@ test('cleaning removes overlapping flags once and never gives rejected roles Ins
   });
   const counts = g.tally(run);
   const evidence = g.evaluateEvidence(run, counts, 100);
-  assert.equal(evidence.cleaned, 2);
-  assert.equal(Object.values(evidence.removed).reduce((sum, n) => sum + n, 0), 5);
+  assert.equal(evidence.cleaned, 500);
+  assert.equal(Object.values(evidence.removed).reduce((sum, n) => sum + n, 0), 1250);
   assert.ok(evidence.insight.score < g.computeInsight(counts, run).score);
   assert.ok(evidence.insight.topics.some(topic => /Missing persona/.test(topic.reason)));
   assert.equal(JSON.stringify(g.evaluateEvidence(run, counts, 100)), JSON.stringify(evidence));
@@ -1223,10 +1425,8 @@ test('bounce-backs reconcile with the funnel totals for skip, full, and partial 
     const c = g.tally(g.runData);
     const bb = g.runData.bounceBacks;
     assert.ok(bb, `${label}: the record is stored on the run`);
-    /* Same tally counts, same scale, same rounding points as the funnel
-       paragraph the report prints: the section can never disagree with it. */
-    assert.equal(bb.total, Math.round((c.bouncedHard + c.bouncedSoft) * g.runData.scale), label);
-    assert.equal(bb.hard, Math.round(c.bouncedHard * g.runData.scale), label);
+    assert.equal(bb.total, c.bouncedHard + c.bouncedSoft, label);
+    assert.equal(bb.hard, c.bouncedHard, label);
     assert.equal(bb.hard + bb.soft, bb.total, `${label}: the split sums to the total`);
     assert.equal(bb.causes.catchall + bb.causes.never + bb.causes.partial, bb.total, `${label}: causes sum to the total`);
     assert.equal(bb.sample.length + bb.more, bb.total, `${label}: sample plus remainder is exact`);
@@ -1304,19 +1504,10 @@ test('bounce-back sample is deterministic for the same run configuration', () =>
 test('a run with no bounces renders the clean bounce-backs state', () => {
   const { context: g, element } = game();
   g.selectLevel(1, false);
-  g.state.seg = g.SEGMENTS.find(s => s.id === 'fresh');
+  g.state.seg = { ...g.SEGMENTS.find(s => s.id === 'fresh'), n: 1, invalidPct: 0 };
   g.state.validation = 'full';
-  let found = false;
-  for (const invite of g.INVITES) {
-    for (const reminders of [0, 1, 2]) {
-      g.state.invite = invite; g.state.reminders = reminders;
-      g.startRun(); g.showReport();
-      const c = g.tally(g.runData);
-      if (c.bouncedHard + c.bouncedSoft === 0) { found = true; break; }
-    }
-    if (found) break;
-  }
-  assert.ok(found, 'a zero-bounce configuration is reachable on Fresh with full validation');
+  g.startRun(); g.showReport();
+  assert.equal(g.tally(g.runData).sent, 1);
   assert.equal(g.runData.bounceBacks.total, 0);
   assert.equal(g.runData.bounceBacks.sample.length, 0);
   assert.match(element('report').innerHTML, /<b>No bounce-backs\.<\/b> Every address accepted the mail this round\./);
@@ -1359,11 +1550,9 @@ test('reminder wave beats land on the first recovered open of each wave', () => 
   const pm = g.pileModel(g.runData);
   assert.equal(pm.waves.length, 2);
   for (const w of pm.waves) {
-    /* Independent recount straight off the raw sprite events: a wave's
-       recovered opens are the sprites buildRun tagged via that wave
-       whose OPENED gate event survived into the final event list. */
+    /* Recount individual records, not representative groups. */
     const opens = [];
-    g.runData.sprites.forEach(sp => {
+    g.runData.respondents.forEach(sp => {
       if (sp.via !== 'r' + w.wave) return;
       sp.events.forEach(e => { if (e.type === 'gate' && e.gate === 'opened') opens.push(e.t); });
     });
@@ -1376,11 +1565,7 @@ test('reminder wave beats land on the first recovered open of each wave', () => 
   assert.ok(pm.waves[0].at < pm.waves[1].at, 'wave 1 lands before wave 2');
 });
 
-test('reminder presentation leaves run tallies bit-identical to the pre-change engine', () => {
-  /* Tallies pinned from the engine at HEAD 787658a, before the piles
-     and reminder-presentation change. buildRun, tally, and every
-     scoring input are presentation-untouched, so any drift here means
-     the display work leaked into the simulation. */
+test('reminder presentation cannot mutate full-population statistics', () => {
   const pinned = [
     {
       name: 'blast/skip/rem2/generic',
@@ -1388,21 +1573,18 @@ test('reminder presentation leaves run tallies bit-identical to the pre-change e
         g.state.seg = g.SEGMENTS.find(s => s.id === 'blast');
         g.state.validation = 'skip'; g.state.reminders = 2;
         g.state.invite = g.INVITES.find(i => i.id === 'generic');
-      },
-      expect: { sent: 31, delivered: 24, bouncedHard: 4, bouncedSoft: 1, opened: 9, started: 7, completed: 0 }
+      }
     },
     {
       name: 'stale/partial/rem2/escapes',
       setup(g) {
         g.state.seg = g.SEGMENTS.find(s => s.id === 'stale');
         g.state.validation = 'partial'; g.state.reminders = 2; g.state.escapes = true;
-      },
-      expect: { sent: 40, delivered: 37, bouncedHard: 2, bouncedSoft: 1, opened: 26, started: 22, completed: 0 }
+      }
     },
     {
       name: 'fresh/full/rem1/default-invite',
-      setup(g) { g.state.validation = 'full'; g.state.reminders = 1; },
-      expect: { sent: 40, delivered: 39, bouncedHard: 1, bouncedSoft: 0, opened: 24, started: 22, completed: 7 }
+      setup(g) { g.state.validation = 'full'; g.state.reminders = 1; }
     }
   ];
   for (const pin of pinned) {
@@ -1410,10 +1592,11 @@ test('reminder presentation leaves run tallies bit-identical to the pre-change e
     g.selectLevel(1, false);
     pin.setup(g);
     g.startRun();
-    const c = g.tally(g.runData);
-    for (const key of Object.keys(pin.expect)) {
-      assert.equal(c[key], pin.expect[key], `${pin.name}: tally.${key} must not drift`);
-    }
+    const before = JSON.stringify(g.tally(g.runData));
+    g.pileModel(g.runData);
+    g.setupStage(g.runData);
+    g.renderPopulationProgress(g.runData, Infinity);
+    assert.equal(JSON.stringify(g.tally(g.runData)), before, pin.name);
   }
 });
 
@@ -1519,7 +1702,7 @@ test('report prints the unopened count from the same tally the piles use', () =>
   g.state.validation = 'skip';
   g.startRun(); g.showReport();
   const c = g.tally(g.runData);
-  const unopened = Math.round((c.delivered - c.opened) * g.runData.scale);
+  const unopened = c.delivered - c.opened;
   assert.ok(unopened > 0, 'this configuration leaves mail unopened');
   assert.ok(element('report').innerHTML.includes(`UNOPENED · ${g.fmt(unopened)}`),
     'the deliverability card prints the tally unopened count');
@@ -1667,7 +1850,7 @@ test('LIST REALITY: leaving the extras unresolved still loses the final verdict'
   assert.match(html, /Extras resolved <b>0 \/ 3<\/b>/);
 });
 
-test('THE LATE QUESTION: uncuttable, carried or repaired into a genuine second wave', () => {
+test('THE LATE QUESTION: carried or repaired into a genuine second wave', () => {
   const { context: g, element } = game();
   const seed = startQCWithComp(g, 0, 0, 'late');
   const comp = g.state.quickChallenge.comp;
@@ -1683,10 +1866,6 @@ test('THE LATE QUESTION: uncuttable, carried or repaired into a genuine second w
   assert.match(element('report').innerHTML, /COMPLICATION · ONE MORE QUESTION, NON-NEGOTIABLE/);
   assert.equal(g.acceptQuickComplication(), true);
   assert.equal(g.state.quickChallenge.lateQid, comp.qid);
-  /* The action path refuses its cut, like a required card. */
-  assert.equal(g.applyCut(comp.qid), 'late');
-  clickCut(g, comp.qid);
-  assert.equal(g.state.qstate[comp.qid], 'keep');
   g.renderQuestions();
   assert.match(element('qGrid').innerHTML, /LATE · REQUIRED/);
   /* Resolve the wave 1 miss; this seed's late card (Q5, BEYOND
@@ -1705,6 +1884,21 @@ test('THE LATE QUESTION: uncuttable, carried or repaired into a genuine second w
   assert.ok(seed);
 });
 
+test('a late question can be cut without satisfying its study requirement', () => {
+  const { context: g, element } = game();
+  startQCWithComp(g, 0, 0, 'late');
+  applyQuickLine(g, 0, 'intended');
+  g.startRun(); g.showReport();
+  assert.equal(g.acceptQuickComplication(), true);
+  const lateId = g.state.quickChallenge.lateQid;
+  clickCut(g, lateId);
+  assert.equal(g.state.qstate[lateId], 'cut');
+  g.startRun(); g.showReport();
+  assert.match(element('report').innerHTML, /TRY ANOTHER REPAIR · FINAL/);
+  assert.match(element('report').innerHTML, /Cut before wave 2/);
+  assert.doesNotMatch(element('report').innerHTML, /It went out as written/);
+});
+
 test('THE LATE QUESTION: carrying it broken past the audit bar flips a win, repairing it holds', () => {
   /* Risk path: wave 1 wins under QC3's audit twist (quality 95+). */
   const { context: g, element } = game();
@@ -1714,7 +1908,7 @@ test('THE LATE QUESTION: carrying it broken past the audit bar flips a win, repa
   g.startRun();
   g.showReport();
   assert.match(element('report').innerHTML, /QUICK CHALLENGE · WON/);
-  assert.equal(g.state.quickChallenge.wave1.quality, 100);
+  assert.ok(g.state.quickChallenge.wave1.quality >= g.quickQualityGate());
   assert.equal(g.acceptQuickComplication(), true);
   /* Carry the late card as written: its defect symptoms land in wave
      2's quality, under the audit bar, and the twist rules NOT MET. */
@@ -1813,7 +2007,7 @@ test('wave 2 locks the wave 1 list and never leaks into the campaign', () => {
   g.selectLevel(1, false);
   assert.equal(g.quickVariant(), null);
   assert.equal(g.quickQualityGate(), 60);
-  assert.equal(g.instrumentFloor(), 6);
+  assert.equal(g.instrumentFloor(), 1);
 });
 
 /* ---- Manager mood machine: presentation only. The machine reads
@@ -1993,12 +2187,15 @@ test('mood parameters come off real runs: needed count and finish window', () =>
   g.state.invite = g.INVITES.find(i => i.id === 'generic');
   g.startRun();
   const bp = g.moodParamsForRun(g.runData);
-  assert.equal(bp.sent, 31);
-  assert.equal(bp.needed, 4, 'floor(0.12 x 31) + 1 finishes beat the Level 1 target');
-  assert.equal(bp.firstFinishT, g.RUN_MS, 'the pinned blast run finishes nobody: the window collapses to RUN_MS');
-  assert.equal(bp.lastFinishT, g.RUN_MS);
+  const count = g.tally(g.runData);
+  assert.equal(bp.sent, count.sent);
+  assert.ok(bp.sent > 0 && bp.sent < g.state.seg.n, 'the breaker stops part of the population');
+  assert.equal(bp.needed, Math.floor(g.curLevel().target * count.sent) + 1);
+  const blastTimes = g.runData.respondents.flatMap(person => person.events.filter(event => event.type === 'finish').map(event => event.t));
+  assert.equal(bp.firstFinishT, blastTimes.length ? Math.min(...blastTimes) : g.RUN_MS);
+  assert.equal(bp.lastFinishT, blastTimes.length ? Math.max(...blastTimes) : g.RUN_MS);
   assert.ok(g.moodMachine, 'setupStage armed a mood machine for the run');
-  assert.equal(g.moodMachine.params.needed, 4);
+  assert.equal(g.moodMachine.params.needed, bp.needed);
   assert.equal(element('mgrRun').innerHTML, g.pixelHTML(g.MGR_NORMAL, 4 / 3).html, 'the run figure starts NORMAL (hi-res maps render at a third of the legacy cell size)');
   assert.equal(element('mgrRun').className, 'pixelbox', 'no shake class at rest');
 
@@ -2008,11 +2205,11 @@ test('mood parameters come off real runs: needed count and finish window', () =>
   g2.state.validation = 'full'; g2.state.reminders = 1;
   g2.startRun();
   const fp = g2.moodParamsForRun(g2.runData);
-  assert.equal(fp.sent, 40);
-  assert.equal(fp.needed, 5, 'floor(0.12 x 40) + 1');
+  assert.equal(fp.sent, g2.state.seg.n);
+  assert.equal(fp.needed, Math.floor(g2.curLevel().target * fp.sent) + 1);
   const times = [];
-  g2.runData.sprites.forEach(sp => sp.events.forEach(e => { if (e.type === 'finish') times.push(e.t); }));
-  assert.equal(times.length, 7, 'the pinned fresh run finishes seven');
+  g2.runData.respondents.forEach(sp => sp.events.forEach(e => { if (e.type === 'finish') times.push(e.t); }));
+  assert.equal(times.length, g2.tally(g2.runData).completed);
   assert.equal(fp.firstFinishT, Math.min.apply(null, times));
   assert.equal(fp.lastFinishT, Math.max.apply(null, times));
 });

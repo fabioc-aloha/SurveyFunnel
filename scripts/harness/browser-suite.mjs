@@ -414,12 +414,8 @@ async function runViewport(browser, gameUrl, viewport, options) {
     await clickAndWait(page, '[data-rem="0"]', 200);
     await assertSelected(run, '[data-rem="0"]', 'zero reminders');
 
-    // The fixture line is the post-cut-floor legal winner recorded in
-    // docs/development.md (fixed winning cost 58 of 120): Q3 is CORE, so
-    // it is repaired with its class-correct ANCHOR fix instead of cut,
-    // and the instrument keeps exactly the six core questions. The
-    // pre-floor fixture cut Q3 and kept five; the cut floor made that
-    // line unreachable by design, so the harness follows the legal line.
+    // The recorded 58-credit strategy preserves core coverage and
+    // repairs Q3 rather than accepting its quality/Insight loss.
     await clickAndWait(page, '#qGrid .qbtn[data-q="3"][data-act="simplify"]', 300);
     const cutIds = [5, 7, 8, 10, 11, 12];
     for (const id of cutIds) {
@@ -446,6 +442,28 @@ async function runViewport(browser, gameUrl, viewport, options) {
     await run.check('launch opens run screen', await isVisible(page, '#runStage'), { selector: '#runStage' });
     await waitCountdownDone(page);
     await run.check('launch countdown exposes the run controls', true, { selector: '#countdownOverlay' });
+    const population = await page.evaluate(() => {
+      const number = id => Number(document.getElementById(id).textContent.replaceAll(',', ''));
+      const sent = runData.respondents.filter(person => person.fate !== 'notsent' && person.spawnAt <= virtualT).length;
+      const completed = runData.respondents.filter(person => person.events.some(event =>
+        event.type === 'finish' && event.t <= virtualT)).length;
+      return {
+        recipients: runData.respondents.length,
+        groups: runData.sprites.length,
+        groupedRecipients: runData.sprites.reduce((total, group) => total + group.count, 0),
+        badges: document.querySelectorAll('#track .groupcount').length,
+        sent, completed, displayedSent: number('sentCount'), displayedCompleted: number('compCount'),
+        summary: document.getElementById('animationSummary').textContent
+      };
+    });
+    await run.check('full recipient population is independent of the animation groups',
+      population.recipients === 10000 && population.groups > 40 &&
+      population.groups < population.recipients && population.groupedRecipients === population.recipients, population);
+    await run.check('live counters equal individual recipient events',
+      population.displayedSent === population.sent && population.displayedCompleted === population.completed, population);
+    await run.check('animation explains weighted groups instead of forty-person proxies',
+      population.badges > 0 && population.summary.includes('10,000 simulated recipients') &&
+      population.summary.includes('group size'), population);
     await nameplateCheck(run, '#runStage', 'run');
     await checkOverflow(run, 'run screen');
 
@@ -460,12 +478,17 @@ async function runViewport(browser, gameUrl, viewport, options) {
       return {
         gradeText: gradeBox ? (gradeBox.textContent || '').trim().replace(/\s+/g, ' ') : '',
         verdict: gradeBox?.querySelector('.w')?.textContent.trim() || '',
-        scoreBoxes
+        scoreBoxes,
+        completed: runData.respondents.filter(person => person.fate === 'finish' || person.fate === 'guessfinish').length,
+        displayedCompleted: Number(document.getElementById('compCount').textContent.replaceAll(',', '')),
+        legacyUnits: /sent sprites|40 sprites|people per sprite/.test(document.getElementById('report').textContent)
       };
     });
     await run.check('report renders with a grade and verdict element',
       Boolean(report.gradeText && report.verdict), report);
     await run.check('scripted Level 1 playthrough wins', report.verdict === 'ROUND WON', report);
+    await run.check('report retains exact recipient totals without proxy units',
+      report.completed === report.displayedCompleted && !report.legacyUnits, report);
     await nameplateCheck(run, '#report', 'report');
     await checkOverflow(run, 'report screen');
 
@@ -600,10 +623,14 @@ async function observeRun(page, maxMs = 50000) {
       return {
         gates,
         cols,
-        bounceCount: Number(document.querySelector('#bounceCount')?.textContent || 0),
-        unopenedCount: Number(document.querySelector('#unopenedCount')?.textContent || 0),
+        bounceCount: Number((document.querySelector('#bounceCount')?.textContent || '0').replaceAll(',', '')),
+        unopenedCount: Number((document.querySelector('#unopenedCount')?.textContent || '0').replaceAll(',', '')),
         bounceGlyphs: document.querySelectorAll('#bounceStack .pile-env').length,
         piled: document.querySelectorAll('#track .sprite.piled').length,
+        piledRecipients: [...document.querySelectorAll('#track .sprite.piled')].reduce((total, group) => {
+          const badge = group.querySelector('.groupcount');
+          return total + (badge ? Number(badge.textContent.replace(/[^\d]/g, '')) : NaN);
+        }, 0),
         mgrClass: document.querySelector('#mgrRun')?.className || '',
         reportVisible: Boolean(report) && getComputedStyle(report).display !== 'none' &&
           report.querySelector('.reportcard') !== null
@@ -637,14 +664,14 @@ async function observeRun(page, maxMs = 50000) {
 // challenge 1 it draws the LIST REALITY complication, and under the
 // intended instrument line (the three BRD cards repaired, the extras
 // resolved as curated) the wave-2 run against the true 9%-invalid
-// list, mailed raw with no re-validation bought, bounces 5 of the 40
-// sprites. Buying a validation tier instead would shrink the
-// effective invalid rate to a sub-1% expectation and zero out the
-// deterministic draw, so the raw send is what makes this journey a
-// stable high-bounce run; the complication's own copy offers exactly
+// list, mailed raw with no re-validation bought, produces individual
+// bounces and weighted visual cohorts. Buying a validation tier shrinks the
+// effective invalid rate to a sub-1% expectation, so the raw send
+// is what makes this journey a stable high-bounce run; the
+// complication's own copy offers exactly
 // that choice ("mail the wave raw and let the bounces land where they
 // land"). The live journey exercises the pile strip, the settled-
-// figure accumulation, the mood machine, and the final report's
+// figure accumulation and the final report's
 // wave-2 bounce accounting in one deterministic pass.
 async function runQuickBounceScenario(browser, gameUrl, viewport, options) {
   const run = newScenarioRun(viewport, options);
@@ -720,12 +747,11 @@ async function runQuickBounceScenario(browser, gameUrl, viewport, options) {
     await run.check('bounced figures pile up in the strip during the high-bounce run',
       observed.maxPiled >= 4, { maxPiled: observed.maxPiled, samples: observed.samples.length });
     const late = observed.late || {};
-    await run.check('settled figures persist late in the run and match the BOUNCED count and fan',
-      late.piled === Math.min(12, late.bounceCount) &&
+    await run.check('settled cohort figures persist while counts and fan describe recipients',
+      late.piled > 0 && late.piled <= 12 && late.piledRecipients > 0 &&
+      late.piledRecipients <= late.bounceCount &&
       late.bounceGlyphs === Math.min(12, late.bounceCount) && late.bounceCount >= 4,
-      { piled: late.piled, bounceCount: late.bounceCount, bounceGlyphs: late.bounceGlyphs });
-    await run.check('manager figure turns agitated during the high-bounce run',
-      observed.sawAgitated, { samples: observed.samples.length });
+      { piled: late.piled, piledRecipients: late.piledRecipients, bounceCount: late.bounceCount, bounceGlyphs: late.bounceGlyphs });
     await run.check('wave 2 run reaches the final report', observed.reportSeen, {});
     if (observed.reportSeen) {
       const finalText = await page.evaluate(() =>
@@ -752,11 +778,13 @@ async function runQuickBounceScenario(browser, gameUrl, viewport, options) {
 
 // Scenario: the campaign report's BOUNCE-BACKS section on a run that
 // really bounces. Level 1's fixed instrument is deterministic (seed
-// A001). Selecting the Stale segment, the Generic Blast invitation,
+// A001). Selecting Executive Blast, the Generic Blast invitation,
 // zero reminders, and no validation leaves the instrument exactly as
 // dealt; replaying that configuration through the game's own engine
-// gives 6 bounced sprites of 40 (2 hard, 4 soft), so the report must
-// name a non-empty BOUNCE-BACKS sample. The campaign report is the
+// produces individual bounced records, so the report must name a
+// non-empty BOUNCE-BACKS sample. Its 16%-invalid list also exercises
+// agitation above the 10% recipient threshold, unlike the 9% quick
+// challenge list. The campaign report is the
 // surface that carries this section; the Quick Challenge final report
 // is a two-wave summary and does not.
 async function runCampaignBounceScenario(browser, gameUrl, viewport, options) {
@@ -769,8 +797,8 @@ async function runCampaignBounceScenario(browser, gameUrl, viewport, options) {
     await waitForVisible(page, '#setup');
     await page.waitForSelector('#qGrid .qcard', { visible: true, timeout: 15000 });
 
-    await clickAndWait(page, '[data-seg="stale"]', 200);
-    await assertSelected(run, '[data-seg="stale"]', 'Stale audience for the bouncing campaign run');
+    await clickAndWait(page, '[data-seg="blast"]', 200);
+    await assertSelected(run, '[data-seg="blast"]', 'Executive Blast audience for the bouncing campaign run');
     await assertSelected(run, '[data-val="skip"]', 'validation skipped for the bouncing campaign run');
     await clickAndWait(page, '[data-inv="generic"]', 200);
     await assertSelected(run, '[data-inv="generic"]', 'Generic Blast invitation for the bouncing campaign run');
@@ -780,7 +808,22 @@ async function runCampaignBounceScenario(browser, gameUrl, viewport, options) {
     await clickAndWait(page, '#launchBtn', 300);
     await waitForVisible(page, '#runStage');
     await waitCountdownDone(page);
-    await clickAndWait(page, '#skipBtn', 600);
+    await clickAndWait(page, '#spd2', 150);
+    const observed = await observeRun(page);
+    const bounceRate = await page.evaluate(() => {
+      const sent = runData.respondents.filter(person => person.fate !== 'notsent').length;
+      const bounced = runData.respondents.filter(person => person.fate === 'bounced').length;
+      return { sent, bounced, threshold: MOOD_BOUNCE_T1, trips: runData.gm.trips };
+    });
+    await run.check('campaign bounce run crosses the recipient-based agitation threshold',
+      !bounceRate.trips && bounceRate.bounced >= bounceRate.sent * bounceRate.threshold, bounceRate);
+    await run.check('manager figure turns agitated during the above-threshold bounce run',
+      observed.sawAgitated, { samples: observed.samples.length, ...bounceRate });
+    await run.check('campaign bounce run reaches the report without skipping', observed.reportSeen);
+    await run.check('live observer parses comma-formatted recipient counts exactly',
+      observed.samples.at(-1)?.bounceCount === bounceRate.bounced &&
+      bounceRate.bounced > 999,
+      { observed: observed.samples.at(-1)?.bounceCount, expected: bounceRate.bounced });
     await waitForVisible(page, '#report');
 
     const bb = await page.evaluate(() => {
@@ -813,11 +856,7 @@ async function runCampaignBounceScenario(browser, gameUrl, viewport, options) {
   return run;
 }
 
-// Scenario: the campaign cut floor. Core questions carry a disabled
-// CUT button and a LOCKED line; cutting the non-core cards one by one
-// must stop at exactly the six core questions, with every remaining
-// CUT disabled, the floor note announcing the locked minimum, and a
-// further click on a locked card changing nothing.
+// Any question can be cut; only the final kept question is protected.
 async function runCutFloorScenario(browser, gameUrl, viewport, options) {
   const run = newScenarioRun(viewport, options);
   try {
@@ -828,18 +867,19 @@ async function runCutFloorScenario(browser, gameUrl, viewport, options) {
     await waitForVisible(page, '#setup');
     await page.waitForSelector('#qGrid .qcard', { visible: true, timeout: 15000 });
 
-    const coreLock = await page.evaluate(() => {
+    const initialCuts = await page.evaluate(() => {
       const coreCut = document.querySelector('#qGrid .qbtn[data-q="3"][data-act="cut"]');
       return {
         coreCutPresent: Boolean(coreCut),
         coreCutDisabled: coreCut ? coreCut.disabled : null,
-        lockLines: [...document.querySelectorAll('#qGrid .cutlock')]
-          .map((el) => (el.textContent || '').trim())
+        enabledCuts: [...document.querySelectorAll('#qGrid .qbtn[data-act="cut"]')]
+          .filter(button => !button.disabled).length,
+        cards: document.querySelectorAll('#qGrid .qcard').length
       };
     });
-    await run.check('core questions render a locked, disabled cut control',
-      coreLock.coreCutPresent && coreLock.coreCutDisabled === true &&
-      coreLock.lockLines.some((text) => text.includes('CORE')), coreLock);
+    await run.check('all questions including core cards can be cut above one kept',
+      initialCuts.coreCutPresent && initialCuts.coreCutDisabled === false &&
+      initialCuts.enabledCuts === initialCuts.cards, initialCuts);
 
     // Cut through the real buttons until none is enabled. A refused
     // cut changes no state; a landed cut animates the card out over
@@ -858,29 +898,58 @@ async function runCutFloorScenario(browser, gameUrl, viewport, options) {
     }
     const floor = await page.evaluate(() => {
       const note = document.querySelector('#qFloorNote');
+      const cut = document.querySelector('#qGrid .qbtn[data-act="cut"]');
       return {
         kept: [...document.querySelectorAll('#qGrid .qcard')]
           .map((card) => Number(card.id.replace('qc', ''))).sort((a, b) => a - b),
         enabledCuts: [...document.querySelectorAll('#qGrid .qbtn[data-act="cut"]')]
           .filter((b) => !b.disabled).length,
         noteClass: note?.className || '',
-        noteText: (note?.textContent || '').replace(/\s+/g, ' ').trim()
+        noteText: (note?.textContent || '').replace(/\s+/g, ' ').trim(),
+        disabled: cut?.disabled,
+        filter: cut ? getComputedStyle(cut).filter : '',
+        opacity: cut ? getComputedStyle(cut).opacity : ''
       };
     });
-    await run.check('cutting stops at the six-question floor with the core kept',
-      JSON.stringify(floor.kept) === JSON.stringify([1, 2, 3, 4, 6, 9]) && floor.enabledCuts === 0,
-      floor);
+    await run.check('cutting stops with exactly one question kept',
+      floor.kept.length === 1 && floor.enabledCuts === 0, floor);
+    await run.check('the last cut button is disabled and gray',
+      floor.disabled && floor.filter === 'grayscale(1)' && Number(floor.opacity) < 1, floor);
     await run.check('floor note announces the locked minimum instrument',
       floor.noteClass.includes('atmin') && floor.noteText.includes('MINIMUM INSTRUMENT REACHED'),
       floor);
 
     await page.evaluate(() => {
-      document.querySelector('#qGrid .qbtn[data-q="3"][data-act="cut"]')?.click();
+      document.querySelector('#qGrid .qbtn[data-act="cut"]').click();
     });
     await new Promise((resolvePromise) => setTimeout(resolvePromise, 500));
     const cardsAfter = await page.evaluate(() => document.querySelectorAll('#qGrid .qcard').length);
     await run.check('a locked cut attempt leaves the instrument unchanged',
       cardsAfter === floor.kept.length, { cardsAfter, cardsAtFloor: floor.kept.length });
+    const restoreId = await page.$eval('[data-restore]', button => Number(button.dataset.restore));
+    await clickAndWait(page, `[data-restore="${restoreId}"]`, 500);
+    const restored = await page.evaluate(() => ({
+      cards: document.querySelectorAll('#qGrid .qcard').length,
+      enabled: [...document.querySelectorAll('#qGrid .qbtn[data-act="cut"]')].filter(button => !button.disabled).length
+    }));
+    await run.check('restoring a question re-enables both cut controls',
+      restored.cards === 2 && restored.enabled === 2, restored);
+    await clickAndWait(page, `#qGrid [data-q="${restoreId}"][data-act="cut"]`, 650);
+    const addId = await page.$eval('[data-add]:not([disabled])', button => Number(button.dataset.add));
+    await clickAndWait(page, `[data-add="${addId}"]`, 500);
+    const added = await page.evaluate(() => ({
+      cards: document.querySelectorAll('#qGrid .qcard').length,
+      enabled: [...document.querySelectorAll('#qGrid .qbtn[data-act="cut"]')].filter(button => !button.disabled).length
+    }));
+    await run.check('adding a bank question re-enables both cut controls',
+      added.cards === 2 && added.enabled === 2, added);
+    await clickAndWait(page, `#qGrid [data-q="${floor.kept[0]}"][data-act="cut"]`, 650);
+    const bankLast = await page.evaluate(() => ({
+      ids: [...document.querySelectorAll('#qGrid .qcard')].map(card => Number(card.id.replace('qc', ''))),
+      disabled: document.querySelector('#qGrid .qbtn[data-act="cut"]')?.disabled
+    }));
+    await run.check('the final bank question is protected just like a dealt question',
+      JSON.stringify(bankLast.ids) === JSON.stringify([addId]) && bankLast.disabled, bankLast);
     await checkNoJourneyErrors(run, 'cut floor scenario');
   } catch (error) {
     await run.record('cut floor scenario completes without a harness exception', false, {

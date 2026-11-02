@@ -32,6 +32,8 @@ read the Drop-off Detective, go again.
 - **Three levers, always on screen.** AUDIENCE (who gets invited),
   INVITATION (wording and click through appeal), QUESTIONNAIRE
   (length, complexity, answerability). Every action belongs to one.
+  Any question may be cut until one remains; the last CUT is gray and
+  disabled. Missing BRD coverage still penalizes results.
 - **Two budgets.** Goodwill, the audience's patience with you, shown
   as a breaker panel. Credits, one pool of 120 per level (150 in
   Level 6), shared across all your attempts and spent on list
@@ -42,8 +44,11 @@ read the Drop-off Detective, go again.
   you win or the money runs out, or NEW GAME for a fresh random
   questionnaire. It sounds like a cabinet too: original chiptune
   BGM and event effects, all synthesized inside the file.
-- **A funnel you can watch.** Up to 40 persona sprites walk SENT,
-  DELIVERED, OPENED, STARTED, FINISH. A breaker trip stops new sends
+- **A funnel you can watch.** Every recipient is simulated individually.
+  Sprites show behavior cohorts labeled with their sizes (`×N`); the
+  number of groups adapts and can exceed 40. All statistics use actual
+  simulation records, not extrapolated animation counts. Cohorts walk
+  SENT, DELIVERED, OPENED, STARTED, FINISH. A breaker trip stops new sends
   and interrupts anyone still in the funnel. Only completions before
   the trip count.
 - **Five independent evidence checks.** Funnel execution, evidence fitness,
@@ -109,10 +114,10 @@ docs/                  Design, play, development, deployment docs
 - Gameplay release `3661c23` passed the
   [production workflow](https://github.com/fabioc-aloha/SurveyFunnel/actions/runs/41366863464)
   and independent live-package verification on 2026-11-01.
-- Local Node and integrated-browser checks are recorded in the
-  [changelog](CHANGELOG.md). The full CLI browser suite remains unverified
-  on this Windows machine because Puppeteer installation was blocked by
-  package-fetch policy.
+- Local full-harness and automated player-acceptance checks passed on
+  2026-11-02 using existing approved browser tooling. The population and
+  cut-rule changes remain unpublished. See the [changelog](CHANGELOG.md)
+  for the tested scope and remaining human checks.
 - A push is not proof of deployment. Check the
   [production workflow](https://github.com/fabioc-aloha/SurveyFunnel/actions/workflows/deploy-production.yml)
   and its live-package verification for the commit being played.

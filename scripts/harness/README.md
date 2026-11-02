@@ -125,13 +125,18 @@ For each viewport it asserts:
   - Zero reminders
   - Repair Q3 with its class-correct ANCHOR fix
   - Cut Q5, Q7, Q8, Q10, Q11, and Q12
-  - Keep Q1, Q2, Q3, Q4, Q6, and Q9, the legal post-cut-floor fixture
-    line (fixed winning cost 58 of 120, as recorded in
+  - Keep Q1, Q2, Q3, Q4, Q6, and Q9, the recorded full-population
+    winning line (fixed winning cost 58 of 120, as recorded in
     `docs/development.md`)
 - Launch is enabled, the launch countdown exposes the run controls,
   **Skip to Report** works, and the report contains a grade box and
   verdict.
 - The scripted playthrough's verdict is `ROUND WON`.
+- The simulation has one record per recipient, with more than 40
+  weighted visual cohorts whose membership sums to the full population.
+  Group-size badges and the animation summary distinguish these units.
+- Live send/completion counters agree with individual event times,
+  and the final report retains exact recipient totals without proxy units.
 - The report contains all five independent evidence checks, each PASS
   for the recorded winner, and the FINISH-to-ACT processing stages.
 - The publication result is ready with a context note disclosing
@@ -149,12 +154,11 @@ are not taken for passing checks.
 
 The feature scenarios run once, at the mobile viewport:
 
-- **Cut floor.** Core questions render a locked, disabled CUT control.
-  Cutting through the real buttons stops at exactly the six core
-  questions of the fixed Level 1 instrument (Q1, Q2, Q3, Q4, Q6, Q9);
-  no CUT button stays enabled, the floor note announces the locked
-  minimum instrument, and clicking a locked CUT afterward changes
-  nothing.
+- **Cut floor.** Every question, including core cards, can be cut until
+  exactly one remains. The final CUT is disabled and grayscale, and a
+  further click changes nothing. Restoring a question or adding one
+  from the bank enables cutting again; a bank question receives the
+  same protection when it becomes the last remaining item.
 - **Quick Challenge pile, mood, and second wave.** The challenge seed
   comes from `randomSeedStr()`, which draws four hex digits from
   `Math.random`; it is the only `Math.random` consumer that affects the
@@ -162,24 +166,27 @@ The feature scenarios run once, at the mobile viewport:
   scenario stubs `Math.random` to a constant 0.375, pinning seed
   `6666`. That seed was selected by replaying the game's own engine
   offline: for challenge 1 it draws the LIST REALITY complication, and
-  under the intended instrument line the wave-2 run against the true
-  9%-invalid list, mailed raw with no re-validation bought, bounces 5
-  of the 40 sprites. The scenario asserts that the pile strip has five
+  the wave-2 run uses the true 9%-invalid list, mailed raw with no
+  re-validation bought. It counts individual bounces, not avatars.
+  The scenario asserts that the pile strip has five
   columns aligned under the funnel step labels (within 3px), that
   settled bounced figures accumulate in the strip (at least 4 visible),
-  that they persist late in the run and match the BOUNCED count and the
-  envelope fan, that the manager figure carries the agitated class
-  during the run, and that the final report reads both waves together
+  that weighted cohort figures persist late in the run while the
+  BOUNCED label counts recipients and the envelope fan stays capped,
+  and that the final report reads both waves together
   and names the raw wave 2 mailing.
-- **Campaign BOUNCE-BACKS.** A separate Level 1 campaign run (Stale
+- **Campaign BOUNCE-BACKS and agitation.** A separate Level 1 campaign run (Executive Blast
   segment, Generic Blast invitation, zero reminders, validation
-  skipped, instrument as dealt; the engine replay of that configuration
-  bounces 6 of 40 sprites) must produce a campaign report whose
+  skipped, instrument as dealt) runs naturally at 2x speed. Its bounced
+  recipient share must exceed the 10% agitation threshold, the manager
+  must become agitated, and the run must produce a campaign report whose
   DELIVERABILITY AND DATA card carries a BOUNCE-BACKS section: a
   bounced total, simulated `.example` addresses, and a sample table
   with more than its header row. The Quick Challenge final report is a
   two-wave summary and does not carry this section; that is why the
-  check lives on the campaign report.
+  check lives on the campaign report. The 9%-invalid Quick Challenge
+  list is below that mood threshold and is not an agitation assertion.
+  Live observers parse comma-formatted recipient counts, not proxy units.
 
 ## Results
 
@@ -260,16 +267,24 @@ browser version will work. If installation is blocked by organizational
 policy, use an approved test environment; do not change package-fetch or
 security policy to make the harness run.
 
-### Verification boundary for the evidence-fitness update
+### Verification history
 
 On 2026-11-01 the Windows build and Node sections passed, but the browser
 section could not import Puppeteer and its external installation was
-refused by package-fetch policy. The extended harness and negative
-controls have not passed on this source in that environment.
+refused by package-fetch policy.
 Integrated-browser checks separately passed the mobile and desktop
 Level 1 journey, evidence scorecard, pipeline, next-instrument history,
-and BRD focus behavior. These are not a passing CLI harness result;
-see the [changelog](../../CHANGELOG.md) for the dated evidence.
+and BRD focus behavior. Those checks were not a passing CLI harness result.
+
+On 2026-11-02 the full local harness passed all three sections, including
+the complete Node suite and the extended browser scenarios. Both negative
+controls also passed. An existing approved Mermaid CLI installation supplied
+Puppeteer 25.12.0, with installed Edge 156.0.4314.58 as the browser.
+No package installation or policy change was required. The initial browser
+run exposed an old 9%-invalid-list agitation expectation and an observer
+that did not parse thousands separators; both harness assumptions were
+corrected before the successful run. See the [changelog](../../CHANGELOG.md)
+for exact totals and additional session-only player-acceptance checks.
 
 ## Negative controls: proving failures are real
 

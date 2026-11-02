@@ -47,8 +47,11 @@ objectives. They do not consume or change campaign audience history.
 
 ## Boundaries and verification
 
-The audience model tracks synthetic cohorts, not individual customers.
-Account identifiers are simulated, and sample volumes are sprite-weighted.
+Each run contains one synthetic record per invited recipient; sample
+volumes count actual records after cleaning and account matching.
+Weighted animation cohorts are display-only and do not scale the results.
+The cross-instrument health model still tracks cohort exposure rather
+than persistent individual customer histories. Account identifiers are simulated.
 Passing does not establish statistical precision, representativeness,
 construct validity, privacy compliance, or research readiness.
 

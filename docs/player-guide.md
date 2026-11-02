@@ -13,13 +13,14 @@ cards with defects, plus three questions the BRD never asked for.
 The Fresh audience, full list preparation, and Honest Ask invitation
 are provided. Repair all three BRD cards and resolve each extra,
 by repair or by cut, within 48 credits, then reach response above
-12%, quality 60+, and Insight 60+. The BRD cards cannot be cut, and
-keeping an unresolved extra leaves the challenge unfinished.
+12%, quality 60+, and Insight 60+. Any question can be cut, but at least
+one must remain. Cutting a BRD card leaves its requirement unmet;
+keeping an unresolved extra also leaves the challenge unfinished.
 
 Each run also draws one **BRD twist** from the run seed, so the same
 six cards stop having one memorized answer. A twist is one of three
 kinds: a stakeholder demand (a named extra becomes required: it
-cannot be cut and only its repair resolves it), a raised bar (a
+must be kept and repaired to satisfy the twist), a raised bar (a
 higher response threshold, or a quality gate of 95+ instead of 60),
 or a time ceiling on the repaired instrument, read from its
 estimated minutes. The challenge banner and the BRD name the twist
@@ -30,8 +31,8 @@ brief, and a retry draws a new one.
 Most runs also draw a **complication** after the first report: the
 list was older than the brief stated (the real invalid rate is 9%,
 and the provided validation does not carry to a second wave), a
-stakeholder adds one required question that cannot be cut (repair
-it, or carry it as written), or the sponsor demands a second push
+stakeholder adds one required question (repair it or carry it as written
+to satisfy the request; cutting it leaves the challenge unfinished), or the sponsor demands a second push
 to the people who never opened (reminder waves at the usual price).
 Accepting sets up a **second wave** on the credits left in the same
 48; the pool never refills, and only wave 2's own actions are
@@ -66,8 +67,11 @@ progress or spends the campaign's credits.
    or cut each question. Watch the estimated
    minutes against each persona's patience. Add escapes (Don't know
    / Not applicable) to allow item nonresponse instead of forced answers.
-5. **LAUNCH.** Countdown, then up to 40 sprites run the funnel:
-   SENT, DELIVERED, OPENED, STARTED, FINISH. A breaker trip stops
+5. **LAUNCH.** Every recipient in the selected audience is simulated.
+   Animated sprites represent groups with similar behavior, each
+   labeled `×N`. There may be more than 40 groups. Counters show
+   individual simulated recipients, not the number of visible sprites.
+   Groups run through SENT, DELIVERED, OPENED, STARTED, FINISH. A breaker trip stops
    new sends and interrupts anyone still in the funnel. Only
    completions before the trip count. Respondent bubbles illustrate
    actual simulated events; they add no penalties or randomness.
@@ -176,6 +180,18 @@ starts after your first click, as browsers require.
 
 ## Question defects and their fixes
 
+Any question may be cut for 1 credit, including core, BRD-required,
+and late-added questions. When only one remains, its CUT button is
+gray and disabled. Restoring a cut question or adding a bank question
+enables cutting again; an empty instrument cannot launch.
+
+Permission to cut is separate from study acceptance. Missing core
+items incur the report's 10-point-per-item quality deduction; losing
+required agenda coverage lowers Insight. Quick Challenges cannot be
+won with missing BRD cards, an unmet mandatory twist, or a cut required
+late question. A shorter questionnaire can therefore perform better
+in the funnel while producing a worse result.
+
 Every defective question has one named defect, and the fix button
 names its in-game repair. Real questionnaire revisions also depend on
 the construct, routing, respondent population, and pretesting.
@@ -262,6 +278,8 @@ verified.
   not an AAPOR response rate; eligibility and full case dispositions
   are not modeled. Campaign response benchmarks are diagnostic;
   Quick Challenges still enforce their specified response thresholds.
+  Displayed percentages use up to three decimals; acceptance checks
+  use the unrounded rate.
 - **Data quality score:** starts at 100. Guesses, speeders, straight
   liners, duplicates, forwarded responses, and missing core
   questions subtract. Escapes used add a small bonus.
@@ -289,15 +307,23 @@ verified.
 | Global Fieldwork | Global | 900 | Technicians and end users, each at least 10% |
 | The Big Quarter | Leadership | 1,500 | Executives and IT decision makers together at least 50% |
 
-Each required role group must contain at least one usable sprite.
-Every sprite represents the audience size divided by 40, so the displayed
-sample is simulated volume, not that many independent observations.
+Each required role group must contain at least one usable respondent.
+The usable sample is the actual number of cleaned, account-linked
+recipient records. Animation cohorts neither inflate this count nor
+determine its size. These are programmed simulation outcomes, not
+observations of real customers.
 Cleaning excludes duplicate, junk, speeder, straight-lined, and guessed
 responses, once each in that order. Forwarded responses have no verified
 invited-account association and are excluded at MATCH. The original quality
 score still diagnoses fieldwork defects; cleaning does not erase their
 penalties. Publication requires all five checks, and the ACT step names
 the corrections needed or the decision the evidence can support.
+
+Guessed-completion and duplicate deductions use their rates among
+invited recipients, not raw population-sized counts. Their game weights
+are 160 and 120 respectively, rounded to quality points. Other response
+flags use shares of completions. Missing core questions still cost
+10 quality points each; changing animation density changes no score.
 
 Data quality and Insight Value are game indices, not validated research
 metrics. Neither a high rate nor a winning score establishes construct

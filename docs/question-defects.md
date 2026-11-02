@@ -24,8 +24,10 @@ Drop-off Detective diagnostics, and its fix buttons.
 | 11 | Wordy stem | A paragraph where a sentence would do | Reading fatigue, satisficing | SIMPLIFY (2) |
 
 Some questions are clean controls. They still impose respondent burden.
-Core questions cannot be cut through the controls, and launches require
-the minimum instrument size. Non-core cuts can lose agenda coverage.
+Any question can be cut, but one must remain; the last CUT button is
+gray and disabled. Cutting a core item incurs a missing-core quality
+deduction, and losing agenda coverage reduces Insight. Required BRD
+questions must still be kept and repaired where required to win.
 Low-value items are a separate gameplay tier, not a claim that their
 wording is methodologically sound.
 

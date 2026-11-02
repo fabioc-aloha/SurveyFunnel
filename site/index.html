@@ -143,12 +143,14 @@
   .qbtn.wide{ flex-grow:1.8; }
   .qbtn .qlabel{ min-width:0; }
   .qbtn .qprice{ font-size:8px; line-height:1.2; opacity:.78; }
-  .cutlock{ margin-top:6px; font-family:"Press Start 2P", monospace; font-size:8px; line-height:1.5; color:var(--teal); text-align:center; }
+  .qbtn[data-act="cut"]:disabled{ filter:grayscale(1); }
   .floornote{ margin:0 0 10px; padding:8px 10px; border:2px dashed var(--line); border-radius:6px; font-size:13px; color:var(--dim); text-align:center; }
   .floornote.atmin{ border:2px solid var(--gold); background:#2e2a12; color:#ffe9a3; font-weight:600; }
   .qbtn.sel{ color:#0c2a1e; background:var(--teal); border-color:var(--teal); }
   .qbtn[data-act="simplify"].sel{ background:var(--gold); border-color:var(--gold); color:#231a00; }
   .qbtn[data-act="cut"].sel{ background:var(--red); border-color:var(--red); color:#2b0006; }
+  .sprite .groupcount{position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);font:7px monospace;white-space:nowrap;color:var(--ink);background:#0a0d18;padding:1px 2px;border-radius:2px}
+  #animationSummary{color:var(--dim);padding:0 12px 8px;font-size:13px}
   .escrow{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:14px; background:var(--panel); border:3px solid var(--line); border-radius:8px; padding:12px; }
   .escrow .txt{ flex:1; min-width:220px; font-size:14.5px; color:var(--dim); }
   .escrow .txt b{ color:var(--ink); }
@@ -620,7 +622,7 @@
       <section class="lever" aria-label="Question cards">
         <div class="lever-head">
           <span class="lever-title" style="font-size:12px;">THE INSTRUMENT · AS DEALT INTO THE SKELETON</span>
-          <span class="lever-sub" id="instrumentHelp">KEEP, apply the class-correct repair on the card (SPLIT, NEUTRALIZE, DEFINE, ANCHOR and the rest, each at its price), or CUT for 1 credit. Core questions cannot be cut, and the instrument always keeps at least 6 questions. SIMPLIFY repairs a WORDY STEM. Low-value items contribute no agenda insight: CUT removes their burden. Sections run A outcome core, B drivers, C diagnostics, D sensitive, E open-text closer, F demographics last.</span>
+          <span class="lever-sub" id="instrumentHelp">KEEP, apply the class-correct repair on the card (SPLIT, NEUTRALIZE, DEFINE, ANCHOR and the rest, each at its price), or CUT any question for 1 credit. Keep at least one question. Cutting core questions reduces quality; missing BRD coverage loses Insight and can prevent a win. SIMPLIFY repairs a WORDY STEM. Low-value items contribute no agenda insight: CUT removes their burden. Sections run A outcome core, B drivers, C diagnostics, D sensitive, E open-text closer, F demographics last.</span>
         </div>
         <div id="qFloorNote" class="floornote" role="note"></div>
         <div class="qgrid" id="qGrid"></div><div id="cutTray"></div><div id="bankPanel"></div>
@@ -637,13 +639,14 @@
     <!-- ================= RUN ================= -->
     <div id="runStage">
       <div class="stagehead">
-        <span class="counter">COMPLETED <b id="compCount">0</b> / 40</span>
-        <span class="counter">GUESSES <b id="guessCount" style="color:var(--red)">0</b></span>
+        <span class="counter">COMPLETED <b id="compCount">0</b> / <b id="sentCount">0</b> SENT</span>
+        <span class="counter">GUESSED ANSWERS <b id="guessCount" style="color:var(--red)">0</b></span>
         <span class="breaker" id="breakerChip">BREAKER · GOODWILL <span id="gwLive">72</span></span>
         <span class="breaker repchip" id="repChip">SENDER REPUTATION <b id="repLive">90</b></span>
         <span class="speedctl" role="group" aria-label="Animation speed"><button class="speedbtn sel" id="spd1">1×</button><button class="speedbtn" id="spd2">2×</button></span>
         <button class="skipbtn" id="skipBtn" style="margin-left:0">SKIP TO REPORT ≫</button>
       </div>
+      <div class="simnote" id="animationSummary"></div>
       <div id="repBanner">⚠ DOMAIN REPUTATION AT RISK · HARD BOUNCES OVER 10% · OPENS HALVED BY SPAM FILTERS ⚠</div>
       <div class="trackwrap">
         <div class="gates" id="gates"></div>
@@ -684,7 +687,7 @@
       <h2>MPOR</h2>
       <p>Master Plan of Record</p>
       <h3>QUICK CHALLENGE</h3>
-      <p>Six questions, 48 credits, one launch. The audience, list preparation, and Honest Ask invitation are provided. Three questions are the BRD cards: repair all three to win, and they cannot be cut. Three more arrived unrequested: repair or cut each one, because an unresolved extra leaves the challenge unfinished.</p>
+      <p>Six questions, 48 credits, one launch. The audience, list preparation, and Honest Ask invitation are provided. Any question can be cut, but at least one must remain. Three questions are the BRD cards: keep and repair all three to win. Cutting one leaves that requirement unmet. Three more arrived unrequested: repair or cut each one, because an unresolved extra leaves the challenge unfinished.</p>
       <p>Sending costs 30 credits, the invitation costs 4, and the three BRD repairs cost 6 in total. You also need response above 12%, quality 60+, and Insight 60+. Each run also draws one BRD twist from the run seed: a stakeholder demand (a named extra that must stay in the instrument and be repaired), a raised bar (a higher response threshold or a 95+ quality gate), or a time ceiling on the repaired instrument, read from its estimated minutes. The BRD names the twist and its acceptance line. The challenge banner repeats the acceptance line, and the report rules on whether the twist was met.</p>
       <p>Most runs also draw a complication after the first report (a staler list than the brief stated, a question added by a stakeholder, or a sponsor demanding a second push): accept it and a follow-up wave is set up on the credits left in the same 48, or decline it and the first result stands. The final verdict then reads both waves together.</p>
       <p>Retry resets this challenge and draws a new brief. Next Challenge changes the six cards. Neither changes campaign progress.</p>
@@ -1113,7 +1116,7 @@ var QUICK_CHALLENGES = [
    seed, using the same hashStr + mulberry machinery as the instrument
    draw, so a seed always deals the same brief. The twist never reseeds
    the run simulation; it only tightens this run's acceptance rules: a
-   named extra becomes required (kept and repaired, uncuttable), the
+   named extra becomes required (kept and repaired to win), the
    response or quality bar rises, or the repaired instrument must fit a
    time ceiling read from estMinutes, the engine's own length model. */
 function quickVariantIndex(index, seedStr){
@@ -1229,7 +1232,7 @@ function quickComplicationCardHTML(){
       '<div class="dialogue"><b>' + comp.source.toUpperCase() + ':</b> "' + comp.ask + '"</div>' +
       '<p style="font-size:15.5px">Q' + comp.qid + ' joins the instrument for wave 2, as drafted: <b>"' + lq.text + '"</b> It carries a ' + defectOf(lq) + ' defect. ' +
       (lv ? 'Repair it in the questionnaire step (' + lv + ' · ' + lc + ' cr), or carry it as written and let wave 2\'s numbers show what it costs.' : 'There is no wording fix for ' + defectOf(lq) + ': carry it as written, or buy the DK/NA escapes (2 cr) so respondents can say they do not know instead of guessing.') +
-      ' It cannot be cut: ' + comp.source + ' asked for it by name.</p>' +
+      ' You may cut it, but the challenge cannot be won without fielding the question ' + comp.source + ' requested.</p>' +
       buttons("ADD Q" + comp.qid + " · SET UP WAVE 2") + foot;
   }
   var canFund = remaining >= 8;
@@ -1422,13 +1425,13 @@ function evidenceMission(){
 function evidenceRequirementsHTML(){
   var mission = evidenceMission(), history = audienceHistory();
   return '<p><b>' + mission.purpose + '</b> Minimum usable sample: <b>' + fmt(mission.minimumN) +
-    '</b> simulated responses from the <b>' + mission.pool + '</b> audience pool. Required roles: ' + mission.roles.map(function(role){ return role.label + ' (' + Math.round(role.share * 100) + '%+ of usable responses, at least one sprite)'; }).join('; ') +
+    '</b> simulated responses from the <b>' + mission.pool + '</b> audience pool. Required roles: ' + mission.roles.map(function(role){ return role.label + ' (' + Math.round(role.share * 100) + '%+ of usable responses, at least one respondent)'; }).join('; ') +
     '. Match at least 80% of cleaned responses to the invited account. Retain at least 60% of completions after cleaning; quality 60+ and usable Insight ' + insightGate() +
     '+. Validate the list and dedupe; a Global audience also needs localization review and a localized invitation.</p>' +
-    '<p>Response benchmark: ' + targetPct(curLevel().target) + '%, not a win gate. Minimums are mission rules in a 40-sprite simulation, not confidence or representativeness guarantees.</p>' +
+    '<p>Response benchmark: ' + targetPct(curLevel().target) + '%, not a win gate. Every recipient is simulated individually; minimums are mission rules, not confidence or representativeness guarantees.</p>' +
     '<p>Audience portfolio: ' + (history ? history.contacts + ' previous sends across ' + history.instruments.length + ' instrument(s); ' + history.suppressionOverrides + ' repeat-contact suppression override(s).' : 'No previous sends in this campaign audience pool.') +
     ' Fresh, Stale, and Tired share the Support pool; Global and Executive Blast have separate pools. Suppression reduces contact fatigue; it does not erase it. A new instrument retains this history.</p>' +
-    (history ? '<p>Previous completed response sprites by role (not unique people): ' + PKEYS.map(function(k){ return PERSONAS[k].name + ' ' + (history.responses[k] || 0); }).join('; ') + '.</p>' : '');
+    (history ? '<p>Previous completed responses by role (not unique people): ' + PKEYS.map(function(k){ return PERSONAS[k].name + ' ' + fmt(history.responses[k] || 0); }).join('; ') + '.</p>' : '');
 }
 
 /* ================= AUDIO ================= */
@@ -1750,14 +1753,20 @@ var SPRITE_MAP = [
 ".B..B.",
 ".T..T."
 ];
+var spriteArtwork = new Map();
 function spriteHTML(color){
-  var pal = { H:"#241f31", S:"#f2c29b", E:"#241f31", B:color, T:"#241f31" };
-  var html = "", px = 2;
-  for (var y=0; y<SPRITE_MAP.length; y++) for (var x=0; x<SPRITE_MAP[y].length; x++){
-    var c = SPRITE_MAP[y][x]; if (c === "." || c === " ") continue;
-    html += '<div style="position:absolute;left:' + (x*px + 5) + 'px;top:' + (y*px) + 'px;width:' + px + 'px;height:' + px + 'px;background:' + pal[c] + '"></div>';
+  if (!spriteArtwork.has(color)){
+    var pal = { H:"#241f31", S:"#f2c29b", E:"#241f31", B:color, T:"#241f31" };
+    var pixels = "", px = 2, width = SPRITE_MAP[0].length * px, height = SPRITE_MAP.length * px;
+    for (var y=0; y<SPRITE_MAP.length; y++) for (var x=0; x<SPRITE_MAP[y].length; x++){
+      var c = SPRITE_MAP[y][x]; if (c === "." || c === " ") continue;
+      pixels += '<rect x="' + (x*px) + '" y="' + (y*px) + '" width="2" height="2" fill="' + pal[c] + '"/>';
+    }
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + width + '" height="' + height + '" shape-rendering="crispEdges">' + pixels + '</svg>';
+    spriteArtwork.set(color, '<img class="sprite-art" alt="" aria-hidden="true" width="' + width + '" height="' + height +
+      '" style="position:absolute;left:5px;top:0;image-rendering:pixelated" src="data:image/svg+xml,' + encodeURIComponent(svg) + '">');
   }
-  return html;
+  return spriteArtwork.get(color);
 }
 
 /* ================= SETUP RENDER ================= */
@@ -2052,7 +2061,7 @@ function startQuickChallenge(index, seedStr){
   state.validation = "full"; state.dedupe = true; state.suppression = true;
   state.baseline = snapshotCurrent();
   $("cabinet").classList.add("quick-mode"); $("quickExit").hidden = false;
-  $("instrumentHelp").textContent = "Repair the three BRD cards to win; they cannot be cut. The other three questions are scope creep the BRD never asked for: repair what is worth saving, cut what is not. An unresolved extra leaves the challenge unfinished.";
+  $("instrumentHelp").textContent = "Any question can be cut, but keep at least one. Keep and repair all three BRD cards to win; cutting a required card leaves the requirement unmet. The other three questions are scope creep the BRD never asked for: repair what is worth saving, cut what is not. An unresolved extra leaves the challenge unfinished.";
   $("startScreen").style.display="none"; $("campaignScreen").style.display="none"; $("report").style.display="none"; $("setup").style.display="block";
   renderLevelUI(); renderQuestions(); renderReadout(); setMusicVariant("setup");
   window.scrollTo({top:0,behavior:"smooth"});
@@ -2202,19 +2211,11 @@ function renderAgenda(){
   el.innerHTML = '<div class="at">LEVEL AGENDA · INSIGHT VALUE NEEDS ' + insightGate() + '+ · EACH TOPIC MUST BE ASKED, SOUND, ANSWERABLE, AND ANSWERED BY ITS KEY PERSONAS</div>' + rows +
     '<div class="fineprint" style="font-size:12.5px;color:var(--faint);margin-top:6px">Coverage is the pre-run signal. Insight itself is scored from the actual run: who finished matters as much as how many (Groves &amp; Peytcheva 2008).</div>';
 }
-/* Cut floor: CORE questions are the instrument's spine and can never be
-   cut, and the kept count can never fall below the floor for the dealt
-   instrument: 6 in the campaign, or the dealt size itself when a campaign
-   mode deals fewer. In a Quick Challenge the floor is the challenge
-   instrument's CORE count (its three BRD cards), so the three non-core
-   extras can be cut down to the core set and no further. The guard lives
-   in applyCut, the action path, not only in button rendering, so no
-   caller can bypass it. A refused cut changes no state, so it charges
-   nothing. */
-var MIN_QUESTIONS = 6;
+/* Cut permission is independent of study acceptance. Every question
+   may be removed except the last; refused cuts change no state or cost. */
+var MIN_QUESTIONS = 1;
 function instrumentFloor(){
-  if (state.quickChallenge) return activeQuestions().filter(function(q){ return q.core; }).length;
-  return Math.min(MIN_QUESTIONS, activeQuestions().length);
+  return MIN_QUESTIONS;
 }
 function questionById(id){
   var pools = [activeQuestions(), addBankQuestions(), QUESTION_BANK, OPTIONAL_QUESTIONS];
@@ -2223,18 +2224,7 @@ function questionById(id){
 }
 function cutBlockReason(q){
   if (!q) return "unknown";
-  if (q.core) return "core";
-  /* A late complication card goes out in wave 2, repaired or as
-     written: the stakeholder who added it asked for it by name, so
-     its cut is refused in the action path like a required card. */
-  var qcLate = state.quickChallenge;
-  if (qcLate && qcLate.wave === 2 && qcLate.lateQid === q.id) return "late";
   if (keptQuestions().length <= instrumentFloor()) return "floor";
-  /* A mandatory BRD-twist extra is required by this run's brief: it
-     must stay in the instrument and be repaired, so its cut is refused
-     here in the action path, and the verdict re-checks it. */
-  var v = quickVariant();
-  if (v && v.type === "mandatory" && v.qid === q.id) return "required";
   return null;
 }
 function applyCut(qid){
@@ -2246,19 +2236,15 @@ function applyCut(qid){
 function cutButtonHtml(q){
   var reason = cutBlockReason(q);
   if (!reason) return '<button class="qbtn" data-q="' + q.id + '" data-act="cut"><span class="qlabel">CUT</span><span class="qprice"> \u00B7 1</span></button>';
-  var why = reason === "core" ? "Core questions cannot be cut" : reason === "required" ? "Required by this run's BRD twist: keep it and repair it" : reason === "late" ? "Added after wave 1 by a stakeholder who asked for it by name: it goes out in wave 2, repaired or as written" : "Minimum instrument reached: at least " + instrumentFloor() + " questions must be kept";
+  var why = reason === "unknown" ? "Question not found" : "Keep at least one question.";
   return '<button class="qbtn" data-q="' + q.id + '" data-act="cut" disabled title="' + why + '" aria-label="Cut unavailable: ' + why + '"><span class="qlabel">CUT</span><span class="qprice"> \u00B7 1</span></button>';
 }
 function renderQuestions(){
   var fnote = $("qFloorNote");
   if (fnote){
-    var keptN = keptQuestions().length, fl = instrumentFloor();
-    if (state.quickChallenge){
-      if (keptN <= fl){ fnote.className = "floornote atmin"; fnote.innerHTML = "\u26A0 MINIMUM INSTRUMENT REACHED \u00B7 " + keptN + " KEPT, MINIMUM IS " + fl + " (THE THREE BRD CARDS) \u00B7 CUT IS LOCKED \u00B7 RESTORE A CUT EXTRA TO CHOOSE A DIFFERENT CUT"; }
-      else { fnote.className = "floornote"; fnote.innerHTML = "MINIMUM INSTRUMENT: " + fl + " QUESTIONS (THE THREE BRD CARDS) \u00B7 BRD CARDS CANNOT BE CUT \u00B7 EXTRAS MAY BE CUT \u00B7 " + keptN + " KEPT"; }
-    }
-    else if (keptN <= fl){ fnote.className = "floornote atmin"; fnote.innerHTML = "\u26A0 MINIMUM INSTRUMENT REACHED \u00B7 " + keptN + " KEPT, MINIMUM IS " + fl + " \u00B7 CUT IS LOCKED \u00B7 RESTORE A CUT QUESTION OR ADD FROM THE BANK TO CUT AGAIN"; }
-    else { fnote.className = "floornote"; fnote.innerHTML = "MINIMUM INSTRUMENT: " + fl + " QUESTIONS \u00B7 CORE QUESTIONS CANNOT BE CUT \u00B7 " + keptN + " KEPT"; }
+    var keptN = keptQuestions().length;
+    if (keptN <= instrumentFloor()){ fnote.className = "floornote atmin"; fnote.innerHTML = "\u26A0 MINIMUM INSTRUMENT REACHED \u00B7 " + keptN + " KEPT, MINIMUM IS 1 \u00B7 CUT IS LOCKED \u00B7 RESTORE A CUT QUESTION TO CUT AGAIN"; }
+    else { fnote.className = "floornote"; fnote.innerHTML = "KEEP AT LEAST ONE QUESTION \u00B7 ANY QUESTION MAY BE CUT \u00B7 " + keptN + " KEPT \u00B7 MISSING BRD COVERAGE PENALIZES RESULTS"; }
   }
   var displayQs = activeQuestions().concat(addBankQuestions().filter(function(q){ return state.added[q.id]; }));
   $("qGrid").innerHTML = displayQs.filter(function(q){ return state.qstate[q.id] !== "cut"; }).map(function(q){
@@ -2304,10 +2290,7 @@ function renderQuestions(){
         '<button class="qbtn' + (st === "keep" ? " sel" : "") + '" data-q="' + q.id + '" data-act="keep">KEEP</button>' +
         (verb ? '<button class="qbtn wide' + (st === "simplify" ? " sel" : "") + '" data-q="' + q.id + '" data-act="simplify"' + (st !== "simplify" && budgetMath().total + fcost > BUDGET_TOTAL ? " disabled title=\"Not enough budget for " + verb + " (" + fcost + " cr)\"" : "") + '><span class="qlabel">' + verb + '</span><span class="qprice"> \u00B7 ' + fcost + '</span></button>'
               : (d !== "CLEAN" ? '<button class="qbtn wide" disabled title="No wording fix exists for this class">NO WORDING FIX</button>' : "")) +
-        cutButtonHtml(q) + '</div>' +
-        (q.core ? '<div class="cutlock">LOCKED \u00B7 CORE \u00B7 CANNOT BE CUT</div>' : '') +
-        (isRequired ? '<div class="cutlock">LOCKED \u00B7 REQUIRED BY THE BRD TWIST \u00B7 CANNOT BE CUT</div>' : '') +
-        (isLate ? '<div class="cutlock">LOCKED \u00B7 ADDED AFTER WAVE 1 \u00B7 CANNOT BE CUT</div>' : '');
+        cutButtonHtml(q) + '</div>';
     }
     return html + "</div>";
   }).join("");
@@ -2316,7 +2299,7 @@ function renderQuestions(){
     b.addEventListener("click", function(){
       var qid = parseInt(b.getAttribute("data-q"), 10), act = b.getAttribute("data-act");
       if (act === "cut"){
-        if (applyCut(qid)) return; /* refused: core question, or the floor is reached; no state changed, no charge */
+        if (applyCut(qid)) return;
         var instrument = state.instrument;
         var card = $("qc" + qid);
         card.style.transform = "translateX(70px) rotate(8deg)"; card.style.opacity = "0";
@@ -2389,7 +2372,7 @@ function renderChecklist(){
     ["Invite chosen (Step 3)", !!(t.invite || state.chainActive)],
     ["Defects reviewed (Step 4): at least one fix or cut, or skip below", !!reviewDone],
     ["Agenda coverage seen: check the AGENDA panel in Step 4", !!(reviewDone || t.agenda)],
-    ["Instrument size (Step 4): at least " + instrumentFloor() + " questions kept", keptQuestions().length >= instrumentFloor()]
+    ["Instrument size (Step 4): at least one question kept", keptQuestions().length >= instrumentFloor()]
   ];
   el.innerHTML = '<div class="ct">READY TO LAUNCH? · THIS LIST ONLY INFORMS · THE BUTTON ENFORCES THE BUDGET AND THE MINIMUM INSTRUMENT</div>' +
     rows.map(function(r, i){
@@ -2425,7 +2408,7 @@ function renderReadout(){
     lb.disabled = over || tooFew;
     lb.style.opacity = (over || tooFew) ? ".45" : "";
     lb.textContent = over ? "OVER BUDGET" : (tooFew ? "TOO FEW QUESTIONS \u00B7 MIN " + instrumentFloor() : "\u25B6 LAUNCH");
-    lb.title = tooFew ? "The instrument must keep at least " + instrumentFloor() + " questions. Restore a cut question or add one from the bank." : "";
+    lb.title = tooFew ? "Keep at least one question. Restore a cut question or add one from the bank." : "";
   }
   var escB = $("escBtn");
   if (escB && !state.escapes && budgetMath({escapes:true}).total > BUDGET_TOTAL){ escB.disabled = true; escB.title = "Not enough budget"; }
@@ -2546,44 +2529,49 @@ function repMath(){
 var RUN_MS = 30000;
 var BREAKER_STOP_T = 10500;
 
-function buildRun(){
+function buildRun(animationTarget){
   var rng = mulberry(hashStr(choiceKey()));
   var seg = state.seg, inv = state.invite, gm = goodwillMath();
+  if (!Number.isInteger(seg.n) || seg.n <= 0) throw new Error("Simulation population must be a positive integer.");
   var kept = keptQuestions();
   var keptDefects = {};
   kept.forEach(function(q){ if (state.qstate[q.id] === "keep" && defectOf(q) !== "CLEAN") keptDefects[defectOf(q)] = true; });
-  var scale = seg.n / 40;
+  var totalMin = estMinutes(), invalidRate = effInvalidRate(), reputation = repMath();
+  var cums = [], runningMin = state.escapes ? 0.5 : 0;
+  kept.forEach(function(q){ runningMin += effMin(q); cums.push(runningMin); });
+  var gridQ = kept.filter(function(q){ return q.flag === "mobile"; })[0];
+  var gridSt = gridQ ? (state.qstate[gridQ.id] || "keep") : "cut";
 
   /* persona assignment from mix */
   var bag = [];
-  PKEYS.forEach(function(k){ var c = Math.round(seg.mix[k] * 40); for (var i=0;i<c;i++) bag.push(k); });
-  while (bag.length > 40) bag.splice(Math.floor(rng()*bag.length), 1);
-  while (bag.length < 40) bag.push("end");
+  PKEYS.forEach(function(k){ var c = Math.round(seg.mix[k] * seg.n); for (var i=0;i<c;i++) bag.push(k); });
+  while (bag.length > seg.n) bag.splice(Math.floor(rng()*bag.length), 1);
+  while (bag.length < seg.n) bag.push("end");
   /* shuffle deterministically */
   for (var i = bag.length-1; i>0; i--){ var j = Math.floor(rng()*(i+1)); var t = bag[i]; bag[i]=bag[j]; bag[j]=t; }
 
-  var sprites = [];
+  var respondents = [];
   var spawnWindow = 13000;
-  for (var s = 0; s < 40; s++){
+  for (var s = 0; s < seg.n; s++){
     var pk = bag[s], P = PERSONAS[pk];
-    var langPool=["en","en","en","en","es","es","pt","pt","de","ja"]; var spLang = seg.id==="multi" ? langPool[Math.floor(rng()*langPool.length)] : "en";
+    var langRoll = rng();
+    var spLang = seg.id === "multi" ? (langRoll < 0.4 ? "en" : langRoll < 0.6 ? "es" : langRoll < 0.75 ? "pt" : langRoll < 0.88 ? "de" : "ja") : "en";
     var sp = { i:s, persona:pk, lang:spLang, abGroup:(state.abEnabled ? (s%2===0?"A":"B") : "A"), x:GATE_X.invited, top: 30 + rng()*62, state:"wait",
-      spawnAt: 400 + (s/40)*spawnWindow + rng()*500, mobile: rng() < 0.6,
+      spawnAt: 400 + (s/seg.n)*spawnWindow + rng()*500, mobile: rng() < 0.6,
       guessed:false, escapedUsed:false, fate:null, dropCause:null, dropQ:0, via:"base",
       events:[], done:false, counted:false, surveyStart:0, patienceTotal: P.patience };
-    if (gm.trips && sp.spawnAt > BREAKER_STOP_T){ sp.fate = "notsent"; sp.done = true; sprites.push(sp); continue; }
+    if (gm.trips && sp.spawnAt > BREAKER_STOP_T){ sp.fate = "notsent"; sp.done = true; respondents.push(sp); continue; }
     sp.angry = false; sp.dupEnv = false;
     sp.qSpeed = false; sp.qStraight = false; sp.qDup = false; sp.qFwd = false; sp.qJunk = false; sp.qTopBox = false; sp.qMush = false; sp.qRefusal = false; sp.qInconsist = false; sp.qEstimate = false;
 
     /* BOUNCE at DELIVERED gate */
-    var rm = repMath();
-    if (rng() < effInvalidRate()){
+    if (rng() < invalidRate){
       sp.fate = "bounced"; sp.bounceHard = rng() < 0.7;
       sp.events.push({ t: sp.spawnAt + 650, type:"drop", cause:"bounce", x: GATE_X.delivered + rng()*3 });
-      sprites.push(sp); continue;
+      respondents.push(sp); continue;
     }
     sp.events.push({ t: sp.spawnAt + 650, type: "gate", gate: "delivered" });
-    if (!state.suppression && s < 2) sp.angry = true;
+    if (!state.suppression && s < Math.round(seg.n * 0.05)) sp.angry = true;
     if (!state.dedupe && rng() < 0.18) sp.dupEnv = true;
 
     /* OPEN */
@@ -2591,7 +2579,7 @@ function buildRun(){
     var langOpenFactor = (sp.lang!=="en" && state.langChoice!=="localized") ? 0.45 : 1;
     if(sp.lang!=="en" && state.localization) langOpenFactor = state.langChoice==="localized" ? 1 : 0.6;
     var healthFactor = state.quickChallenge ? 1 : Math.max(0.5, Math.min(1, gm.start / seg.goodwill));
-    var pOpen = invSp.open * seg.relevance * repMath().openFactor * (state.localization ? 1.03 : 1) * (pk === "exec" ? 0.8 : pk === "admin" ? 1.1 : 1) * langOpenFactor * healthFactor;
+    var pOpen = invSp.open * seg.relevance * reputation.openFactor * (state.localization ? 1.03 : 1) * (pk === "exec" ? 0.8 : pk === "admin" ? 1.1 : 1) * langOpenFactor * healthFactor;
     var opened = rng() < pOpen, via = "base";
     if (!opened){
       for (var r = 1; r <= state.reminders && !opened; r++){
@@ -2602,7 +2590,7 @@ function buildRun(){
     var tOpen = sp.spawnAt + 900 + rng()*700 + (via === "r1" ? 1800 : via === "r2" ? 3400 : 0);
     if (!opened){
       sp.fate = "noopen"; sp.events.push({ t: sp.spawnAt + 1100, type:"drop", cause:"noopen", x: 12 + rng()*10 });
-      sprites.push(sp); continue;
+      respondents.push(sp); continue;
     }
     sp.events.push({ t: tOpen, type:"gate", gate:"opened" });
     if (sp.angry) sp.events.push({ t: tOpen - 500, type:"angry", x: GATE_X.invited + 4 });
@@ -2611,7 +2599,7 @@ function buildRun(){
     /* START */
     if (rng() > invSp.start){
       sp.fate = "nostart"; sp.events.push({ t: tOpen + 1000, type:"drop", cause:"nostart", x: GATE_X.opened + 5 + rng()*8 });
-      sprites.push(sp); continue;
+      respondents.push(sp); continue;
     }
     var tStart = tOpen + 900 + rng()*500;
     sp.events.push({ t: tStart, type:"gate", gate:"started" });
@@ -2619,7 +2607,6 @@ function buildRun(){
 
     /* SURVEY: one completion roll per persona, from total length vs patience.
        The clock drop lands at the question where running time crosses patience. */
-    var totalMin = estMinutes();
     var pComplete = Math.max(0.05, Math.min(0.88, 1.02 - totalMin / (P.patience * 2.6)));
     if (pk === "tech") pComplete *= 0.9; /* interruption prone */
     pComplete = Math.max(0.03, Math.min(0.95, pComplete * (0.65 + rng() * 0.55)));
@@ -2628,12 +2615,7 @@ function buildRun(){
 
     var n = kept.length, alive = true;
     var stretch = GATE_X.finish - GATE_X.started - 6;
-    var cums = [], runCum = state.escapes ? 0.5 : 0, crossIdx = -1;
-    kept.forEach(function(q, qi){
-      runCum += effMin(q);
-      cums.push(runCum);
-      if (crossIdx === -1 && runCum > P.patience) crossIdx = qi;
-    });
+    var crossIdx = cums.findIndex(function(minutes){ return minutes > P.patience; });
     if (!willFinish && crossIdx === -1) crossIdx = n - 1;
     for (var qi = 0; qi < n && alive; qi++){
       var q = kept[qi], st = state.qstate[q.id];
@@ -2680,13 +2662,9 @@ function buildRun(){
       sp.fate = sp.guessed ? "guessfinish" : "finish";
       var pSpeed = Math.max(0, Math.min(0.30, 0.02 + Math.max(0, totalMin - 5) * 0.015 + Math.max(0, 1 - seg.relevance) * 0.18));
       sp.qSpeed = rng() < pSpeed;
-      var gridQ = kept.filter(function(q){ return q.flag === "mobile"; })[0];
-      var gridSt = gridQ ? (state.qstate[gridQ.id] || "keep") : "cut";
       sp.qStraight = rng() < (gridSt === "keep" ? 0.18 : gridSt === "simplify" ? 0.06 : 0.01);
       sp.qDup = !state.dedupe && rng() < 0.09;
       sp.qFwd = rng() < (0.02 + (seg.id === "blast" ? 0.05 : 0) + (inv.id === "generic" ? 0.03 : 0));
-      var openQ = kept.filter(function(q){ return q.text.indexOf("In your own words") === 0; })[0];
-      var q11kept = !!openQ;
       sp.qJunk = rng() < (keptDefects["BROKEN OPTIONS"] ? 0.16 : 0.02);
       /* defect symptom flags: index-derived pseudo-rolls, so adding the
          v1.4 symptom layer never shifts the deterministic run stream */
@@ -2698,10 +2676,10 @@ function buildRun(){
       sp.accountId = sp.qFwd ? null : "SIM-" + audienceGroup(seg) + "-" + sp.i;
       sp.events.push({ t: tStart + 7600 + rng()*500, type:"finish" });
     }
-    sprites.push(sp);
+    respondents.push(sp);
   }
   if (gm.trips){
-    sprites.forEach(function(sp){
+    respondents.forEach(function(sp){
       if (sp.fate === "notsent") return;
       var endedBeforeTrip = sp.events.some(function(e){
         return (e.type === "finish" || e.type === "drop") && e.t <= BREAKER_STOP_T;
@@ -2719,12 +2697,91 @@ function buildRun(){
       sp.events.push({ t: BREAKER_STOP_T, type:"drop", cause:"breaker", x:GATE_X[stopGate] });
     });
   }
-  return { sprites: sprites, gm: gm, scale: scale, kept: kept };
+  return { respondents:respondents, sprites:groupRespondents(respondents, animationTarget),
+    timeline:buildProgressTimeline(respondents), gm:gm, kept:kept };
+}
+
+function groupRespondents(respondents, targetUnits){
+  if (targetUnits === undefined) targetUnits = 160;
+  if (!Number.isInteger(targetUnits) || targetUnits <= 0) throw new Error("Animation target must be a positive integer.");
+  var size = Math.max(1, Math.ceil(respondents.length / targetUnits));
+  var buckets = new Map(), groups = [];
+  /* Latent response flags stay in the data; splitting them here adds
+     visual buckets without adding a distinct animated behavior. */
+  var visualFlags = ["guessed","escapedUsed","angry","dupEnv","qSpeed","qStraight","qDup"];
+  respondents.forEach(function(person, index){
+    var key = [person.persona, person.abGroup, person.fate, person.dropCause, person.dropQ,
+      person.via, person.breakerStage, !!person.bounceHard].concat(visualFlags.map(function(flag){ return !!person[flag]; })).join("|");
+    var group = buckets.get(key);
+    if (!group || group.memberIds.length >= size){
+      group = { memberIds:[] };
+      groups.push(group); buckets.set(key, group);
+    }
+    group.memberIds.push(index);
+  });
+  return groups.map(function(group){
+    var representative = respondents[group.memberIds[Math.floor(group.memberIds.length / 2)]];
+    return Object.assign({}, representative, { count:group.memberIds.length, memberIds:group.memberIds,
+      events:representative.events.map(function(event){ return Object.assign({}, event); }) });
+  });
+}
+
+function buildProgressTimeline(respondents){
+  var events = [];
+  respondents.forEach(function(person){
+    if (person.fate === "notsent") return;
+    events.push({ t:person.spawnAt, key:"sent" });
+    person.events.forEach(function(event){
+      var key = event.type === "gate" ? event.gate :
+        event.type === "finish" ? "completed" :
+        event.type === "guess" ? "guesses" :
+        event.type === "angry" ? "angry" :
+        event.type === "dupe" ? "dupes" :
+        event.type === "drop" && event.cause === "bounce" ? "bounced" :
+        event.type === "drop" && ["patience","knowledge","mobile"].indexOf(event.cause) >= 0 ? "abandons" : null;
+      if (key) events.push({ t:event.t, key:key });
+      if (event.type === "finish" && (person.qSpeed || person.qStraight || person.qDup)) events.push({ t:event.t, key:"quality" });
+    });
+  });
+  events.sort(function(a,b){ return a.t - b.t; });
+  var counts = { t:0, sent:0, delivered:0, opened:0, started:0, completed:0, guesses:0, bounced:0, abandons:0, quality:0, angry:0, dupes:0 };
+  var timeline = [];
+  events.forEach(function(event, index){
+    counts[event.key]++;
+    if (!events[index + 1] || events[index + 1].t !== event.t){
+      counts.t = event.t;
+      timeline.push(Object.assign({}, counts));
+    }
+  });
+  return timeline;
+}
+
+function populationProgress(run, time){
+  var timeline = run.timeline || (run.timeline = buildProgressTimeline(run.respondents));
+  var low = 0, high = timeline.length - 1, found = -1;
+  while (low <= high){
+    var mid = Math.floor((low + high) / 2);
+    if (timeline[mid].t <= time){ found = mid; low = mid + 1; } else high = mid - 1;
+  }
+  return found >= 0 ? timeline[found] :
+    { t:0, sent:0, delivered:0, opened:0, started:0, completed:0, guesses:0, bounced:0, abandons:0, quality:0, angry:0, dupes:0 };
+}
+
+function renderPopulationProgress(run, time){
+  var progress = populationProgress(run, time);
+  finishedCount = progress.completed; guessShown = progress.guesses;
+  $("compCount").textContent = fmt(finishedCount);
+  $("sentCount").textContent = fmt(progress.sent);
+  $("guessCount").textContent = fmt(guessShown);
+  pileLive.bounced = progress.bounced;
+  pileLive.unopened = progress.delivered - progress.opened;
+  renderPiles();
+  return progress;
 }
 
 function evaluateEvidence(run, c, quality){
   var mission = evidenceMission();
-  var finished = run.sprites.filter(function(sp){ return sp.fate === "finish" || sp.fate === "guessfinish"; });
+  var finished = run.respondents.filter(function(sp){ return sp.fate === "finish" || sp.fate === "guessfinish"; });
   var removed = { speed:0, straight:0, duplicate:0, junk:0, guess:0 };
   var cleaned = finished.filter(function(sp){
     var reason = sp.qDup ? "duplicate" : sp.qJunk ? "junk" : sp.qSpeed ? "speed" : sp.qStraight ? "straight" : sp.guessed ? "guess" : null;
@@ -2732,21 +2789,21 @@ function evaluateEvidence(run, c, quality){
     return !reason;
   });
   var matched = cleaned.filter(function(sp){ return !!sp.accountId; });
-  var usableCounts = tally({ sprites:matched });
+  var usableCounts = tally({ respondents:matched });
   var insight = computeInsight(usableCounts, run);
-  var n = matched.length * run.scale;
+  var n = matched.length;
   var retained = finished.length ? cleaned.length / finished.length : 0;
   var associated = cleaned.length ? matched.length / cleaned.length : 0;
   var roles = mission.roles.map(function(role){
     var count = role.keys.reduce(function(sum,k){ return sum + usableCounts.perPersona[k].completed; }, 0);
-    return { label:role.label, count:count * run.scale, share:matched.length ? count / matched.length : 0,
+    return { label:role.label, count:count, share:matched.length ? count / matched.length : 0,
       met:count > 0 && count >= matched.length * role.share };
   });
   var history = audienceHistory();
   var minimumHealth = state.level === 4 ? 35 : 1;
   var checks = [
     { id:"funnel", name:"Funnel execution", met:c.sent > 0 && c.completed > 0 && !run.gm.trips,
-      detail:c.completed + " completions from " + c.sent + " sent sprites. Response benchmark " + targetPct(curLevel().target) + "%; rate is diagnostic.",
+      detail:fmt(c.completed) + " completions from " + fmt(c.sent) + " simulated recipients sent. Response benchmark " + targetPct(curLevel().target) + "%; rate is diagnostic.",
       action:"Repair delivery and questionnaire burden; keep the goodwill breaker from interrupting fieldwork." },
     { id:"fitness", name:"Evidence fitness", met:audienceGroup(state.seg) === mission.pool && n >= mission.minimumN && associated >= 0.8 && roles.every(function(role){ return role.met; }),
       detail:"Audience pool " + audienceGroup(state.seg) + "; required " + mission.pool + ". " + fmt(n) + " usable simulated responses; minimum " + fmt(mission.minimumN) + ". Account match " + Math.round(associated * 100) + "%; minimum 80%. " +
@@ -2773,10 +2830,10 @@ function evaluateEvidence(run, c, quality){
 function evidenceReportHTML(evidence, run, c){
   var failed = evidence.checks.filter(function(check){ return !check.met; });
   var stages = [
-    ["FINISH", fmt(c.completed * run.scale) + " completed simulated responses"],
-    ["CLEAN", fmt(evidence.cleaned * run.scale) + " retained; removed once each: " +
-      Object.keys(evidence.removed).map(function(key){ return key + " " + fmt(evidence.removed[key] * run.scale); }).join(", ")],
-    ["MATCH", fmt(evidence.usableN) + " account-linked; " + fmt((evidence.cleaned - evidence.matched) * run.scale) + " unmatched and excluded"],
+    ["FINISH", fmt(c.completed) + " completed simulated responses"],
+    ["CLEAN", fmt(evidence.cleaned) + " retained; removed once each: " +
+      Object.keys(evidence.removed).map(function(key){ return key + " " + fmt(evidence.removed[key]); }).join(", ")],
+    ["MATCH", fmt(evidence.usableN) + " account-linked; " + fmt(evidence.cleaned - evidence.matched) + " unmatched and excluded"],
     ["INTERPRET", "Usable Insight " + evidence.insight.score + "; required roles and sample checked after exclusions"],
     ["PUBLISH", evidence.won ? "READY WITH LIMITS: all five checks passed" : "WITHHOLD: " + failed.map(function(check){ return check.name; }).join(", ")],
     ["ACT", evidence.won ? "Use the evidence for the stated mission, disclose its limits, and close the loop before another instrument contacts this audience." : failed.map(function(check){ return check.action; }).join(" ")]
@@ -2786,7 +2843,7 @@ function evidenceReportHTML(evidence, run, c){
     '</div></div><div class="reportcard"><h2>AFTER FINISH: EVIDENCE TO ACTION</h2>' +
     stages.map(function(stage){ return '<p><b>' + stage[0] + '</b>: ' + stage[1] + '</p>'; }).join("") +
     '<h3>CONTEXT NOTE</h3><p>' + evidence.mission.purpose + ' Baseline: response rate uses invitations actually sent, including bounces; the usable sample excludes flagged and unmatched responses. ' +
-    fmt(run.scale) + ' simulated people per sprite; ' + evidence.matched + ' usable sprites. These mission thresholds do not establish statistical precision, population representativeness, or construct validity. No real customer records are collected or stored.</p></div>';
+    fmt(run.respondents.length) + ' individual recipient records were simulated; ' + fmt(evidence.matched) + ' usable responses. Animation groups do not determine these counts. These mission thresholds do not establish statistical precision, population representativeness, or construct validity. No real customer records are collected or stored.</p></div>';
 }
 function tally(run){
   var c = { invited:0, sent:0, delivered:0, bouncedHard:0, bouncedSoft:0, angry:0, dupEnv:0, qSpeed:0, qStraight:0, qDup:0, qFwd:0, qJunk:0, qTopBox:0, qMush:0, qRefusal:0, qInconsist:0, qEstimate:0, guessByQ:{}, opened:0, started:0, completed:0, guessed:0, guessedAny:0, escapesUsed:0,
@@ -2794,7 +2851,7 @@ function tally(run){
     dropPersona:{}, dropQ:{}, remRecovery:{ r1:0, r2:0 }, perPersona:{}, perAB:{A:{invited:0,completed:0},B:{invited:0,completed:0}}, perLang:{} };
   PKEYS.forEach(function(k){ c.perPersona[k] = { invited:0, opened:0, completed:0 }; });
   function countBreakerStop(sp){ c.drops.breaker++; bump(c.dropPersona, sp, "breaker"); }
-  run.sprites.forEach(function(sp){
+  run.respondents.forEach(function(sp){
     c.invited++;
     sp.events.forEach(function(e){ if (e.type === "guess" && e.qid) c.guessByQ[e.qid] = (c.guessByQ[e.qid]||0)+1; });
     if (sp.fate === "notsent") return;
@@ -2853,7 +2910,7 @@ function pileModel(run){
   var waves = [];
   for (var r = 1; r <= state.reminders; r++){
     var at = null, recovered = 0;
-    run.sprites.forEach(function(sp){
+    run.respondents.forEach(function(sp){
       if (sp.via !== "r" + r) return;
       var openEv = null;
       sp.events.forEach(function(e){ if (e.type === "gate" && e.gate === "opened") openEv = e; });
@@ -2903,14 +2960,19 @@ function renderPiles(){
    body instead fades into its envelope: the unopened pile is the
    fan itself, which grows on deliveries and drains on opens. */
 var piledBySlot = {};
+var pileFrameGeometry = null;
+function measurePileGeometry(){
+  return { track:$("track").getBoundingClientRect(), bounce:$("bounceStack").getBoundingClientRect(),
+    unopened:$("unopenedStack").getBoundingClientRect() };
+}
 function routeSpriteToPile(sp, cause){
   var isBounce = cause === "bounce";
   var n = isBounce ? pileLive.bounced : pileLive.unopened;
   var slot = Math.max(0, n - 1) % PILE_SPOTS.length;
   /* Measure the target stack as rendered (the phone layout scales
      and lifts the piles) and land the sprite on its fan slot. */
-  var stackEl = isBounce ? $("bounceStack") : $("unopenedStack");
-  var tr = $("track").getBoundingClientRect(), sr = stackEl.getBoundingClientRect();
+  var geometry = pileFrameGeometry || measurePileGeometry();
+  var tr = geometry.track, sr = isBounce ? geometry.bounce : geometry.unopened;
   var sx = sr.width / 76, sy = sr.height / 32;
   var gx = sr.left - tr.left + (PILE_SPOTS[slot][0] + 7) * sx;
   var gy = sr.bottom - tr.top - (PILE_SPOTS[slot][1] + 7) * sy;
@@ -2955,20 +3017,20 @@ function fireRemBeat(beat){
    SAD, the same story the report card tells.
 
    Reactions (event-driven; holds are 1.5 / 2 / 2.5 s by severity):
-     PUMP sev 2    3 finishes inside 1600 ms: a cluster landing
-     PUMP sev 2/1  a reminder wave recovering >= 2 / exactly 1 of
-                   the unopened (pileModel's wave counts)
+     PUMP sev 2    7.5% of sent recipients finishing inside 1600 ms
+     PUMP sev 2/1  a reminder recovering >= 5% / a smaller positive
+                   share of sent recipients (pileModel's wave counts)
      PUMP sev 1    the pace crossing into ahead-of-target
      SAD sev 1     a finish drought: 5000 ms without a finish in
                    the middle of the window while still short of
                    the needed count (re-arms after 6000 ms)
-     AGITATED sev 2  the bounce pile crossing 4 settled bounces
-     AGITATED sev 3  the bounce pile crossing 8 settled bounces,
+     AGITATED sev 2  bounces crossing 10% of sent recipients
+     AGITATED sev 3  bounces crossing 20% of sent recipients,
                    or DOMAIN REPUTATION AT RISK (repMath().atRisk)
-     AGITATED sev 2  3 mid-survey abandonments (patience /
+     AGITATED sev 2  7.5% mid-survey abandonments (patience /
                    knowledge / mobile drops) inside 2000 ms
-     AGITATED sev 2  3 guesses inside 2500 ms, or 2 finishes
-                   carrying speeder / straight-liner / duplicate
+     AGITATED sev 2  7.5% guessed answers inside 2500 ms, or 5%
+                   finishes carrying speeder / straight-liner / duplicate
                    quality flags inside 2500 ms
      AGITATED sev 1  an opted-out respondent mailed anyway
                    (angry event), or a duplicate envelope (dupe)
@@ -2980,12 +3042,12 @@ function fireRemBeat(beat){
    face for a tripped run. */
 var MOOD_HOLD_MS = { 1: 1500, 2: 2000, 3: 2500 };
 var MOOD_MIN_DWELL_MS = 1000;
-var MOOD_BOUNCE_T1 = 4, MOOD_BOUNCE_T2 = 8;
+var MOOD_BOUNCE_T1 = 0.1, MOOD_BOUNCE_T2 = 0.2;
 function moodParamsForRun(run){
   var c = tally(run);
   var needed = Math.floor(curLevel().target * c.sent) + 1;
   var first = null, last = null;
-  run.sprites.forEach(function(sp){
+  run.respondents.forEach(function(sp){
     sp.events.forEach(function(e){
       if (e.type !== "finish") return;
       if (first === null || e.t < first) first = e.t;
@@ -3009,8 +3071,8 @@ function createMoodMachine(params){
     return Math.max(0, Math.min(1, t / RUN_MS));
   }
   function recent(times, t, windowMs){
-    while (times.length && times[0] < t - windowMs) times.shift();
-    return times.length;
+    while (times.length && times[0].t < t - windowMs) times.shift();
+    return times.reduce(function(total, item){ return total + item.count; }, 0);
   }
   function react(t, mood, sev){
     if (m.locked) return;
@@ -3028,32 +3090,33 @@ function createMoodMachine(params){
     if (wf >= 0.97) mood = finished >= p.needed ? "PUMP" : "SAD";
     return { mood: mood, category: category, ratio: ratio, wf: wf };
   };
-  m.noteFinish = function(t, qualityFlag){
-    m.finishTimes.push(t); m.lastFinishAt = t;
-    if (recent(m.finishTimes, t, 1600) >= 3) react(t, "PUMP", 2);
+  m.noteFinish = function(t, qualityFlag, count, flaggedCount){
+    if (count === undefined) count = 1;
+    m.finishTimes.push({t:t,count:count}); m.lastFinishAt = t;
+    if (recent(m.finishTimes, t, 1600) >= m.params.sent * 0.075) react(t, "PUMP", 2);
     if (qualityFlag){
-      m.qualityTimes.push(t);
-      if (recent(m.qualityTimes, t, 2500) >= 2) react(t, "AGITATED", 2);
+      m.qualityTimes.push({t:t,count:flaggedCount === undefined ? count : flaggedCount});
+      if (recent(m.qualityTimes, t, 2500) >= m.params.sent * 0.05) react(t, "AGITATED", 2);
     }
   };
   m.noteBounce = function(t, total){
-    if (m.lastBounceTotal < MOOD_BOUNCE_T1 && total >= MOOD_BOUNCE_T1) react(t, "AGITATED", 2);
-    if (m.lastBounceTotal < MOOD_BOUNCE_T2 && total >= MOOD_BOUNCE_T2) react(t, "AGITATED", 3);
+    if (m.lastBounceTotal < m.params.sent * MOOD_BOUNCE_T1 && total >= m.params.sent * MOOD_BOUNCE_T1) react(t, "AGITATED", 2);
+    if (m.lastBounceTotal < m.params.sent * MOOD_BOUNCE_T2 && total >= m.params.sent * MOOD_BOUNCE_T2) react(t, "AGITATED", 3);
     m.lastBounceTotal = total;
   };
-  m.noteAbandon = function(t){
-    m.abandonTimes.push(t);
-    if (recent(m.abandonTimes, t, 2000) >= 3) react(t, "AGITATED", 2);
+  m.noteAbandon = function(t, count){
+    m.abandonTimes.push({t:t,count:count === undefined ? 1 : count});
+    if (recent(m.abandonTimes, t, 2000) >= m.params.sent * 0.075) react(t, "AGITATED", 2);
   };
-  m.noteGuess = function(t){
-    m.guessTimes.push(t);
-    if (recent(m.guessTimes, t, 2500) >= 3) react(t, "AGITATED", 2);
+  m.noteGuess = function(t, count){
+    m.guessTimes.push({t:t,count:count === undefined ? 1 : count});
+    if (recent(m.guessTimes, t, 2500) >= m.params.sent * 0.075) react(t, "AGITATED", 2);
   };
   m.noteAngry = function(t){ react(t, "AGITATED", 1); };
   m.noteDupe = function(t){ react(t, "AGITATED", 1); };
   m.noteReminder = function(t, recovered){
-    if (recovered >= 2) react(t, "PUMP", 2);
-    else if (recovered === 1) react(t, "PUMP", 1);
+    if (recovered >= Math.max(1, m.params.sent * 0.05)) react(t, "PUMP", 2);
+    else if (recovered > 0) react(t, "PUMP", 1);
   };
   m.noteRepRisk = function(t){
     if (m.repRiskFired) return;
@@ -3065,7 +3128,7 @@ function createMoodMachine(params){
     if (m.locked) return m.locked;
     var base = m.baselineAt(t, finished);
     /* pace crossing into ahead-of-target: one cheer as it happens */
-    if (base.category === "AHEAD" && m.prevCategory !== "AHEAD" && base.wf > 0.02 && base.wf < 0.97 && finished >= 2) react(t, "PUMP", 1);
+    if (base.category === "AHEAD" && m.prevCategory !== "AHEAD" && base.wf > 0.02 && base.wf < 0.97 && finished >= Math.max(1, m.params.sent * 0.05)) react(t, "PUMP", 1);
     m.prevCategory = base.category;
     /* finish drought in the middle of the window, still short */
     if (base.wf >= 0.2 && base.wf <= 0.97 && finished < m.params.needed){
@@ -3100,6 +3163,7 @@ function moodRender(t){
 var rafId = null, runData = null, runStart = 0, finishedCount = 0, guessShown = 0, tripFired = false;
 var virtualT = 0, lastNow = null;
 var reactionLastAt = -Infinity;
+var liveProgress = null;
 function respondentReaction(event, sprite){
   if (event.type === "guess") return "I don't know this. I'm guessing.";
   if (event.type === "escape") return "I can say 'don't know' instead of guessing.";
@@ -3122,15 +3186,14 @@ function respondentReaction(event, sprite){
     "WORDY STEM":"Can we get to the question?", "JARGON":"What do those initials mean?" }[defectOf(q)] || "";
 }
 function sampleReactions(run){
-  var candidates=[];
-  run.sprites.forEach(function(sp){sp.events.forEach(function(event){
-    var text=respondentReaction(event,sp);
-    if(text) candidates.push({t:event.t,persona:sp.persona,text:text});
+  var textCache = new Map(), earliest = new Map();
+  run.respondents.forEach(function(person){person.events.forEach(function(event){
+    var key = [event.type,event.cause,event.qid,!!person.guessed].join("|");
+    if (!textCache.has(key)) textCache.set(key, respondentReaction(event,person));
+    var text = textCache.get(key), previous = earliest.get(text);
+    if (text && (!previous || event.t < previous.t)) earliest.set(text,{t:event.t,persona:person.persona,text:text});
   });});
-  candidates.sort(function(a,b){return a.t-b.t;});
-  var seen={}, samples=[];
-  candidates.forEach(function(item){if(!seen[item.text] && samples.length<4){seen[item.text]=true;samples.push(item);}});
-  return samples;
+  return Array.from(earliest.values()).sort(function(a,b){return a.t-b.t;}).slice(0,4);
 }
 function showRespondentReaction(event,sprite){
   var text=respondentReaction(event,sprite), now=performance.now();
@@ -3189,11 +3252,15 @@ function setupStage(run){
   $("breakerChip").classList.remove("tripped");
   $("breakerChip").firstChild.textContent = "BREAKER · GOODWILL ";
   $("compCount").textContent = "0"; $("guessCount").textContent = "0";
+  $("sentCount").textContent = "0";
+  $("animationSummary").textContent = fmt(run.respondents.length) + " simulated recipients \u00B7 " +
+    fmt(run.sprites.length) + " animation groups. Each \u00D7N badge is a group size; counters use individual records.";
   /* fallout piles: reset counts, align the bottom strip's columns
      under their gates (same GATE_X source as the labels across the
      top), and arm this run's reminder beats */
   pileLive = { bounced: 0, unopened: 0, shownB: -1, shownU: -1 };
   piledBySlot = {};
+  pileFrameGeometry = null;
   pileBeats = pileModel(run).waves.filter(function(w){ return w.at !== null; });
   pileBeatIdx = 0;
   if (remStampTimer){ clearTimeout(remStampTimer); remStampTimer = null; }
@@ -3202,6 +3269,7 @@ function setupStage(run){
     col.style.left = GATE_X[col.getAttribute("data-gate")] + "%";
   });
   renderPiles();
+  liveProgress = populationProgress(run, 0);
   $("runLog").textContent = "STAMPING INVITES…";
   $("stampMsg").style.opacity = "1";
 }
@@ -3239,13 +3307,9 @@ function showCampaign(){
 function startRun(){
   if (state.running) return;
   if (budgetMath().total > BUDGET_TOTAL){ sndSad(); return; }
-  /* Defense in depth for the cut floor: the launch button already
-     refuses a sub-floor instrument (see renderReadout); this refuses
-     any other caller that reaches startRun in that state, before any
-     state changes or charges. Quick Challenges are exempt: their cards
-     are all core and cannot be cut in play, and their report owns the
-     degenerate states (unrepaired or cut cards) as failed attempts. */
-  if (!state.quickChallenge && keptQuestions().length < instrumentFloor()){ sndError(); renderReadout(); return; }
+  if (keptQuestions().length < instrumentFloor()){
+    sndError(); renderReadout(); logLine("Keep at least one question before launch."); return;
+  }
   if ((state.level===3||state.level===6) && !state.stakeholder) state.stakeholder="pushback";
   state.launchCost = budgetMath().attemptCost;
   state.launchedSnapshot = snapshotCurrent();
@@ -3287,7 +3351,8 @@ function beginTicks(){
     if(state.abEnabled) el.style.boxShadow = sp.abGroup==="A" ? "0 0 0 2px var(--teal)" : "0 0 0 2px var(--gold)";
     el.innerHTML = '<span class="dropicon"></span>' + spriteHTML(PERSONAS[sp.persona].color) +
       '<span class="badge" style="background:' + PERSONAS[sp.persona].color + '">' + PERSONAS[sp.persona].glyph + "</span>" +
-      '<span class="pat"><div></div></span>';
+      '<span class="pat"><div></div></span><span class="groupcount">\u00D7' + fmt(sp.count) + '</span>';
+    el.title = fmt(sp.count) + " simulated respondents with similar behavior";
     track.appendChild(el);
     sp.el = el; sp.evIdx = 0; sp.x = GATE_X.invited; sp.spawned = false;
   });
@@ -3302,7 +3367,20 @@ function tick(now){
   var delta = now - lastNow; lastNow = now;
   virtualT += delta * (state.speed || 1);
   /* effective run duration scales with speed for the end check */
-  var t = virtualT, run = runData, allDone = true;
+  var t = virtualT, run = runData;
+  pileFrameGeometry = measurePileGeometry();
+  var progress = renderPopulationProgress(run, t);
+  var allDone = !run.timeline.length || t >= run.timeline[run.timeline.length - 1].t;
+  if (moodMachine && liveProgress){
+    if (progress.completed > liveProgress.completed) moodMachine.noteFinish(t, progress.quality > liveProgress.quality,
+      progress.completed - liveProgress.completed, progress.quality - liveProgress.quality);
+    if (progress.bounced > liveProgress.bounced) moodMachine.noteBounce(t, progress.bounced);
+    if (progress.abandons > liveProgress.abandons) moodMachine.noteAbandon(t, progress.abandons - liveProgress.abandons);
+    if (progress.guesses > liveProgress.guesses) moodMachine.noteGuess(t, progress.guesses - liveProgress.guesses);
+    if (progress.angry > liveProgress.angry) moodMachine.noteAngry(t);
+    if (progress.dupes > liveProgress.dupes) moodMachine.noteDupe(t);
+  }
+  liveProgress = progress;
   /* goodwill drain + breaker */
   var frac = Math.min(1, t / 12000);
   var gwNow = run.gm.trips && t > BREAKER_STOP_T ? 0 : Math.round(run.gm.start + (Math.max(0, run.gm.ending) - run.gm.start) * frac);
@@ -3352,12 +3430,10 @@ function tick(now){
       var e = sp.events[sp.evIdx]; sp.evIdx++;
       showRespondentReaction(e,sp);
       if (e.type === "gate"){
-        if (e.gate === "delivered"){ pileLive.unopened++; renderPiles(); sndChime(); }
-        else if (e.gate === "opened"){ pileLive.unopened--; renderPiles(); sndPop(); }
-        else if (e.gate === "started") sndTick();
+        if (e.gate === "delivered" && sfxGate("delivered", 90)) sndChime();
+        else if (e.gate === "opened" && sfxGate("opened", 90)) sndPop();
+        else if (e.gate === "started" && sfxGate("started", 90)) sndTick();
       } else if (e.type === "drop"){
-        if (e.cause === "bounce"){ pileLive.bounced++; renderPiles(); if (moodMachine) moodMachine.noteBounce(t, pileLive.bounced); }
-        if (moodMachine && (e.cause === "patience" || e.cause === "knowledge" || e.cause === "mobile")) moodMachine.noteAbandon(t);
         sp.done = true;
         var dropEl = sp.el.querySelector(".dropicon");
         dropEl.textContent = DROP_ICON[e.cause] || "?";
@@ -3374,19 +3450,17 @@ function tick(now){
           sp.el.classList.add("dropping");
         }
         logLine(e.cause === "bounce" ? DROP_LOG.bounce + "." : PERSONAS[sp.persona].name.toUpperCase() + " " + DROP_LOG[e.cause].toUpperCase() + ".");
-        if (e.cause === "bounce") sndThud(); else if (sfxGate("wander", 240)) sndWander();
+        if (e.cause === "bounce"){ if (sfxGate("bounce", 120)) sndThud(); }
+        else if (sfxGate("wander", 240)) sndWander();
       } else if (e.type === "guess"){
         sp.el.classList.add("guessed", "shake");
-        guessShown++; $("guessCount").textContent = guessShown;
-        if (moodMachine) moodMachine.noteGuess(t);
-        sndWrong();
+        if (sfxGate("guess", 180)) sndWrong();
         logLine(PERSONAS[sp.persona].name.toUpperCase() + " GUESSED AT Q" + e.qid + ". THAT ANSWER IS NOISE.");
       } else if (e.type === "angry"){
         var ai = sp.el.querySelector(".dropicon");
         ai.textContent = "\u26A0"; ai.style.fontSize = "11px";
         sp.el.classList.add("escaped");
         setTimeout(function(){ sp.el.classList.remove("escaped"); }, 1400);
-        if (moodMachine) moodMachine.noteAngry(t);
         logLine(PERSONAS[sp.persona].name.toUpperCase() + " WAS MAILED ANYWAY (OPTED OUT / SURVEYED LAST MONTH). GOODWILL HIT.");
       } else if (e.type === "dupe"){
         sndDoubleThud();
@@ -3394,7 +3468,6 @@ function tick(now){
         di.textContent = "\u2709\u2709"; di.style.fontSize = "9px";
         sp.el.classList.add("escaped");
         setTimeout(function(){ sp.el.classList.remove("escaped"); }, 1400);
-        if (moodMachine) moodMachine.noteDupe(t);
         logLine("DUPLICATE: ONE PERSON, TWO ENVELOPES. NO DEDUPE PASS WAS BOUGHT.");
       } else if (e.type === "escape"){
         var ic = sp.el.querySelector(".dropicon");
@@ -3406,21 +3479,22 @@ function tick(now){
         sp.done = true;
         sp.el.classList.add("cheer");
         sp.el.classList.remove("in-survey");
-        finishedCount++; $("compCount").textContent = finishedCount;
-        if (moodMachine) moodMachine.noteFinish(t, !!(sp.qSpeed || sp.qStraight || sp.qDup));
         /* combo: finishes landing close together climb in pitch (sndDing
            already steps up with the count); quality flags get signatures */
-        sndDing(finishedCount);
-        if (sp.qSpeed) sndSpeedTicks();
-        if (sp.qStraight) sndFlat();
-        if (sp.qDup) sndDoubleThud();
+        if (sfxGate("finish", 100)){
+          sndDing(finishedCount);
+          if (sp.qSpeed) sndSpeedTicks();
+          if (sp.qStraight) sndFlat();
+          if (sp.qDup) sndDoubleThud();
+        }
         if (sp.guessed) logLine("FINISHED, WITH GUESSED ANSWERS ABOARD.");
       }
     }
     if (sp.evIdx >= sp.events.length && !sp.done){ sp.done = true; }
   });
+  pileFrameGeometry = null;
   moodRender(t);
-  if (t < RUN_MS && !allDone){ rafId = requestAnimationFrame(tick); }
+  if (!allDone){ rafId = requestAnimationFrame(tick); }
   else { rafId = null; var completedRun = runData; setTimeout(function(){ if (state.running && runData === completedRun) showReport(); }, 700); }
 }
 $("launchBtn").addEventListener("click", startRun);
@@ -3494,23 +3568,23 @@ function computeInsight(c, run){
 }
 
 /* ================= REPORT ================= */
-function pct(x){ return (Math.round(x * 10) / 10) + "%"; }
+function pct(x){ return (Math.round(x * 1000) / 1000) + "%"; }
 
 function extraReportHTML(c){
   var h="";
   if(state.level===2 && state.abEnabled){
     var a=c.perAB.A,b=c.perAB.B; var ra=a.invited?a.completed/a.invited:0, rb=b.invited?b.completed/b.invited:0;
-    var sampleScale=state.seg.n/40, nA=Math.max(1,a.invited*sampleScale), nB=Math.max(1,b.invited*sampleScale);
+    var nA=a.invited, nB=b.invited;
     var pooledN=a.invited+b.invited, pPool=pooledN?(a.completed+b.completed)/pooledN:0;
-    var se=Math.sqrt(Math.max(0.0001,pPool*(1-pPool)*(1/nA+1/nB)))*1.96;
-    var diff=Math.abs(ra-rb); var tooClose=diff<=se; window.__abTooClose=tooClose;
-    h+='<div class="reportcard"><h2>A/B TEST · THE SPLIT</h2><div class="simnote">Simulated. A = selected invite, B = variant. Uncertainty is an approximate 95% range for the combined sample.</div><table class="mini"><tr><th>Variant</th><th>Sent (sim)</th><th>Completed</th><th>Rate</th></tr><tr><td>A · '+state.invite.name+'</td><td>'+fmt(nA)+'</td><td>'+fmt(a.completed*sampleScale)+'</td><td>'+pct(ra*100)+'</td></tr><tr><td>B · '+(INVITES.filter(function(x){return x.id===state.abInvite;})[0]||{}).name+'</td><td>'+fmt(nB)+'</td><td>'+fmt(b.completed*sampleScale)+'</td><td>'+pct(rb*100)+'</td></tr></table><p style="font-size:15.5px"><b>Gap '+pct(diff*100)+' pts · Uncertainty ±'+pct(se*100)+' pts · Verdict: '+(tooClose?"TOO CLOSE TO CALL":"A DIFFERENCE THIS SIZE IS OUTSIDE THE UNCERTAINTY RANGE")+'</b></p>'+(tooClose?'<p style="font-size:15px">The winning methodology move is to accept TOO CLOSE TO CALL and run it bigger next time, not to declare a winner the data cannot support.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="againbtn" id="abRunBigger" style="font-size:11px;padding:12px 14px">RUN IT BIGGER NEXT TIME ✓</button><button class="againbtn" id="abDeclare" style="font-size:11px;padding:12px 14px;background:var(--red)">DECLARE A WINNER</button></div><p id="abVerdictMsg" style="font-size:15px;margin-top:10px"></p>':'<p style="font-size:15px">Declaring the leading variant is defensible at this gap. Still report the uncertainty range with the result.</p>')+'</div>';
+    var se=nA && nB ? Math.sqrt(pPool*(1-pPool)*(1/nA+1/nB))*1.96 : null;
+    var diff=Math.abs(ra-rb); var tooClose=se === null || diff<=se; window.__abTooClose=tooClose;
+    h+='<div class="reportcard"><h2>A/B TEST · THE SPLIT</h2><div class="simnote">Simulated. A = selected invite, B = variant. Uncertainty is an approximate 95% range for the combined sample.</div><table class="mini"><tr><th>Variant</th><th>Sent (sim)</th><th>Completed</th><th>Rate</th></tr><tr><td>A · '+state.invite.name+'</td><td>'+fmt(nA)+'</td><td>'+fmt(a.completed)+'</td><td>'+pct(ra*100)+'</td></tr><tr><td>B · '+(INVITES.filter(function(x){return x.id===state.abInvite;})[0]||{}).name+'</td><td>'+fmt(nB)+'</td><td>'+fmt(b.completed)+'</td><td>'+pct(rb*100)+'</td></tr></table><p style="font-size:15.5px"><b>Gap '+pct(diff*100)+' pts · Uncertainty '+(se === null ? 'unavailable' : '±'+pct(se*100)+' pts')+' · Verdict: '+(se === null ? 'INSUFFICIENT DATA' : tooClose?"TOO CLOSE TO CALL":"A DIFFERENCE THIS SIZE IS OUTSIDE THE UNCERTAINTY RANGE")+'</b></p>'+(tooClose?'<p style="font-size:15px">Collect enough randomized responses in both arms before declaring a superior invitation.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="againbtn" id="abRunBigger" style="font-size:11px;padding:12px 14px">RUN IT BIGGER NEXT TIME ✓</button><button class="againbtn" id="abDeclare" style="font-size:11px;padding:12px 14px;background:var(--red)">DECLARE A WINNER</button></div><p id="abVerdictMsg" style="font-size:15px;margin-top:10px"></p>':'<p style="font-size:15px">Declaring the leading variant is defensible at this gap. Still report the uncertainty range with the result.</p>')+'</div>';
   }
   if(state.level===3||state.level===6){
     var ch=state.stakeholder||"pushback";
     var txt= ch==="accept"?"Detective: ACCEPT modeled the eight-question request as +4 min, −10 goodwill, and 10 cr. Check the patience leak above.": ch==="rotate"?"Detective: Rotating modules are modeled as +1 minute, −3 goodwill, and 4 credits. Extra-topic answers are not simulated or scored.":"Detective: PUSH BACK kept the instrument focused (0 cr). The cost is a stakeholder conversation, not added survey burden.";
     var impact=stakeholderImpact();
-    h+='<div class="reportcard"><h2>STAKEHOLDER DEBRIEF</h2><p><b>YOUR RESPONSE:</b> '+impact.title+'</p><p>'+txt+'</p><p><b>STAKEHOLDER:</b> '+impact.response+'</p><p>Evidence from this send: '+c.completed+' of '+c.sent+' sent sprites completed · '+estMinutes()+' minutes · '+Math.max(0,gmEndingForReport())+' ending goodwill · '+c.drops.patience+' patience drop-offs. Extra-topic coverage is not scored separately.</p></div>';
+    h+='<div class="reportcard"><h2>STAKEHOLDER DEBRIEF</h2><p><b>YOUR RESPONSE:</b> '+impact.title+'</p><p>'+txt+'</p><p><b>STAKEHOLDER:</b> '+impact.response+'</p><p>Evidence from this send: '+fmt(c.completed)+' of '+fmt(c.sent)+' simulated recipients completed · '+estMinutes()+' minutes · '+Math.max(0,gmEndingForReport())+' ending goodwill · '+fmt(c.drops.patience)+' patience drop-offs. Extra-topic coverage is not scored separately.</p></div>';
   }
   if(state.level===4){
     h+='<div class="reportcard"><h2>TIRED LIST · GOODWILL GATE</h2><p style="font-size:15.5px">Ending goodwill: <b>'+Math.max(0,gmEndingForReport())+' / must be 35+</b>. '+(state.reportBack?"Report back line was on (3 cr): what changed last time did the restoring.":"No report back line — the list got another ask with no proof the last one mattered.")+' Short instrument (≤7 kept) restores the most.</p></div>';
@@ -3519,7 +3593,7 @@ function extraReportHTML(c){
     var rows=Object.keys(c.perLang).sort().map(function(k){var v=c.perLang[k]; return '<tr><td>'+k.toUpperCase()+'</td><td>'+v.invited+'</td><td>'+v.completed+'</td><td>'+(v.invited?pct(v.completed/v.invited*100):"0%")+'</td></tr>';}).join("");
     var nonTot=0,nonComp=0; Object.keys(c.perLang).forEach(function(k){if(k!=="en"){nonTot+=c.perLang[k].invited; nonComp+=c.perLang[k].completed;}});
     var share=c.completed?Math.round(nonComp/c.completed*1000)/10:0;
-    h+='<div class="reportcard"><h2>FUNNEL BY LANGUAGE · SIMULATED</h2><div class="simnote">Sent sprites (40 = full segment when no breaker trips). Non-English share of completions: <b>'+share+'%</b> (non-English is ~60% of the list).</div><table class="mini"><tr><th>Language</th><th>Sprites sent</th><th>Completed</th><th>Rate</th></tr>'+rows+'</table><p style="font-size:15px">'+(state.langChoice==="localized"?"Localized invite was on (4 cr)"+(state.localization?" plus localization review (8 cr).":" — but no localization review was bought, so wording risk remains."):"English only: the largest leak is the non-English drop. Buy the localized invite (4 cr) and localization review (8 cr).")+'</p></div>';
+    h+='<div class="reportcard"><h2>FUNNEL BY LANGUAGE · SIMULATED</h2><div class="simnote">Counts come from individual recipient records. Non-English share of completions: <b>'+share+'%</b> (non-English is ~60% of the list).</div><table class="mini"><tr><th>Language</th><th>Recipients sent</th><th>Completed</th><th>Rate</th></tr>'+rows+'</table><p style="font-size:15px">'+(state.langChoice==="localized"?"Localized invite was on (4 cr)"+(state.localization?" plus localization review (8 cr).":" — but no localization review was bought, so wording risk remains."):"English only: the largest leak is the non-English drop. Buy the localized invite (4 cr) and localization review (8 cr).")+'</p></div>';
   }
   return h;
 }
@@ -3527,8 +3601,7 @@ function gmEndingForReport(){ return runData ? runData.gm.ending : 0; }
 /* ---- Bounce-backs: the individual undeliverable addresses behind the
    funnel's DELIVERED gate, listed in the report's deliverability card.
    Counts mirror the exact numbers the report prints for the funnel (same
-   tally counts, same scale, same rounding points): hard is rounded on its
-   own, the total is rounded on its own, and soft is total minus hard, so
+   individual tally counts): hard and soft are counted directly, so
    the split always sums exactly to the printed total. Causes mirror the
    validation model in effInvalidRate(): full validation leaves only the
    catch-all floor (its survivors are 0.15 of the raw invalid rate); partial
@@ -3553,9 +3626,9 @@ function bbQuotaKeys(counts, rng){
   for (var i = keys.length - 1; i > 0; i--){ var j = Math.floor(rng() * (i + 1)); var t = keys[i]; keys[i] = keys[j]; keys[j] = t; }
   return keys;
 }
-function computeBounceBacks(c, scale){
-  var hard = Math.round(c.bouncedHard * scale);
-  var total = Math.round((c.bouncedHard + c.bouncedSoft) * scale);
+function computeBounceBacks(c){
+  var hard = c.bouncedHard;
+  var total = c.bouncedHard + c.bouncedSoft;
   var soft = total - hard;
   var val = state.validation;
   var causes = { catchall: 0, never: 0, partial: 0 };
@@ -3656,21 +3729,21 @@ function showQuickFinalReport(run, c, rate, quality, ins, won){
   } else if (comp.flavor === "late"){
     var lq = questionById(comp.qid);
     compLine = comp.source + ' added Q' + comp.qid + ' (' + defectOf(lq) + ') after wave 1. ' +
-      (state.qstate[comp.qid] === "simplify" ? 'It went out repaired with ' + fixVerbFor(lq) + '.' : 'It went out as written, and its defect rode along in wave 2.');
+      (state.qstate[comp.qid] === "cut" ? 'Cut before wave 2; the required question was not fielded.' : state.qstate[comp.qid] === "simplify" ? 'It went out repaired with ' + fixVerbFor(lq) + '.' : 'It went out as written, and its defect rode along in wave 2.');
   } else {
     compLine = 'The sponsor\'s second push fielded ' + state.reminders + ' reminder wave' + (state.reminders === 1 ? '' : 's') + ' over the wave 2 pass.';
   }
   var lateLine = '';
   if (comp.flavor === "late"){
     var lq2 = questionById(comp.qid);
-    lateLine = '<p><b>LATE Q' + comp.qid + ' · ' + defectOf(lq2) + ':</b> ' + (state.qstate[comp.qid] === "simplify" ? 'Repaired with ' + fixVerbFor(lq2) + ' before wave 2' : 'Carried as written into wave 2') + '</p>';
+    lateLine = '<p><b>LATE Q' + comp.qid + ' · ' + defectOf(lq2) + ':</b> ' + (state.qstate[comp.qid] === "cut" ? 'Cut before wave 2; required item NOT MET' : state.qstate[comp.qid] === "simplify" ? 'Repaired with ' + fixVerbFor(lq2) + ' before wave 2' : 'Carried as written into wave 2') + '</p>';
   }
   $("report").innerHTML = '<div class="reportcard"><h2>QUICK CHALLENGE · ' + (won ? "WON" : "TRY ANOTHER REPAIR") + ' · FINAL</h2>' +
     '<p>' + qc.name + ' · two waves · ' + totalSpent + ' / ' + QUICK_BUDGET + ' credits</p>' +
-    '<p><b>WAVE 1</b> · Response <b>' + pct(w1.rate * 100) + '</b> · Quality <b>' + w1.quality + '</b> · Insight <b>' + w1.insight + '</b> · ' + (w1.won ? 'WON' : 'NOT WON') + ' · ' + w1.cost + ' credits · ' + w1.completed + ' of ' + w1.sent + ' sent sprites completed</p>' +
+    '<p><b>WAVE 1</b> · Response <b>' + pct(w1.rate * 100) + '</b> · Quality <b>' + w1.quality + '</b> · Insight <b>' + w1.insight + '</b> · ' + (w1.won ? 'WON' : 'NOT WON') + ' · ' + w1.cost + ' credits · ' + fmt(w1.completed) + ' of ' + fmt(w1.sent) + ' simulated recipients completed</p>' +
     '<p><b>COMPLICATION · ' + quickComplicationTitle(comp) + '</b> · ' + compLine + '</p>' +
-    '<p><b>WAVE 2</b> · Response <b>' + pct(rate * 100) + '</b> · Quality <b>' + quality + '</b> · Insight <b>' + ins.score + '</b> · ' + c.completed + ' of ' + c.sent + ' sent sprites completed</p>' +
-    '<p><b>COMBINED</b> · Response <b>' + pct(combRate * 100) + '</b> across both waves (' + combCompleted + ' of ' + combSent + ' sends; bar above ' + targetPct(curLevel().target) + '%) · Quality <b>' + quality + '</b> (' + quickQualityGate() + '+) · Insight <b>' + ins.score + '</b> (' + insightGate() + '+), read from the final instrument\'s wave</p>' +
+    '<p><b>WAVE 2</b> · Response <b>' + pct(rate * 100) + '</b> · Quality <b>' + quality + '</b> · Insight <b>' + ins.score + '</b> · ' + fmt(c.completed) + ' of ' + fmt(c.sent) + ' simulated recipients completed</p>' +
+    '<p><b>COMBINED</b> · Response <b>' + pct(combRate * 100) + '</b> across both waves (' + fmt(combCompleted) + ' of ' + fmt(combSent) + ' sends; bar above ' + targetPct(curLevel().target) + '%) · Quality <b>' + quality + '</b> (' + quickQualityGate() + '+) · Insight <b>' + ins.score + '</b> (' + insightGate() + '+), read from the final instrument\'s wave</p>' +
     '<p>BRD card repairs <b>' + repaired + ' / 3</b> (all three required) · Extras resolved <b>' + resolved + ' / ' + extras.length + '</b> (repair or cut each one)</p>' + twistLine + lateLine +
     activeQuestions().filter(function(q){ return q.id !== qc.lateQid; }).map(function(q){
       var st = state.qstate[q.id];
@@ -3707,6 +3780,32 @@ function quickExtraResolved(q){
   if (defectOf(q) === "CLEAN") return st === "keep" || st === "cut";
   return st === "simplify" || st === "cut";
 }
+function qualityAssessment(run, c){
+  var seg = state.seg, keptUnsimplifiedUnanswerable = 0, nobodyCan = 0;
+  run.kept.forEach(function(q){
+    if (!q.answerBy || state.qstate[q.id] !== "keep") return;
+    keptUnsimplifiedUnanswerable++;
+    var share = PKEYS.reduce(function(sum,k){ return sum + (q.answerBy.indexOf(k) !== -1 ? seg.mix[k] : 0); }, 0);
+    if (share < 0.10) nobodyCan++;
+  });
+  var keptCore = run.kept.filter(function(q){ return q.core; }).length;
+  var missingCore = Math.max(0, coreTotalAvailable() - keptCore);
+  var overMin = state.invite.id === "honest" ? Math.max(0, Math.ceil(estMinutes() - state.invite.promise)) : 0;
+  var qGuess = Math.round(160 * c.guessed / Math.max(1, c.invited)), qNobody = 3 * nobodyCan,
+    qOver = 2 * overMin, qCore = 10 * missingCore, qEsc = state.escapes && c.escapesUsed > 0 ? 5 : 0;
+  function sharePct(n){ return c.completed ? Math.round(n / c.completed * 1000) / 10 : 0; }
+  var shSpeed = sharePct(c.qSpeed), shStraight = sharePct(c.qStraight), shFwd = sharePct(c.qFwd), shJunk = sharePct(c.qJunk);
+  var shTop = sharePct(c.qTopBox), shMush = sharePct(c.qMush), shRef = sharePct(c.qRefusal), shInc = sharePct(c.qInconsist), shEst = sharePct(c.qEstimate);
+  var qSpeed = Math.round(shSpeed * 0.6), qStraight = Math.round(shStraight * 0.6),
+    qDup = Math.round(120 * c.qDup / Math.max(1, c.invited)), qFwd = Math.round(shFwd * 0.5), qJunk = Math.round(shJunk * 0.4),
+    qTopD = Math.round(shTop * 0.5), qMushD = Math.round(shMush * 0.5), qRefD = Math.round(shRef * 0.5),
+    qIncD = Math.round(shInc * 0.5), qEstD = Math.round(shEst * 0.5), qLoc = state.localization ? 2 : 0;
+  var quality = Math.max(0, Math.min(100, 100 - qGuess - qNobody - qOver - qCore + qEsc - qSpeed - qStraight - qDup - qFwd - qJunk - qTopD - qMushD - qRefD - qIncD - qEstD + qLoc));
+  return { quality, keptUnsimplifiedUnanswerable, nobodyCan, missingCore, overMin, sharePct,
+    qGuess, qNobody, qOver, qCore, qEsc, qSpeed, qStraight, qDup, qFwd, qJunk, qTopD, qMushD, qRefD, qIncD, qEstD, qLoc,
+    shSpeed, shStraight, shFwd, shJunk, shTop, shMush, shRef, shInc, shEst };
+}
+
 function showReport(){
   if (!runData || state.reportShown) return;
   state.reportShown = true;
@@ -3716,34 +3815,17 @@ function showReport(){
   var remainingAfter = BUDGET_TOTAL - spentAfter;
   var prevUnlocked = state.unlocked;
   var run = runData, c = tally(run), seg = state.seg, gm = run.gm;
-  var scale = run.scale;
-  if (!run.bounceBacks) run.bounceBacks = computeBounceBacks(c, scale);
+  renderPopulationProgress(run, Infinity);
+  if (!run.bounceBacks) run.bounceBacks = computeBounceBacks(c);
   var simInvites = seg.n;
-  var simSent = c.sent * scale, simDelivered = c.delivered * scale, simBounced = (c.bouncedHard + c.bouncedSoft) * scale, simOpened = c.opened * scale, simStarted = c.started * scale, simCompleted = c.completed * scale;
+  var simSent = c.sent, simDelivered = c.delivered, simBounced = c.bouncedHard + c.bouncedSoft,
+    simOpened = c.opened, simStarted = c.started, simCompleted = c.completed;
   var respRate = c.sent ? c.completed / c.sent : 0;
   var compRate = c.started ? c.completed / c.started : 0;
 
-  /* data quality */
-  var keptUnsimplifiedUnanswerable = 0, nobodyCan = 0;
-  run.kept.forEach(function(q){
-    if (!q.answerBy || state.qstate[q.id] !== "keep") return;
-    keptUnsimplifiedUnanswerable++;
-    var share = PKEYS.reduce(function(a,k){ return a + (q.answerBy.indexOf(k) !== -1 ? seg.mix[k] : 0); }, 0);
-    if (share < 0.10) nobodyCan++;
-  });
-  var keptCore = run.kept.filter(function(q){ return q.core; }).length;
-  var missingCore = Math.max(0, coreTotalAvailable() - keptCore);
-  var overMin = state.invite.id === "honest" ? Math.max(0, Math.ceil(estMinutes() - state.invite.promise)) : 0;
-  var qGuess = 4 * c.guessed, qNobody = 3 * nobodyCan, qOver = 2 * overMin,
-      qCore = 10 * missingCore, qEsc = (state.escapes && c.escapesUsed > 0) ? 5 : 0;
-  function sharePct(n){ return c.completed ? Math.round(n / c.completed * 1000) / 10 : 0; }
-  var shSpeed = sharePct(c.qSpeed), shStraight = sharePct(c.qStraight), shFwd = sharePct(c.qFwd), shJunk = sharePct(c.qJunk);
-  var shTop = sharePct(c.qTopBox), shMush = sharePct(c.qMush), shRef = sharePct(c.qRefusal), shInc = sharePct(c.qInconsist), shEst = sharePct(c.qEstimate);
-  var qSpeed = Math.round(shSpeed * 0.6), qStraight = Math.round(shStraight * 0.6),
-      qDup = 3 * c.qDup, qFwd = Math.round(shFwd * 0.5), qJunk = Math.round(shJunk * 0.4),
-      qTopD = Math.round(shTop * 0.5), qMushD = Math.round(shMush * 0.5), qRefD = Math.round(shRef * 0.5), qIncD = Math.round(shInc * 0.5), qEstD = Math.round(shEst * 0.5),
-      qLoc = state.localization ? 2 : 0;
-  var quality = Math.max(0, Math.min(100, 100 - qGuess - qNobody - qOver - qCore + qEsc - qSpeed - qStraight - qDup - qFwd - qJunk - qTopD - qMushD - qRefD - qIncD - qEstD + qLoc));
+  var { quality, keptUnsimplifiedUnanswerable, nobodyCan, missingCore, overMin, sharePct,
+    qGuess, qNobody, qOver, qCore, qEsc, qSpeed, qStraight, qDup, qFwd, qJunk, qTopD, qMushD, qRefD, qIncD, qEstD, qLoc,
+    shSpeed, shStraight, shFwd, shJunk, shTop, shMush, shRef, shInc, shEst } = qualityAssessment(run, c);
 
   var evidence = state.quickChallenge ? null : evaluateEvidence(run, c, quality);
   var ins = evidence ? evidence.insight : computeInsight(c, run);
@@ -3761,7 +3843,8 @@ function showReport(){
        quality and Insight describe the final instrument's wave. */
     var qcVerdict = state.quickChallenge;
     var structuralMet = quickCoreQuestions().every(function(q){return state.qstate[q.id] === "simplify";})
-      && quickScoredExtras().every(quickExtraResolved);
+      && quickScoredExtras().every(quickExtraResolved)
+      && (!qcVerdict.lateQid || state.qstate[qcVerdict.lateQid] !== "cut");
     if (qcVerdict.wave === 2 && qcVerdict.wave1){
       var combRate = (qcVerdict.wave1.completed + c.completed) / Math.max(1, qcVerdict.wave1.sent + c.sent);
       won = combRate > targetRate && quality >= quickQualityGate() && insight >= insightGate()
@@ -3799,22 +3882,22 @@ function showReport(){
     return best;
   }
   var dropDefs = [
-    { key:"noopen", n: c.drops.noopen * scale, gate:"INVITED \u2192 OPENED",
+    { key:"noopen", n: c.drops.noopen, gate:"INVITED \u2192 OPENED",
       cause:function(p){ return "The invite never earned a click. The subject line gave " + PERSONAS[p].lower + "s no reason to stop and open it."; },
       lever:"LEVER 2 · INVITATION", quest:"Switch to the Known Name invite and keep 1 reminder on. The why-me line is what buys the open." },
-    { key:"nostart", n: c.drops.nostart * scale, gate:"OPENED \u2192 STARTED",
+    { key:"nostart", n: c.drops.nostart, gate:"OPENED \u2192 STARTED",
       cause:function(p){ return "They opened, then bounced before question one. The ask never said why them, or how long it would take."; },
       lever:"LEVER 2 · INVITATION", quest:"Use an invite with a why-me line and a stated time, then check the questionnaire really matches the promise." },
-    { key:"patience", n: c.drops.patience * scale, gate:"INSIDE THE SURVEY · CLOCK",
+    { key:"patience", n: c.drops.patience, gate:"INSIDE THE SURVEY · CLOCK",
       cause:function(p){ return "The survey ran past the " + PERSONAS[p].lower + "'s patience of about " + PERSONAS[p].patience + " minutes, and the clock won."; },
       lever:"LEVER 3 · QUESTIONNAIRE", quest:"Cut questions, or SIMPLIFY a WORDY STEM (the one class that verb fixes), until the estimated length fits inside the shortest patience in your mix. Speeding traces to total length, so length is the lever." },
-    { key:"knowledge", n: c.drops.knowledge * scale, gate:"INSIDE THE SURVEY · KNOWLEDGE",
+    { key:"knowledge", n: c.drops.knowledge, gate:"INSIDE THE SURVEY · KNOWLEDGE",
       cause:function(p){ return "A question asked for something a " + PERSONAS[p].lower + " cannot see from their role, so they quit instead of guessing."; },
       lever:"LEVER 3 · QUESTIONNAIRE", quest:"Name the class first: BEYOND KNOWLEDGE has no wording fix, so CUT it (1 cr) or buy DK/NA escapes; JARGON takes DEFINE, a VAGUE TIMEFRAME takes ANCHOR (2 cr each)." },
-    { key:"mobile", n: c.drops.mobile * scale, gate:"INSIDE THE SURVEY · PHONE",
+    { key:"mobile", n: c.drops.mobile, gate:"INSIDE THE SURVEY · PHONE",
       cause:function(p){ return "A wide grid question on a phone screen ended the run for " + PERSONAS[p].lower + "s answering between other jobs."; },
       lever:"LEVER 3 · QUESTIONNAIRE", quest:"The class is GRID BURDEN: BREAK UP the grid (3 cr) so it works one item at a time on a phone, or CUT it (1 cr) and ask the top item only." },
-    { key:"breaker", n: c.drops.breaker * scale, gate:"GOODWILL BREAKER",
+    { key:"breaker", n: c.drops.breaker, gate:"GOODWILL BREAKER",
       cause:function(){ return "The goodwill breaker ended the run while this invitation or response was still in the funnel. Results after the cutoff are not counted."; },
       lever:"LEVER 1 · GOODWILL", quest:"Trim the instrument, avoid unnecessary reminders, and suppress people who should not receive another invite." }
   ];
@@ -3824,7 +3907,7 @@ function showReport(){
   /* reminder worth */
   function worthLine(r, recovered){
     if (state.reminders < r) return "";
-    var sim = recovered * scale;
+    var sim = recovered;
     var verdict = sim >= 100 ? "Worth it." : "Poor trade.";
     return "<tr><td>Reminder " + r + " recovered</td><td>\u2248" + fmt(sim) + " completions for 5 goodwill · " + verdict + "</td></tr>";
   }
@@ -3868,7 +3951,7 @@ function showReport(){
 
   /* funnel */
   html += '<div class="reportcard"><h2>THE FUNNEL · SIMULATED</h2>' +
-    '<div class="simnote">Simulated from your three lever choices. ' + fmt(seg.n) + " invites are shown as 40 sprites, so each sprite stands for " + fmt(scale) + " people.</div>" +
+    '<div class="simnote">All ' + fmt(run.respondents.length) + ' recipients were simulated individually. The animation uses ' + fmt(run.sprites.length) + ' behavior groups labeled with their sizes; no result is multiplied from an animation sample.</div>' +
     '<div class="funnel" style="grid-template-columns:repeat(3,1fr)">' + funnelSteps.map(function(f){
       return '<div class="fstep"><div class="fl">' + f[0] + '</div><div class="fv">' + fmt(f[1]) + '</div><div class="fb"><div style="width:' + Math.max(2, f[2] * 100) + '%"></div></div></div>';
     }).join("") + "</div>" +
@@ -3918,15 +4001,15 @@ function showReport(){
   if (!state.suppression) openEffectTxt += " Mailing opted-out and recently surveyed people cost 5 reputation on top.";
   function flagRow(name, count, share, ded, cause, fix){
     if (!count) return "<p style='font-size:15px;margin:4px 0'><b>" + name + ": 0.</b> None flagged this round.</p>";
-    return "<p style='font-size:15px;margin:4px 0'><b>" + name + ": " + fmt(count * scale) + " responses (" + share + "% of completions, \u2212" + ded + " quality).</b> " + cause + " <b>Fix:</b> " + fix + "</p>";
+    return "<p style='font-size:15px;margin:4px 0'><b>" + name + ": " + fmt(count) + " responses (" + share + "% of completions, \u2212" + ded + " quality).</b> " + cause + " <b>Fix:</b> " + fix + "</p>";
   }
   html += '<div class="reportcard"><h2>DELIVERABILITY AND DATA</h2>' +
     '<div class="simnote">What the mail system and the data itself did, priced against the prep you bought or skipped. This attempt cost <b>' + (state.launchCost || 0) + " credits</b>; level pool spent so far <b>" + spentAfter + " / " + BUDGET_TOTAL + "</b>, leaving <b>" + remainingAfter + " credits</b>.</div>" +
-    "<p style='font-size:15.5px;margin:4px 0'><b>Delivered " + fmt(simDelivered) + " of " + fmt(simSent) + " sent.</b> Bounced " + fmt(simBounced) + " (" + fmt(c.bouncedHard * scale) + " hard (dead addresses) and " + fmt(c.bouncedSoft * scale) + " soft (full or failing mailboxes). Bounce rate <b>" + bounceRatePct + "%</b>, hard bounce rate <b>" + hardRatePct + "%</b>.</p>" +
-    "<p style='font-size:15.5px;margin:4px 0'><b>UNOPENED \u00B7 " + fmt((c.delivered - c.opened) * scale) + "</b> sat in inboxes, never opened." + (state.reminders ? " The reminder wave" + (state.reminders > 1 ? "s" : "") + " you bought went out to exactly these inboxes." : " No reminder waves were bought to nudge them.") + "</p>" +
+    "<p style='font-size:15.5px;margin:4px 0'><b>Delivered " + fmt(simDelivered) + " of " + fmt(simSent) + " sent.</b> Bounced " + fmt(simBounced) + " (" + fmt(c.bouncedHard) + " hard (dead addresses) and " + fmt(c.bouncedSoft) + " soft (full or failing mailboxes). Bounce rate <b>" + bounceRatePct + "%</b>, hard bounce rate <b>" + hardRatePct + "%</b>.</p>" +
+    "<p style='font-size:15.5px;margin:4px 0'><b>UNOPENED \u00B7 " + fmt(c.delivered - c.opened) + "</b> sat in inboxes, never opened." + (state.reminders ? " The reminder wave" + (state.reminders > 1 ? "s" : "") + " you bought went out to exactly these inboxes." : " No reminder waves were bought to nudge them.") + "</p>" +
     "<p style='font-size:15.5px;margin:4px 0'><b>Sender reputation: " + rmR.before + " \u2192 " + repA + ".</b> " + openEffectTxt + "</p>" +
     "<p style='font-size:15.5px;margin:4px 0'><b>Validation verdict:</b> " + valVerdict + "</p>" +
-    (c.angry ? "<p style='font-size:15.5px;margin:4px 0'><b>Suppression skipped:</b> " + c.angry + " sprite(s) are people who opted out or were surveyed recently, mailed anyway. Goodwill took the hit in the ledger above. <b>Fix:</b> buy the Suppression scrub (4 cr) in PREPARE THE LIST.</p>" : "") +
+    (c.angry ? "<p style='font-size:15.5px;margin:4px 0'><b>Suppression skipped:</b> " + fmt(c.angry) + " recipients who opted out or were surveyed recently were mailed anyway. Goodwill took the hit in the ledger above. <b>Fix:</b> buy the Suppression scrub (4 cr) in PREPARE THE LIST.</p>" : "") +
     (c.dupEnv ? "<p style='font-size:15.5px;margin:4px 0'><b>No dedupe:</b> duplicate envelopes went out during the run. <b>Fix:</b> buy the Dedupe pass (4 cr).</p>" : "") +
     bounceBacksHTML(run.bounceBacks) +
     '<h2 style="margin-top:14px">DATA QUALITY FLAGS</h2>' +
@@ -3945,18 +4028,18 @@ function showReport(){
   /* guesses + quality breakdown */
   html += '<div class="reportcard"><h2>GUESSES FLAGGED · DATA QUALITY</h2>' +
     "<p style='font-size:15.5px;margin:4px 0'>" + (c.guessed
-      ? "<b>" + fmt(c.guessed * scale) + " completions</b> included a guessed answer on a question the respondent's role cannot answer. A guess counts as a completion and still poisons the data: it looks like signal and is not." + (c.guessedAny > c.guessed ? " Another " + fmt((c.guessedAny - c.guessed) * scale) + " respondents guessed too, then quit later anyway." : "")
-      : (c.guessedAny ? fmt(c.guessedAny * scale) + " respondents guessed at a question their role cannot answer, then quit later anyway. No completion carried a guess, so quality is untouched, but the guessing itself is the smoke, not the fire."
+      ? "<b>" + fmt(c.guessed) + " completions</b> included a guessed answer on a question the respondent's role cannot answer. A guess counts as a completion and still poisons the data: it looks like signal and is not." + (c.guessedAny > c.guessed ? " Another " + fmt(c.guessedAny - c.guessed) + " respondents guessed too, then quit later anyway." : "")
+      : (c.guessedAny ? fmt(c.guessedAny) + " respondents guessed at a question their role cannot answer, then quit later anyway. No completion carried a guess, so quality is untouched, but the guessing itself is the smoke, not the fire."
         : "No guessed answers this round. Every completion is data you can defend.")) + "</p>" +
     '<div class="qbreak">' +
     "<span>Quality starts at 100.</span>" +
-    (qGuess ? "<span>\u2212" + qGuess + " for guessed completions (" + c.guessed + " guessing respondents \u00D7 4)</span>" : "") +
+    (qGuess ? "<span>\u2212" + qGuess + " for guessed completions (based on their share of invited recipients)</span>" : "") +
     (qNobody ? "<span>\u2212" + qNobody + " for kept questions essentially no one in this segment can answer (\u00D7 3)</span>" : "") +
     (qOver ? "<span>\u2212" + qOver + " for overrunning the invite's stated time (" + overMin + " min \u00D7 2)</span>" : "") +
     (qCore ? "<span>\u2212" + qCore + " for cutting " + missingCore + " of the " + coreTotalAvailable() + " core questions in play (\u00D7 10). A one-question survey posts a great rate and decides nothing.</span>" : "") +
     (qSpeed ? "<span>\u2212" + qSpeed + " for speeders (" + shSpeed + "% of completions; excluded from usable campaign evidence)</span>" : "") +
     (qStraight ? "<span>\u2212" + qStraight + " for straight liners (" + shStraight + "% of completions)</span>" : "") +
-    (qDup ? "<span>\u2212" + qDup + " for duplicates (" + c.qDup + " duplicate responses \u00D7 3)</span>" : "") +
+    (qDup ? "<span>\u2212" + qDup + " for duplicates (based on their share of invited recipients)</span>" : "") +
     (qFwd ? "<span>\u2212" + qFwd + " for forwarded link responses (" + shFwd + "% of completions)</span>" : "") +
     (qJunk ? "<span>\u2212" + qJunk + " for junk / Other-box noise (" + shJunk + "% of completions)</span>" : "") +
     (qTopD ? "<span>\u2212" + qTopD + " for suspect top-box inflation from a LEADING question (" + shTop + "% of completions)</span>" : "") +
@@ -3989,7 +4072,7 @@ function showReport(){
     var n = symptomCountFor(q);
     if (n > 0) defectObserved.push({ q: q, d: d, n: n });
     var fixTxt = fixVerbFor(q) ? fixVerbFor(q) + " (" + fixCostFor(q) + " cr) or CUT (1 cr)" : "No wording fix \u2014 CUT (1 cr) or DK/NA escapes (2 cr)";
-    return "<p style='font-size:15px;margin:4px 0'><b>Q" + q.id + " \u00B7 " + d + ": " + (n > 0 ? "OBSERVED" : "LATENT") + ".</b> Symptom: " + info.symptom + (n > 0 ? " \u2014 " + fmt(n * scale) + " simulated respondents (" + n + " sprites) showed it this run." : " \u2014 no symptom this run, so no count is claimed; the defect is still a measurement risk.") + " <b>Fix:</b> " + fixTxt + "</p>";
+    return "<p style='font-size:15px;margin:4px 0'><b>Q" + q.id + " \u00B7 " + d + ": " + (n > 0 ? "OBSERVED" : "LATENT") + ".</b> Symptom: " + info.symptom + (n > 0 ? " \u2014 " + fmt(n) + " simulated respondents showed it this run." : " \u2014 no symptom this run, so no count is claimed; the defect is still a measurement risk.") + " <b>Fix:</b> " + fixTxt + "</p>";
   }).join("");
   var largestObservedDefect = defectObserved.sort(function(a,b){ return b.n - a.n; })[0] || null;
   html += '<div class="reportcard"><h2>DEFECT DIAGNOSTICS \u00B7 PER QUESTION</h2>' +
@@ -4018,7 +4101,7 @@ function showReport(){
   } else if (largestObservedDefect){
     var LOD = largestObservedDefect, lodInfo = fixInfoFor(LOD.q);
     html += '<div class="reportcard"><h2>FIX QUEST · NEXT TRY</h2><div class="quest"><span class="px">\u2605 QUEST</span>' +
-      "Largest OBSERVED defect damage: <b>" + LOD.d + "</b> on Q" + LOD.q.id + " \u2014 " + lodInfo.symptom.toLowerCase() + ", " + fmt(LOD.n * scale) + " simulated respondents this run. " +
+      "Largest OBSERVED defect damage: <b>" + LOD.d + "</b> on Q" + LOD.q.id + " \u2014 " + lodInfo.symptom.toLowerCase() + ", " + fmt(LOD.n) + " simulated respondents this run. " +
       (fixVerbFor(LOD.q) ? "Apply the class-correct fix: <b>" + fixVerbFor(LOD.q) + " (" + fixCostFor(LOD.q) + " cr)</b>, or CUT it (1 cr). No other verb fixes this class." : "<b>No wording fix exists for this class.</b> CUT it (1 cr), or buy the DK/NA escapes (2 cr) so it stops ending runs.") + "</div></div>";
   } else if (questDrop){
     var qp = topPersona(questDrop.key) || "end";
@@ -4034,7 +4117,7 @@ function showReport(){
     var tv = quickVariant();
     var tcheck = quickVariantCheck(rate, quality);
     var twistLine = tv ? '<p>BRD twist · <b>' + tv.name + '</b>: ' + tv.acceptance + ' — <b>' + (tcheck.met ? "MET" : "NOT MET") + '</b> (' + tcheck.detail + ')</p>' : '';
-    $("report").innerHTML='<div class="reportcard"><h2>QUICK CHALLENGE · '+(won?"WON":"TRY ANOTHER REPAIR")+'</h2><p>'+state.quickChallenge.name+' · '+(state.quickChallenge.comp?'wave 1':'one launch')+' · '+state.launchCost+' / '+QUICK_BUDGET+' credits</p><p>BRD card repairs <b>'+repaired+' / 3</b> (all three required) · Extras resolved <b>'+resolved+' / '+extras.length+'</b> (repair or cut each one)</p>'+twistLine+'<p>Response <b>'+pct(rate*100)+'</b> (above '+targetPct(curLevel().target)+'%) · Quality <b>'+quality+'</b> ('+quickQualityGate()+'+) · Insight <b>'+ins.score+'</b> ('+insightGate()+'+)</p><p>'+c.completed+' of '+c.sent+' sent sprites completed. All results simulated.</p>'+activeQuestions().map(function(q){
+    $("report").innerHTML='<div class="reportcard"><h2>QUICK CHALLENGE · '+(won?"WON":"TRY ANOTHER REPAIR")+'</h2><p>'+state.quickChallenge.name+' · '+(state.quickChallenge.comp?'wave 1':'one launch')+' · '+state.launchCost+' / '+QUICK_BUDGET+' credits</p><p>BRD card repairs <b>'+repaired+' / 3</b> (all three required) · Extras resolved <b>'+resolved+' / '+extras.length+'</b> (repair or cut each one)</p>'+twistLine+'<p>Response <b>'+pct(rate*100)+'</b> (above '+targetPct(curLevel().target)+'%) · Quality <b>'+quality+'</b> ('+quickQualityGate()+'+) · Insight <b>'+ins.score+'</b> ('+insightGate()+'+)</p><p>'+fmt(c.completed)+' of '+fmt(c.sent)+' simulated recipients completed. All results simulated.</p>'+activeQuestions().map(function(q){
       var st = state.qstate[q.id];
       var kind = tierOf(q) === "stupid" ? "LOW-VALUE" : tierOf(q) === "filler" ? "FILLER" : defectOf(q);
       var verdict;
@@ -4115,8 +4198,8 @@ function showReport(){
     if (gb){ gb.classList.add("stamp"); sndStamp(); }
     if (won) spawnConfetti();
   }, 180);
-  var rb1=$("abRunBigger"); if(rb1) rb1.addEventListener("click",function(){ $("abVerdictMsg").innerHTML="<b>Inconclusive result.</b> The gap is within the game's uncertainty range. A larger randomized sample could give a more precise estimate. This verdict does not change scores."; sndNeutral(); });
-  var dc1=$("abDeclare"); if(dc1) dc1.addEventListener("click",function(){ $("abVerdictMsg").innerHTML="<b>Not defensible yet.</b> The gap is within the game's uncertainty range. Do not declare a superior invitation from this result. This verdict does not change scores."; sndWrong(); });
+  var rb1=$("abRunBigger"); if(rb1) rb1.addEventListener("click",function(){ $("abVerdictMsg").innerHTML="<b>Inconclusive result.</b> A larger randomized sample in both invitation groups could give a more precise estimate. This verdict does not change scores."; sndNeutral(); });
+  var dc1=$("abDeclare"); if(dc1) dc1.addEventListener("click",function(){ $("abVerdictMsg").innerHTML="<b>Not defensible yet.</b> This comparison does not provide enough evidence to declare a superior invitation. Report its limits and collect more data. This verdict does not change scores."; sndWrong(); });
   var ab2=$("againBtn"); if(ab2) ab2.addEventListener("click", function(){
     sndCoin();
     state.attempt++;

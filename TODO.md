@@ -1,22 +1,11 @@
 # Open work
 
-## Verification blocker
-
-- Run the extended tracked browser harness and negative controls in an
-  approved environment with Puppeteer available:
-  `node scripts/harness/run-all.mjs` and
-  `node scripts/harness/self-test.mjs`.
-- The Windows run was blocked by missing tooling and package-fetch policy.
-  Integrated-browser checks and a green deployment do not close this item.
-  Use the [harness guide](scripts/harness/README.md) for provisioning and
-  current coverage; completed integration and dated results remain in the
-  [changelog](CHANGELOG.md).
-
 ## Browser regression expansion
 
-These are proposed saved checks, not claims that earlier session-browser
-evaluations are automated. Extending the tracked harness to this scope
-still requires a scope/workflow decision.
+These are proposed tracked checks. Several were exercised by session-only
+automated UAT on 2026-11-02, as recorded in the [changelog](CHANGELOG.md);
+that does not make them part of the repository harness. Extending the
+tracked harness to this scope still requires a scope/workflow decision.
 
 - Breaker cutoff accounting, interrupted participants, and completions
   on both sides of the cutoff.
@@ -46,6 +35,8 @@ checks own rendered controls and event wiring, not a second scoring model.
 - Scan the expanded QR with a physical phone and repeat key touch journeys
   on iOS Safari and Android Chrome. Cross-browser and screen-reader UAT
   remain unverified.
+- Complete owner acceptance after the remaining human checks; automated
+  player-acceptance tests do not substitute for that decision.
 
 ## Feedback roadmap
 
@@ -81,8 +72,10 @@ The following features remain unimplemented:
   `scripts/generate-winning-setups.mjs`, and update the existing tests.
 - Contract: accept levels/seeds and the current corpus; emit only a complete,
   UI-legal corpus with exact report metadata. Preserve coverage, budgets,
-  core locks, floors, and every acceptance gate; fail before replacing
+  the one-question floor and every acceptance gate; fail before replacing
   fixtures if any required winner is missing.
 - Validate the current corpus and deterministic repeat generation; prove
   that inactive bank items stay unchanged and a failed search leaves the
-  existing fixture file intact. No tooling files have been created.
+  existing fixture file intact. No repository generator or shared-helper
+  module has been created; the population update used session-only action
+  replay to regenerate its witnesses.

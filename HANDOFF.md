@@ -2,44 +2,69 @@
 
 ## Current state
 
-- Evidence fitness is deployed at production
+- Two local gameplay changes are implemented and verified, but not committed,
+  pushed, or deployed:
+  - Any question may be cut except the last, whose CUT is gray/disabled.
+    Missing BRD coverage still penalizes results.
+  - Statistics use individual simulated recipients. Animation uses adaptive,
+    labeled cohorts and an independent exact progress timeline. Quality
+    deductions are rate-based; study gates and budgets are unchanged.
+- The earlier evidence-fitness release is deployed at production
   <https://nice-mushroom-0bdb0ef0f.6.azurestaticapps.net>.
   Gameplay release `3661c23` and documentation receipt `f57b0c7` are
   deployed; both receipts are in the [changelog](CHANGELOG.md).
-  Later continuity-only updates do not change the game package.
-- The meditation reconciled continuity only; no gameplay or test tooling
-  was changed. Fixture generation remains a proposal awaiting approval.
+  Those production receipts predate both local gameplay changes.
+- A persistent fixture generator remains a proposal awaiting approval.
+  Population witnesses were regenerated using session-only action replay;
+  no repository generator or shared test-helper module was created.
 - Quick Challenge stages 2 and 3 are already implemented. New Azure
   provisioning and DNS/custom-domain work remain manual and outside
   this release.
 
-## Blocker
+## Acceptance boundary
 
-The extended CLI browser suite and negative controls remain unverified
-here: Puppeteer was unavailable and installation was blocked by package-fetch
-policy. Use an approved environment; do not treat deployment or prior
-session-browser checks as a passing harness run.
+The full local harness, negative controls, and automated player journeys
+now pass using existing approved Puppeteer/Edge tooling. No installation
+or policy change was needed. Physical-device, screen-reader, human audio,
+and owner acceptance remain open in [TODO.md](TODO.md).
 
 ## Next action
 
-Run the existing browser harness and negative controls in an approved
-environment, then complete the human checks in [TODO.md](TODO.md).
-That file also owns the unimplemented roadmap and the fixture-generator
-proposal, which requires separate approval before authoring.
+Review the two local gameplay changes and publish when requested. Run the
+remaining human checks in [TODO.md](TODO.md); that file also owns the
+unimplemented roadmap and fixture-generator approval decision. Production
+verification must be repeated after any future deployment.
 
-## Verification - 2026-11-01
+## Verification - 2026-11-02
 
-- Latest relevant Node run:
-  `node --test scripts/build-site.test.mjs scripts/game-features.test.mjs`
-  passed 94 tests, including 364 legal witnesses and a continuous campaign.
-  It was not rerun for these continuity-only edits.
+- `node scripts/harness/run-all.mjs` passed all three sections:
+  packaging, 109 Node tests (including all 364 regenerated witnesses),
+  and 119 real-browser checks. `node scripts/harness/self-test.mjs`
+  caught both deliberate defects. Outputs are in ignored harness results.
+- The initial browser failure was an obsolete below-threshold agitation
+  expectation. It now tests an above-threshold Executive Blast; the live
+  observer also has an explicit thousands-separator regression check.
+  No game-source change was required.
+- Separate session-only UAT passed 143 assertions: complete six-level
+  campaigns at 390px/1280px, all three Quick Challenges, natural 20,000-person
+  reduced-motion progress, exact individual/cohort accounting, and BRD cuts
+  down to one disabled gray CUT. This did not install repository automation.
+- Additional browser-tool checks covered modal/keyboard behavior, local fonts
+  and sound controls, QR expansion, breaker accounting, owned prep, and retry
+  recovery. Screenshots of the mobile run, disabled CUT, and desktop finale
+  were visually reviewed. Human-only acceptance is not established by these.
+- Full-harness and UAT game hashes matched:
+  `a5cdb86909d5cd3cdad1760a3cc4621f8cef53994f7d987bb57a41240f19db38`.
+- Changed-file editor diagnostics, harness syntax, and whitespace checks
+  passed. All 75 local links and 3 anchors resolve across 20 tracked
+  Markdown files. Generated results and private feedback remain ignored.
 - [Production workflow 41367108944](https://github.com/fabioc-aloha/SurveyFunnel/actions/runs/41367108944)
   passed for `f57b0c7`, including live-package verification; independent
-  production verification also passed afterward.
-- Integrated-browser mobile/desktop checks passed for the release.
-  Exact scope and historical harness results are in the
-  [changelog](CHANGELOG.md); full CLI, human audio, physical-device,
-  cross-browser, and screen-reader checks remain open in [TODO.md](TODO.md).
+  production verification also passed afterward. That receipt predates
+  both local gameplay changes.
+- Exact historical verification is in the [changelog](CHANGELOG.md);
+  remaining human audio, physical-device, cross-browser, and screen-reader
+  checks are in [TODO.md](TODO.md).
 
 ## References
 

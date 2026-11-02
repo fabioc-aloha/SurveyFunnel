@@ -1,5 +1,97 @@
 # Changelog
 
+## Unreleased - 2026-11-02 - Full regression and automated player acceptance
+
+- The complete tracked harness passed all three sections: production-package
+  validation, 109 Node tests (including every winning witness), and 119 browser
+  checks at mobile and desktop sizes. Both deliberate-defect negative controls
+  caught their intended overflow and page-error failures.
+- Resolved the earlier tooling blocker using Puppeteer 25.12.0 from an
+  existing approved installation and Edge 156.0.4314.58. No package was
+  installed and no package-fetch policy changed.
+- The first browser run passed 115 of 116 checks. Its agitation assertion
+  still expected a 9%-invalid list to cross the new 10% recipient threshold;
+  that assertion now runs on a raw Executive Blast that demonstrably exceeds
+  the threshold. Corrected the live observer to parse comma-formatted
+  recipient counts, with an explicit above-999 regression assertion.
+  No gameplay rules or thresholds changed during this verification.
+- Separate session-only automated UAT passed 143 assertions across five
+  scenarios: uninterrupted six-level campaigns through real controls at
+  390px and 1280px, a naturally completed 20,000-recipient reduced-motion run
+  with exact intermediate counts, all three Quick Challenges with campaign
+  isolation, and BRD cuts down to the protected final question.
+- Additional browser-tool checks passed MPOR/BRD focus, Tab/Shift-Tab
+  containment, inert backgrounds, Escape and opener restoration, MPOR
+  reopened scrolling, mouse/keyboard QR expansion, font loading, sound/hint
+  controls, owned-preparation locks, audience locks, and successive retry
+  cost reductions. A breaker run counted 15,159 actual sends and 4,841
+  unsent recipients from a population of 20,000; its counters reconciled.
+- Visual review confirmed the gray disabled CUT and mobile live counts,
+  cohort labels, and desktop finale scorecard. No overflow or runtime errors
+  occurred in the passing journeys. Game-source hashes matched before/after
+  the complete harness and the separate UAT run.
+- Removed the resolved tooling blocker from current documentation. Physical
+  phone/QR, Safari/Android Chrome, screen-reader, human audio review, and owner
+  acceptance remain open. Local verification does not test a newly deployed
+  release; these changes are still not committed, pushed, or deployed.
+
+## Unreleased - 2026-11-02 - Count every simulated recipient
+
+- Replaced the 40-person statistical proxy with one synthetic record per
+  audience recipient. Live counters follow individual events; final reports,
+  A/B results, cleaning, usable samples, and audience history use those same
+  records. Breaker-stopped invitations are not counted as sent.
+- Animation now groups recipients with similar visible behavior into
+  representative cohorts, labeled with their group size. The group count can
+  exceed 40; changing visual density does not change statistical results.
+  Cohort trajectories illustrate behavior rather than every member's timing.
+- Converted guessed-completion and duplicate deductions to recipient rates,
+  preserving their per-capita weight. Core-question penalties, BRD acceptance,
+  evidence gates, and budgets remain unchanged. Percentages retain enough
+  precision to distinguish one recipient in a 20,000-person audience.
+- Cached the original pixel artwork as SVG images and batched pile geometry
+  measurements to support the larger animation without runtime dependencies.
+- Regenerated all 364 existing winning witnesses through legal card actions,
+  preserving every sampled instrument. All 109 Node tests pass, including the
+  continuous campaign, individual-population contracts, renderer independence,
+  exact live counts, and the earlier cut-rule regressions.
+- Local headless Edge checks passed at 390px and 1280px with 10,000- and
+  20,000-recipient audiences: exact live/final totals, A/B accounting, expected
+  verdicts, and no horizontal overflow or runtime errors. The five scenarios
+  used 183-424 visual groups; unprepared stress runs averaged approximately
+  17-24 ms between frames. These are local measurements, not physical-device
+  guarantees or a passing CLI harness run.
+- Updated the current player, evidence, development, and harness guides.
+  The initial full Puppeteer run was blocked by missing tooling; the later
+  successful run is recorded above. Both this change and the cut-rule update
+  below remain local, not committed, pushed, or deployed.
+
+## Unreleased - 2026-11-02 - Cut any question except the last
+
+- Campaign and Quick Challenge players may cut any question, including
+  core, mandatory-BRD, and late-added cards. The only structural cut
+  restriction is keeping one question. The last CUT button is disabled
+  and grayscale; restoring or adding a question enables cutting again.
+  Both launch paths reject an empty instrument without charging it.
+- Cutting permission does not remove study requirements. Missing core
+  items retain their quality deduction, missing agenda coverage lowers
+  Insight, and unmet mandatory BRD requirements prevent a challenge win.
+  A cut required late item is explicitly NOT MET rather than falsely
+  reported as fielded.
+- Updated setup/MPOR copy, current guides, and the tracked browser scenario.
+  All 97 Node tests pass, including the 364 unchanged winning witnesses,
+  the continuous campaign, and cut/BRD-penalty regressions. The focused
+  specifications failed against the old locks before implementation.
+- Integrated-browser checks passed at 390px and 1280px: arbitrary/core
+  cuts down to one, native disabled/grayscale appearance, refused final
+  cut, real restore/bank controls, one-question launches, and penalized
+  reports for missing campaign/Quick Challenge coverage. No overflow or
+  runtime errors occurred.
+- The tracked browser script passes syntax validation, but its CLI run
+  was initially blocked by unavailable Puppeteer; the later UAT entry above
+  records the successful full run.
+  These changes are local, not committed, pushed, or deployed.
+
 ## 2026-11-01 - Documentation and publication audit
 
 - Updated the README and every design/play/development/deployment guide
