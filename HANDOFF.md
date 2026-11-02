@@ -2,18 +2,18 @@
 
 ## Current state
 
-- Two local gameplay changes are implemented and verified, but not committed,
-  pushed, or deployed:
+- Gameplay release `b45bb69` is committed, pushed to `main`, and deployed:
   - Any question may be cut except the last, whose CUT is gray/disabled.
     Missing BRD coverage still penalizes results.
   - Statistics use individual simulated recipients. Animation uses adaptive,
     labeled cohorts and an independent exact progress timeline. Quality
     deductions are rate-based; study gates and budgets are unchanged.
-- The earlier evidence-fitness release is deployed at production
+- Production is
   <https://nice-mushroom-0bdb0ef0f.6.azurestaticapps.net>.
-  Gameplay release `3661c23` and documentation receipt `f57b0c7` are
-  deployed; both receipts are in the [changelog](CHANGELOG.md).
-  Those production receipts predate both local gameplay changes.
+  [Workflow 41490330923](https://github.com/fabioc-aloha/SurveyFunnel/actions/runs/41490330923)
+  passed deployment and live-package verification. Independent package
+  verification and production browser checks also passed. This
+  documentation receipt does not change the game package.
 - A persistent fixture generator remains a proposal awaiting approval.
   Population witnesses were regenerated using session-only action replay;
   no repository generator or shared test-helper module was created.
@@ -30,8 +30,7 @@ and owner acceptance remain open in [TODO.md](TODO.md).
 
 ## Next action
 
-Review the two local gameplay changes and publish when requested. Run the
-remaining human checks in [TODO.md](TODO.md); that file also owns the
+Run the remaining human checks in [TODO.md](TODO.md); that file also owns the
 unimplemented roadmap and fixture-generator approval decision. Production
 verification must be repeated after any future deployment.
 
@@ -58,10 +57,16 @@ verification must be repeated after any future deployment.
 - Changed-file editor diagnostics, harness syntax, and whitespace checks
   passed. All 75 local links and 3 anchors resolve across 20 tracked
   Markdown files. Generated results and private feedback remain ignored.
-- [Production workflow 41367108944](https://github.com/fabioc-aloha/SurveyFunnel/actions/runs/41367108944)
-  passed for `f57b0c7`, including live-package verification; independent
-  production verification also passed afterward. That receipt predates
-  both local gameplay changes.
+- [Production workflow 41490330923](https://github.com/fabioc-aloha/SurveyFunnel/actions/runs/41490330923)
+  passed for `b45bb69`, including live-package verification. Independent
+  `node scripts/verify-deployment.mjs` matched production HTML, font,
+  license, QR, response headers, and unpublished-document checks.
+- Production browser journeys at 390px and 1280px each verified 10,000
+  recipients partitioned into 183 animation groups, nonzero intermediate
+  counters matching individual events, and 1,154 completions with ROUND WON
+  and all five evidence checks passing. No overflow or runtime errors
+  occurred. A separate cut-to-one check confirmed native disabled CUT
+  and `grayscale(1)` after the rendered card settled.
 - Exact historical verification is in the [changelog](CHANGELOG.md);
   remaining human audio, physical-device, cross-browser, and screen-reader
   checks are in [TODO.md](TODO.md).

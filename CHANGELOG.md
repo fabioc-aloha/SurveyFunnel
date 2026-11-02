@@ -1,6 +1,26 @@
 # Changelog
 
-## Unreleased - 2026-11-02 - Full regression and automated player acceptance
+## 2026-11-02 - Population and cut-rule release deployed
+
+- Pushed gameplay release `b45bb69` directly to `main`.
+  [Production workflow 41490330923](https://github.com/fabioc-aloha/SurveyFunnel/actions/runs/41490330923)
+  passed build, Node tests, deployment, and live-package verification.
+- An independent `node scripts/verify-deployment.mjs` run matched
+  production HTML, font, license, QR, response headers, and
+  unpublished-document checks.
+- Production browser journeys passed at 390px and 1280px. Each used
+  10,000 individual recipients and 183 animation groups, reconciled
+  nonzero intermediate counters against individual events, and reported
+  1,154 completions, ROUND WON, and five passing evidence checks.
+  No horizontal overflow or runtime errors occurred.
+- A production cut-to-one check confirmed native disabled CUT and
+  `grayscale(1)` after the rendered card settled. No game change was needed.
+- Updated the README and handoff to record publication. This
+  documentation-only receipt leaves the verified game package unchanged.
+  Human audio, physical-device, cross-browser, screen-reader, and owner
+  acceptance checks remain open in [TODO.md](TODO.md).
+
+## 2026-11-02 - Full regression and automated player acceptance
 
 - The complete tracked harness passed all three sections: production-package
   validation, 109 Node tests (including every winning witness), and 119 browser
@@ -32,10 +52,10 @@
   the complete harness and the separate UAT run.
 - Removed the resolved tooling blocker from current documentation. Physical
   phone/QR, Safari/Android Chrome, screen-reader, human audio review, and owner
-  acceptance remain open. Local verification does not test a newly deployed
-  release; these changes are still not committed, pushed, or deployed.
+  acceptance remain open. These local checks preceded publication;
+  production verification is recorded above.
 
-## Unreleased - 2026-11-02 - Count every simulated recipient
+## 2026-11-02 - Count every simulated recipient
 
 - Replaced the 40-person statistical proxy with one synthetic record per
   audience recipient. Live counters follow individual events; final reports,
@@ -63,10 +83,9 @@
   guarantees or a passing CLI harness run.
 - Updated the current player, evidence, development, and harness guides.
   The initial full Puppeteer run was blocked by missing tooling; the later
-  successful run is recorded above. Both this change and the cut-rule update
-  below remain local, not committed, pushed, or deployed.
+  successful run and publication receipt are recorded above.
 
-## Unreleased - 2026-11-02 - Cut any question except the last
+## 2026-11-02 - Cut any question except the last
 
 - Campaign and Quick Challenge players may cut any question, including
   core, mandatory-BRD, and late-added cards. The only structural cut
@@ -89,8 +108,7 @@
   runtime errors occurred.
 - The tracked browser script passes syntax validation, but its CLI run
   was initially blocked by unavailable Puppeteer; the later UAT entry above
-  records the successful full run.
-  These changes are local, not committed, pushed, or deployed.
+  records the successful full run. Publication is recorded above.
 
 ## 2026-11-01 - Documentation and publication audit
 

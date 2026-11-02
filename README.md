@@ -108,16 +108,18 @@ docs/                  Design, play, development, deployment docs
 ## Status
 
 - Production updates deploy through GitHub Actions on every push to `main`.
-- Current update: five-part evidence fitness, usable-sample and role
-  requirements, audience health across instruments, and reporting
-  beyond completion. See the [release summary](docs/evidence-fitness.md).
-- Gameplay release `3661c23` passed the
-  [production workflow](https://github.com/fabioc-aloha/SurveyFunnel/actions/runs/41366863464)
-  and independent live-package verification on 2026-11-01.
+- Current update: individual-recipient statistics, weighted animation
+  groups, and cutting any question except the last. Five-part evidence
+  fitness, sample and role requirements, and audience health remain
+  enforced. See the [release summary](docs/evidence-fitness.md).
+- Gameplay release `b45bb69` passed the
+  [production workflow](https://github.com/fabioc-aloha/SurveyFunnel/actions/runs/41490330923)
+  and independent live-package verification on 2026-11-02. Production
+  browser checks passed at 390px and 1280px, including exact recipient
+  counts, all five evidence checks, and the protected final CUT.
 - Local full-harness and automated player-acceptance checks passed on
-  2026-11-02 using existing approved browser tooling. The population and
-  cut-rule changes remain unpublished. See the [changelog](CHANGELOG.md)
-  for the tested scope and remaining human checks.
+  2026-11-02 using existing approved browser tooling. See the
+  [changelog](CHANGELOG.md) for the tested scope and remaining human checks.
 - A push is not proof of deployment. Check the
   [production workflow](https://github.com/fabioc-aloha/SurveyFunnel/actions/workflows/deploy-production.yml)
   and its live-package verification for the commit being played.
