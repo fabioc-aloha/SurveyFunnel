@@ -1,0 +1,157 @@
+[
+  {
+    "level": 1,
+    "width": 390,
+    "blast": false,
+    "unprepared": false,
+    "population": 10000,
+    "groups": 183,
+    "buildMs": 53.400000005960464,
+    "frames": {
+      "meanMs": 9.899999999900682,
+      "maxMs": 10.69999999999709
+    },
+    "liveSent": 9208,
+    "liveCompleted": 153,
+    "visible": true,
+    "report": {
+      "sent": 10000,
+      "completed": 1154,
+      "verdict": "ROUND WON",
+      "arms": {
+        "A": {
+          "invited": 10000,
+          "completed": 1154
+        },
+        "B": {
+          "invited": 0,
+          "completed": 0
+        }
+      }
+    }
+  },
+  {
+    "level": 2,
+    "width": 1280,
+    "blast": false,
+    "unprepared": false,
+    "population": 10000,
+    "groups": 215,
+    "buildMs": 66.80000001192093,
+    "frames": {
+      "meanMs": 9.839999999900707,
+      "maxMs": 10.5
+    },
+    "liveSent": 9231,
+    "liveCompleted": 173,
+    "visible": true,
+    "report": {
+      "sent": 10000,
+      "completed": 1432,
+      "verdict": "ROUND WON",
+      "arms": {
+        "A": {
+          "invited": 5000,
+          "completed": 559
+        },
+        "B": {
+          "invited": 5000,
+          "completed": 873
+        }
+      }
+    }
+  },
+  {
+    "level": 1,
+    "width": 1280,
+    "blast": true,
+    "unprepared": false,
+    "population": 20000,
+    "groups": 184,
+    "buildMs": 97.09999999403954,
+    "frames": {
+      "meanMs": 9.869999999801317,
+      "maxMs": 10.700000000000728
+    },
+    "liveSent": 18407,
+    "liveCompleted": 321,
+    "visible": true,
+    "report": {
+      "sent": 20000,
+      "completed": 2252,
+      "verdict": "TARGET MISSED",
+      "arms": {
+        "A": {
+          "invited": 20000,
+          "completed": 2252
+        },
+        "B": {
+          "invited": 0,
+          "completed": 0
+        }
+      }
+    }
+  },
+  {
+    "level": 1,
+    "width": 390,
+    "blast": false,
+    "unprepared": true,
+    "population": 10000,
+    "groups": 404,
+    "buildMs": 95.7999999821186,
+    "frames": {
+      "meanMs": 16.530000000198683,
+      "maxMs": 20.399999999999636
+    },
+    "liveSent": 9551,
+    "liveCompleted": 87,
+    "visible": true,
+    "report": {
+      "sent": 10000,
+      "completed": 676,
+      "verdict": "TARGET MISSED",
+      "arms": {
+        "A": {
+          "invited": 10000,
+          "completed": 676
+        },
+        "B": {
+          "invited": 0,
+          "completed": 0
+        }
+      }
+    }
+  },
+  {
+    "level": 1,
+    "width": 1280,
+    "blast": true,
+    "unprepared": true,
+    "population": 20000,
+    "groups": 424,
+    "buildMs": 130.69999998807907,
+    "frames": {
+      "meanMs": 24.12333333353202,
+      "maxMs": 40
+    },
+    "liveSent": 19788,
+    "liveCompleted": 167,
+    "visible": true,
+    "report": {
+      "sent": 20000,
+      "completed": 1494,
+      "verdict": "TARGET MISSED",
+      "arms": {
+        "A": {
+          "invited": 20000,
+          "completed": 1494
+        },
+        "B": {
+          "invited": 0,
+          "completed": 0
+        }
+      }
+    }
+  }
+]

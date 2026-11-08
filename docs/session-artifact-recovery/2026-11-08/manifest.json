@@ -1,0 +1,363 @@
+{
+  "schemaVersion": 1,
+  "status": "historical-local-recovery-not-publication",
+  "repository": "SurveyFunnel",
+  "destination": "docs/session-artifact-recovery/2026-11-08",
+  "matchedSessions": [
+    "98c9a4f6-a15f-4258-b9e2-b133032f61e4",
+    "e23dd4ad-8b53-40c1-ba55-74980cd62531"
+  ],
+  "artifacts": [
+    {
+      "session": "98c9a4f6-a15f-4258-b9e2-b133032f61e4",
+      "sourcePath": "population-blast-1280-raw.png",
+      "sourceSha256": "9c9c7d386422ebabe884feab8338a2bbc40036f739284cde54ee9bb8b591ca65",
+      "sourceBytes": 156610,
+      "path": "docs/session-artifact-recovery/2026-11-08/history/98c9a4f6/population-blast-1280-raw.png",
+      "edits": [],
+      "bytes": 156610,
+      "sha256": "9c9c7d386422ebabe884feab8338a2bbc40036f739284cde54ee9bb8b591ca65",
+      "retention": "reviewed-historical-game-screenshot"
+    },
+    {
+      "session": "98c9a4f6-a15f-4258-b9e2-b133032f61e4",
+      "sourcePath": "population-blast-1280.png",
+      "sourceSha256": "c5866689e1974c38d74f3862639984dda11bceccd1c89b1881d7a3b6bc26dab9",
+      "sourceBytes": 103632,
+      "path": "docs/session-artifact-recovery/2026-11-08/history/98c9a4f6/population-blast-1280.png",
+      "edits": [],
+      "bytes": 103632,
+      "sha256": "c5866689e1974c38d74f3862639984dda11bceccd1c89b1881d7a3b6bc26dab9",
+      "retention": "reviewed-historical-game-screenshot"
+    },
+    {
+      "session": "98c9a4f6-a15f-4258-b9e2-b133032f61e4",
+      "sourcePath": "population-browser-results.json",
+      "sourceSha256": "eca0833f10d66f52978408a5318d007fa4322a6ff3779e7fbf13c563ee265160",
+      "sourceBytes": 3011,
+      "path": "docs/session-artifact-recovery/2026-11-08/history/98c9a4f6/population-browser-results.json",
+      "edits": [],
+      "bytes": 3011,
+      "sha256": "eca0833f10d66f52978408a5318d007fa4322a6ff3779e7fbf13c563ee265160"
+    },
+    {
+      "session": "98c9a4f6-a15f-4258-b9e2-b133032f61e4",
+      "sourcePath": "population-level1-390-raw.png",
+      "sourceSha256": "3c2e3f187907dfbf2631cd04929b4f9e977347d9ec0fac0482bd5fcaf6a3af5d",
+      "sourceBytes": 54941,
+      "path": "docs/session-artifact-recovery/2026-11-08/history/98c9a4f6/population-level1-390-raw.png",
+      "edits": [],
+      "bytes": 54941,
+      "sha256": "3c2e3f187907dfbf2631cd04929b4f9e977347d9ec0fac0482bd5fcaf6a3af5d",
+      "retention": "reviewed-historical-game-screenshot"
+    },
+    {
+      "session": "98c9a4f6-a15f-4258-b9e2-b133032f61e4",
+      "sourcePath": "population-level1-390.png",
+      "sourceSha256": "073aa7ef30fd14b1bbdac624d6e56debe8a4045f1d56e106ef69c2e42c841812",
+      "sourceBytes": 46671,
+      "path": "docs/session-artifact-recovery/2026-11-08/history/98c9a4f6/population-level1-390.png",
+      "edits": [],
+      "bytes": 46671,
+      "sha256": "073aa7ef30fd14b1bbdac624d6e56debe8a4045f1d56e106ef69c2e42c841812",
+      "retention": "reviewed-historical-game-screenshot"
+    },
+    {
+      "session": "98c9a4f6-a15f-4258-b9e2-b133032f61e4",
+      "sourcePath": "population-level2-1280.png",
+      "sourceSha256": "98014d25db8abe6851f46d86a315a2814ff5757d8a7aa0cb321b838fac482b45",
+      "sourceBytes": 110436,
+      "path": "docs/session-artifact-recovery/2026-11-08/history/98c9a4f6/population-level2-1280.png",
+      "edits": [],
+      "bytes": 110436,
+      "sha256": "98014d25db8abe6851f46d86a315a2814ff5757d8a7aa0cb321b838fac482b45",
+      "retention": "reviewed-historical-game-screenshot"
+    },
+    {
+      "session": "98c9a4f6-a15f-4258-b9e2-b133032f61e4",
+      "sourcePath": "production-smoke-results.json",
+      "sourceSha256": "da7f2daa1f8016962b2a4c54144f0379eed43cfdca5e1f9a06777423faa99aba",
+      "sourceBytes": 2559,
+      "path": "docs/session-artifact-recovery/2026-11-08/history/98c9a4f6/production-smoke-results.json",
+      "edits": [],
+      "bytes": 2559,
+      "sha256": "da7f2daa1f8016962b2a4c54144f0379eed43cfdca5e1f9a06777423faa99aba"
+    },
+    {
+      "session": "98c9a4f6-a15f-4258-b9e2-b133032f61e4",
+      "sourcePath": "receipt-workflow.log",
+      "sourceSha256": "6a11b370e7b998e2e0cfeeff256c254b65b341b9a63af411be822d6e2d4ee2e9",
+      "sourceBytes": 4633,
+      "path": "docs/session-artifact-recovery/2026-11-08/history/98c9a4f6/receipt-workflow.log",
+      "edits": [],
+      "bytes": 4633,
+      "sha256": "6a11b370e7b998e2e0cfeeff256c254b65b341b9a63af411be822d6e2d4ee2e9"
+    },
+    {
+      "session": "98c9a4f6-a15f-4258-b9e2-b133032f61e4",
+      "sourcePath": "release-workflow.log",
+      "sourceSha256": "c783517b9ca93739db5fca5d3ea88ad396bce1f8b9bcec08e7508adc6fa8f579",
+      "sourceBytes": 4559,
+      "path": "docs/session-artifact-recovery/2026-11-08/history/98c9a4f6/release-workflow.log",
+      "edits": [],
+      "bytes": 4559,
+      "sha256": "c783517b9ca93739db5fca5d3ea88ad396bce1f8b9bcec08e7508adc6fa8f579"
+    },
+    {
+      "session": "98c9a4f6-a15f-4258-b9e2-b133032f61e4",
+      "sourcePath": "uat-blast-live-390.png",
+      "sourceSha256": "35d21f2ea9c3f04a0f3e4a7f75f3c00bf7d3580efc07bd56e2dbb8503d988be9",
+      "sourceBytes": 50973,
+      "path": "docs/session-artifact-recovery/2026-11-08/history/98c9a4f6/uat-blast-live-390.png",
+      "edits": [],
+      "bytes": 50973,
+      "sha256": "35d21f2ea9c3f04a0f3e4a7f75f3c00bf7d3580efc07bd56e2dbb8503d988be9",
+      "retention": "reviewed-historical-game-screenshot"
+    },
+    {
+      "session": "98c9a4f6-a15f-4258-b9e2-b133032f61e4",
+      "sourcePath": "uat-blast-report-390.png",
+      "sourceSha256": "c37236f051d8b25cbba98451fd6d497c2eb4ed9af9a0079c1261f23c171d31de",
+      "sourceBytes": 52866,
+      "path": "docs/session-artifact-recovery/2026-11-08/history/98c9a4f6/uat-blast-report-390.png",
+      "edits": [],
+      "bytes": 52866,
+      "sha256": "c37236f051d8b25cbba98451fd6d497c2eb4ed9af9a0079c1261f23c171d31de",
+      "retention": "reviewed-historical-game-screenshot"
+    },
+    {
+      "session": "98c9a4f6-a15f-4258-b9e2-b133032f61e4",
+      "sourcePath": "uat-cut-brd-report-390.png",
+      "sourceSha256": "713305aef5454713bbf2e87b38f0b80d6069987b0438ecd8cd60a782d3db2df7",
+      "sourceBytes": 59532,
+      "path": "docs/session-artifact-recovery/2026-11-08/history/98c9a4f6/uat-cut-brd-report-390.png",
+      "edits": [],
+      "bytes": 59532,
+      "sha256": "713305aef5454713bbf2e87b38f0b80d6069987b0438ecd8cd60a782d3db2df7",
+      "retention": "reviewed-historical-game-screenshot"
+    },
+    {
+      "session": "98c9a4f6-a15f-4258-b9e2-b133032f61e4",
+      "sourcePath": "uat-disabled-cut-390.png",
+      "sourceSha256": "cf12a5beffbf902bb266a30129080168684ad06150d9da54cc9e068354c4923b",
+      "sourceBytes": 15285,
+      "path": "docs/session-artifact-recovery/2026-11-08/history/98c9a4f6/uat-disabled-cut-390.png",
+      "edits": [],
+      "bytes": 15285,
+      "sha256": "cf12a5beffbf902bb266a30129080168684ad06150d9da54cc9e068354c4923b",
+      "retention": "reviewed-historical-game-screenshot"
+    },
+    {
+      "session": "98c9a4f6-a15f-4258-b9e2-b133032f61e4",
+      "sourcePath": "uat-finale-1280.png",
+      "sourceSha256": "eb329471e0e23322e15bad1ddfad914cf64f4a5bb3b74f90b129f38a894dd7f6",
+      "sourceBytes": 105136,
+      "path": "docs/session-artifact-recovery/2026-11-08/history/98c9a4f6/uat-finale-1280.png",
+      "edits": [],
+      "bytes": 105136,
+      "sha256": "eb329471e0e23322e15bad1ddfad914cf64f4a5bb3b74f90b129f38a894dd7f6",
+      "retention": "reviewed-historical-game-screenshot"
+    },
+    {
+      "session": "98c9a4f6-a15f-4258-b9e2-b133032f61e4",
+      "sourcePath": "uat-finale-390.png",
+      "sourceSha256": "a0c2427d045b9420bc304e5b142689b0047e82ce88a3bb166fd82bf0ce4c1281",
+      "sourceBytes": 48717,
+      "path": "docs/session-artifact-recovery/2026-11-08/history/98c9a4f6/uat-finale-390.png",
+      "edits": [],
+      "bytes": 48717,
+      "sha256": "a0c2427d045b9420bc304e5b142689b0047e82ce88a3bb166fd82bf0ce4c1281",
+      "retention": "reviewed-historical-game-screenshot"
+    },
+    {
+      "session": "98c9a4f6-a15f-4258-b9e2-b133032f61e4",
+      "sourcePath": "uat-results.json",
+      "sourceSha256": "602ee6be85295cf77292298c92e745ee884a0270e13a5866a25ba9797d879667",
+      "sourceBytes": 246718,
+      "path": "docs/session-artifact-recovery/2026-11-08/history/98c9a4f6/uat-results.json",
+      "edits": [
+        "environment-path-and-email-redaction"
+      ],
+      "bytes": 246718,
+      "sha256": "c9b0a46a521a0e75cdc99352d4e384b24a327071f674d94ae99191892576b2ab"
+    },
+    {
+      "session": "98c9a4f6-a15f-4258-b9e2-b133032f61e4",
+      "sourcePath": "uat-season-1280.png",
+      "sourceSha256": "56a33e438efe3379d2f28047d1cd73fa2c65e30630846000957fef6f65ec0f59",
+      "sourceBytes": 88403,
+      "path": "docs/session-artifact-recovery/2026-11-08/history/98c9a4f6/uat-season-1280.png",
+      "edits": [],
+      "bytes": 88403,
+      "sha256": "56a33e438efe3379d2f28047d1cd73fa2c65e30630846000957fef6f65ec0f59",
+      "retention": "reviewed-historical-game-screenshot"
+    },
+    {
+      "session": "98c9a4f6-a15f-4258-b9e2-b133032f61e4",
+      "sourcePath": "uat-season-390.png",
+      "sourceSha256": "963ea352f4b25cc843b5418ca83e307e7d8917362c4afde3f6bee0231bd038c7",
+      "sourceBytes": 67782,
+      "path": "docs/session-artifact-recovery/2026-11-08/history/98c9a4f6/uat-season-390.png",
+      "edits": [],
+      "bytes": 67782,
+      "sha256": "963ea352f4b25cc843b5418ca83e307e7d8917362c4afde3f6bee0231bd038c7",
+      "retention": "reviewed-historical-game-screenshot"
+    },
+    {
+      "session": "e23dd4ad-8b53-40c1-ba55-74980cd62531",
+      "sourcePath": "balance-audit.mjs",
+      "sourceSha256": "4f19b4e95516547fd28b93a106236cfe6951f9617492937272bf9d653f5d1217",
+      "sourceBytes": 9065,
+      "path": "docs/session-artifact-recovery/2026-11-08/history/e23dd4ad/balance-audit.mjs",
+      "edits": [],
+      "bytes": 9065,
+      "sha256": "4f19b4e95516547fd28b93a106236cfe6951f9617492937272bf9d653f5d1217"
+    },
+    {
+      "session": "e23dd4ad-8b53-40c1-ba55-74980cd62531",
+      "sourcePath": "balance-results.json",
+      "sourceSha256": "4b5b1d541cc689798ef1bb29d4ee8088c3e4bd0ef1a78dab4044993ccc00015e",
+      "sourceBytes": 301315,
+      "path": "docs/session-artifact-recovery/2026-11-08/history/e23dd4ad/balance-results.json",
+      "edits": [],
+      "bytes": 301315,
+      "sha256": "4b5b1d541cc689798ef1bb29d4ee8088c3e4bd0ef1a78dab4044993ccc00015e"
+    },
+    {
+      "session": "e23dd4ad-8b53-40c1-ba55-74980cd62531",
+      "sourcePath": "brd-desktop.png",
+      "sourceSha256": "8cc41bf55cad1130942cf55d755c7aaf3674911780630f5e8f3723510cc38116",
+      "sourceBytes": 61734,
+      "path": "docs/session-artifact-recovery/2026-11-08/history/e23dd4ad/brd-desktop.png",
+      "edits": [],
+      "bytes": 61734,
+      "sha256": "8cc41bf55cad1130942cf55d755c7aaf3674911780630f5e8f3723510cc38116",
+      "retention": "reviewed-historical-game-screenshot"
+    },
+    {
+      "session": "e23dd4ad-8b53-40c1-ba55-74980cd62531",
+      "sourcePath": "difficulty-title.png",
+      "sourceSha256": "beeb29a3beddec52e1f2879a258a7087d42e224bb51a1032307cd43b01f05453",
+      "sourceBytes": 120232,
+      "path": "docs/session-artifact-recovery/2026-11-08/history/e23dd4ad/difficulty-title.png",
+      "edits": [],
+      "bytes": 120232,
+      "sha256": "beeb29a3beddec52e1f2879a258a7087d42e224bb51a1032307cd43b01f05453",
+      "retention": "reviewed-historical-game-screenshot"
+    },
+    {
+      "session": "e23dd4ad-8b53-40c1-ba55-74980cd62531",
+      "sourcePath": "qr-1440.png",
+      "sourceSha256": "b0d4d66cab0d74f536f80fc25172f22464e564429a6ef3f35f7230da8cceb044",
+      "sourceBytes": 3782,
+      "path": "docs/session-artifact-recovery/2026-11-08/history/e23dd4ad/qr-1440.png",
+      "edits": [],
+      "bytes": 3782,
+      "sha256": "b0d4d66cab0d74f536f80fc25172f22464e564429a6ef3f35f7230da8cceb044",
+      "retention": "reviewed-historical-game-screenshot"
+    },
+    {
+      "session": "e23dd4ad-8b53-40c1-ba55-74980cd62531",
+      "sourcePath": "qr-390.png",
+      "sourceSha256": "1c40ed3d28a07f5f642aa80b04c227a41fe38bb8071443365999f68510257c0c",
+      "sourceBytes": 3711,
+      "path": "docs/session-artifact-recovery/2026-11-08/history/e23dd4ad/qr-390.png",
+      "edits": [],
+      "bytes": 3711,
+      "sha256": "1c40ed3d28a07f5f642aa80b04c227a41fe38bb8071443365999f68510257c0c",
+      "retention": "reviewed-historical-game-screenshot"
+    },
+    {
+      "session": "e23dd4ad-8b53-40c1-ba55-74980cd62531",
+      "sourcePath": "quick-challenge-mobile.png",
+      "sourceSha256": "1dbfeb9f46c58d274f7d55a41500bc0bb466b608e4921e99f97bdf6d3e02a96e",
+      "sourceBytes": 133548,
+      "path": "docs/session-artifact-recovery/2026-11-08/history/e23dd4ad/quick-challenge-mobile.png",
+      "edits": [],
+      "bytes": 133548,
+      "sha256": "1dbfeb9f46c58d274f7d55a41500bc0bb466b608e4921e99f97bdf6d3e02a96e",
+      "retention": "reviewed-historical-game-screenshot"
+    },
+    {
+      "session": "e23dd4ad-8b53-40c1-ba55-74980cd62531",
+      "sourcePath": "stakeholder-desktop.png",
+      "sourceSha256": "cfc1a8c1cc71fa99c594ed34799866194acf4d4222b286f0308f36ac97da59d6",
+      "sourceBytes": 52022,
+      "path": "docs/session-artifact-recovery/2026-11-08/history/e23dd4ad/stakeholder-desktop.png",
+      "edits": [],
+      "bytes": 52022,
+      "sha256": "cfc1a8c1cc71fa99c594ed34799866194acf4d4222b286f0308f36ac97da59d6",
+      "retention": "reviewed-historical-game-screenshot"
+    },
+    {
+      "session": "e23dd4ad-8b53-40c1-ba55-74980cd62531",
+      "sourcePath": "title-qr-1440.png",
+      "sourceSha256": "d53792de3ec36a045bbcb75b2f2b681fbb9a5b3765782db6c3b188d559daaa77",
+      "sourceBytes": 21068,
+      "path": "docs/session-artifact-recovery/2026-11-08/history/e23dd4ad/title-qr-1440.png",
+      "edits": [],
+      "bytes": 21068,
+      "sha256": "d53792de3ec36a045bbcb75b2f2b681fbb9a5b3765782db6c3b188d559daaa77",
+      "retention": "reviewed-historical-game-screenshot"
+    },
+    {
+      "session": "e23dd4ad-8b53-40c1-ba55-74980cd62531",
+      "sourcePath": "title-qr-390.png",
+      "sourceSha256": "0680103bf4d7fbbccdb5584a5c538abc4861e9150b82164d3b4f8c101200e786",
+      "sourceBytes": 13555,
+      "path": "docs/session-artifact-recovery/2026-11-08/history/e23dd4ad/title-qr-390.png",
+      "edits": [],
+      "bytes": 13555,
+      "sha256": "0680103bf4d7fbbccdb5584a5c538abc4861e9150b82164d3b4f8c101200e786",
+      "retention": "reviewed-historical-game-screenshot"
+    },
+    {
+      "session": "e23dd4ad-8b53-40c1-ba55-74980cd62531",
+      "sourcePath": "uat-qr-1440.png",
+      "sourceSha256": "3d4b391f0f298b3155ec4e3e2c7337a0d5ae87623d9264e178168a21b8e3a4dc",
+      "sourceBytes": 115859,
+      "path": "docs/session-artifact-recovery/2026-11-08/history/e23dd4ad/uat-qr-1440.png",
+      "edits": [],
+      "bytes": 115859,
+      "sha256": "3d4b391f0f298b3155ec4e3e2c7337a0d5ae87623d9264e178168a21b8e3a4dc",
+      "retention": "reviewed-historical-game-screenshot"
+    },
+    {
+      "session": "e23dd4ad-8b53-40c1-ba55-74980cd62531",
+      "sourcePath": "uat-qr-390.png",
+      "sourceSha256": "0b284ac4377f5701b6edc787d37cf48c334b8a33fd8ba8592d04a4ab0395dfb2",
+      "sourceBytes": 33971,
+      "path": "docs/session-artifact-recovery/2026-11-08/history/e23dd4ad/uat-qr-390.png",
+      "edits": [],
+      "bytes": 33971,
+      "sha256": "0b284ac4377f5701b6edc787d37cf48c334b8a33fd8ba8592d04a4ab0395dfb2",
+      "retention": "reviewed-historical-game-screenshot"
+    },
+    {
+      "session": "e23dd4ad-8b53-40c1-ba55-74980cd62531",
+      "sourcePath": "uat-report.md",
+      "sourceSha256": "4c46e022ad2474363f0394521e005927a4186cd6bc27eaf80d5b13025d32a165",
+      "sourceBytes": 14339,
+      "path": "docs/session-artifact-recovery/2026-11-08/history/e23dd4ad/uat-report.md",
+      "edits": [
+        "historical-status-and-local-link-rebasing"
+      ],
+      "bytes": 14316,
+      "sha256": "35e4325e392cb645668ccaace8f3fad6dab69bf3f34b6ab313eebd77b332107c"
+    }
+  ],
+  "accounted": [],
+  "excluded": [],
+  "supportingArtifacts": [
+    {
+      "path": "docs/session-artifact-recovery/2026-11-08/inspection/image-inventory.json",
+      "bytes": 5641,
+      "sha256": "70df57d5abf00f97b9c650685387d080009102e2cbed3011f1276550453bd17f"
+    },
+    {
+      "path": "docs/session-artifact-recovery/2026-11-08/inspection/screenshots-contact-sheet.png",
+      "bytes": 1076561,
+      "sha256": "e5aba96bdeadf8d8ea9ba0048e92ca93218a210a28f75950fdd6a56a91c1d35e"
+    }
+  ]
+}

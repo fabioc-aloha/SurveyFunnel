@@ -1,0 +1,112 @@
+{
+  "gameplayCommit": "b45bb69ed3d30159c0f3cf7e7fd95d330744b000",
+  "results": [
+    {
+      "width": 390,
+      "live": {
+        "recipients": 10000,
+        "groups": 183,
+        "members": 10000,
+        "sent": 0,
+        "displayedSent": 0,
+        "completed": 0,
+        "displayedCompleted": 0,
+        "badges": 183,
+        "summary": "10,000 simulated recipients · 183 animation groups. Each ×N badge is a group size; counters use individual records.",
+        "overflow": false
+      },
+      "report": {
+        "verdict": "ROUND WON",
+        "completed": 1154,
+        "displayedCompleted": 1154,
+        "evidence": [
+          {
+            "id": "funnel",
+            "pass": true
+          },
+          {
+            "id": "fitness",
+            "pass": true
+          },
+          {
+            "id": "integrity",
+            "pass": true
+          },
+          {
+            "id": "audience",
+            "pass": true
+          },
+          {
+            "id": "trust",
+            "pass": true
+          }
+        ],
+        "overflow": false
+      },
+      "progress": {
+        "sent": 1013,
+        "displayedSent": 1013,
+        "completed": 0,
+        "displayedCompleted": 0,
+        "virtualTime": 1950.1
+      }
+    },
+    {
+      "width": 1280,
+      "live": {
+        "recipients": 10000,
+        "groups": 183,
+        "members": 10000,
+        "sent": 0,
+        "displayedSent": 0,
+        "completed": 0,
+        "displayedCompleted": 0,
+        "badges": 183,
+        "summary": "10,000 simulated recipients · 183 animation groups. Each ×N badge is a group size; counters use individual records.",
+        "overflow": false
+      },
+      "report": {
+        "verdict": "ROUND WON",
+        "completed": 1154,
+        "displayedCompleted": 1154,
+        "evidence": [
+          {
+            "id": "funnel",
+            "pass": true
+          },
+          {
+            "id": "fitness",
+            "pass": true
+          },
+          {
+            "id": "integrity",
+            "pass": true
+          },
+          {
+            "id": "audience",
+            "pass": true
+          },
+          {
+            "id": "trust",
+            "pass": true
+          }
+        ],
+        "overflow": false
+      },
+      "progress": {
+        "sent": 1013,
+        "displayedSent": 1013,
+        "completed": 0,
+        "displayedCompleted": 0,
+        "virtualTime": 1949.8999999999996
+      }
+    }
+  ],
+  "cut": {
+    "disabled": true,
+    "filter": "grayscale(1)",
+    "cards": 1
+  },
+  "errors": [],
+  "passed": true
+}
