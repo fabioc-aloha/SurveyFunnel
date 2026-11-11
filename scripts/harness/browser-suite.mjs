@@ -1155,10 +1155,12 @@ async function runSurveyIdentityScenario(browser, gameUrl, viewport, options) {
     await page.waitForSelector('#studyBRD.open', { visible: true, timeout: 10000 });
     const brd2 = await page.evaluate(() =>
       (document.querySelector('#brdContent')?.textContent || '').replace(/\s+/g, ' '));
-    await run.check('unmigrated Level 2 keeps its naming and BRD through the same model',
+    await run.check('Level 2 BRD renders its own Copilot study through the same model',
       banner2.includes('Survey: Copilot Adoption Survey') &&
       brd2.includes('Copilot Adoption Survey') && !brd2.includes('Support Experience Survey') &&
-      !brd2.includes('SPONSOR'),
+      brd2.includes('SPONSOR') && brd2.includes('AI Adoption team') && brd2.includes('AUDIENCE') &&
+      brd2.includes('adoption breadth') && brd2.includes('enablement gap') &&
+      brd2.includes('two invitation variants against the same instrument'),
       { banner: banner2.slice(0, 240), excerpt: brd2.slice(0, 320) });
     await page.keyboard.press('Escape');
     await checkNoJourneyErrors(run, 'per-level survey identity scenario');

@@ -1,5 +1,62 @@
 # Changelog
 
+## 2026-11-11 - Per-level surveys phase 2: Level 2 Copilot Adoption bank and BRD
+
+- Design: [docs/level-surveys-scope.md](docs/level-surveys-scope.md),
+  phase 2. Level 2 (The Split) migrated from the legacy shared bank
+  to its own survey, the Copilot Adoption Survey. Level 2 mechanics
+  are unchanged: the A/B invitation test, the TOO CLOSE TO CALL
+  verdict, pricing, and targets all behave as before.
+- Level 2 bank: 36 newly authored entries (ids 201-236; 0 reused),
+  appended after the legacy bank so legacy pool order is untouched.
+  Structure follows the scope doc's derivation: sections
+  A4/B18/C6/D2/E2/F4; 14 clean, 13 defective, 5 stupid, 4 filler;
+  core set of 7, all clean, with a creditable core question on each
+  of the survey's five agenda topics (adoption breadth, workflow
+  impact, trust in output, output quality, enablement gap). Defect
+  coverage is 10 of the 11 classes; the theme-natural classes are
+  doubled (JARGON, BEYOND KNOWLEDGE, LEADING). GRID BURDEN is the
+  one omission, recorded in the bank's header comment: rating
+  matrices belong to the platform-survey genre, not to an adoption
+  instrument. Answerability follows the scope doc's Level 2
+  pattern: end users and frontline staff are the strong respondents
+  on usage, output, and workflow; executives cannot answer
+  daily-use detail; IT decision makers carry rollout and
+  enablement; budget figures sit with Partner Admin seats and
+  pre-release model facts with no seat on the list. The instrument
+  treats its subject as a subject of measurement, never as
+  promotion: no capability claims or feature promises; hype
+  wording appears only as labeled LEADING and vanity traps.
+- Level 2 BRD: the survey record is complete (sponsor: the AI
+  Adoption team; purpose; audience with the answerability pattern;
+  required topics with per-survey topic-to-persona keys; success
+  measures through the unchanged mission numbers). The constraints
+  carry the A/B design note: two invitation variants against the
+  same instrument, the comparison is about the invitation, and the
+  study reports uncertainty rather than assuming a winner. The
+  evidence mission purpose for Level 2 is rewritten to the survey.
+- Fixed first play: Level 2 now deals a curated 12 from its own
+  bank (6 core) when no seed is recorded, through
+  `fixedInstrumentForLevel`; unmigrated levels keep the legacy
+  fixed instrument. The transitional fallback now covers Levels
+  3-6 only and returns the legacy pool exactly as phase 1 left it,
+  so their deals and witnesses are unchanged.
+- Witnesses: Level 2's 65 winning setups (fixed plus the same 64
+  seeds) were regenerated through the real handlers against the
+  Copilot bank. The fixed line now costs 61 cr against the recorded
+  67 cr baseline, and seeded winning lines cost 59-67 cr against
+  the old 64-93 cr range: the themed bank's minimal lines are
+  cheaper, chiefly because its core set is all clean and its five
+  agenda topics each carry a creditable core question. No pool
+  changed. Other levels' fixtures are byte-identical.
+- Coverage: four new Node tests (Level 2 bank structure with the
+  defect-coverage floor and doubled classes, Level 2 fixed
+  instrument, Level 2 BRD rendering, Insight against Level 2
+  topics), the fallback test extended to the narrowed pool, and
+  the browser survey-identity scenario updated to the migrated
+  Level 2 BRD. Gates: build, Node suite (127), full harness
+  (browser 148/148).
+
 ## 2026-11-11 - Per-level surveys phase 1: data model, per-level BRD, Level 1 Support bank
 
 - Design: [docs/level-surveys-scope.md](docs/level-surveys-scope.md).

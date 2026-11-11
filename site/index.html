@@ -894,7 +894,18 @@ var QUESTION_REPAIRS = {
   53:["Was your priority-two case resolved on the first contact with support?","Was your case resolved within the time the support team promised?"],
   54:["Was the help article clear?"],
   55:["How many support contacts did you have for this case? Choose one: 1 / 2-3 / 4-5 / 6 or more."],
-  56:["In the past 30 days, about how many support cases did your team open?"]
+  56:["In the past 30 days, about how many support cases did your team open?"],
+  212:["When the assistant uses your organization's documents to answer, how often does it base the answer on the right document? (never / sometimes / usually / always)"],
+  213:["How often does the assistant give you an answer that turns out to be wrong? (never / sometimes / usually / almost always)"],
+  214:["How would you rate the assistant's effect on your everyday work?"],
+  215:["How would you rate the assistant's help with your most recent document?"],
+  218:["How satisfied are you with the assistant's speed?","How satisfied are you with the assistant's accuracy?"],
+  219:["In the past 30 days, how often did the assistant's first answer meet your need? (never / sometimes / usually / almost always)"],
+  220:["Was the assistant helpful when you used it for drafting? (yes / partly / no)"],
+  225:["In the past 30 days, about how many times did you ask the assistant for help?"],
+  226:["How many times did you use the assistant last week? Choose one: 0 / 1-2 / 3-5 / 6-10 / more than 10"],
+  230:['Example privacy line (use only if accurate): "Your answer will help improve how the assistant is rolled out. Only the AI adoption research team will review individual responses."',"Have you ever pasted confidential company or customer information into the assistant? (yes / no)"],
+  232:["What one change would most improve the assistant for your work?"]
 };
 function repairedQuestionMarkup(q){
   var prompts = QUESTION_REPAIRS[q.id] || [q.text];
@@ -1041,16 +1052,114 @@ var QUESTION_BANK = QUESTIONS.concat([
    never renumbered: the Quick Challenges deal by id from
    QUESTION_BANK and keep working byte-identically, because the
    drills read the union bank directly, never bankForLevel.
-   Transitional state: Levels 2-6 are not migrated yet, so
-   bankForLevel falls back to the full legacy shared bank for them,
-   exactly the draw they have always had. Each later phase migrates
-   one level and narrows its fallback; phase 4 removes it. */
+   Transitional state: unmigrated levels fall back to the legacy
+   shared bank, exactly the draw they have always had. Each later
+   phase migrates one level and narrows its fallback; phase 4
+   removes it. Phase 2 (below) migrates Level 2. */
 var LEVEL_1_BANK_IDS = [1,2,3,4,5,6,7,8,9,10,11,12,25,27,29,30,31,32,37,39,43,45,46,52,53,54,55,57,58,59,63,66,67,68,71,72];
 QUESTION_BANK.forEach(function(q){ q.survey = LEVEL_1_BANK_IDS.indexOf(q.id) >= 0 ? 1 : 0; });
 OPTIONAL_QUESTIONS.forEach(function(q){ q.survey = 1; });
 function bankForLevel(level){
-  if (level === 1) return QUESTION_BANK.filter(function(q){ return q.survey === 1; });
-  return QUESTION_BANK; /* legacy shared bank: unmigrated levels, transitional */
+  if (level === 1 || level === 2) return QUESTION_BANK.filter(function(q){ return q.survey === level; });
+  /* Unmigrated levels (3-6) draw the legacy pool exactly as phase 1
+     left it: every entry stamped 0 or 1, in original bank order, so
+     their deals and witnesses are unchanged. Phase 4 removes this. */
+  return QUESTION_BANK.filter(function(q){ return q.survey === 0 || q.survey === 1; });
+}
+/* ================= PER-LEVEL SURVEYS · PHASE 2 =================
+   Level 2 (The Split) migrates to its own survey: the Copilot
+   Adoption Survey, ids 201-236. Structure follows the scope doc's
+   derivation (A4/B18/C6/D2/E2/F4; 14 clean, 13 defective, 5 stupid,
+   4 filler; core set of 7, all clean, with a creditable core
+   question on every agenda topic). Defect coverage: 10 of the 11
+   classes; the theme-natural classes from the scope doc's Level 2
+   rationale are doubled (JARGON, BEYOND KNOWLEDGE, LEADING), and
+   GRID BURDEN is the one omission, recorded here: rating matrices
+   belong to the platform-survey genre (Level 3 doubles the class),
+   not to an adoption instrument. Answerability follows the scope
+   doc's Level 2 pattern: end users and frontline staff answer
+   usage, output, and workflow items from their own desks;
+   executives cannot answer daily-use detail; IT decision makers
+   answer rollout, governance, and enablement items; budget figures
+   sit with Partner Admin seats and pre-release model facts with no
+   seat on the list. The survey treats its subject as a subject of
+   measurement, never as promotion: stems assert no capability
+   claims, and hype wording appears only as labeled LEADING and
+   vanity traps. New ids live in the 2xx range and are appended
+   after the legacy entries, so legacy pool order (and therefore
+   every unmigrated level's deal) is untouched. */
+var COPILOT_TOPIC_KEYS = {
+  "adoption breadth":["end","tech"], "workflow impact":["end","tech"],
+  "trust in output":["end","tech"], "output quality":["end","tech"],
+  "enablement gap":["itdm","end"], "rollout experience":["end","tech"],
+  "concerns and risks":["end","itdm"], "licensing and cost":["admin"]
+};
+var COPILOT_BANK = [
+ { id:201, text:"Overall, how valuable is the AI assistant in your work? (1-5)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"workflow impact", tier:"clean", sec:"A", survey:2 },
+ { id:202, text:"Thinking about the last 30 days, how often did you use the AI assistant for real work? (never / once or twice / weekly / most days)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"adoption breadth", tier:"clean", sec:"A", survey:2 },
+ { id:203, text:"Overall, how much do you trust the AI assistant's output in your work? (1-5, not at all to completely)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"trust in output", tier:"clean", sec:"A", survey:2 },
+ { id:204, text:"Overall, how valuable is the AI assistant in your work? (1-5)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"workflow impact", tier:"stupid", sec:"A", survey:2, rg:"dup-value", dup:true,
+   flagTxt:"LOW-VALUE · DUPLICATE. This repeats the overall value question word for word. It adds burden without new information." },
+ { id:205, text:"In the last 30 days, how often was the AI assistant's first answer good enough to use with little or no editing? (never / sometimes / usually / almost always)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"output quality", tier:"clean", sec:"B", survey:2 },
+ { id:206, text:"In a typical week last month, how much time did the AI assistant save you? (none / under an hour / 1-3 hours / more than 3 hours)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"workflow impact", tier:"clean", sec:"B", survey:2 },
+ { id:207, text:"In the last 30 days, which of these did you use the AI assistant for? (drafting / summarizing / finding information / working with data / none of these)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"adoption breadth", tier:"clean", sec:"B", survey:2 },
+ { id:208, text:"When the AI assistant gives you an answer, how often do you check it against another source before using it? (never / sometimes / usually / always)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:false, answerBy:null, defect:"CLEAN", topic:"trust in output", tier:"clean", sec:"B", survey:2 },
+ { id:209, text:"Have you received any training or guidance on using the AI assistant in your role? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"enablement gap", tier:"clean", sec:"B", survey:2 },
+ { id:210, text:"Do you know where to find guidance on using the AI assistant well? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"enablement gap", tier:"clean", sec:"B", survey:2 },
+ { id:211, text:"In the last 30 days, did you use the AI assistant to prepare for, or follow up from, a meeting? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"workflow impact", tier:"clean", sec:"B", survey:2 },
+ { id:212, text:"How would you rate the grounding quality and token efficiency of the assistant's RAG responses?", min:0.5, know:"IT Decision Maker, maybe", who:"itdm", cx:"High", val:"Medium", core:false, answerBy:["itdm"], flag:"jargon", defect:"JARGON", topic:"output quality", tier:"defective", sec:"B", survey:2,
+   flagTxt:"JARGON. Grounding, token efficiency, RAG: three insider terms, none defined. Only the AI team can parse this; everyone else guesses." },
+ { id:213, text:"Did the assistant's LLM meet your expectations for inference latency and hallucination rate?", min:0.5, know:"IT Decision Maker, maybe", who:"itdm", cx:"High", val:"Medium", core:false, answerBy:["itdm"], flag:"jargon", defect:"JARGON", topic:"trust in output", tier:"defective", sec:"B", survey:2,
+   flagTxt:"JARGON. LLM, inference latency, hallucination rate: respondents live with the answers, not the engineering terms for them. Undefined terms manufacture guess clusters." },
+ { id:214, text:"How excellent was the AI assistant at transforming your everyday work?", min:0.75, know:"Everyone", who:"all", cx:"Medium", val:"Medium", core:false, answerBy:null, defect:"LEADING", topic:"workflow impact", tier:"defective", sec:"B", survey:2,
+   flagTxt:"LEADING. 'How excellent' and 'transforming' presume the answer. Expect inflated top-box scores that flatter the rollout and measure nothing." },
+ { id:215, text:"How amazing was the AI assistant's help with your most recent document?", min:0.5, know:"Everyone", who:"all", cx:"Medium", val:"Low", core:false, answerBy:null, defect:"LEADING", topic:"output quality", tier:"defective", sec:"B", survey:2,
+   flagTxt:"LEADING. 'How amazing' loads the answer before the respondent starts. Document help will read better than it was." },
+ { id:216, text:"What percentage of your organization's AI budget is spent on the assistant's usage charges?", min:1.0, know:"Finance only, not on this list", who:"admin", cx:"High", val:"Medium", core:false, answerBy:["admin"], flag:"knowledge", defect:"BEYOND KNOWLEDGE", topic:"licensing and cost", tier:"defective", sec:"B", survey:2,
+   flagTxt:"BEYOND KNOWLEDGE. The assistant's share of the AI budget sits in finance systems no one on this list can see. No wording fix: this audience cannot know this." },
+ { id:217, text:"What score did the assistant's model achieve on the industry benchmark suite run before its release?", min:1.0, know:"The AI product team only, not on this list", who:"itdm", cx:"High", val:"Medium", core:false, answerBy:["itdm"], flag:"knowledge", defect:"BEYOND KNOWLEDGE", topic:"output quality", tier:"defective", sec:"B", survey:2,
+   flagTxt:"BEYOND KNOWLEDGE. Pre-release benchmark scores are held by the product team and were never published to users. Respondents will guess a grade for a test they never saw." },
+ { id:218, text:"How satisfied are you with the assistant's speed and accuracy?", min:1.0, know:"Everyone", who:"all", cx:"High", val:"Low", core:false, answerBy:null, defect:"DOUBLE-BARRELED", topic:"output quality", tier:"defective", sec:"B", survey:2,
+   flagTxt:"DOUBLE-BARRELED. Speed and accuracy are two judgments sharing one answer. A fast-but-wrong answer and a slow-but-right one land in the same box. Only SPLIT separates them." },
+ { id:219, text:"Do you usually get good answers when you ask the assistant for help?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"VAGUE TIMEFRAME", topic:"output quality", tier:"defective", sec:"B", survey:2,
+   flagTxt:"VAGUE TIMEFRAME. 'Usually' and 'good answers' are both undefined. Every respondent grades a different period against a different standard." },
+ { id:220, text:"Would you disagree that the assistant is not unhelpful for drafting?", min:0.5, know:"Everyone, after two reads", who:"all", cx:"High", val:"Low", core:false, answerBy:null, defect:"DOUBLE NEGATIVE", topic:"workflow impact", tier:"defective", sec:"B", survey:2,
+   flagTxt:"DOUBLE NEGATIVE. Disagree, not, unhelpful: the item must be parsed twice, and a share of respondents will answer the opposite of what they mean." },
+ { id:221, text:"How revolutionary is the AI assistant, on a scale of 1 to 10?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"workflow impact", tier:"stupid", sec:"B", survey:2, rg:"vanity",
+   flagTxt:"LOW-VALUE · VANITY. The wording solicits hype rather than evidence for a study decision." },
+ { id:222, text:"Why have you not used the AI assistant more often?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"adoption breadth", tier:"stupid", sec:"B", survey:2, rg:"blame",
+   flagTxt:"LOW-VALUE · BLAME. The question presumes the respondent is at fault for not using the assistant more. Expect defensive answers, not adoption insight." },
+ { id:223, text:"Thinking of the most recent task where the assistant helped you, how much time did it save? (none / under 15 minutes / 15-60 minutes / over an hour)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"workflow impact", tier:"clean", sec:"C", survey:2 },
+ { id:224, text:"Which best describes your access to the assistant? (I use it most days / I have access but rarely use it / I do not have access yet / not sure)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"adoption breadth", tier:"clean", sec:"C", survey:2 },
+ { id:225, text:"Over the last 12 months, how many times have you asked the assistant for help, and how many of those answers needed a follow-up correction?", min:1.0, know:"Everyone, from memory", who:"all", cx:"High", val:"Medium", core:false, answerBy:null, defect:"RECALL OVERLOAD", topic:"adoption breadth", tier:"defective", sec:"C", survey:2,
+   flagTxt:"RECALL OVERLOAD. A year of questions, counted, plus a year of corrections, counted, from memory. Nobody recalls this; they estimate it, and the estimates look like data." },
+ { id:226, text:"How many times did you use the assistant last week? Choose one: 0-2 / 2-5 / 5-10 / more than 10 / Other", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"BROKEN OPTIONS", topic:"adoption breadth", tier:"defective", sec:"C", survey:2,
+   flagTxt:"BROKEN OPTIONS. 2, 5 and 10 each sit in two ranges, so two honest respondents with the same week can pick different boxes, and the unsure land in Other." },
+ { id:227, text:"What was the internal codename for the AI assistant before it launched?", min:0.5, know:"Nobody outside the building", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"rollout experience", tier:"stupid", sec:"C", survey:2, rg:"trivia",
+   flagTxt:"LOW-VALUE · TRIVIA. An internal codename does not inform the adoption-study agenda." },
+ { id:228, text:"Roughly how many surveys about workplace tools have you received this quarter?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"rollout experience", tier:"filler", sec:"C", survey:2 },
+ { id:229, text:"Your answers are confidential and are never linked to your name. Have you ever held back a question from the assistant because you were unsure who might see it? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"trust in output", tier:"clean", sec:"D", survey:2 },
+ { id:230, text:"Have you ever pasted confidential company or customer information into the assistant? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"SENSITIVE NO ASSURANCE", topic:"concerns and risks", tier:"defective", sec:"D", survey:2,
+   flagTxt:"SENSITIVE, NO ASSURANCE. Asking respondents to admit pasting confidential information, with no confidentiality line anywhere near it, invites denial, not data." },
+ { id:231, text:"In your own words, what one thing would most help you get more from the AI assistant?", min:1.0, know:"Everyone", who:"all", cx:"Medium", val:"High", core:false, answerBy:null, defect:"CLEAN", topic:"enablement gap", tier:"clean", sec:"E", survey:2 },
+ { id:232, text:"Considering everything about your experience with the assistant so far, from the first announcement and the sign-up process, through the training or lack of it, the prompts you have tried, the answers you got, the times it helped and the times it got in the way, and how all of that fits together as one overall impression, please tell us in your own words the complete story of what the assistant means for your work and everything we could possibly do differently.", min:1.5, know:"Everyone", who:"all", cx:"Medium", val:"Medium", core:false, answerBy:null, defect:"WORDY STEM", topic:"enablement gap", tier:"defective", sec:"E", survey:2,
+   flagTxt:"WORDY STEM. A paragraph where a sentence would do. The reading load alone spends patience before the respondent types a word. This is the one class SIMPLIFY actually fixes." },
+ { id:233, text:"Which colleagues on your team refuse to use the assistant? (please name them)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"rollout experience", tier:"stupid", sec:"F", survey:2, rg:"nosy",
+   flagTxt:"LOW-VALUE · IRRELEVANT. Naming colleagues who decline a tool has no bearing on this study. The item requests personal information about third parties without a study purpose." },
+ { id:234, text:"Which day of the week do you prefer to receive surveys on?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"rollout experience", tier:"filler", sec:"F", survey:2 },
+ { id:235, text:"Would you like to receive a monthly tips newsletter about the assistant? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"rollout experience", tier:"filler", sec:"F", survey:2 },
+ { id:236, text:"What device are you answering on right now? (phone / tablet / computer)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"rollout experience", tier:"filler", sec:"F", survey:2 }
+];
+COPILOT_BANK.forEach(function(q){ QUESTION_BANK.push(q); });
+/* Level 2's fixed first-play instrument: its curated 12 from its own
+   bank (6 core, all clean except five teaching defectives), installed
+   by applyInstrumentForLevel when no seed is recorded for the level.
+   Level 1's fixed instrument stays QUESTIONS, a subset of its bank;
+   unmigrated levels keep QUESTIONS until their phases. */
+var LEVEL_2_FIXED_IDS = [201,202,203,205,206,209,212,214,216,218,224,230];
+function fixedInstrumentForLevel(n){
+  if (n === 2) return LEVEL_2_FIXED_IDS.map(function(id){ return questionById(id); });
+  return QUESTIONS.slice();
 }
 function activeQuestions(){ return state.instrument || QUESTIONS; }
 function fmtMin(m){ return Math.round(m * 100) / 100; }
@@ -1066,7 +1175,7 @@ var TOPIC_KEYS = {
 };
 var LEVEL_AGENDA = {
   1:["overall satisfaction","customer effort","self-service gap","renewal risk"],
-  2:["overall satisfaction","support speed","agent knowledge","renewal risk"],
+  2:["adoption breadth","workflow impact","trust in output","output quality","enablement gap"],
   3:["resolution quality","customer effort","product reliability","self-service gap"],
   4:["overall satisfaction","customer effort","resolution quality"],
   5:["support speed","self-service gap","product reliability","customer effort"],
@@ -1075,22 +1184,24 @@ var LEVEL_AGENDA = {
 /* Per-level survey records (scope doc section 3.2). The BRD assembly,
    the level cards, and the HUD read these. Agenda and topic-to-persona
    maps live on the record: Insight credits a topic only against the
-   survey that owns it. Phase 1 writes Level 1's record in full
-   (sponsor, purpose, audience). Levels 2-6 carry their survey name,
-   their current agenda and constraints, and the mission purpose they
-   have always printed; their sponsor and audience sections complete
-   in their own migration phases, and openBRD omits a section whose
-   field is null rather than inventing one. */
+   survey that owns it. Phases 1 and 2 write the Level 1 and Level 2
+   records in full (sponsor, purpose, audience). Levels 3-6 carry
+   their survey name, their current agenda and constraints, and the
+   mission purpose they have always printed; their sponsor and
+   audience sections complete in their own migration phases, and
+   openBRD omits a section whose field is null rather than inventing
+   one. */
 var SURVEY_BASE_CONSTRAINTS = "One credit pool for the whole level, shared across attempts. Choose an audience that can answer the required topics. Preserve useful coverage while controlling burden and data contamination.";
 var SURVEYS = {
   1:{ label:"SUPPORT EXPERIENCE", title:"Support Experience Survey", sponsor:"the Support Experience team",
     purpose:"Decide what to fix first in the support experience: where cases slow down, where the effort falls on the customer, and where self-service fails before a case ever opens. The findings set the support team's improvement priorities for the next quarter and are read alongside case data, never instead of it.",
     audience:"Customers whose support case closed in the last 30 days: the people who lived the case, across frontline, administrator, IT decision-maker, and executive seats. Case-experience questions are answerable by whoever lived the case; contract and billing figures sit with Partner Admin seats only, and org-wide cost figures sit with no seat on this list.",
     agenda:LEVEL_AGENDA[1], topicKeys:TOPIC_KEYS, constraints:SURVEY_BASE_CONSTRAINTS },
-  2:{ label:"COPILOT / AI ADOPTION", title:"Copilot Adoption Survey", sponsor:null,
-    purpose:"Improve the support experience using technician and end-user evidence.",
-    audience:null, agenda:LEVEL_AGENDA[2], topicKeys:TOPIC_KEYS,
-    constraints:SURVEY_BASE_CONSTRAINTS + " A/B testing is available: compare different invitations and report uncertainty rather than assuming a winner." },
+  2:{ label:"COPILOT / AI ADOPTION", title:"Copilot Adoption Survey", sponsor:"the AI Adoption team",
+    purpose:"Decide where adoption support goes next: who is actually using the assistant and for what work, where its output is trusted, where it is checked or quietly avoided, and what training and enablement are missing. The findings set the rollout team's priorities for the next two quarters and are read alongside usage telemetry, never instead of it.",
+    audience:"People who have been offered the assistant in their work. End users and frontline staff answer usage, output, and workflow questions from their own desks; on this survey they are the strong respondents. Executives cannot answer daily-use or prompt-level detail they never touch, and asking them manufactures guesses. IT decision makers answer rollout, governance, and enablement questions; budget and licensing figures sit with Partner Admin seats, and pre-release model facts sit with no seat on this list.",
+    agenda:LEVEL_AGENDA[2], topicKeys:COPILOT_TOPIC_KEYS,
+    constraints:SURVEY_BASE_CONSTRAINTS + " A/B testing is available: this study fields two invitation variants against the same instrument, and the comparison is about the invitation, never about two different questionnaires. Compare the invitations and report uncertainty rather than assuming a winner." },
   3:{ label:"AZURE CLOUD SERVICES", title:"Azure Cloud Services Survey", sponsor:null,
     purpose:"Improve the support experience using technician and end-user evidence.",
     audience:null, agenda:LEVEL_AGENDA[3], topicKeys:TOPIC_KEYS,
@@ -1566,6 +1677,7 @@ function evidenceMission(){
     roles: state.level === 6 ? [{ keys:["exec","itdm"], share:0.5, label:"Decision makers (executives or IT decision makers)" }] :
       [{ keys:["tech"], share:0.1, label:"Frontline technicians" }, { keys:["end"], share:0.1, label:"End users" }],
     purpose: state.level === 6 ? "Inform the renewal decision using decision-maker evidence." :
+      state.level === 2 ? "Measure adoption of the AI assistant using the evidence of the people who use it in their daily work." :
       "Improve the support experience using technician and end-user evidence."
   };
 }
@@ -2199,7 +2311,7 @@ function applyInstrumentForLevel(n){
     state.instrument = generateInstrument(n, state.instrumentSeed);
   } else {
     state.instrumentSeed = "A00" + n;
-    state.instrument = QUESTIONS.slice();
+    state.instrument = fixedInstrumentForLevel(n);
   }
   QUESTION_BANK.forEach(function(q){ if (state.qstate[q.id] === undefined) state.qstate[q.id]="keep"; });
   state.addBankIds = computeAddBankIds();
