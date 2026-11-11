@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-11-10 - Favicon and apple touch icon
+
+- Added site icons drawn from the game's own IM sprite: the MGR_NORMAL
+  head and shoulders (headset visible) on the cabinet background
+  (#141826), as `favicon.svg`, `favicon-32x32.png`, and an opaque
+  180x180 `apple-touch-icon.png`. Replaced the empty `data:,` icon
+  placeholder in the page head with the three icon links, and added
+  the icon files to the deployment package (now 8 files).
+
 ## 2026-11-10 - Gameplay copy diet
 
 - Shortened copy on the gameplay surfaces only: title and level select,

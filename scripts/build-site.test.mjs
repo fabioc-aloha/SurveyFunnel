@@ -5,14 +5,17 @@ import { join } from 'node:path';
 import test from 'node:test';
 import { buildSite, files, output, root, validateHtml } from './build-site.mjs';
 
-test('production package contains only the game, config, font, license, and QR code', () => {
+test('production package contains only the game, config, icons, font, license, and QR code', () => {
   buildSite();
-  assert.deepEqual(readdirSync(output).sort(), ['assets', 'index.html', 'staticwebapp.config.json']);
+  assert.deepEqual(readdirSync(output).sort(), [
+    'apple-touch-icon.png', 'assets', 'favicon-32x32.png', 'favicon.svg',
+    'index.html', 'staticwebapp.config.json'
+  ]);
   assert.deepEqual(readdirSync(join(output, 'assets')).sort(), [
     'OFL-Press-Start-2P.txt', 'play-mobile-qr.svg', 'press-start-2p.ttf'
   ]);
   for (const [source, destination] of files) {
-    const expected = destination.endsWith('.ttf')
+    const expected = destination.endsWith('.ttf') || destination.endsWith('.png')
       ? readFileSync(join(root, source))
       : Buffer.from(readFileSync(join(root, source), 'utf8').replace(/\r\n?/g, '\n'));
     assert.equal(
@@ -32,6 +35,23 @@ test('production package contains only the game, config, font, license, and QR c
   const qr = readFileSync(join(output, 'assets', 'play-mobile-qr.svg'), 'utf8');
   assert.match(qr, /<svg/);
   assert.doesNotMatch(qr, /<script|<foreignObject/);
+});
+
+test('favicon and apple touch icon are packaged and linked from the page head', () => {
+  buildSite();
+  const html = readFileSync(join(output, 'index.html'), 'utf8');
+  assert.match(html, /<link rel="icon" type="image\/svg\+xml" href="favicon\.svg" \/>/);
+  assert.match(html, /<link rel="icon" type="image\/png" sizes="32x32" href="favicon-32x32\.png" \/>/);
+  assert.match(html, /<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon\.png" \/>/);
+  const svg = readFileSync(join(output, 'favicon.svg'), 'utf8');
+  assert.match(svg, /<svg/);
+  assert.match(svg, /#141826/);
+  for (const [name, size] of [['favicon-32x32.png', 32], ['apple-touch-icon.png', 180]]) {
+    const png = readFileSync(join(output, name));
+    assert.deepEqual([...png.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10], `${name}: PNG signature`);
+    assert.equal(png.readUInt32BE(16), size, `${name}: width`);
+    assert.equal(png.readUInt32BE(20), size, `${name}: height`);
+  }
 });
 
 test('syntax validation rejects invalid inline JavaScript', () => {

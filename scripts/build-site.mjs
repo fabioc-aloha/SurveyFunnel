@@ -8,6 +8,9 @@ export const output = join(root, 'dist');
 export const files = [
   ['site/index.html', 'index.html'],
   ['site/staticwebapp.config.json', 'staticwebapp.config.json'],
+  ['site/favicon.svg', 'favicon.svg'],
+  ['site/favicon-32x32.png', 'favicon-32x32.png'],
+  ['site/apple-touch-icon.png', 'apple-touch-icon.png'],
   ['assets/press-start-2p.ttf', 'assets/press-start-2p.ttf'],
   ['assets/OFL-Press-Start-2P.txt', 'assets/OFL-Press-Start-2P.txt'],
   ['assets/play-mobile-qr.svg', 'assets/play-mobile-qr.svg']
@@ -33,7 +36,7 @@ export function buildSite() {
   for (const [source, destination] of files) {
     const target = join(output, destination);
     mkdirSync(dirname(target), { recursive: true });
-    const content = destination.endsWith('.ttf')
+    const content = destination.endsWith('.ttf') || destination.endsWith('.png')
       ? readFileSync(join(root, source))
       : readFileSync(join(root, source), 'utf8').replace(/\r\n?/g, '\n');
     writeFileSync(target, content);
