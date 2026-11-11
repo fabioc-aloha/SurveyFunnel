@@ -1,5 +1,53 @@
 # Changelog
 
+## 2026-11-11 - Per-level surveys phase 1: data model, per-level BRD, Level 1 Support bank
+
+- Design: [docs/level-surveys-scope.md](docs/level-surveys-scope.md).
+  The owner approved the level-to-survey mapping and all seven open
+  decisions as recommended on 2026-11-11; the scope doc records the
+  decisions as the build specification.
+- Data model: every bank entry now carries a `survey` field naming
+  its level's bank (0 = legacy shared bank). `bankForLevel(level)`
+  is the single lookup the deal and the add bank read. Level 1 is
+  migrated; Levels 2-6 resolve to the full legacy shared bank
+  through the transitional fallback, so their deals are unchanged.
+  Question ids are never renumbered, and the Quick Challenges,
+  which deal by id from the union bank, are byte-identical.
+- Level 1 Support Experience bank: 36 entries curated from the
+  existing support bank (36 reused, 0 newly authored; the bank
+  already was this survey). Structure follows the scope doc's
+  derivation: sections A4/B18/C6/D2/E2/F4; 15 clean, 12 defective,
+  5 stupid, 4 filler; core set of 8 with a creditable core question
+  on every agenda topic; all 11 defect classes present, with
+  SENSITIVE NO ASSURANCE doubled. The fixed first-play instrument
+  (ids 1-12) is a subset of the bank.
+- Per-level BRD: `openBRD` now assembles the campaign document from
+  a shared front section (five-checks acceptance language,
+  segment-driven list preparation, closing note) plus the current
+  level's own study from its `SURVEYS` record (name, sponsor,
+  purpose, audience, required topics, constraints, success
+  measures). Level 1's Support Experience BRD is written in full;
+  Levels 2-6 render their current topics and constraints through
+  the same model until their phases. The generic purpose sentence
+  is retired. The Quick Challenge BRD is unchanged. Insight now
+  reads topic-to-persona keys from the level's survey record.
+- Naming (decision 6): level cards read "LEVEL 1 · EASY · FIRST
+  SEND · SUPPORT EXPERIENCE", the setup banner and HUD name the
+  survey, and the BRD title carries the survey name. The existing
+  difficulty-label pins are kept, so the card line keeps its
+  difficulty segment.
+- Witnesses: Level 1's 64 seeded winning setups were regenerated
+  through the real card handlers against the curated bank; the
+  fixed-instrument entry is untouched and replays byte-identically
+  (58 cr, the recorded baseline). Seeded winning lines now cost
+  53-71 cr, against 58-93 cr before the migration: the curated
+  bank is denser in core and agenda-clean questions. No pool
+  changed. Other levels' fixtures are byte-identical.
+- Coverage: six new Node tests (bank structure, fallback, QC id
+  preservation, per-level BRD rendering, naming, Insight against
+  Level 1 topics) and a new browser scenario for survey identity
+  at both viewports. Gates: build, Node suite, full harness.
+
 ## 2026-11-11 - Fact-check fixes: BriteVerify name, accept_all label, catch-all scope, guide prices
 
 - The email validator is Validity's BriteVerify; game copy and the

@@ -20,14 +20,28 @@
 - Quick Challenge stages 2 and 3 are already implemented. New Azure
   provisioning and DNS/custom-domain work remain manual and outside
   this release.
-- Local, not yet pushed: medallion prep stage phase 1 (derived list
-  health) is built and committed on top of the design commit. Step 2
-  is Bronze / Silver / Gold, campaign invalid rates are derived from
-  a dealt intake mix, and the witness corpus was regenerated at the
-  same 364 setups with unchanged minimum credits-to-win. Full local
+- Production also carries the 2026-11-10/11 releases pushed after
+  `b45bb69`: the gameplay copy diet, the favicon set, medallion prep
+  stage phase 1 (Step 2 as Bronze / Silver / Gold with derived list
+  health), the Fishbowl help overlay, and the fact-check fixes
+  (BriteVerify name, accept_all label, catch-all scope, guide
+  prices), deployed as `c8a1c01b` and live-verified 2026-11-11.
+- Local, not yet pushed: per-level surveys phase 1 (design in
+  [docs/level-surveys-scope.md](docs/level-surveys-scope.md), all
+  seven decisions approved as recommended 2026-11-11). Each level
+  now has a survey identity: bank entries carry a `survey` field,
+  Level 1 draws its own curated 36-entry Support Experience bank,
+  Levels 2-6 draw the legacy shared bank through a transitional
+  fallback, and the BRD assembles from a per-level survey record
+  (shared front section plus the level's own study; Level 1's BRD
+  is written in full, the generic purpose sentence is retired).
+  Level cards, the setup banner, the HUD, and the BRD title name
+  the survey. Level 1 witnesses were regenerated (65 setups; the
+  fixed line replays byte-identically at 58 cr, seeded winning
+  lines now cost 53-71 cr against the old 58-93 range). Full local
   gates pass (build, Node suite, browser harness with the new
-  medallion scenario). Production still runs `b45bb69` plus the
-  2026-11-10 copy, favicon, and design commits until this is pushed.
+  survey-identity scenario). Phases 2 to 5 are in
+  [TODO.md](TODO.md).
 
 ## Acceptance boundary
 

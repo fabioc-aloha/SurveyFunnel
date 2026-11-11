@@ -1028,6 +1028,30 @@ var QUESTION_BANK = QUESTIONS.concat([
  { id:71, text:"Would you like to receive a monthly product newsletter? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"renewal risk", tier:"filler", sec:"F" },
  { id:72, text:"What device are you answering on right now? (phone / tablet / computer)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"onboarding", tier:"filler", sec:"F" }
 ]);
+/* ================= PER-LEVEL SURVEYS · PHASE 1 =================
+   Design: docs/level-surveys-scope.md (all seven decisions approved
+   as recommended, 2026-11-11). Every bank entry carries a `survey`
+   field: the level whose bank it belongs to, or 0 for the legacy
+   shared bank. Phase 1 migrates Level 1 (Support Experience) to its
+   own curated bank of 36 entries, selected from the support bank
+   above: the fixed first-play instrument (ids 1-12) is a subset, all
+   11 defect classes are present, and the section and tier structure
+   follows the scope doc's derivation (A4/B18/C6/D2/E2/F4; 15 clean,
+   12 defective, 5 stupid, 4 filler; core set of 8). Question ids are
+   never renumbered: the Quick Challenges deal by id from
+   QUESTION_BANK and keep working byte-identically, because the
+   drills read the union bank directly, never bankForLevel.
+   Transitional state: Levels 2-6 are not migrated yet, so
+   bankForLevel falls back to the full legacy shared bank for them,
+   exactly the draw they have always had. Each later phase migrates
+   one level and narrows its fallback; phase 4 removes it. */
+var LEVEL_1_BANK_IDS = [1,2,3,4,5,6,7,8,9,10,11,12,25,27,29,30,31,32,37,39,43,45,46,52,53,54,55,57,58,59,63,66,67,68,71,72];
+QUESTION_BANK.forEach(function(q){ q.survey = LEVEL_1_BANK_IDS.indexOf(q.id) >= 0 ? 1 : 0; });
+OPTIONAL_QUESTIONS.forEach(function(q){ q.survey = 1; });
+function bankForLevel(level){
+  if (level === 1) return QUESTION_BANK.filter(function(q){ return q.survey === 1; });
+  return QUESTION_BANK; /* legacy shared bank: unmigrated levels, transitional */
+}
 function activeQuestions(){ return state.instrument || QUESTIONS; }
 function fmtMin(m){ return Math.round(m * 100) / 100; }
 function fmt(n){ return Math.round(n).toLocaleString("en-US"); }
@@ -1048,7 +1072,45 @@ var LEVEL_AGENDA = {
   5:["support speed","self-service gap","product reliability","customer effort"],
   6:["overall satisfaction","renewal risk","billing clarity","resolution quality","product reliability"]
 };
-function agendaTopics(){ return state.quickChallenge ? state.quickChallenge.topics : LEVEL_AGENDA[state.level] || LEVEL_AGENDA[1]; }
+/* Per-level survey records (scope doc section 3.2). The BRD assembly,
+   the level cards, and the HUD read these. Agenda and topic-to-persona
+   maps live on the record: Insight credits a topic only against the
+   survey that owns it. Phase 1 writes Level 1's record in full
+   (sponsor, purpose, audience). Levels 2-6 carry their survey name,
+   their current agenda and constraints, and the mission purpose they
+   have always printed; their sponsor and audience sections complete
+   in their own migration phases, and openBRD omits a section whose
+   field is null rather than inventing one. */
+var SURVEY_BASE_CONSTRAINTS = "One credit pool for the whole level, shared across attempts. Choose an audience that can answer the required topics. Preserve useful coverage while controlling burden and data contamination.";
+var SURVEYS = {
+  1:{ label:"SUPPORT EXPERIENCE", title:"Support Experience Survey", sponsor:"the Support Experience team",
+    purpose:"Decide what to fix first in the support experience: where cases slow down, where the effort falls on the customer, and where self-service fails before a case ever opens. The findings set the support team's improvement priorities for the next quarter and are read alongside case data, never instead of it.",
+    audience:"Customers whose support case closed in the last 30 days: the people who lived the case, across frontline, administrator, IT decision-maker, and executive seats. Case-experience questions are answerable by whoever lived the case; contract and billing figures sit with Partner Admin seats only, and org-wide cost figures sit with no seat on this list.",
+    agenda:LEVEL_AGENDA[1], topicKeys:TOPIC_KEYS, constraints:SURVEY_BASE_CONSTRAINTS },
+  2:{ label:"COPILOT / AI ADOPTION", title:"Copilot Adoption Survey", sponsor:null,
+    purpose:"Improve the support experience using technician and end-user evidence.",
+    audience:null, agenda:LEVEL_AGENDA[2], topicKeys:TOPIC_KEYS,
+    constraints:SURVEY_BASE_CONSTRAINTS + " A/B testing is available: compare different invitations and report uncertainty rather than assuming a winner." },
+  3:{ label:"AZURE CLOUD SERVICES", title:"Azure Cloud Services Survey", sponsor:null,
+    purpose:"Improve the support experience using technician and end-user evidence.",
+    audience:null, agenda:LEVEL_AGENDA[3], topicKeys:TOPIC_KEYS,
+    constraints:SURVEY_BASE_CONSTRAINTS + " Resolve the stakeholder request for eight extra questions. Costs and added burden depend on your response; extra-topic answers are not simulated or scored." },
+  4:{ label:"ACCOUNT TEAM RELATIONSHIP", title:"Account Team Relationship Survey", sponsor:null,
+    purpose:"Improve the support experience using technician and end-user evidence.",
+    audience:null, agenda:LEVEL_AGENDA[4], topicKeys:TOPIC_KEYS,
+    constraints:SURVEY_BASE_CONSTRAINTS + " The tired audience requires ending goodwill 35 or higher." },
+  5:{ label:"GENERAL PERCEPTIONS OF MICROSOFT", title:"General Perceptions of Microsoft Survey", sponsor:null,
+    purpose:"Improve the support experience using technician and end-user evidence.",
+    audience:null, agenda:LEVEL_AGENDA[5], topicKeys:TOPIC_KEYS,
+    constraints:SURVEY_BASE_CONSTRAINTS + " The multilingual list is 40% English-speaking. Consider invitation language and localization review." },
+  6:{ label:"ENTERPRISE RELATIONSHIP", title:"Enterprise Relationship Flagship Annual Survey", sponsor:null,
+    purpose:"Inform the renewal decision using decision-maker evidence.",
+    audience:null, agenda:LEVEL_AGENDA[6], topicKeys:TOPIC_KEYS,
+    constraints:SURVEY_BASE_CONSTRAINTS + " Resolve the stakeholder request for eight extra questions. Costs and added burden depend on your response; extra-topic answers are not simulated or scored." + " Executive Blast is the available audience for this study." }
+};
+function surveyRecord(level){ return SURVEYS[level || state.level] || SURVEYS[1]; }
+function topicKeysFor(topic){ var s = surveyRecord(); return (s.topicKeys && s.topicKeys[topic]) || TOPIC_KEYS[topic] || []; }
+function agendaTopics(){ return state.quickChallenge ? state.quickChallenge.topics : (surveyRecord().agenda || LEVEL_AGENDA[1]); }
 function insightGate(){ return state.level === 6 ? 70 : 60; }
 var SEC_RANK = { A:0, B:1, C:2, D:3, E:4, F:5 };
 var SEC_MAP = { 1:"A",2:"A",3:"B",4:"B",5:"C",6:"A",7:"B",8:"B",9:"B",10:"B",11:"E",12:"D",13:"E",14:"B",15:"F",21:"B",22:"C",23:"C",24:"B",25:"C",26:"B" };
@@ -1066,7 +1128,7 @@ function computeAddBankIds(){
   var instIds = {}; activeQuestions().forEach(function(q){ instIds[q.id] = true; });
   var covered = {}; activeQuestions().forEach(function(q){ covered[q.topic] = true; });
   var agenda = agendaTopics();
-  var pool = QUESTION_BANK.filter(function(q){ return !instIds[q.id]; });
+  var pool = bankForLevel(state.level).filter(function(q){ return !instIds[q.id]; });
   pool.sort(function(a, b){
     function score(q){
       var s = 0;
@@ -1408,7 +1470,7 @@ function generateInstrument(level, seedStr){
      D sensitive 0-1 late · E open-text closer 0-1 · F demographics 0-2 last. */
   var targetLen = 9 + Math.floor(rng() * 8); /* 9..16 */
   var pools = { A:[], B:[], C:[], D:[], E:[], F:[] };
-  QUESTION_BANK.forEach(function(q){ pools[sectionOf(q)].push(q); });
+  bankForLevel(level).forEach(function(q){ pools[sectionOf(q)].push(q); });
   Object.keys(pools).forEach(function(s){ pools[s] = shuffleWith(rng, pools[s]); });
   var quota = { A: 2 + Math.floor(rng() * 2), C: 1 + Math.floor(rng() * 3), D: Math.floor(rng() * 2), E: Math.floor(rng() * 2), F: Math.floor(rng() * 3) };
   var fixed = quota.A + quota.C + quota.D + quota.E + quota.F;
@@ -1418,14 +1480,14 @@ function generateInstrument(level, seedStr){
   /* Winnability guarantee: at least half the agenda topics must have a
      question (any tier) in the deal itself; swap B-section fillers out
      until they do. The add bank covers the rest. */
-  var agenda = LEVEL_AGENDA[level] || LEVEL_AGENDA[1];
+  var agenda = (SURVEYS[level] && SURVEYS[level].agenda) || LEVEL_AGENDA[level] || LEVEL_AGENDA[1];
   function topicsPresent(){ var t = {}; drawn.forEach(function(q){ t[q.topic] = true; }); return t; }
   var need = Math.ceil(agenda.length / 2);
   agenda.forEach(function(topic){
     var present = topicsPresent();
     var have = agenda.filter(function(t){ return present[t]; }).length;
     if (present[topic] || have >= need + 1) return;
-    var candidate = QUESTION_BANK.filter(function(q){ return q.topic === topic && drawn.indexOf(q) < 0; })[0];
+    var candidate = bankForLevel(level).filter(function(q){ return q.topic === topic && drawn.indexOf(q) < 0; })[0];
     if (!candidate) return;
     var swapIdx = -1;
     for (var i = drawn.length - 1; i >= 0; i--){ if (sectionOf(drawn[i]) === "B" && agenda.indexOf(drawn[i].topic) < 0 && tierOf(drawn[i]) !== "clean"){ swapIdx = i; break; } }
@@ -2062,10 +2124,10 @@ function curLevel(){
 }
 function renderLevelUI(){
   var L=curLevel();
-  var hl=$("hudLevel"); if(hl) hl.innerHTML="LEVEL "+L.id+" · "+L.difficulty+" · <b>"+L.name+"</b> · ATTEMPT "+state.attempt+" · INSTRUMENT #"+state.instrumentSeed;
+  var hl=$("hudLevel"); if(hl) hl.innerHTML="LEVEL "+L.id+" · "+L.difficulty+" · <b>"+L.name+"</b> · "+surveyRecord(L.id).label+" · ATTEMPT "+state.attempt+" · INSTRUMENT #"+state.instrumentSeed;
   var ht=$("hudTarget"); if(ht) ht.innerHTML=(state.quickChallenge ? "TARGET RESPONSE RATE <b>&gt; " : "RESPONSE BENCHMARK <b>")+targetPct(L.target)+"%</b>"+(L.id===4?" · END GOODWILL 35+":"");
   $("hudGates").innerHTML=state.quickChallenge ? "WIN NEEDS QUALITY <b>"+quickQualityGate()+"+</b> · INSIGHT <b>"+insightGate()+"+</b>" : "WIN: <b>FIVE EVIDENCE CHECKS</b> · USABLE INSIGHT <b>"+insightGate()+"+</b>";
-  var lb=$("levelBanner"); if(lb) lb.innerHTML='<div class="lever" style="border-color:var(--gold)"><div class="lever-head"><span class="lever-no">LEVEL '+L.id+'</span><span class="lever-title">'+L.name+'</span><span class="lever-sub">'+L.desc+' Budget '+L.budget+' cr · <b style="color:var(--ink)">'+activeQuestions().length+' questions</b> dealt.</span></div></div>';
+  var lb=$("levelBanner"); if(lb) lb.innerHTML='<div class="lever" style="border-color:var(--gold)"><div class="lever-head"><span class="lever-no">LEVEL '+L.id+'</span><span class="lever-title">'+L.name+'</span><span class="lever-sub">'+L.desc+' Budget '+L.budget+' cr · <b style="color:var(--ink)">'+activeQuestions().length+' questions</b> dealt · Survey: '+surveyRecord(L.id).title+'.</span></div></div>';
   if (state.quickChallenge){
     var tv = quickVariant();
     hl.textContent = "QUICK CHALLENGE · " + L.name;
@@ -2073,7 +2135,7 @@ function renderLevelUI(){
       (state.quickChallenge.wave === 2 ? '<p><b>WAVE 2 · COMPLICATION: ' + quickComplicationTitle(state.quickChallenge.comp) + '.</b> Same pool, no refill: wave 1 spent ' + (state.quickChallenge.wave1 ? state.quickChallenge.wave1.cost : 0) + ' of 48 cr. The verdict reads both waves together.</p>' : '') + '</div>';
   }
   // level grid
-  var grid=$("levelGrid"); if(grid){ grid.innerHTML=LEVELS.map(function(lv){ var locked=lv.id>state.unlocked; var best=state.campaignBest[lv.id]; return '<button class="lvlcard'+(locked?" locked":"")+(lv.id===state.level?" sel":"")+'" data-level="'+lv.id+'" '+(locked?"disabled":"")+'>'+'<div class="ln">LEVEL '+lv.id+' · '+lv.difficulty+(locked?" · 🔒 LOCKED":"")+'</div><h3>'+lv.name+'</h3><p>'+lv.desc+'</p>'+(best?'<div class="best">BEST: '+best+'</div>':"")+'</button>';}).join("");
+  var grid=$("levelGrid"); if(grid){ grid.innerHTML=LEVELS.map(function(lv){ var locked=lv.id>state.unlocked; var best=state.campaignBest[lv.id]; return '<button class="lvlcard'+(locked?" locked":"")+(lv.id===state.level?" sel":"")+'" data-level="'+lv.id+'" '+(locked?"disabled":"")+'>'+'<div class="ln">LEVEL '+lv.id+' · '+lv.difficulty+' · '+lv.name+' · '+surveyRecord(lv.id).label+(locked?" · 🔒 LOCKED":"")+'</div><h3>'+lv.name+'</h3><p>'+lv.desc+'</p>'+(best?'<div class="best">BEST: '+best+'</div>':"")+'</button>';}).join("");
     Array.prototype.forEach.call(grid.querySelectorAll("[data-level]"),function(b){ b.addEventListener("click",function(){ selectLevel(parseInt(b.getAttribute("data-level"),10),false); }); });
   }
   var sl=$("seasonLine"); if(sl){ var won=Object.keys(state.campaignWon).filter(function(k){return state.campaignWon[k];}).length; sl.textContent="SEASON: "+won+" / 6 LEVELS WON"; }
@@ -2570,12 +2632,7 @@ function openBRD(){
   var L = curLevel(), quick = !!state.quickChallenge;
   var tv = quick ? quickVariant() : null;
   var constraints = quick ? "Repair the three BRD cards and resolve the three unrequested extras within " + L.budget + " credits; one launch. If a complication lands after the report, one follow-up wave may be mailed from the same pool, which does not refill. Three questions in this drill were not asked for in this BRD: treat them as scope creep and judge each on its merits. The Fresh audience, full validation, dedupe, suppression, and Honest Ask invitation with no reminders are provided. Retry starts fresh without changing campaign progress." :
-    "One credit pool for the whole level, shared across attempts. Choose an audience that can answer the required topics. Preserve useful coverage while controlling burden and data contamination.";
-  if (!quick && state.level === 2) constraints += " A/B testing is available: compare different invitations and report uncertainty rather than assuming a winner.";
-  if (!quick && (state.level === 3 || state.level === 6)) constraints += " Resolve the stakeholder request for eight extra questions. Costs and added burden depend on your response; extra-topic answers are not simulated or scored.";
-  if (!quick && state.level === 4) constraints += " The tired audience requires ending goodwill 35 or higher.";
-  if (!quick && state.level === 5) constraints += " The multilingual list is 40% English-speaking. Consider invitation language and localization review.";
-  if (!quick && state.level === 6) constraints += " Executive Blast is the available audience for this study.";
+    surveyRecord().constraints;
   var listPrepBRD = "";
   if (!quick && state.seg && state.seg.intake){
     var bm = currentIntake(), bn = state.seg.n;
@@ -2593,10 +2650,28 @@ function openBRD(){
       '</ul>' +
       '<p>List health is derived, not stored: invalid records (stale plus unrepaired broken) divided by promoted records. This list runs <b>' + (bNone.invalid * 100).toFixed(1) + '% invalid with no Silver work</b>, <b>' + (bFull.invalid * 100).toFixed(1) + '% with the full Silver line</b>, and <b>' + (bNow.invalid * 100).toFixed(1) + '% as currently configured</b>, before validation.</p>';
   }
-  $("brdContent").innerHTML = '<h2>BRD</h2><p>Business Requirement Document</p><h3>'+L.name+(quick?"":" · "+L.difficulty)+'</h3><h3>STUDY PURPOSE</h3><p>Collect credible answers on the required business topics below. A high response rate alone does not establish useful evidence.</p><h3>REQUIRED TOPICS AND RESPONDENTS</h3><ul>'+agendaTopics().map(function(topic){
-    var personas=(TOPIC_KEYS[topic]||[]).map(function(key){return PERSONAS[key].name;}).join(" or ");
-    return '<li><b>'+topic+'</b>: credible answers from '+personas+'.</li>';
-  }).join("")+'</ul><h3>ACCEPTANCE CRITERIA</h3>'+(quick ? '<p>Response strictly above '+targetPct(L.target)+'% of invitations actually sent. Data quality '+quickQualityGate()+' and Insight '+insightGate()+'+.</p>' : '<p>Pass all five evidence checks; none can compensate for another.</p>'+evidenceRequirementsHTML())+'<ul><li>Budget: '+L.budget+' credits'+(quick?' for one launch, plus a follow-up wave if a complication lands.':' across all attempts.')+'</li>'+(!quick && state.level===4?'<li>Maintain ending goodwill 35 or higher.</li>':"")+(quick?'<li>Repair all three BRD cards and resolve each extra by repair or cut; kept unresolved extras and cuts of BRD cards do not complete the challenge.</li>':"")+(tv?'<li>Twist · '+tv.name+': '+tv.acceptance+'</li>':"")+'</ul><h3>STUDY CONSTRAINTS</h3><p>'+constraints+'</p>'+(tv?'<h3>BRD TWIST · '+tv.name+'</h3><p>'+tv.brief+'</p><p>Drawn for this run from seed <b>'+state.quickChallenge.seed+'</b> with the same seeded draw that deals the instruments: the same seed always deals the same brief. A retry draws a new brief.</p>':"")+listPrepBRD+'<p>These are the active study requirements, not a forecast. Consult MPOR for game rules, scoring definitions, and simulation limitations.</p>';
+  if (quick){
+    $("brdContent").innerHTML = '<h2>BRD</h2><p>Business Requirement Document</p><h3>'+L.name+'</h3><h3>STUDY PURPOSE</h3><p>Collect credible answers on the required business topics below. A high response rate alone does not establish useful evidence.</p><h3>REQUIRED TOPICS AND RESPONDENTS</h3><ul>'+agendaTopics().map(function(topic){
+      var personas=(TOPIC_KEYS[topic]||[]).map(function(key){return PERSONAS[key].name;}).join(" or ");
+      return '<li><b>'+topic+'</b>: credible answers from '+personas+'.</li>';
+    }).join("")+'</ul><h3>ACCEPTANCE CRITERIA</h3>'+'<p>Response strictly above '+targetPct(L.target)+'% of invitations actually sent. Data quality '+quickQualityGate()+' and Insight '+insightGate()+'+.</p>'+'<ul><li>Budget: '+L.budget+' credits for one launch, plus a follow-up wave if a complication lands.</li>'+'<li>Repair all three BRD cards and resolve each extra by repair or cut; kept unresolved extras and cuts of BRD cards do not complete the challenge.</li>'+(tv?'<li>Twist · '+tv.name+': '+tv.acceptance+'</li>':"")+'</ul><h3>STUDY CONSTRAINTS</h3><p>'+constraints+'</p>'+(tv?'<h3>BRD TWIST · '+tv.name+'</h3><p>'+tv.brief+'</p><p>Drawn for this run from seed <b>'+state.quickChallenge.seed+'</b> with the same seeded draw that deals the instruments: the same seed always deals the same brief. A retry draws a new brief.</p>':"")+listPrepBRD+'<p>These are the active study requirements, not a forecast. Consult MPOR for game rules, scoring definitions, and simulation limitations.</p>';
+  } else {
+    /* Campaign BRD: shared front section (five-checks acceptance
+       language, segment-driven list preparation, closing note) plus
+       the current level's own study, read from its survey record.
+       The generic purpose sentence is retired: the purpose below is
+       the study's own. */
+    var survey = surveyRecord();
+    $("brdContent").innerHTML = '<h2>BRD</h2><p>Business Requirement Document</p><h3>'+survey.title+' · '+L.name+' · '+L.difficulty+'</h3>'+
+      '<p>Shared front section, the same for every study: pass all five evidence checks; none can compensate for another. A high response rate alone does not establish useful evidence. Everything from STUDY PURPOSE to STUDY CONSTRAINTS belongs to this study alone; the list preparation section after it is generated from the selected audience.</p>'+
+      '<h3>STUDY PURPOSE</h3><p>'+survey.purpose+'</p>'+
+      (survey.sponsor ? '<h3>SPONSOR</h3><p>Commissioned by '+survey.sponsor+'.</p>' : '')+
+      (survey.audience ? '<h3>AUDIENCE</h3><p>'+survey.audience+'</p>' : '')+
+      '<h3>REQUIRED TOPICS AND RESPONDENTS</h3><ul>'+agendaTopics().map(function(topic){
+        var personas=topicKeysFor(topic).map(function(key){return PERSONAS[key].name;}).join(" or ");
+        return '<li><b>'+topic+'</b>: credible answers from '+personas+'.</li>';
+      }).join("")+'</ul><h3>ACCEPTANCE CRITERIA</h3>'+'<p>Pass all five evidence checks; none can compensate for another.</p>'+evidenceRequirementsHTML()+'<ul><li>Budget: '+L.budget+' credits across all attempts.</li>'+(state.level===4?'<li>Maintain ending goodwill 35 or higher.</li>':"")+'</ul><h3>STUDY CONSTRAINTS</h3><p>'+constraints+'</p>'+listPrepBRD+'<p>These are the active study requirements, not a forecast. Consult MPOR for game rules, scoring definitions, and simulation limitations.</p>';
+  }
   openReference("studyBRD", "brdClose", "brdBtn");
 }
 var activeReference = null;
@@ -3691,7 +3766,7 @@ function computeInsight(c, run){
     if (!creditable.length) return { topic: topic, status: "LOST", earned: 0, reason: "Only a low-value item asked about this topic (Q" + qs[0].id + "). Low-value items earn zero insight in this game." };
     var answerable = creditable.filter(function(q){ return !q.answerBy || q.answerBy.some(function(p){ return segPersonas.indexOf(p) >= 0; }); });
     if (!answerable.length) return { topic: topic, status: "LOST", earned: 0, reason: "Wrong audience: the question on this topic (Q" + creditable[0].id + ") can only be answered by " + creditable[0].know + ", who are not in the segment sent." };
-    var keys = TOPIC_KEYS[topic] || [];
+    var keys = topicKeysFor(topic);
     var personaOk = keys.some(function(k){ return c.perPersona[k] && c.perPersona[k].completed > 0; });
     if (!personaOk) return { topic: topic, status: "LOST", earned: 0, reason: "Missing persona: no finisher was a " + keys.map(function(k){ return PERSONAS[k].name; }).join(" or ") + ", the group this topic is about. Who responds decides what the data can say." };
     var best = -1, bestQ = null, bestWhy = "";

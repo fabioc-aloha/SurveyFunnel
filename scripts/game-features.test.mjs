@@ -2334,6 +2334,110 @@ test('medallion: Silver actions charge once, stay owned, and suppression still c
   assert.equal(row(g.budgetMath(), 'Suppression')[1], 4, 'suppression still charges 4 cr at Gold when not owned');
 });
 
+/* Per-level surveys, phase 1 (docs/level-surveys-scope.md; all seven
+   decisions approved as recommended, 2026-11-11). Level 1 migrated to
+   its own Support Experience bank; Levels 2-6 still draw the legacy
+   shared bank through the transitional fallback. */
+test('per-level surveys: Level 1 bank has the derived structure', () => {
+  const { context: g } = game();
+  const bank = g.bankForLevel(1);
+  assert.equal(bank.length, 36);
+  assert.ok(bank.every(q => q.survey === 1));
+  const sections = {}, tiers = {}, defects = new Set();
+  for (const q of bank) {
+    sections[g.sectionOf(q)] = (sections[g.sectionOf(q)] || 0) + 1;
+    tiers[g.tierOf(q)] = (tiers[g.tierOf(q)] || 0) + 1;
+    if (g.tierOf(q) === 'defective') defects.add(g.defectOf(q));
+  }
+  assert.deepEqual(sections, { A: 4, B: 18, C: 6, D: 2, E: 2, F: 4 });
+  assert.deepEqual(tiers, { clean: 15, defective: 12, stupid: 5, filler: 4 });
+  assert.equal(defects.size, 11, 'all 11 defect classes present on Level 1');
+  const core = bank.filter(q => q.core);
+  assert.ok(core.length >= 6 && core.length <= 8, 'core set is 6-8');
+  /* The fixed first-play instrument is a subset of the Level 1 bank. */
+  assert.ok(g.QUESTIONS.every(q => bank.some(b => b.id === q.id)));
+  /* At least 2 creditable questions per agenda topic, and at least one
+     creditable core question per agenda topic. */
+  for (const topic of g.SURVEYS[1].agenda) {
+    const creditable = bank.filter(q => q.topic === topic && g.tierOf(q) !== 'stupid');
+    assert.ok(creditable.length >= 2, `Level 1 agenda topic "${topic}" has 2+ creditable questions`);
+    assert.ok(creditable.some(q => q.core), `Level 1 agenda topic "${topic}" has a creditable core question`);
+  }
+});
+
+test('per-level surveys: unmigrated levels fall back to the legacy shared bank', () => {
+  const { context: g } = game();
+  for (let level = 2; level <= 6; level++) assert.equal(g.bankForLevel(level), g.QUESTION_BANK);
+  /* Seeded deals on Level 1 draw only Level 1 bank questions, across a seed sweep. */
+  const bankIds = new Set(g.bankForLevel(1).map(q => q.id));
+  for (let n = 0; n < 25; n++) {
+    const inst = g.generateInstrument(1, 'T' + String(n).padStart(3, '0'));
+    assert.ok(inst.length >= 9 && inst.length <= 16);
+    assert.ok(inst.every(q => bankIds.has(q.id)), 'Level 1 deal stays inside its own bank');
+  }
+  /* A Level 2 deal still draws from the full legacy bank. */
+  const inst2 = g.generateInstrument(2, 'T000');
+  assert.ok(inst2.every(q => g.QUESTION_BANK.some(b => b.id === q.id)));
+});
+
+test('per-level surveys: Quick Challenge ids resolve unchanged in the union bank', () => {
+  const { context: g } = game();
+  for (const ch of g.QUICK_CHALLENGES) {
+    for (const id of [...ch.ids, ...ch.extras]) {
+      const q = g.QUESTION_BANK.find(b => b.id === id);
+      assert.ok(q, `QC card ${id} still resolves`);
+    }
+    assert.ok(ch.extras.every(id => g.QUESTION_BANK.find(b => b.id === id).core === false),
+      'QC extras remain non-core in the bank data');
+  }
+});
+
+test('per-level surveys: BRD renders the Level 1 study from its survey record', () => {
+  const { context: g, element } = game();
+  g.selectLevel(1, false);
+  g.openBRD();
+  const text = element('brdContent').innerHTML;
+  assert.match(text, /Support Experience Survey/);
+  assert.match(text, /SPONSOR/);
+  assert.match(text, /Support Experience team/);
+  assert.match(text, /AUDIENCE/);
+  assert.match(text, /Shared front section/);
+  assert.doesNotMatch(text, /Collect credible answers on the required business topics below/);
+  for (const topic of g.SURVEYS[1].agenda) assert.ok(text.includes(topic));
+  /* No other level's survey leaks into the Level 1 BRD. */
+  for (let level = 2; level <= 6; level++) assert.ok(!text.includes(g.SURVEYS[level].title));
+  /* Unmigrated levels render through the same model with their own
+     name, topics, and constraints, and no invented sponsor section. */
+  g.selectLevel(3, false);
+  g.openBRD();
+  const text3 = element('brdContent').innerHTML;
+  assert.match(text3, /Azure Cloud Services Survey/);
+  assert.doesNotMatch(text3, /Support Experience Survey/);
+  assert.doesNotMatch(text3, /SPONSOR/);
+  assert.match(text3, /extra-topic answers are not simulated or scored/i);
+});
+
+test('per-level surveys: naming reaches level cards, setup banner, and HUD', () => {
+  const { context: g, element } = game();
+  g.selectLevel(1, false);
+  assert.match(element('levelGrid').innerHTML, /LEVEL 1 · EASY · FIRST SEND · SUPPORT EXPERIENCE/);
+  assert.match(element('levelBanner').innerHTML, /Survey: Support Experience Survey/);
+  assert.match(element('hudLevel').innerHTML, /SUPPORT EXPERIENCE/);
+  g.selectLevel(2, false);
+  assert.match(element('levelGrid').innerHTML, /LEVEL 2 · EASY · THE SPLIT · COPILOT \/ AI ADOPTION/);
+  assert.match(element('levelBanner').innerHTML, /Survey: Copilot Adoption Survey/);
+});
+
+test('per-level surveys: Level 1 Insight credits only its own agenda topics', () => {
+  const { context: g } = game();
+  g.selectLevel(1, false);
+  assert.deepEqual(g.agendaTopics(), g.SURVEYS[1].agenda);
+  const run = g.buildRun();
+  const counts = g.tally(run);
+  const insight = g.computeInsight(counts, run);
+  assert.deepEqual(Array.from(insight.topics, t => t.topic), Array.from(g.SURVEYS[1].agenda, String));
+});
+
 test('medallion: campaign report carries the list preparation ledger; quick report does not', () => {
   const { context: g, element } = game();
   g.selectLevel(1, false);

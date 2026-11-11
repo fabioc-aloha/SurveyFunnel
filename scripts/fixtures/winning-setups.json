@@ -32,60 +32,64 @@
   {
     "level": 1,
     "seed": "0000",
-    "cost": 83,
-    "rate": 0.2351,
-    "quality": 98,
-    "insight": 97,
+    "cost": 57,
+    "rate": 0.102,
+    "quality": 95,
+    "insight": 100,
     "won": true,
-    "goodwill": 51,
-    "usableN": 1926,
+    "goodwill": 68,
+    "usableN": 883,
     "sent": 10000,
-    "completed": 2351,
-    "invite": "honest",
-    "reminders": 1,
-    "escapes": true,
+    "completed": 1020,
+    "invite": "generic",
+    "reminders": 0,
+    "escapes": false,
     "kept": [
-      28,
-      43,
-      64
-    ],
-    "added": [
-      1,
       2,
-      9
+      4,
+      6,
+      27,
+      29,
+      46,
+      54,
+      71
     ],
-    "repaired": [],
+    "added": [],
+    "repaired": [
+      54
+    ],
     "consolidate": false,
     "repair": false
   },
   {
     "level": 1,
     "seed": "0001",
-    "cost": 80,
-    "rate": 0.1907,
-    "quality": 93,
+    "cost": 61,
+    "rate": 0.1043,
+    "quality": 96,
     "insight": 100,
     "won": true,
-    "goodwill": 65,
-    "usableN": 1647,
+    "goodwill": 68,
+    "usableN": 931,
     "sent": 10000,
-    "completed": 1907,
+    "completed": 1043,
     "invite": "generic",
-    "reminders": 1,
+    "reminders": 0,
     "escapes": false,
     "kept": [
-      1,
+      3,
       4,
-      21,
-      33
-    ],
-    "added": [
       6,
-      2,
-      9
+      9,
+      27,
+      29,
+      37,
+      54
     ],
+    "added": [],
     "repaired": [
-      21
+      3,
+      54
     ],
     "consolidate": false,
     "repair": false
@@ -93,174 +97,122 @@
   {
     "level": 1,
     "seed": "0002",
-    "cost": 69,
-    "rate": 0.1942,
-    "quality": 95,
+    "cost": 61,
+    "rate": 0.1047,
+    "quality": 94,
     "insight": 100,
     "won": true,
-    "goodwill": 76,
-    "usableN": 1723,
+    "goodwill": 72,
+    "usableN": 896,
     "sent": 10000,
-    "completed": 1942,
-    "invite": "honest",
+    "completed": 1047,
+    "invite": "generic",
     "reminders": 0,
     "escapes": false,
     "kept": [
+      2,
       6,
-      31,
-      32,
-      70
+      9,
+      25,
+      27,
+      54
     ],
-    "added": [
-      1,
-      2
+    "added": [],
+    "repaired": [
+      25,
+      54
     ],
-    "repaired": [],
     "consolidate": false,
     "repair": false
   },
   {
     "level": 1,
     "seed": "0003",
-    "cost": 62,
-    "rate": 0.1133,
-    "quality": 84,
+    "cost": 59,
+    "rate": 0.0934,
+    "quality": 94,
     "insight": 100,
     "won": true,
-    "goodwill": 72,
-    "usableN": 992,
+    "goodwill": 70,
+    "usableN": 816,
     "sent": 10000,
-    "completed": 1133,
+    "completed": 934,
     "invite": "generic",
     "reminders": 0,
     "escapes": false,
     "kept": [
+      2,
       6,
-      24,
-      29,
-      32,
-      44
+      9,
+      25,
+      27,
+      43,
+      46
     ],
-    "added": [
-      1
+    "added": [],
+    "repaired": [
+      25
     ],
-    "repaired": [],
     "consolidate": false,
     "repair": false
   },
   {
     "level": 1,
     "seed": "0004",
-    "cost": 74,
-    "rate": 0.197,
-    "quality": 95,
-    "insight": 97,
+    "cost": 61,
+    "rate": 0.1168,
+    "quality": 94,
+    "insight": 100,
     "won": true,
-    "goodwill": 65,
-    "usableN": 1718,
+    "goodwill": 70,
+    "usableN": 1020,
     "sent": 10000,
-    "completed": 1970,
+    "completed": 1168,
     "invite": "generic",
-    "reminders": 1,
+    "reminders": 0,
     "escapes": false,
     "kept": [
+      3,
       6,
-      44,
-      64
+      27,
+      29,
+      43,
+      55
     ],
     "added": [
-      1,
-      2,
       9
     ],
-    "repaired": [],
+    "repaired": [
+      3,
+      55
+    ],
     "consolidate": false,
     "repair": false
   },
   {
     "level": 1,
     "seed": "0005",
-    "cost": 65,
-    "rate": 0.1179,
+    "cost": 60,
+    "rate": 0.1247,
     "quality": 94,
-    "insight": 97,
+    "insight": 100,
     "won": true,
-    "goodwill": 70,
-    "usableN": 1034,
+    "goodwill": 72,
+    "usableN": 1092,
     "sent": 10000,
-    "completed": 1179,
+    "completed": 1247,
     "invite": "generic",
     "reminders": 0,
     "escapes": false,
     "kept": [
       1,
       2,
-      65
-    ],
-    "added": [
-      6,
-      9,
-      27
-    ],
-    "repaired": [],
-    "consolidate": false,
-    "repair": false
-  },
-  {
-    "level": 1,
-    "seed": "0006",
-    "cost": 66,
-    "rate": 0.123,
-    "quality": 94,
-    "insight": 100,
-    "won": true,
-    "goodwill": 72,
-    "usableN": 1067,
-    "sent": 10000,
-    "completed": 1230,
-    "invite": "generic",
-    "reminders": 0,
-    "escapes": false,
-    "kept": [
-      1,
-      24,
-      31,
-      44
-    ],
-    "added": [
-      6,
-      2
-    ],
-    "repaired": [
-      24
-    ],
-    "consolidate": false,
-    "repair": false
-  },
-  {
-    "level": 1,
-    "seed": "0007",
-    "cost": 75,
-    "rate": 0.1775,
-    "quality": 96,
-    "insight": 81,
-    "won": true,
-    "goodwill": 49,
-    "usableN": 1381,
-    "sent": 10000,
-    "completed": 1775,
-    "invite": "generic",
-    "reminders": 1,
-    "escapes": true,
-    "kept": [
       3,
-      27,
-      28,
-      31,
-      33
+      37,
+      43
     ],
     "added": [
-      2
+      9
     ],
     "repaired": [
       3
@@ -270,66 +222,67 @@
   },
   {
     "level": 1,
-    "seed": "0008",
-    "cost": 74,
-    "rate": 0.1899,
+    "seed": "0006",
+    "cost": 58,
+    "rate": 0.0931,
     "quality": 95,
     "insight": 100,
     "won": true,
-    "goodwill": 74,
-    "usableN": 1721,
+    "goodwill": 68,
+    "usableN": 799,
     "sent": 10000,
-    "completed": 1899,
-    "invite": "honest",
+    "completed": 931,
+    "invite": "generic",
     "reminders": 0,
     "escapes": false,
     "kept": [
-      1,
-      3,
       4,
-      24,
-      44
-    ],
-    "added": [
       6,
-      9
+      9,
+      25,
+      27,
+      32,
+      55,
+      71
     ],
+    "added": [],
     "repaired": [
-      3,
-      24
+      25,
+      55
     ],
     "consolidate": false,
     "repair": false
   },
   {
     "level": 1,
-    "seed": "0009",
-    "cost": 79,
-    "rate": 0.1306,
-    "quality": 98,
+    "seed": "0007",
+    "cost": 70,
+    "rate": 0.139,
+    "quality": 93,
     "insight": 100,
     "won": true,
-    "goodwill": 45,
-    "usableN": 1063,
+    "goodwill": 61,
+    "usableN": 1174,
     "sent": 10000,
-    "completed": 1306,
+    "completed": 1390,
     "invite": "generic",
     "reminders": 1,
-    "escapes": true,
+    "escapes": false,
     "kept": [
-      3,
-      6,
-      25,
-      28,
-      33,
-      44
-    ],
-    "added": [
       1,
-      9
+      3,
+      4,
+      6,
+      9,
+      10,
+      25,
+      27,
+      29
     ],
+    "added": [],
     "repaired": [
       3,
+      10,
       25
     ],
     "consolidate": false,
@@ -337,26 +290,91 @@
   },
   {
     "level": 1,
-    "seed": "000A",
-    "cost": 73,
-    "rate": 0.2202,
+    "seed": "0008",
+    "cost": 62,
+    "rate": 0.0959,
     "quality": 96,
-    "insight": 88,
+    "insight": 100,
     "won": true,
-    "goodwill": 44,
-    "usableN": 1769,
+    "goodwill": 70,
+    "usableN": 863,
     "sent": 10000,
-    "completed": 2202,
+    "completed": 959,
     "invite": "generic",
-    "reminders": 2,
-    "escapes": true,
+    "reminders": 0,
+    "escapes": false,
     "kept": [
       1,
-      27,
-      28,
+      6,
+      9,
+      25,
       32,
-      70,
+      55,
       71
+    ],
+    "added": [],
+    "repaired": [
+      25,
+      55
+    ],
+    "consolidate": false,
+    "repair": false
+  },
+  {
+    "level": 1,
+    "seed": "0009",
+    "cost": 61,
+    "rate": 0.1113,
+    "quality": 96,
+    "insight": 100,
+    "won": true,
+    "goodwill": 68,
+    "usableN": 1002,
+    "sent": 10000,
+    "completed": 1113,
+    "invite": "generic",
+    "reminders": 0,
+    "escapes": false,
+    "kept": [
+      1,
+      2,
+      3,
+      4,
+      27,
+      32,
+      43,
+      55
+    ],
+    "added": [],
+    "repaired": [
+      3,
+      55
+    ],
+    "consolidate": false,
+    "repair": false
+  },
+  {
+    "level": 1,
+    "seed": "000A",
+    "cost": 55,
+    "rate": 0.1161,
+    "quality": 94,
+    "insight": 100,
+    "won": true,
+    "goodwill": 72,
+    "usableN": 1008,
+    "sent": 10000,
+    "completed": 1161,
+    "invite": "generic",
+    "reminders": 0,
+    "escapes": false,
+    "kept": [
+      2,
+      9,
+      27,
+      29,
+      32,
+      43
     ],
     "added": [],
     "repaired": [],
@@ -366,31 +384,32 @@
   {
     "level": 1,
     "seed": "000B",
-    "cost": 62,
-    "rate": 0.115,
-    "quality": 93,
+    "cost": 64,
+    "rate": 0.121,
+    "quality": 94,
     "insight": 100,
     "won": true,
     "goodwill": 70,
-    "usableN": 988,
+    "usableN": 1054,
     "sent": 10000,
-    "completed": 1150,
+    "completed": 1210,
     "invite": "generic",
     "reminders": 0,
     "escapes": false,
     "kept": [
       1,
+      2,
       3,
-      4,
-      6,
-      9,
-      32
+      27,
+      43,
+      55
     ],
     "added": [
-      2
+      9
     ],
     "repaired": [
-      3
+      3,
+      55
     ],
     "consolidate": false,
     "repair": false
@@ -398,29 +417,28 @@
   {
     "level": 1,
     "seed": "000C",
-    "cost": 72,
-    "rate": 0.1022,
-    "quality": 94,
+    "cost": 58,
+    "rate": 0.1032,
+    "quality": 95,
     "insight": 100,
     "won": true,
     "goodwill": 70,
-    "usableN": 902,
+    "usableN": 914,
     "sent": 10000,
-    "completed": 1022,
+    "completed": 1032,
     "invite": "generic",
     "reminders": 0,
-    "escapes": true,
+    "escapes": false,
     "kept": [
       1,
-      4,
-      27,
-      33
-    ],
-    "added": [
       2,
+      4,
       6,
-      9
+      9,
+      37,
+      71
     ],
+    "added": [],
     "repaired": [],
     "consolidate": false,
     "repair": false
@@ -428,29 +446,31 @@
   {
     "level": 1,
     "seed": "000D",
-    "cost": 59,
-    "rate": 0.1141,
+    "cost": 61,
+    "rate": 0.1137,
     "quality": 94,
     "insight": 100,
     "won": true,
     "goodwill": 72,
-    "usableN": 982,
+    "usableN": 981,
     "sent": 10000,
-    "completed": 1141,
+    "completed": 1137,
     "invite": "generic",
     "reminders": 0,
     "escapes": false,
     "kept": [
       2,
-      6,
-      32,
-      33,
-      44
+      9,
+      10,
+      27,
+      29
     ],
     "added": [
-      1
+      6
     ],
-    "repaired": [],
+    "repaired": [
+      10
+    ],
     "consolidate": false,
     "repair": false
   },
@@ -458,59 +478,60 @@
     "level": 1,
     "seed": "000E",
     "cost": 63,
-    "rate": 0.1167,
-    "quality": 94,
+    "rate": 0.0967,
+    "quality": 95,
     "insight": 100,
     "won": true,
-    "goodwill": 72,
-    "usableN": 1020,
+    "goodwill": 70,
+    "usableN": 848,
     "sent": 10000,
-    "completed": 1167,
+    "completed": 967,
     "invite": "generic",
     "reminders": 0,
     "escapes": false,
     "kept": [
-      4,
+      1,
+      2,
+      3,
       6,
-      42,
-      46
+      25,
+      71
     ],
     "added": [
-      2,
-      1
+      9
     ],
-    "repaired": [],
+    "repaired": [
+      3,
+      25
+    ],
     "consolidate": false,
     "repair": false
   },
   {
     "level": 1,
     "seed": "000F",
-    "cost": 69,
-    "rate": 0.1101,
-    "quality": 94,
+    "cost": 58,
+    "rate": 0.1202,
+    "quality": 96,
     "insight": 100,
     "won": true,
-    "goodwill": 70,
-    "usableN": 968,
+    "goodwill": 72,
+    "usableN": 1056,
     "sent": 10000,
-    "completed": 1101,
+    "completed": 1202,
     "invite": "generic",
     "reminders": 0,
     "escapes": false,
     "kept": [
-      24,
-      27,
-      43,
-      44
-    ],
-    "added": [
-      1,
       2,
-      9
+      6,
+      27,
+      37,
+      54
     ],
+    "added": [],
     "repaired": [
-      24
+      54
     ],
     "consolidate": false,
     "repair": false
@@ -518,30 +539,30 @@
   {
     "level": 1,
     "seed": "0010",
-    "cost": 82,
-    "rate": 0.2348,
+    "cost": 62,
+    "rate": 0.1,
     "quality": 93,
     "insight": 100,
     "won": true,
-    "goodwill": 44,
-    "usableN": 1809,
+    "goodwill": 72,
+    "usableN": 857,
     "sent": 10000,
-    "completed": 2348,
+    "completed": 1000,
     "invite": "generic",
-    "reminders": 2,
-    "escapes": true,
+    "reminders": 0,
+    "escapes": false,
     "kept": [
+      2,
       6,
-      24,
+      25,
       27,
-      28,
-      37
+      54,
+      71
     ],
-    "added": [
-      1
-    ],
+    "added": [],
     "repaired": [
-      24
+      25,
+      54
     ],
     "consolidate": false,
     "repair": false
@@ -549,30 +570,31 @@
   {
     "level": 1,
     "seed": "0011",
-    "cost": 68,
-    "rate": 0.2001,
-    "quality": 88,
+    "cost": 64,
+    "rate": 0.1067,
+    "quality": 95,
     "insight": 100,
     "won": true,
-    "goodwill": 76,
-    "usableN": 1839,
+    "goodwill": 72,
+    "usableN": 950,
     "sent": 10000,
-    "completed": 2001,
-    "invite": "honest",
+    "completed": 1067,
+    "invite": "generic",
     "reminders": 0,
     "escapes": false,
     "kept": [
-      24,
+      2,
+      3,
+      6,
+      25,
       27,
-      43,
-      44,
       54
     ],
-    "added": [
-      1
-    ],
+    "added": [],
     "repaired": [
-      24
+      3,
+      25,
+      54
     ],
     "consolidate": false,
     "repair": false
@@ -580,31 +602,32 @@
   {
     "level": 1,
     "seed": "0012",
-    "cost": 72,
-    "rate": 0.1584,
-    "quality": 98,
+    "cost": 59,
+    "rate": 0.103,
+    "quality": 93,
     "insight": 100,
     "won": true,
-    "goodwill": 56,
-    "usableN": 1319,
+    "goodwill": 68,
+    "usableN": 898,
     "sent": 10000,
-    "completed": 1584,
-    "invite": "honest",
+    "completed": 1030,
+    "invite": "generic",
     "reminders": 0,
-    "escapes": true,
+    "escapes": false,
     "kept": [
+      1,
       2,
-      21,
-      27,
-      28,
-      43
+      3,
+      6,
+      10,
+      43,
+      46,
+      68
     ],
-    "added": [
-      9,
-      1
-    ],
+    "added": [],
     "repaired": [
-      21
+      3,
+      10
     ],
     "consolidate": false,
     "repair": false
@@ -612,61 +635,62 @@
   {
     "level": 1,
     "seed": "0013",
-    "cost": 62,
-    "rate": 0.1137,
-    "quality": 93,
-    "insight": 79,
+    "cost": 64,
+    "rate": 0.1067,
+    "quality": 95,
+    "insight": 100,
     "won": true,
-    "goodwill": 72,
-    "usableN": 962,
+    "goodwill": 68,
+    "usableN": 914,
     "sent": 10000,
-    "completed": 1137,
+    "completed": 1067,
     "invite": "generic",
     "reminders": 0,
     "escapes": false,
     "kept": [
+      2,
+      3,
+      4,
       6,
-      27,
-      30,
       32,
-      42
+      46,
+      55
     ],
     "added": [
       1
     ],
-    "repaired": [],
+    "repaired": [
+      3,
+      55
+    ],
     "consolidate": false,
     "repair": false
   },
   {
     "level": 1,
     "seed": "0014",
-    "cost": 74,
-    "rate": 0.1652,
-    "quality": 97,
+    "cost": 58,
+    "rate": 0.1228,
+    "quality": 95,
     "insight": 100,
     "won": true,
-    "goodwill": 74,
-    "usableN": 1522,
+    "goodwill": 72,
+    "usableN": 1092,
     "sent": 10000,
-    "completed": 1652,
-    "invite": "honest",
+    "completed": 1228,
+    "invite": "generic",
     "reminders": 0,
     "escapes": false,
     "kept": [
-      1,
-      24,
-      25,
-      44
-    ],
-    "added": [
       6,
-      2,
-      9
+      9,
+      27,
+      46,
+      55
     ],
+    "added": [],
     "repaired": [
-      24,
-      25
+      55
     ],
     "consolidate": false,
     "repair": false
@@ -675,53 +699,54 @@
     "level": 1,
     "seed": "0015",
     "cost": 62,
-    "rate": 0.1985,
-    "quality": 96,
-    "insight": 99,
+    "rate": 0.1297,
+    "quality": 94,
+    "insight": 100,
     "won": true,
-    "goodwill": 74,
-    "usableN": 1816,
+    "goodwill": 72,
+    "usableN": 1159,
     "sent": 10000,
-    "completed": 1985,
-    "invite": "honest",
+    "completed": 1297,
+    "invite": "generic",
     "reminders": 0,
     "escapes": false,
     "kept": [
       2,
-      4,
-      6,
-      46,
-      63
+      3,
+      9,
+      27,
+      55
     ],
     "added": [
-      1
+      6
     ],
-    "repaired": [],
+    "repaired": [
+      3,
+      55
+    ],
     "consolidate": false,
     "repair": false
   },
   {
     "level": 1,
     "seed": "0016",
-    "cost": 74,
-    "rate": 0.2141,
-    "quality": 97,
+    "cost": 62,
+    "rate": 0.1227,
+    "quality": 95,
     "insight": 100,
     "won": true,
-    "goodwill": 51,
-    "usableN": 1733,
+    "goodwill": 72,
+    "usableN": 1066,
     "sent": 10000,
-    "completed": 2141,
-    "invite": "honest",
-    "reminders": 1,
-    "escapes": true,
+    "completed": 1227,
+    "invite": "generic",
+    "reminders": 0,
+    "escapes": false,
     "kept": [
+      2,
+      4,
       6,
-      28,
-      43,
-      44,
-      46,
-      70
+      9
     ],
     "added": [
       1
@@ -733,31 +758,29 @@
   {
     "level": 1,
     "seed": "0017",
-    "cost": 61,
-    "rate": 0.1128,
+    "cost": 60,
+    "rate": 0.12,
     "quality": 94,
-    "insight": 100,
+    "insight": 88,
     "won": true,
-    "goodwill": 70,
-    "usableN": 974,
+    "goodwill": 72,
+    "usableN": 1023,
     "sent": 10000,
-    "completed": 1128,
+    "completed": 1200,
     "invite": "generic",
     "reminders": 0,
     "escapes": false,
     "kept": [
       1,
       2,
-      6,
-      21,
-      43,
-      54,
-      68
+      9,
+      46,
+      55,
+      71
     ],
     "added": [],
     "repaired": [
-      21,
-      54
+      55
     ],
     "consolidate": false,
     "repair": false
@@ -765,28 +788,27 @@
   {
     "level": 1,
     "seed": "0018",
-    "cost": 69,
-    "rate": 0.1618,
-    "quality": 98,
-    "insight": 100,
+    "cost": 54,
+    "rate": 0.1121,
+    "quality": 94,
+    "insight": 88,
     "won": true,
-    "goodwill": 58,
-    "usableN": 1318,
+    "goodwill": 72,
+    "usableN": 981,
     "sent": 10000,
-    "completed": 1618,
-    "invite": "honest",
+    "completed": 1121,
+    "invite": "generic",
     "reminders": 0,
-    "escapes": true,
+    "escapes": false,
     "kept": [
       1,
-      2,
-      4,
-      28
-    ],
-    "added": [
+      6,
       9,
-      6
+      43,
+      46,
+      68
     ],
+    "added": [],
     "repaired": [],
     "consolidate": false,
     "repair": false
@@ -794,56 +816,183 @@
   {
     "level": 1,
     "seed": "0019",
-    "cost": 80,
-    "rate": 0.2512,
+    "cost": 60,
+    "rate": 0.1256,
     "quality": 95,
-    "insight": 100,
+    "insight": 92,
     "won": true,
-    "goodwill": 62,
-    "usableN": 2243,
+    "goodwill": 72,
+    "usableN": 1106,
     "sent": 10000,
-    "completed": 2512,
+    "completed": 1256,
     "invite": "generic",
-    "reminders": 2,
+    "reminders": 0,
     "escapes": false,
     "kept": [
-      6,
-      27,
-      29,
-      37
+      1,
+      2,
+      3,
+      4,
+      54,
+      71
     ],
-    "added": [
-      9,
-      1
+    "added": [],
+    "repaired": [
+      3,
+      54
     ],
-    "repaired": [],
     "consolidate": false,
     "repair": false
   },
   {
     "level": 1,
     "seed": "001A",
-    "cost": 73,
-    "rate": 0.2018,
-    "quality": 94,
-    "insight": 97,
+    "cost": 62,
+    "rate": 0.0977,
+    "quality": 95,
+    "insight": 100,
     "won": true,
-    "goodwill": 65,
-    "usableN": 1750,
+    "goodwill": 70,
+    "usableN": 855,
     "sent": 10000,
-    "completed": 2018,
+    "completed": 977,
     "invite": "generic",
-    "reminders": 1,
+    "reminders": 0,
     "escapes": false,
     "kept": [
+      4,
       6,
-      32,
+      9,
+      25,
+      27,
       43,
-      55,
-      59
+      54
+    ],
+    "added": [],
+    "repaired": [
+      25,
+      54
+    ],
+    "consolidate": false,
+    "repair": false
+  },
+  {
+    "level": 1,
+    "seed": "001B",
+    "cost": 64,
+    "rate": 0.1103,
+    "quality": 94,
+    "insight": 100,
+    "won": true,
+    "goodwill": 68,
+    "usableN": 956,
+    "sent": 10000,
+    "completed": 1103,
+    "invite": "generic",
+    "reminders": 0,
+    "escapes": false,
+    "kept": [
+      3,
+      4,
+      6,
+      9,
+      27,
+      43,
+      46
     ],
     "added": [
-      1
+      2
+    ],
+    "repaired": [
+      3
+    ],
+    "consolidate": false,
+    "repair": false
+  },
+  {
+    "level": 1,
+    "seed": "001C",
+    "cost": 59,
+    "rate": 0.1054,
+    "quality": 94,
+    "insight": 100,
+    "won": true,
+    "goodwill": 70,
+    "usableN": 922,
+    "sent": 10000,
+    "completed": 1054,
+    "invite": "generic",
+    "reminders": 0,
+    "escapes": false,
+    "kept": [
+      1,
+      2,
+      9,
+      27,
+      29,
+      32,
+      43
+    ],
+    "added": [],
+    "repaired": [],
+    "consolidate": false,
+    "repair": false
+  },
+  {
+    "level": 1,
+    "seed": "001D",
+    "cost": 57,
+    "rate": 0.0963,
+    "quality": 94,
+    "insight": 100,
+    "won": true,
+    "goodwill": 72,
+    "usableN": 816,
+    "sent": 10000,
+    "completed": 963,
+    "invite": "generic",
+    "reminders": 0,
+    "escapes": false,
+    "kept": [
+      1,
+      4,
+      6,
+      25,
+      46,
+      71
+    ],
+    "added": [],
+    "repaired": [
+      25
+    ],
+    "consolidate": false,
+    "repair": false
+  },
+  {
+    "level": 1,
+    "seed": "001E",
+    "cost": 65,
+    "rate": 0.1072,
+    "quality": 95,
+    "insight": 100,
+    "won": true,
+    "goodwill": 70,
+    "usableN": 940,
+    "sent": 10000,
+    "completed": 1072,
+    "invite": "generic",
+    "reminders": 0,
+    "escapes": false,
+    "kept": [
+      2,
+      4,
+      6,
+      55,
+      71
+    ],
+    "added": [
+      1,
+      9
     ],
     "repaired": [
       55
@@ -853,161 +1002,33 @@
   },
   {
     "level": 1,
-    "seed": "001B",
-    "cost": 76,
-    "rate": 0.2657,
-    "quality": 94,
-    "insight": 85,
-    "won": true,
-    "goodwill": 69,
-    "usableN": 2395,
-    "sent": 10000,
-    "completed": 2657,
-    "invite": "honest",
-    "reminders": 1,
-    "escapes": false,
-    "kept": [
-      2,
-      27,
-      32,
-      64,
-      71
-    ],
-    "added": [
-      1
-    ],
-    "repaired": [],
-    "consolidate": false,
-    "repair": false
-  },
-  {
-    "level": 1,
-    "seed": "001C",
-    "cost": 74,
-    "rate": 0.1747,
-    "quality": 93,
-    "insight": 100,
-    "won": true,
-    "goodwill": 67,
-    "usableN": 1446,
-    "sent": 10000,
-    "completed": 1747,
-    "invite": "generic",
-    "reminders": 1,
-    "escapes": false,
-    "kept": [
-      9,
-      25,
-      32,
-      43,
-      44
-    ],
-    "added": [
-      1
-    ],
-    "repaired": [
-      25
-    ],
-    "consolidate": false,
-    "repair": false
-  },
-  {
-    "level": 1,
-    "seed": "001D",
-    "cost": 71,
-    "rate": 0.1699,
-    "quality": 96,
-    "insight": 100,
-    "won": true,
-    "goodwill": 49,
-    "usableN": 1307,
-    "sent": 10000,
-    "completed": 1699,
-    "invite": "generic",
-    "reminders": 1,
-    "escapes": true,
-    "kept": [
-      2,
-      6,
-      21,
-      24,
-      28
-    ],
-    "added": [
-      1
-    ],
-    "repaired": [
-      21,
-      24
-    ],
-    "consolidate": false,
-    "repair": false
-  },
-  {
-    "level": 1,
-    "seed": "001E",
-    "cost": 81,
-    "rate": 0.1724,
+    "seed": "001F",
+    "cost": 59,
+    "rate": 0.0869,
     "quality": 95,
     "insight": 100,
     "won": true,
-    "goodwill": 40,
-    "usableN": 1398,
+    "goodwill": 68,
+    "usableN": 766,
     "sent": 10000,
-    "completed": 1724,
-    "invite": "honest",
-    "reminders": 1,
-    "escapes": true,
-    "kept": [
-      4,
-      6,
-      9,
-      21,
-      24,
-      25,
-      28
-    ],
-    "added": [
-      1,
-      2
-    ],
-    "repaired": [
-      21,
-      24,
-      25
-    ],
-    "consolidate": false,
-    "repair": false
-  },
-  {
-    "level": 1,
-    "seed": "001F",
-    "cost": 64,
-    "rate": 0.1153,
-    "quality": 94,
-    "insight": 100,
-    "won": true,
-    "goodwill": 70,
-    "usableN": 997,
-    "sent": 10000,
-    "completed": 1153,
+    "completed": 869,
     "invite": "generic",
     "reminders": 0,
     "escapes": false,
     "kept": [
       1,
-      2,
+      3,
       4,
-      21,
-      24,
-      46
+      6,
+      25,
+      27,
+      29,
+      32
     ],
-    "added": [
-      6
-    ],
+    "added": [],
     "repaired": [
-      21,
-      24
+      3,
+      25
     ],
     "consolidate": false,
     "repair": false
@@ -1015,32 +1036,31 @@
   {
     "level": 1,
     "seed": "0020",
-    "cost": 78,
-    "rate": 0.1954,
-    "quality": 93,
+    "cost": 64,
+    "rate": 0.1064,
+    "quality": 95,
     "insight": 100,
     "won": true,
-    "goodwill": 65,
-    "usableN": 1700,
+    "goodwill": 70,
+    "usableN": 926,
     "sent": 10000,
-    "completed": 1954,
+    "completed": 1064,
     "invite": "generic",
-    "reminders": 1,
+    "reminders": 0,
     "escapes": false,
     "kept": [
+      1,
       2,
-      3,
-      4,
-      24,
-      33
+      9,
+      10,
+      27,
+      37
     ],
     "added": [
-      1,
       6
     ],
     "repaired": [
-      3,
-      24
+      10
     ],
     "consolidate": false,
     "repair": false
@@ -1048,60 +1068,61 @@
   {
     "level": 1,
     "seed": "0021",
-    "cost": 74,
-    "rate": 0.1937,
-    "quality": 93,
+    "cost": 57,
+    "rate": 0.1141,
+    "quality": 94,
     "insight": 100,
     "won": true,
-    "goodwill": 67,
-    "usableN": 1678,
+    "goodwill": 70,
+    "usableN": 982,
     "sent": 10000,
-    "completed": 1937,
+    "completed": 1141,
     "invite": "generic",
-    "reminders": 1,
-    "escapes": true,
+    "reminders": 0,
+    "escapes": false,
     "kept": [
-      3,
+      2,
+      4,
       6,
       9,
-      37,
-      44
+      27,
+      32,
+      43
     ],
-    "added": [
-      1
-    ],
-    "repaired": [
-      3
-    ],
+    "added": [],
+    "repaired": [],
     "consolidate": false,
     "repair": false
   },
   {
     "level": 1,
     "seed": "0022",
-    "cost": 77,
-    "rate": 0.2304,
-    "quality": 95,
-    "insight": 79,
+    "cost": 59,
+    "rate": 0.0987,
+    "quality": 94,
+    "insight": 100,
     "won": true,
-    "goodwill": 38,
-    "usableN": 1876,
+    "goodwill": 68,
+    "usableN": 865,
     "sent": 10000,
-    "completed": 2304,
+    "completed": 987,
     "invite": "generic",
-    "reminders": 2,
-    "escapes": true,
+    "reminders": 0,
+    "escapes": false,
     "kept": [
+      1,
       2,
       3,
+      4,
+      6,
       9,
-      27,
-      36,
-      70
+      10,
+      37
     ],
     "added": [],
     "repaired": [
-      3
+      3,
+      10
     ],
     "consolidate": false,
     "repair": false
@@ -1109,206 +1130,58 @@
   {
     "level": 1,
     "seed": "0023",
-    "cost": 65,
-    "rate": 0.0988,
-    "quality": 98,
-    "insight": 88,
-    "won": true,
-    "goodwill": 54,
-    "usableN": 783,
-    "sent": 10000,
-    "completed": 988,
-    "invite": "generic",
-    "reminders": 0,
-    "escapes": true,
-    "kept": [
-      27,
-      28,
-      43,
-      70
-    ],
-    "added": [
-      1,
-      9
-    ],
-    "repaired": [],
-    "consolidate": false,
-    "repair": false
-  },
-  {
-    "level": 1,
-    "seed": "0024",
-    "cost": 68,
-    "rate": 0.1662,
-    "quality": 97,
+    "cost": 62,
+    "rate": 0.0932,
+    "quality": 94,
     "insight": 100,
     "won": true,
-    "goodwill": 43,
-    "usableN": 1323,
+    "goodwill": 70,
+    "usableN": 797,
     "sent": 10000,
-    "completed": 1662,
+    "completed": 932,
     "invite": "generic",
-    "reminders": 1,
-    "escapes": true,
-    "kept": [
-      1,
-      4,
-      32,
-      36,
-      44
-    ],
-    "added": [
-      6
-    ],
-    "repaired": [],
-    "consolidate": false,
-    "repair": false
-  },
-  {
-    "level": 1,
-    "seed": "0025",
-    "cost": 67,
-    "rate": 0.1601,
-    "quality": 98,
-    "insight": 100,
-    "won": true,
-    "goodwill": 56,
-    "usableN": 1290,
-    "sent": 10000,
-    "completed": 1601,
-    "invite": "honest",
     "reminders": 0,
-    "escapes": true,
+    "escapes": false,
     "kept": [
       2,
-      4,
-      24,
-      28,
-      32,
+      6,
+      25,
+      46,
+      54,
       71
     ],
     "added": [
       1
     ],
     "repaired": [
-      24
+      25,
+      54
     ],
     "consolidate": false,
     "repair": false
   },
   {
     "level": 1,
-    "seed": "0026",
-    "cost": 61,
-    "rate": 0.119,
+    "seed": "0024",
+    "cost": 55,
+    "rate": 0.1044,
     "quality": 94,
-    "insight": 87,
+    "insight": 100,
     "won": true,
     "goodwill": 70,
-    "usableN": 1043,
+    "usableN": 910,
     "sent": 10000,
-    "completed": 1190,
+    "completed": 1044,
     "invite": "generic",
     "reminders": 0,
     "escapes": false,
     "kept": [
       1,
-      21,
-      32,
-      64,
-      70
-    ],
-    "added": [
-      6
-    ],
-    "repaired": [
-      21
-    ],
-    "consolidate": false,
-    "repair": false
-  },
-  {
-    "level": 1,
-    "seed": "0027",
-    "cost": 67,
-    "rate": 0.1925,
-    "quality": 96,
-    "insight": 100,
-    "won": true,
-    "goodwill": 76,
-    "usableN": 1733,
-    "sent": 10000,
-    "completed": 1925,
-    "invite": "honest",
-    "reminders": 0,
-    "escapes": false,
-    "kept": [
-      1,
-      9,
-      67,
-      68
-    ],
-    "added": [
       6,
-      2
-    ],
-    "repaired": [],
-    "consolidate": false,
-    "repair": false
-  },
-  {
-    "level": 1,
-    "seed": "0028",
-    "cost": 73,
-    "rate": 0.1785,
-    "quality": 93,
-    "insight": 100,
-    "won": true,
-    "goodwill": 65,
-    "usableN": 1539,
-    "sent": 10000,
-    "completed": 1785,
-    "invite": "generic",
-    "reminders": 1,
-    "escapes": true,
-    "kept": [
-      1,
-      9,
-      21,
       27,
+      29,
       43,
-      70
-    ],
-    "added": [
-      2
-    ],
-    "repaired": [
-      21
-    ],
-    "consolidate": false,
-    "repair": false
-  },
-  {
-    "level": 1,
-    "seed": "0029",
-    "cost": 64,
-    "rate": 0.2007,
-    "quality": 94,
-    "insight": 72,
-    "won": true,
-    "goodwill": 65,
-    "usableN": 1723,
-    "sent": 10000,
-    "completed": 2007,
-    "invite": "generic",
-    "reminders": 1,
-    "escapes": false,
-    "kept": [
-      1,
-      2,
-      43,
-      64,
-      67,
+      46,
       68
     ],
     "added": [],
@@ -1318,28 +1191,27 @@
   },
   {
     "level": 1,
-    "seed": "002A",
-    "cost": 62,
-    "rate": 0.1183,
-    "quality": 95,
+    "seed": "0025",
+    "cost": 60,
+    "rate": 0.1179,
+    "quality": 94,
     "insight": 100,
     "won": true,
     "goodwill": 72,
-    "usableN": 1052,
+    "usableN": 999,
     "sent": 10000,
-    "completed": 1183,
+    "completed": 1179,
     "invite": "generic",
     "reminders": 0,
     "escapes": false,
     "kept": [
       1,
-      6,
-      27,
-      29
+      2,
+      29,
+      46
     ],
     "added": [
-      2,
-      9
+      6
     ],
     "repaired": [],
     "consolidate": false,
@@ -1347,32 +1219,185 @@
   },
   {
     "level": 1,
-    "seed": "002B",
-    "cost": 72,
-    "rate": 0.1241,
-    "quality": 95,
+    "seed": "0026",
+    "cost": 57,
+    "rate": 0.0947,
+    "quality": 94,
     "insight": 100,
     "won": true,
     "goodwill": 72,
-    "usableN": 1057,
+    "usableN": 841,
     "sent": 10000,
-    "completed": 1241,
+    "completed": 947,
     "invite": "generic",
     "reminders": 0,
     "escapes": false,
     "kept": [
+      1,
+      25,
+      27,
+      32,
+      43,
+      71
+    ],
+    "added": [],
+    "repaired": [
+      25
+    ],
+    "consolidate": false,
+    "repair": false
+  },
+  {
+    "level": 1,
+    "seed": "0027",
+    "cost": 58,
+    "rate": 0.1246,
+    "quality": 94,
+    "insight": 88,
+    "won": true,
+    "goodwill": 72,
+    "usableN": 1081,
+    "sent": 10000,
+    "completed": 1246,
+    "invite": "generic",
+    "reminders": 0,
+    "escapes": false,
+    "kept": [
+      1,
+      6,
+      32,
+      54,
+      68
+    ],
+    "added": [],
+    "repaired": [
+      54
+    ],
+    "consolidate": false,
+    "repair": false
+  },
+  {
+    "level": 1,
+    "seed": "0028",
+    "cost": 58,
+    "rate": 0.0897,
+    "quality": 93,
+    "insight": 100,
+    "won": true,
+    "goodwill": 68,
+    "usableN": 761,
+    "sent": 10000,
+    "completed": 897,
+    "invite": "generic",
+    "reminders": 0,
+    "escapes": false,
+    "kept": [
+      1,
       4,
-      21,
-      24,
-      44
+      9,
+      25,
+      27,
+      32,
+      43,
+      68
+    ],
+    "added": [],
+    "repaired": [
+      25
+    ],
+    "consolidate": false,
+    "repair": false
+  },
+  {
+    "level": 1,
+    "seed": "0029",
+    "cost": 59,
+    "rate": 0.1026,
+    "quality": 93,
+    "insight": 100,
+    "won": true,
+    "goodwill": 70,
+    "usableN": 888,
+    "sent": 10000,
+    "completed": 1026,
+    "invite": "generic",
+    "reminders": 0,
+    "escapes": false,
+    "kept": [
+      1,
+      6,
+      10,
+      25,
+      27,
+      37,
+      71
+    ],
+    "added": [],
+    "repaired": [
+      10,
+      25
+    ],
+    "consolidate": false,
+    "repair": false
+  },
+  {
+    "level": 1,
+    "seed": "002A",
+    "cost": 61,
+    "rate": 0.1272,
+    "quality": 93,
+    "insight": 88,
+    "won": true,
+    "goodwill": 72,
+    "usableN": 1106,
+    "sent": 10000,
+    "completed": 1272,
+    "invite": "generic",
+    "reminders": 0,
+    "escapes": false,
+    "kept": [
+      2,
+      27,
+      55,
+      71
     ],
     "added": [
-      1,
-      6
+      9
     ],
     "repaired": [
-      21,
-      24
+      55
+    ],
+    "consolidate": false,
+    "repair": false
+  },
+  {
+    "level": 1,
+    "seed": "002B",
+    "cost": 60,
+    "rate": 0.1026,
+    "quality": 94,
+    "insight": 100,
+    "won": true,
+    "goodwill": 68,
+    "usableN": 879,
+    "sent": 10000,
+    "completed": 1026,
+    "invite": "generic",
+    "reminders": 0,
+    "escapes": false,
+    "kept": [
+      1,
+      6,
+      27,
+      29,
+      32,
+      43,
+      54,
+      68
+    ],
+    "added": [],
+    "repaired": [
+      54
     ],
     "consolidate": false,
     "repair": false
@@ -1381,56 +1406,88 @@
     "level": 1,
     "seed": "002C",
     "cost": 63,
-    "rate": 0.0994,
+    "rate": 0.1127,
     "quality": 93,
     "insight": 100,
     "won": true,
-    "goodwill": 68,
-    "usableN": 835,
+    "goodwill": 72,
+    "usableN": 967,
     "sent": 10000,
-    "completed": 994,
+    "completed": 1127,
     "invite": "generic",
     "reminders": 0,
     "escapes": false,
     "kept": [
       2,
-      4,
       6,
-      29,
-      33,
-      38
+      10,
+      32,
+      37
     ],
     "added": [
-      9,
       1
     ],
-    "repaired": [],
+    "repaired": [
+      10
+    ],
     "consolidate": false,
     "repair": false
   },
   {
     "level": 1,
     "seed": "002D",
-    "cost": 76,
-    "rate": 0.1811,
-    "quality": 94,
-    "insight": 97,
+    "cost": 61,
+    "rate": 0.098,
+    "quality": 95,
+    "insight": 100,
     "won": true,
-    "goodwill": 65,
-    "usableN": 1598,
+    "goodwill": 70,
+    "usableN": 857,
     "sent": 10000,
-    "completed": 1811,
+    "completed": 980,
     "invite": "generic",
-    "reminders": 1,
-    "escapes": true,
+    "reminders": 0,
+    "escapes": false,
     "kept": [
+      1,
+      2,
+      4,
+      25,
       27,
-      44,
-      62
+      46
     ],
     "added": [
+      6
+    ],
+    "repaired": [
+      25
+    ],
+    "consolidate": false,
+    "repair": false
+  },
+  {
+    "level": 1,
+    "seed": "002E",
+    "cost": 59,
+    "rate": 0.1121,
+    "quality": 95,
+    "insight": 100,
+    "won": true,
+    "goodwill": 72,
+    "usableN": 965,
+    "sent": 10000,
+    "completed": 1121,
+    "invite": "generic",
+    "reminders": 0,
+    "escapes": false,
+    "kept": [
       6,
-      1,
+      27,
+      29,
+      37,
+      43
+    ],
+    "added": [
       9
     ],
     "repaired": [],
@@ -1439,56 +1496,27 @@
   },
   {
     "level": 1,
-    "seed": "002E",
-    "cost": 91,
-    "rate": 0.2909,
+    "seed": "002F",
+    "cost": 59,
+    "rate": 0.0885,
     "quality": 95,
     "insight": 100,
     "won": true,
-    "goodwill": 48,
-    "usableN": 2313,
+    "goodwill": 68,
+    "usableN": 775,
     "sent": 10000,
-    "completed": 2909,
-    "invite": "honest",
-    "reminders": 2,
-    "escapes": true,
-    "kept": [
-      2,
-      3,
-      28
-    ],
-    "added": [
-      9,
-      1,
-      6
-    ],
-    "repaired": [
-      3
-    ],
-    "consolidate": false,
-    "repair": false
-  },
-  {
-    "level": 1,
-    "seed": "002F",
-    "cost": 60,
-    "rate": 0.0971,
-    "quality": 94,
-    "insight": 100,
-    "won": true,
-    "goodwill": 72,
-    "usableN": 848,
-    "sent": 10000,
-    "completed": 971,
+    "completed": 885,
     "invite": "generic",
     "reminders": 0,
     "escapes": false,
     "kept": [
       1,
+      4,
       9,
       25,
-      30,
-      44
+      27,
+      46,
+      68
     ],
     "added": [
       6
@@ -1502,240 +1530,26 @@
   {
     "level": 1,
     "seed": "0030",
-    "cost": 81,
-    "rate": 0.134,
-    "quality": 96,
-    "insight": 100,
-    "won": true,
-    "goodwill": 45,
-    "usableN": 1057,
-    "sent": 10000,
-    "completed": 1340,
-    "invite": "generic",
-    "reminders": 1,
-    "escapes": true,
-    "kept": [
-      21,
-      25,
-      27,
-      28
-    ],
-    "added": [
-      9,
-      1,
-      2,
-      6
-    ],
-    "repaired": [
-      21,
-      25
-    ],
-    "consolidate": false,
-    "repair": false
-  },
-  {
-    "level": 1,
-    "seed": "0031",
-    "cost": 93,
-    "rate": 0.2062,
-    "quality": 97,
-    "insight": 100,
-    "won": true,
-    "goodwill": 55,
-    "usableN": 1697,
-    "sent": 10000,
-    "completed": 2062,
-    "invite": "known",
-    "reminders": 0,
-    "escapes": true,
-    "kept": [
-      28
-    ],
-    "added": [
-      9,
-      1,
-      2,
-      6,
-      4,
-      33
-    ],
-    "repaired": [],
-    "consolidate": false,
-    "repair": false
-  },
-  {
-    "level": 1,
-    "seed": "0032",
-    "cost": 84,
-    "rate": 0.2361,
-    "quality": 95,
-    "insight": 77,
-    "won": true,
-    "goodwill": 44,
-    "usableN": 1905,
-    "sent": 10000,
-    "completed": 2361,
-    "invite": "generic",
-    "reminders": 2,
-    "escapes": true,
-    "kept": [
-      1,
-      3,
-      6,
-      21,
-      28
-    ],
-    "added": [
-      2
-    ],
-    "repaired": [
-      3,
-      21
-    ],
-    "consolidate": false,
-    "repair": false
-  },
-  {
-    "level": 1,
-    "seed": "0033",
-    "cost": 68,
-    "rate": 0.1052,
+    "cost": 53,
+    "rate": 0.11,
     "quality": 93,
     "insight": 100,
-    "won": true,
-    "goodwill": 72,
-    "usableN": 891,
-    "sent": 10000,
-    "completed": 1052,
-    "invite": "generic",
-    "reminders": 0,
-    "escapes": true,
-    "kept": [
-      2,
-      4,
-      6,
-      44
-    ],
-    "added": [
-      1,
-      9
-    ],
-    "repaired": [],
-    "consolidate": false,
-    "repair": false
-  },
-  {
-    "level": 1,
-    "seed": "0034",
-    "cost": 66,
-    "rate": 0.1172,
-    "quality": 93,
-    "insight": 97,
     "won": true,
     "goodwill": 70,
-    "usableN": 996,
+    "usableN": 950,
     "sent": 10000,
-    "completed": 1172,
+    "completed": 1100,
     "invite": "generic",
     "reminders": 0,
     "escapes": false,
-    "kept": [
-      27,
-      32,
-      44,
-      58
-    ],
-    "added": [
-      6,
-      1
-    ],
-    "repaired": [],
-    "consolidate": false,
-    "repair": false
-  },
-  {
-    "level": 1,
-    "seed": "0035",
-    "cost": 70,
-    "rate": 0.1081,
-    "quality": 95,
-    "insight": 79,
-    "won": true,
-    "goodwill": 72,
-    "usableN": 932,
-    "sent": 10000,
-    "completed": 1081,
-    "invite": "generic",
-    "reminders": 0,
-    "escapes": true,
     "kept": [
       2,
-      31,
-      33,
-      44
-    ],
-    "added": [
-      1,
-      9
-    ],
-    "repaired": [],
-    "consolidate": false,
-    "repair": false
-  },
-  {
-    "level": 1,
-    "seed": "0036",
-    "cost": 66,
-    "rate": 0.1241,
-    "quality": 93,
-    "insight": 100,
-    "won": true,
-    "goodwill": 72,
-    "usableN": 1070,
-    "sent": 10000,
-    "completed": 1241,
-    "invite": "generic",
-    "reminders": 0,
-    "escapes": false,
-    "kept": [
       6,
-      21,
-      24,
-      27,
-      29
-    ],
-    "added": [
-      9
-    ],
-    "repaired": [
-      21,
-      24
-    ],
-    "consolidate": false,
-    "repair": false
-  },
-  {
-    "level": 1,
-    "seed": "0037",
-    "cost": 60,
-    "rate": 0.1158,
-    "quality": 93,
-    "insight": 79,
-    "won": true,
-    "goodwill": 72,
-    "usableN": 1000,
-    "sent": 10000,
-    "completed": 1158,
-    "invite": "generic",
-    "reminders": 0,
-    "escapes": false,
-    "kept": [
-      1,
-      2,
-      4,
       9,
-      29,
-      33
+      27,
+      46,
+      68,
+      71
     ],
     "added": [],
     "repaired": [],
@@ -1744,157 +1558,88 @@
   },
   {
     "level": 1,
-    "seed": "0038",
-    "cost": 80,
-    "rate": 0.1678,
-    "quality": 97,
-    "insight": 100,
-    "won": true,
-    "goodwill": 53,
-    "usableN": 1384,
-    "sent": 10000,
-    "completed": 1678,
-    "invite": "known",
-    "reminders": 0,
-    "escapes": true,
-    "kept": [
-      24,
-      25,
-      27,
-      28,
-      29,
-      44
-    ],
-    "added": [
-      1,
-      6
-    ],
-    "repaired": [
-      24,
-      25
-    ],
-    "consolidate": false,
-    "repair": false
-  },
-  {
-    "level": 1,
-    "seed": "0039",
-    "cost": 66,
-    "rate": 0.2014,
-    "quality": 96,
-    "insight": 100,
-    "won": true,
-    "goodwill": 76,
-    "usableN": 1835,
-    "sent": 10000,
-    "completed": 2014,
-    "invite": "honest",
-    "reminders": 0,
-    "escapes": false,
-    "kept": [
-      1,
-      21,
-      32,
-      37,
-      44
-    ],
-    "added": [
-      6
-    ],
-    "repaired": [
-      21
-    ],
-    "consolidate": false,
-    "repair": false
-  },
-  {
-    "level": 1,
-    "seed": "003A",
-    "cost": 81,
-    "rate": 0.1951,
-    "quality": 97,
-    "insight": 77,
-    "won": true,
-    "goodwill": 44,
-    "usableN": 1542,
-    "sent": 10000,
-    "completed": 1951,
-    "invite": "generic",
-    "reminders": 2,
-    "escapes": true,
-    "kept": [
-      1,
-      2,
-      25,
-      28,
-      47
-    ],
-    "added": [
-      6
-    ],
-    "repaired": [
-      25
-    ],
-    "consolidate": false,
-    "repair": false
-  },
-  {
-    "level": 1,
-    "seed": "003B",
-    "cost": 81,
-    "rate": 0.1643,
-    "quality": 94,
-    "insight": 100,
-    "won": true,
-    "goodwill": 67,
-    "usableN": 1433,
-    "sent": 10000,
-    "completed": 1643,
-    "invite": "generic",
-    "reminders": 1,
-    "escapes": true,
-    "kept": [
-      1,
-      6,
-      24,
-      25
-    ],
-    "added": [
-      2,
-      9
-    ],
-    "repaired": [
-      24,
-      25
-    ],
-    "consolidate": false,
-    "repair": false
-  },
-  {
-    "level": 1,
-    "seed": "003C",
-    "cost": 70,
-    "rate": 0.2094,
+    "seed": "0031",
+    "cost": 61,
+    "rate": 0.0986,
     "quality": 95,
     "insight": 100,
     "won": true,
-    "goodwill": 76,
-    "usableN": 1879,
+    "goodwill": 70,
+    "usableN": 892,
     "sent": 10000,
-    "completed": 2094,
-    "invite": "honest",
+    "completed": 986,
+    "invite": "generic",
     "reminders": 0,
     "escapes": false,
     "kept": [
-      1,
-      3,
-      30,
+      4,
+      6,
+      25,
+      27,
+      29,
+      32,
+      54
+    ],
+    "added": [],
+    "repaired": [
+      25,
+      54
+    ],
+    "consolidate": false,
+    "repair": false
+  },
+  {
+    "level": 1,
+    "seed": "0032",
+    "cost": 59,
+    "rate": 0.1199,
+    "quality": 96,
+    "insight": 100,
+    "won": true,
+    "goodwill": 72,
+    "usableN": 1065,
+    "sent": 10000,
+    "completed": 1199,
+    "invite": "generic",
+    "reminders": 0,
+    "escapes": false,
+    "kept": [
+      6,
+      27,
+      37,
       43,
-      44
+      46
     ],
-    "added": [
-      9
+    "added": [],
+    "repaired": [],
+    "consolidate": false,
+    "repair": false
+  },
+  {
+    "level": 1,
+    "seed": "0033",
+    "cost": 59,
+    "rate": 0.1104,
+    "quality": 95,
+    "insight": 100,
+    "won": true,
+    "goodwill": 70,
+    "usableN": 956,
+    "sent": 10000,
+    "completed": 1104,
+    "invite": "generic",
+    "reminders": 0,
+    "escapes": false,
+    "kept": [
+      2,
+      3,
+      4,
+      6,
+      27,
+      29,
+      32
     ],
+    "added": [],
     "repaired": [
       3
     ],
@@ -1903,60 +1648,92 @@
   },
   {
     "level": 1,
-    "seed": "003D",
-    "cost": 86,
-    "rate": 0.3025,
-    "quality": 95,
-    "insight": 77,
+    "seed": "0034",
+    "cost": 60,
+    "rate": 0.1172,
+    "quality": 94,
+    "insight": 100,
     "won": true,
-    "goodwill": 48,
-    "usableN": 2465,
+    "goodwill": 72,
+    "usableN": 1025,
     "sent": 10000,
-    "completed": 3025,
-    "invite": "honest",
-    "reminders": 2,
-    "escapes": true,
+    "completed": 1172,
+    "invite": "generic",
+    "reminders": 0,
+    "escapes": false,
     "kept": [
-      21,
-      28,
-      44,
-      45
-    ],
-    "added": [
       1,
-      6
+      4,
+      6,
+      9,
+      46,
+      55
     ],
+    "added": [],
     "repaired": [
-      21
+      55
     ],
     "consolidate": false,
     "repair": false
   },
   {
     "level": 1,
-    "seed": "003E",
-    "cost": 67,
-    "rate": 0.1037,
-    "quality": 94,
+    "seed": "0035",
+    "cost": 63,
+    "rate": 0.1125,
+    "quality": 92,
     "insight": 100,
     "won": true,
     "goodwill": 70,
-    "usableN": 903,
+    "usableN": 950,
     "sent": 10000,
-    "completed": 1037,
+    "completed": 1125,
     "invite": "generic",
     "reminders": 0,
     "escapes": false,
     "kept": [
       1,
+      6,
+      10,
+      27,
+      29,
+      43,
+      54
+    ],
+    "added": [],
+    "repaired": [
+      10,
+      54
+    ],
+    "consolidate": false,
+    "repair": false
+  },
+  {
+    "level": 1,
+    "seed": "0036",
+    "cost": 70,
+    "rate": 0.1411,
+    "quality": 96,
+    "insight": 100,
+    "won": true,
+    "goodwill": 63,
+    "usableN": 1251,
+    "sent": 10000,
+    "completed": 1411,
+    "invite": "generic",
+    "reminders": 1,
+    "escapes": false,
+    "kept": [
+      1,
       2,
+      4,
+      9,
       25,
-      27
+      27,
+      32
     ],
     "added": [
-      6,
-      9,
-      4
+      6
     ],
     "repaired": [
       25
@@ -1966,30 +1743,283 @@
   },
   {
     "level": 1,
-    "seed": "003F",
-    "cost": 72,
-    "rate": 0.0989,
-    "quality": 99,
+    "seed": "0037",
+    "cost": 67,
+    "rate": 0.1145,
+    "quality": 95,
     "insight": 100,
     "won": true,
-    "goodwill": 54,
-    "usableN": 814,
+    "goodwill": 70,
+    "usableN": 1000,
     "sent": 10000,
-    "completed": 989,
+    "completed": 1145,
     "invite": "generic",
     "reminders": 0,
-    "escapes": true,
+    "escapes": false,
     "kept": [
       1,
-      6,
-      28
+      4,
+      9,
+      10,
+      27,
+      55
     ],
     "added": [
+      6
+    ],
+    "repaired": [
+      10,
+      55
+    ],
+    "consolidate": false,
+    "repair": false
+  },
+  {
+    "level": 1,
+    "seed": "0038",
+    "cost": 65,
+    "rate": 0.1217,
+    "quality": 94,
+    "insight": 100,
+    "won": true,
+    "goodwill": 72,
+    "usableN": 1052,
+    "sent": 10000,
+    "completed": 1217,
+    "invite": "generic",
+    "reminders": 0,
+    "escapes": false,
+    "kept": [
+      2,
+      6,
+      9,
+      54
+    ],
+    "added": [
+      1
+    ],
+    "repaired": [
+      54
+    ],
+    "consolidate": false,
+    "repair": false
+  },
+  {
+    "level": 1,
+    "seed": "0039",
+    "cost": 58,
+    "rate": 0.1247,
+    "quality": 94,
+    "insight": 100,
+    "won": true,
+    "goodwill": 72,
+    "usableN": 1096,
+    "sent": 10000,
+    "completed": 1247,
+    "invite": "generic",
+    "reminders": 0,
+    "escapes": false,
+    "kept": [
+      1,
+      2,
+      6,
+      37,
+      43,
+      54
+    ],
+    "added": [],
+    "repaired": [
+      54
+    ],
+    "consolidate": false,
+    "repair": false
+  },
+  {
+    "level": 1,
+    "seed": "003A",
+    "cost": 60,
+    "rate": 0.1134,
+    "quality": 94,
+    "insight": 100,
+    "won": true,
+    "goodwill": 70,
+    "usableN": 977,
+    "sent": 10000,
+    "completed": 1134,
+    "invite": "generic",
+    "reminders": 0,
+    "escapes": false,
+    "kept": [
+      1,
+      2,
+      3,
+      6,
+      9,
+      29,
+      54
+    ],
+    "added": [],
+    "repaired": [
+      3,
+      54
+    ],
+    "consolidate": false,
+    "repair": false
+  },
+  {
+    "level": 1,
+    "seed": "003B",
+    "cost": 63,
+    "rate": 0.117,
+    "quality": 95,
+    "insight": 100,
+    "won": true,
+    "goodwill": 72,
+    "usableN": 1045,
+    "sent": 10000,
+    "completed": 1170,
+    "invite": "generic",
+    "reminders": 0,
+    "escapes": false,
+    "kept": [
       2,
       9,
-      27
+      27,
+      29,
+      46
+    ],
+    "added": [
+      6
     ],
     "repaired": [],
+    "consolidate": false,
+    "repair": false
+  },
+  {
+    "level": 1,
+    "seed": "003C",
+    "cost": 71,
+    "rate": 0.0937,
+    "quality": 96,
+    "insight": 100,
+    "won": true,
+    "goodwill": 70,
+    "usableN": 822,
+    "sent": 10000,
+    "completed": 937,
+    "invite": "generic",
+    "reminders": 0,
+    "escapes": false,
+    "kept": [
+      2,
+      3,
+      10,
+      25,
+      27,
+      54
+    ],
+    "added": [
+      6
+    ],
+    "repaired": [
+      3,
+      10,
+      25,
+      54
+    ],
+    "consolidate": false,
+    "repair": false
+  },
+  {
+    "level": 1,
+    "seed": "003D",
+    "cost": 60,
+    "rate": 0.1168,
+    "quality": 94,
+    "insight": 100,
+    "won": true,
+    "goodwill": 72,
+    "usableN": 1023,
+    "sent": 10000,
+    "completed": 1168,
+    "invite": "generic",
+    "reminders": 0,
+    "escapes": false,
+    "kept": [
+      1,
+      27,
+      32,
+      46,
+      55
+    ],
+    "added": [
+      6
+    ],
+    "repaired": [
+      55
+    ],
+    "consolidate": false,
+    "repair": false
+  },
+  {
+    "level": 1,
+    "seed": "003E",
+    "cost": 58,
+    "rate": 0.1076,
+    "quality": 95,
+    "insight": 100,
+    "won": true,
+    "goodwill": 72,
+    "usableN": 937,
+    "sent": 10000,
+    "completed": 1076,
+    "invite": "generic",
+    "reminders": 0,
+    "escapes": false,
+    "kept": [
+      1,
+      2,
+      6,
+      9,
+      25,
+      54
+    ],
+    "added": [],
+    "repaired": [
+      25,
+      54
+    ],
+    "consolidate": false,
+    "repair": false
+  },
+  {
+    "level": 1,
+    "seed": "003F",
+    "cost": 64,
+    "rate": 0.0969,
+    "quality": 96,
+    "insight": 100,
+    "won": true,
+    "goodwill": 72,
+    "usableN": 868,
+    "sent": 10000,
+    "completed": 969,
+    "invite": "generic",
+    "reminders": 0,
+    "escapes": false,
+    "kept": [
+      2,
+      4,
+      6,
+      25,
+      32
+    ],
+    "added": [
+      1
+    ],
+    "repaired": [
+      25
+    ],
     "consolidate": false,
     "repair": false
   },

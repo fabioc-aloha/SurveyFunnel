@@ -1106,6 +1106,73 @@ async function runMedallionScenario(browser, gameUrl, viewport, options) {
   return run;
 }
 
+async function runSurveyIdentityScenario(browser, gameUrl, viewport, options) {
+  const run = newScenarioRun(viewport, options);
+  try {
+    const page = await openScenarioPage(browser, run, viewport);
+    await page.goto(gameUrl, { waitUntil: 'networkidle0', timeout: 30000 });
+    await waitForVisible(page, '#startScreen');
+
+    const gridText = await page.evaluate(() =>
+      (document.querySelector('#levelGrid')?.textContent || '').replace(/\s+/g, ' '));
+    await run.check('level cards name each survey beside its level',
+      gridText.includes('LEVEL 1 · EASY · FIRST SEND · SUPPORT EXPERIENCE') &&
+      gridText.includes('LEVEL 2 · EASY · THE SPLIT · COPILOT / AI ADOPTION'),
+      { excerpt: gridText.slice(0, 320) });
+
+    await clickAndWait(page, '#startBtn', 500);
+    await waitForVisible(page, '#setup');
+    const bannerText = await page.evaluate(() =>
+      (document.querySelector('#levelBanner')?.textContent || '').replace(/\s+/g, ' '));
+    const hudText = await page.evaluate(() =>
+      (document.querySelector('#hudLevel')?.textContent || '').replace(/\s+/g, ' '));
+    await run.check('setup banner and HUD name the Level 1 survey',
+      bannerText.includes('Survey: Support Experience Survey') && hudText.includes('SUPPORT EXPERIENCE'),
+      { banner: bannerText.slice(0, 240), hud: hudText.slice(0, 240) });
+
+    await clickAndWait(page, '#brdBtn', 400);
+    await page.waitForSelector('#studyBRD.open', { visible: true, timeout: 10000 });
+    const brd = await page.evaluate(() =>
+      (document.querySelector('#brdContent')?.textContent || '').replace(/\s+/g, ' '));
+    await run.check('Level 1 BRD renders its own study from the survey record',
+      brd.includes('Support Experience Survey') && brd.includes('SPONSOR') &&
+      brd.includes('Support Experience team') && brd.includes('AUDIENCE') &&
+      brd.includes('overall satisfaction') && brd.includes('renewal risk') &&
+      !brd.includes('Copilot Adoption Survey') && !brd.includes('Azure Cloud Services Survey') &&
+      !brd.includes('Collect credible answers on the required business topics below'),
+      { excerpt: brd.slice(0, 400) });
+    await checkOverflow(run, 'Level 1 BRD open');
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(() => !document.querySelector('#studyBRD').classList.contains('open'), { timeout: 5000 });
+    const focusAfter = await page.evaluate(() => document.activeElement?.id || '');
+    await run.check('BRD Escape closes and restores focus to the opener', focusAfter === 'brdBtn', { focusAfter });
+
+    await page.evaluate(() => { selectLevel(2, true); });
+    await waitForVisible(page, '#setup');
+    const banner2 = await page.evaluate(() =>
+      (document.querySelector('#levelBanner')?.textContent || '').replace(/\s+/g, ' '));
+    await clickAndWait(page, '#brdBtn', 400);
+    await page.waitForSelector('#studyBRD.open', { visible: true, timeout: 10000 });
+    const brd2 = await page.evaluate(() =>
+      (document.querySelector('#brdContent')?.textContent || '').replace(/\s+/g, ' '));
+    await run.check('unmigrated Level 2 keeps its naming and BRD through the same model',
+      banner2.includes('Survey: Copilot Adoption Survey') &&
+      brd2.includes('Copilot Adoption Survey') && !brd2.includes('Support Experience Survey') &&
+      !brd2.includes('SPONSOR'),
+      { banner: banner2.slice(0, 240), excerpt: brd2.slice(0, 320) });
+    await page.keyboard.press('Escape');
+    await checkNoJourneyErrors(run, 'per-level survey identity scenario');
+  } catch (error) {
+    await run.record('per-level survey identity scenario completes without a harness exception', false, {
+      error: error.message,
+      stack: String(error.stack || '').split('\n').slice(0, 8)
+    }, true);
+  } finally {
+    await closeScenarioPage(run);
+  }
+  return run;
+}
+
 async function main() {
   const options = parseArgs(process.argv.slice(2));
   const gameFile = join(options.gameDir, 'site', 'index.html');
@@ -1152,7 +1219,7 @@ async function main() {
       // Feature scenarios run once, at the first (mobile) viewport.
       // The self-test passes --no-scenarios: its negative controls only
       // need the core journey above to prove failures are caught.
-      for (const scenario of [runQuickBounceScenario, runCutFloorScenario, runCampaignBounceScenario, runMedallionScenario]) {
+      for (const scenario of [runQuickBounceScenario, runCutFloorScenario, runCampaignBounceScenario, runMedallionScenario, runSurveyIdentityScenario]) {
         const run = await scenario(browser, gameUrl, options.viewports[0], options);
         summary.checks.push(...run.checks);
       }

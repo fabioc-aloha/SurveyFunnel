@@ -64,6 +64,18 @@ The following features remain unimplemented:
   per the owner's 2026-11-10 decision), and a season quarantine line;
   phase 3 (separately decided) would make promoted counts the literal
   send base and add a Quick Challenge dirty-Gold complication.
+- Per-level surveys phases 2 to 5 (design in
+  [docs/level-surveys-scope.md](docs/level-surveys-scope.md); all
+  seven decisions approved as recommended 2026-11-11; phase 1 built
+  locally 2026-11-11: survey data model with transitional legacy
+  fallback, per-level BRD, Level 1 Support Experience bank of 36,
+  Level 1 witnesses regenerated). Remaining: phase 2, Level 2
+  Copilot and Level 3 Azure banks and full BRDs; phase 3, Level 4
+  relationship and Level 5 perceptions banks and BRDs; phase 4,
+  Level 6 flagship bank and removal of the legacy-bank fallback;
+  phase 5, witness regeneration and rebalance for each migrated
+  level as it lands (Level 1 done in phase 1) plus the six balance
+  invariants replayed across the themed season.
 
 ## Proposed automation - approval required
 
