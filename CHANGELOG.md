@@ -1,5 +1,96 @@
 # Changelog
 
+## 2026-11-11 - Per-level surveys phase 4: Level 4 Account Team Relationship bank and BRD
+
+- Design: [docs/level-surveys-scope.md](docs/level-surveys-scope.md),
+  phase 4. Level 4 (The Tired List) migrated from the legacy shared
+  bank to its own survey, the Account Team Relationship Survey.
+  Level 4 mechanics are unchanged: the Tired segment starts at
+  goodwill 25, the win requires ending goodwill 35 or higher, the
+  Report back line (3 cr) stays this study's feedback commitment,
+  and pricing and targets behave as before.
+- Level 4 bank: 36 newly authored entries (ids 401-436; 0 reused).
+  Structure follows the scope doc's derivation: sections
+  A4/B18/C6/D2/E2/F4; 14 clean, 13 defective, 5 stupid, 4 filler;
+  core set of 6, all clean, with at least two creditable questions
+  on each of the survey's five agenda topics (account team
+  responsiveness, trust and candor, business value delivered,
+  escalation handling, renewal intent). Defect coverage is 10 of
+  the 11 classes; the theme-natural classes from the scope doc's
+  Level 4 rationale are doubled (SENSITIVE NO ASSURANCE, LEADING,
+  VAGUE TIMEFRAME). The one omission is recorded in the bank's
+  header comment: DOUBLE NEGATIVE (negation-stacked wording lives
+  in agreement and consent text, not in relationship experience
+  items); the class is covered on Levels 1 and 2 and in the
+  drills. The items are phrased as a real relationship instrument
+  phrases them, and the subject is a subject of measurement,
+  never promotion: no marketing claims and no facts about any
+  real account or person; every item is generic to the
+  respondent's own account team.
+- Answerability, one recorded design decision: the scope doc's
+  Level 4 pattern is expressed through the topic-to-persona keys
+  (trust, business value, and renewal intent credit only from
+  executive and IT decision maker evidence; escalation handling
+  only from the frontline and end-user seats that lived the
+  tickets), while the core set itself is answerable by every
+  seat, deliberately. This level's goodwill economy cannot carry
+  a restricted backbone: a kept restricted item charges 6
+  goodwill per persona group that cannot answer it, the Tired
+  list starts at 25, and the win requires ending at 35 or
+  higher. An authoring pass with the core restricted to the
+  pattern's seats produced no winning line for the fixed deal at
+  all: keeping the backbone spent 54 goodwill on unanswerability
+  alone and tripped the breaker before the rate could build.
+  Seat restrictions therefore live where they teach, on the
+  non-core clean items Q411 and Q424, the jargon item Q416, and
+  the beyond-knowledge trap Q417, each a visible, priced decision
+  in the goodwill forecast. Candor, not knowledge, is the design
+  risk on this survey: the sensitive items ask respondents to
+  judge a team they must keep working with.
+- Level 4 BRD: the survey record is complete (sponsor: the
+  Account Management team; purpose; audience with the seat
+  pattern and the repeated-surveying condition; required topics
+  with per-survey topic-to-persona keys; success measures
+  through the unchanged mission numbers). The constraints state
+  the level's defining conditions as study conditions: the
+  audience has been surveyed three times this quarter, the win
+  requires ending goodwill 35 or higher, and report back is the
+  feedback commitment that protects response on the next cycle.
+  The evidence mission purpose for Level 4 is rewritten to the
+  survey.
+- Fixed first play: Level 4 now deals a curated 12 from its own
+  bank (6 core) when no seed is recorded, through
+  `fixedInstrumentForLevel`. The transitional fallback now
+  covers Levels 5-6 only and returns the legacy pool exactly as
+  phase 3 left it, so their deals and witnesses are unchanged.
+- Witnesses: Level 4's 39 winning setups (fixed plus its 38
+  seeded draws; this level's corpus is 39, not 65) were
+  regenerated through the real handlers against the Relationship
+  bank. The recorded fixed line costs 63 cr against the 76 cr
+  baseline: it keeps all six core questions, buys the Honest Ask
+  invite and report back, and ends at 47 goodwill with quality
+  95 and Insight 100 (the old fixed line ended at 40 goodwill).
+  64 winning lines existed for the fixed deal; the cheapest was
+  59 cr. Seeded winning lines cost 59-75 cr against the old
+  58-82 cr range. Recorded lines end at 41-47 goodwill, all
+  clear of the 35 gate, and the fixed line's 47 also carries
+  into the continuous six-level campaign, which passes. No pool
+  changed and no tuning was applied. The cheaper Level 4
+  (fixed line down 13, seeded top down 7) is flagged for the
+  phase-5 rebalance alongside the Level 2 and Level 3 flags.
+  Other levels' fixtures are entry-for-entry identical.
+- Coverage: four new Node tests (Level 4 bank structure with the
+  defect-coverage floor and doubled classes, Level 4 fixed
+  instrument, Level 4 BRD rendering with the goodwill gate and
+  the report-back commitment, Insight against Level 4 topics),
+  the fallback test extended to the narrowed pool, the phase-1
+  BRD test and the phase-2 fixed-instrument test re-pointed to
+  Level 5 as the remaining unmigrated example, the
+  goodwill-ledger test re-based on the Level 4 fixed core set,
+  and the browser survey-identity scenario extended to the
+  Level 4 BRD. Gates: build, Node suite (135), full harness
+  PASS 3/3 (browser 150/150).
+
 ## 2026-11-11 - Per-level surveys phase 3: Level 3 Azure Cloud Services bank and BRD
 
 - Design: [docs/level-surveys-scope.md](docs/level-surveys-scope.md),

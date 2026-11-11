@@ -26,32 +26,42 @@
   health), the Fishbowl help overlay, and the fact-check fixes
   (BriteVerify name, accept_all label, catch-all scope, guide
   prices), deployed as `c8a1c01b` and live-verified 2026-11-11.
-- Per-level surveys phases 1 and 2 are pushed and deployed.
-  Phase 3 is local, not yet pushed (design in
-  [docs/level-surveys-scope.md](docs/level-surveys-scope.md), all
-  seven decisions approved as recommended 2026-11-11). Each level
-  now has a survey identity: bank entries carry a `survey` field,
-  Level 1 draws its own curated 36-entry Support Experience bank,
-  Level 2 draws its own newly authored 36-entry Copilot Adoption
-  bank (ids 201-236), Level 3 draws its own newly authored
-  36-entry Azure Cloud Services bank (ids 301-336), Levels 4-6
-  draw the legacy pool through a transitional fallback, and the
-  BRD assembles from a per-level survey record (shared front
-  section plus the level's own study; the Level 1, 2, and 3 BRDs
-  are written in full, the generic purpose sentence is retired).
-  Level cards, the setup banner, the HUD, and the BRD title name
-  the survey. Levels 2 and 3 deal a curated fixed 12 from their
-  own bank on first play. Witnesses were regenerated per migrated
-  level (Level 1: fixed line byte-identical at 58 cr, seeded
-  lines 53-71 cr against the old 58-93 range; Level 2: fixed line
-  61 cr against the 67 cr baseline, seeded lines 59-67 cr
-  against the old 64-93 range; Level 3: fixed line 69 cr, the
-  same cost as its baseline but a goodwill-lean line ending at
-  58 goodwill, seeded lines 59-92 cr against the old 60-89
-  range; no pool changed). Full local gates pass (build, Node
-  suite 131, browser harness 149/149 with the survey-identity
-  scenario covering Levels 1 to 3). Remaining phases are in
-  [TODO.md](TODO.md).
+- Per-level surveys phases 1, 2, and 3 are pushed and deployed.
+  Phase 4 is built and committed locally, not yet pushed (design
+  in [docs/level-surveys-scope.md](docs/level-surveys-scope.md),
+  all seven decisions approved as recommended 2026-11-11). Each
+  level now has a survey identity: bank entries carry a `survey`
+  field, Level 1 draws its own curated 36-entry Support
+  Experience bank, Level 2 draws its own newly authored 36-entry
+  Copilot Adoption bank (ids 201-236), Level 3 draws its own
+  newly authored 36-entry Azure Cloud Services bank (ids
+  301-336), Level 4 draws its own newly authored 36-entry
+  Account Team Relationship bank (ids 401-436), Levels 5-6 draw
+  the legacy pool through a transitional fallback, and the BRD
+  assembles from a per-level survey record (shared front
+  section plus the level's own study; the Level 1, 2, 3, and 4
+  BRDs are written in full, the generic purpose sentence is
+  retired). Level cards, the setup banner, the HUD, and the BRD
+  title name the survey. Levels 2, 3, and 4 deal a curated fixed
+  12 from their own bank on first play. Witnesses were
+  regenerated per migrated level (Level 1: fixed line
+  byte-identical at 58 cr, seeded lines 53-71 cr against the
+  old 58-93 range; Level 2: fixed line 61 cr against the 67 cr
+  baseline, seeded lines 59-67 cr against the old 64-93 range;
+  Level 3: fixed line 69 cr, the same cost as its baseline but a
+  goodwill-lean line ending at 58 goodwill, seeded lines 59-92
+  cr against the old 60-89 range; Level 4: 39 setups, fixed line
+  63 cr against the 76 cr baseline ending at 47 goodwill,
+  seeded lines 59-75 cr against the old 58-82 range, recorded
+  lines ending at 41-47 goodwill; no pool changed). One recorded
+  design decision in phase 4: the Relationship core is answerable
+  by every seat by design, because this level's goodwill economy
+  cannot carry a restricted backbone; the scope doc's seat
+  pattern is expressed through the topic-to-persona keys instead
+  (see the phase-4 changelog entry). Full local gates pass
+  (build, Node suite 135, browser harness 150/150 with the
+  survey-identity scenario covering Levels 1 to 4). Remaining
+  phases are in [TODO.md](TODO.md).
 
 ## Acceptance boundary
 

@@ -64,7 +64,7 @@ The following features remain unimplemented:
   per the owner's 2026-11-10 decision), and a season quarantine line;
   phase 3 (separately decided) would make promoted counts the literal
   send base and add a Quick Challenge dirty-Gold complication.
-- Per-level surveys phases 4 and 5 (design in
+- Per-level surveys phase 5 (design in
   [docs/level-surveys-scope.md](docs/level-surveys-scope.md); all
   seven decisions approved as recommended 2026-11-11; phase 1 built
   2026-11-11: survey data model with transitional legacy fallback,
@@ -76,18 +76,26 @@ The following features remain unimplemented:
   Cloud Services bank of 36, full Level 3 BRD with the sponsor
   named as the study's stakeholder, Level 3 fixed first-play
   instrument, Level 3 witnesses regenerated, fallback narrowed to
-  Levels 4-6). Remaining: phase 4 in the design doc's numbering,
-  Level 4 relationship and Level 5 perceptions banks and BRDs,
-  then the Level 6 flagship bank and removal of the legacy-bank
-  fallback; phase 5, witness regeneration and rebalance for each
-  migrated level as it lands (Levels 1 to 3 done) plus the six
-  balance invariants replayed across the themed season. Phase-5
-  rebalance flags so far: Level 2 fixed line cheaper than its
-  baseline (61 vs 67 cr); Level 3 seeded winning range widened
-  (59-92 vs 60-89 cr) and the Azure bank's restriction-dense core
-  makes kept restricted items the dominant goodwill cost, which
-  the recorded Level 3 fixed line is chosen around (see the
-  phase-3 changelog entry).
+  Levels 4-6; phase 4 built locally 2026-11-11: Level 4 Account
+  Team Relationship bank of 36, full Level 4 BRD with the goodwill
+  gate and report back as the study's feedback commitment, Level 4
+  fixed first-play instrument, Level 4's 39 witnesses regenerated,
+  fallback narrowed to Levels 5-6). Remaining: phase 5, the
+  Level 5 perceptions bank and BRD, then the Level 6 flagship
+  bank and removal of the legacy-bank fallback, plus witness
+  regeneration and rebalance for each migrated level as it lands
+  (Levels 1 to 4 done) and the six balance invariants replayed
+  across the themed season. Phase-5 rebalance flags so far:
+  Level 2 fixed line cheaper than its baseline (61 vs 67 cr);
+  Level 3 seeded winning range widened (59-92 vs 60-89 cr) and
+  the Azure bank's restriction-dense core makes kept restricted
+  items the dominant goodwill cost, which the recorded Level 3
+  fixed line is chosen around; Level 4 fixed line cheaper than
+  its baseline (63 vs 76 cr) and seeded range narrower (59-75 vs
+  58-82 cr), with recorded lines ending at 41-47 goodwill,
+  because the Relationship core is deliberately answerable by
+  every seat (see the phase-4 changelog entry for the recorded
+  answerability decision).
 
 ## Proposed automation - approval required
 

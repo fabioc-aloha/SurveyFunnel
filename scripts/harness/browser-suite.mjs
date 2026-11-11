@@ -1182,6 +1182,25 @@ async function runSurveyIdentityScenario(browser, gameUrl, viewport, options) {
       brd3.includes("sponsor is also this study's stakeholder"),
       { banner: banner3.slice(0, 240), excerpt: brd3.slice(0, 320) });
     await page.keyboard.press('Escape');
+    await page.waitForFunction(() => !document.querySelector('#studyBRD').classList.contains('open'), { timeout: 5000 });
+
+    await page.evaluate(() => { selectLevel(4, true); });
+    await waitForVisible(page, '#setup');
+    const banner4 = await page.evaluate(() =>
+      (document.querySelector('#levelBanner')?.textContent || '').replace(/\s+/g, ' '));
+    await clickAndWait(page, '#brdBtn', 400);
+    await page.waitForSelector('#studyBRD.open', { visible: true, timeout: 10000 });
+    const brd4 = await page.evaluate(() =>
+      (document.querySelector('#brdContent')?.textContent || '').replace(/\s+/g, ' '));
+    await run.check('Level 4 BRD renders its own Relationship study with the goodwill gate and report-back commitment',
+      banner4.includes('Survey: Account Team Relationship Survey') &&
+      brd4.includes('Account Team Relationship Survey') && !brd4.includes('Support Experience Survey') &&
+      !brd4.includes('Copilot Adoption Survey') && !brd4.includes('Azure Cloud Services Survey') &&
+      brd4.includes('SPONSOR') && brd4.includes('Account Management team') && brd4.includes('AUDIENCE') &&
+      brd4.includes('account team responsiveness') && brd4.includes('renewal intent') &&
+      brd4.includes('ending goodwill 35 or higher') && brd4.includes('feedback commitment'),
+      { banner: banner4.slice(0, 240), excerpt: brd4.slice(0, 320) });
+    await page.keyboard.press('Escape');
     await checkNoJourneyErrors(run, 'per-level survey identity scenario');
   } catch (error) {
     await run.record('per-level survey identity scenario completes without a harness exception', false, {

@@ -5,12 +5,19 @@ The owner approved the direction and the level-to-survey mapping in
 section 1 on 2026-11-11, and approved all seven open decisions in
 section 8 as recommended on 2026-11-11. Phase 1 (data model,
 per-level BRD, Level 1 Support Experience bank), phase 2 (Level 2
-Copilot Adoption bank, full Level 2 BRD, Level 2 witnesses), and
+Copilot Adoption bank, full Level 2 BRD, Level 2 witnesses),
 phase 3 (Level 3 Azure Cloud Services bank, full Level 3 BRD with
-the sponsor named as the study's stakeholder, Level 3 witnesses)
-are built to those decisions; phases 4 and 5 remain (Level 4 and
-Level 5 banks and BRDs, the Level 6 flagship bank with removal
-of the legacy-bank fallback, and the closing rebalance). This
+the sponsor named as the study's stakeholder, Level 3 witnesses),
+and phase 4 (Level 4 Account Team Relationship bank, full Level 4
+BRD stating the goodwill gate and report back as the study's
+feedback commitment, Level 4 witnesses; one recorded deviation:
+the Relationship core is answerable by every seat by design,
+because this level's goodwill economy cannot carry a restricted
+backbone, and the section 3.3 seat pattern is expressed through
+the topic-to-persona keys instead) are built to those decisions;
+phase 5 remains (the Level 5 perceptions bank and BRD, the
+Level 6 flagship bank with removal of the legacy-bank fallback,
+and the closing rebalance). This
 document proposes turning each
 campaign level into a different survey, with its own questionnaire
 bank and its own BRD, replacing today's single shared bank and

@@ -916,7 +916,19 @@ var QUESTION_REPAIRS = {
   325:["In the last 90 days, did your team move or redeploy a workload on the platform? (yes / no)"],
   326:["How many virtual machines does your team run on the platform? Choose one: 0 / 1-10 / 11-50 / 51-100 / more than 100"],
   330:['Example privacy line (use only if accurate): "Your answer will help improve platform security practice. Only the platform research team will review individual responses."',"Has anyone on your team shared platform administrator sign-in details to get work done faster? (yes / no)"],
-  332:["What one change would most improve moving workloads onto the platform for your team?"]
+  332:["What one change would most improve moving workloads onto the platform for your team?"],
+  410:["How useful are the account team's planning and review meetings for your organization? (1-5)"],
+  412:['Example privacy line (use only if accurate): "Your answer will help improve how account teams are staffed and coached. Only the relationship research team will review individual responses."',"How would you rate the competence of the individual members of your account team? (1-5)"],
+  413:["How would you rate working with your account team? (1-5)"],
+  414:["In the last 90 days, when you raised a need with the account team, was it met? (yes / partly / no / I raised none)"],
+  415:["How responsive is the account team when you contact them? (1-5)","How knowledgeable is the account team about your organization's systems? (1-5)"],
+  416:["How well does the account team run its regular review meetings and follow through on the actions agreed there? (1-5)"],
+  418:["In the last 30 days, did you contact the account team about a problem? (yes / no)"],
+  419:["How responsive was the account team function you dealt with most in the last 90 days? Rate one function at a time from 1 to 5."],
+  425:["How many times did you meet with the account team last quarter? Choose one: 0 / 1 / 2-3 / 4-5 / more than 5"],
+  426:["In the last 90 days, did the account team do what it said it would do? (yes / partly / no)"],
+  430:['Example privacy line (use only if accurate): "Your answer will help improve the relationship program. Only the relationship research team will review individual responses."',"Have you ever considered moving your business to a competitor because of the account team's performance? (yes / no)"],
+  432:["What one change would most improve working with the account team for your organization?"]
 };
 function repairedQuestionMarkup(q){
   var prompts = QUESTION_REPAIRS[q.id] || [q.text];
@@ -1065,16 +1077,17 @@ var QUESTION_BANK = QUESTIONS.concat([
    drills read the union bank directly, never bankForLevel.
    Transitional state: unmigrated levels fall back to the legacy
    shared bank, exactly the draw they have always had. Each later
-   phase migrates one level and narrows its fallback; phase 4
-   removes it. Phase 2 (below) migrates Level 2. */
+   phase migrates one level and narrows its fallback; the final
+   migration phase removes it. Phase 2 (below) migrates Level 2. */
 var LEVEL_1_BANK_IDS = [1,2,3,4,5,6,7,8,9,10,11,12,25,27,29,30,31,32,37,39,43,45,46,52,53,54,55,57,58,59,63,66,67,68,71,72];
 QUESTION_BANK.forEach(function(q){ q.survey = LEVEL_1_BANK_IDS.indexOf(q.id) >= 0 ? 1 : 0; });
 OPTIONAL_QUESTIONS.forEach(function(q){ q.survey = 1; });
 function bankForLevel(level){
-  if (level === 1 || level === 2 || level === 3) return QUESTION_BANK.filter(function(q){ return q.survey === level; });
-  /* Unmigrated levels (4-6) draw the legacy pool exactly as phase 1
+  if (level === 1 || level === 2 || level === 3 || level === 4) return QUESTION_BANK.filter(function(q){ return q.survey === level; });
+  /* Unmigrated levels (5-6) draw the legacy pool exactly as phase 1
      left it: every entry stamped 0 or 1, in original bank order, so
-     their deals and witnesses are unchanged. Phase 4 removes this. */
+     their deals and witnesses are unchanged. The final migration
+     phase removes this. */
   return QUESTION_BANK.filter(function(q){ return q.survey === 0 || q.survey === 1; });
 }
 /* ================= PER-LEVEL SURVEYS · PHASE 2 =================
@@ -1256,16 +1269,124 @@ var AZURE_BANK = [
  { id:336, text:"What device are you answering on right now? (phone / tablet / computer)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"platform experience", tier:"filler", sec:"F", survey:3 }
 ];
 AZURE_BANK.forEach(function(q){ QUESTION_BANK.push(q); });
-/* Level 2's fixed first-play instrument: its curated 12 from its own
-   bank (6 core, all clean except five teaching defectives), installed
-   by applyInstrumentForLevel when no seed is recorded for the level.
-   Level 1's fixed instrument stays QUESTIONS, a subset of its bank;
-   unmigrated levels keep QUESTIONS until their phases. */
+/* ================= PER-LEVEL SURVEYS · PHASE 4 =================
+   Level 4 (The Tired List) migrates to its own survey: the Account
+   Team Relationship Survey, ids 401-436. Structure follows the
+   scope doc's derivation (A4/B18/C6/D2/E2/F4; 14 clean, 13
+   defective, 5 stupid, 4 filler; core set of 6, all clean, with a
+   creditable core question on every agenda topic). Defect coverage:
+   10 of the 11 classes; the theme-natural classes from the scope
+   doc's Level 4 rationale are doubled (SENSITIVE NO ASSURANCE,
+   LEADING, VAGUE TIMEFRAME). The one omission is recorded here:
+   DOUBLE NEGATIVE. Negation-stacked wording lives in agreement and
+   consent text, not in relationship experience items; the class is
+   covered on Levels 1 and 2 and in the drills. Answerability
+   follows the scope doc's Level 4 pattern, expressed where this
+   level's economy can carry it: the object is a relationship
+   between organizations, so the topic-to-persona keys make trust,
+   business value, and renewal intent credit only from executive
+   and IT decision maker evidence, and escalation handling only
+   from the frontline and end-user seats that lived the tickets.
+   The core set itself is answerable by every seat, deliberately:
+   relationship perception is this genre's broad base, and this
+   level's goodwill economy (the Tired list starts at 25 and the
+   win requires ending at 35 or higher) leaves no room for a
+   restricted backbone, because a kept restricted item charges 6
+   goodwill per persona group that cannot answer it. Seat
+   restrictions therefore live where they teach, on non-core clean
+   items (Q411, Q424), the jargon item, and the beyond-knowledge
+   trap, each a visible, priced decision in the goodwill forecast.
+   Perception of the account team is answerable by anyone who deals
+   with the team, which makes candor the design risk on this
+   survey, not knowledge: the sensitive items ask respondents to
+   judge a team they must keep working with. The survey treats its
+   subject as a subject of measurement,
+   never as promotion: no marketing claims, and no facts about any
+   real account or person; every item is generic to the respondent's
+   own account team. New ids live in the 4xx range and are appended
+   after the Azure entries, so legacy pool order (and therefore
+   every unmigrated level's deal) is untouched. The level's
+   mechanics are unchanged: the Tired segment starts at goodwill
+   25, the win requires ending goodwill 35 or higher, and report
+   back (3 cr) is this study's feedback commitment, stated in the
+   survey record's constraints. */
+var RELATIONSHIP_TOPIC_KEYS = {
+  "account team responsiveness":["itdm","tech"], "trust and candor":["exec","itdm"],
+  "business value delivered":["exec","itdm"], "escalation handling":["tech","end"],
+  "renewal intent":["exec","itdm"], "business understanding":["exec","itdm"],
+  "planning and reviews":["itdm","exec"], "commercial process":["admin","itdm"],
+  "relationship experience":["end","tech"]
+};
+var RELATIONSHIP_BANK = [
+ { id:401, text:"Overall, how would you rate your working relationship with the account team? (1-5, very poor to very good)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"trust and candor", tier:"clean", sec:"A", survey:4 },
+ { id:402, text:"Overall, how responsive is the account team when your organization needs something? (1-5)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"account team responsiveness", tier:"clean", sec:"A", survey:4 },
+ { id:403, text:"Overall, how much business value has the account team's work delivered to your organization in the last 12 months? (1-5, none to a great deal)", min:0.5, know:"Everyone", who:"exec", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"business value delivered", tier:"clean", sec:"A", survey:4 },
+ { id:404, text:"Overall, how would you rate your working relationship with the account team? (1-5, very poor to very good)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"trust and candor", tier:"stupid", sec:"A", survey:4, rg:"dup-relationship", dup:true,
+   flagTxt:"LOW-VALUE · DUPLICATE. This repeats the overall relationship question word for word. It adds burden without new information." },
+ { id:405, text:"Thinking of the most recent problem you escalated to the account team, how well was it handled? (1-5 / I have not escalated a problem)", min:0.5, know:"Whoever raised the problem", who:"tech", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"escalation handling", tier:"clean", sec:"B", survey:4 },
+ { id:406, text:"How comfortable are you raising a serious concern directly with the account team? (1-5, not at all to completely)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"trust and candor", tier:"clean", sec:"B", survey:4 },
+ { id:407, text:"How likely is your organization to renew its agreement when the current term ends? (1-5, very unlikely to very likely / not my decision)", min:0.5, know:"Everyone", who:"exec", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"renewal intent", tier:"clean", sec:"B", survey:4 },
+ { id:408, text:"In the last 90 days, when you contacted the account team, how soon did you get a reply that addressed your request? (same day / 1-2 days / longer / I did not contact them)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"account team responsiveness", tier:"clean", sec:"B", survey:4 },
+ { id:409, text:"How well does the account team understand your organization's business and priorities? (1-5)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"business understanding", tier:"clean", sec:"B", survey:4 },
+ { id:410, text:"How valuable are the account team's expertly run planning and review meetings?", min:0.75, know:"Everyone", who:"all", cx:"Medium", val:"Medium", core:false, answerBy:null, defect:"LEADING", topic:"planning and reviews", tier:"defective", sec:"B", survey:4,
+   flagTxt:"LEADING. 'Expertly run' presumes the verdict before the respondent gives one. Expect inflated ratings that flatter the meeting cadence and measure nothing." },
+ { id:411, text:"After an escalated problem is resolved, how often does the account team follow up to check the fix held? (always / usually / rarely / never / I have not escalated one)", min:0.5, know:"Frontline Technician or End User", who:"tech", cx:"Low", val:"Medium", core:false, answerBy:["tech","end"], defect:"CLEAN", topic:"escalation handling", tier:"clean", sec:"B", survey:4 },
+ { id:412, text:"How would you rate the competence of the individual members of your account team? (1-5)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"SENSITIVE NO ASSURANCE", topic:"trust and candor", tier:"defective", sec:"B", survey:4,
+   flagTxt:"SENSITIVE, NO ASSURANCE. Rating named colleagues' competence, with no confidentiality line anywhere near it, in a survey the account team will read. Expect safe answers and quiet refusals, not candor." },
+ { id:413, text:"How much do you enjoy working with your outstanding account team?", min:0.75, know:"Everyone", who:"all", cx:"Medium", val:"Medium", core:false, answerBy:null, defect:"LEADING", topic:"account team responsiveness", tier:"defective", sec:"B", survey:4,
+   flagTxt:"LEADING. 'Your outstanding account team' loads the answer before the respondent starts. Relationship warmth will read warmer than it is." },
+ { id:414, text:"Recently, has the account team been meeting your needs?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"VAGUE TIMEFRAME", topic:"account team responsiveness", tier:"defective", sec:"B", survey:4,
+   flagTxt:"VAGUE TIMEFRAME. 'Recently' names no window, so one respondent grades last week and another grades last year. Relationship questions dodge naming the quarter this way; anchor it." },
+ { id:415, text:"How responsive and knowledgeable is the account team when you contact them?", min:1.0, know:"Everyone", who:"all", cx:"High", val:"Low", core:false, answerBy:null, defect:"DOUBLE-BARRELED", topic:"account team responsiveness", tier:"defective", sec:"B", survey:4,
+   flagTxt:"DOUBLE-BARRELED. Responsiveness and knowledge are two judgments sharing one answer. A fast team that does not know your systems and a slow team that does land in the same box. Only SPLIT separates them." },
+ { id:416, text:"Rate the account team's QBR cadence, RACI coverage, and success-plan milestone hygiene.", min:0.5, know:"IT Decision Maker, maybe", who:"itdm", cx:"High", val:"Medium", core:false, answerBy:["itdm"], flag:"jargon", defect:"JARGON", topic:"planning and reviews", tier:"defective", sec:"B", survey:4,
+   flagTxt:"JARGON. QBR, RACI, milestone hygiene: program-management shorthand that most respondents have never heard spelled out. Only the program office can parse this; everyone else guesses." },
+ { id:417, text:"What share of the vendor's total revenue does your organization's contract represent?", min:1.0, know:"The vendor's finance team only, not on this list", who:"admin", cx:"High", val:"Medium", core:false, answerBy:["admin"], flag:"knowledge", defect:"BEYOND KNOWLEDGE", topic:"commercial process", tier:"defective", sec:"B", survey:4,
+   flagTxt:"BEYOND KNOWLEDGE. The vendor's revenue sits in the vendor's finance systems, which no seat at the customer can see. No wording fix: this audience cannot know this." },
+ { id:418, text:"Over the last 12 months, how many times did you contact the account team, and how many of those contacts were about problems rather than plans?", min:1.0, know:"Everyone, from memory", who:"all", cx:"High", val:"Medium", core:false, answerBy:null, defect:"RECALL OVERLOAD", topic:"account team responsiveness", tier:"defective", sec:"B", survey:4,
+   flagTxt:"RECALL OVERLOAD. A year of contacts, counted, then split into problems versus plans, from memory. Nobody holds that ledger; respondents invent one, and the inventions look like data." },
+ { id:419, text:"Grid: rate 8 account team functions (responsiveness, expertise, escalation handling, planning, reviews, billing help, training, roadmap briefings) across 4 scales each", min:2.0, know:"Everyone, slowly", who:"all", cx:"High", val:"Medium", core:false, answerBy:null, flag:"mobile", defect:"GRID BURDEN", topic:"planning and reviews", tier:"defective", sec:"B", survey:4,
+   flagTxt:"GRID BURDEN. Thirty-two ratings in one matrix. On a phone it means pinch, scroll and mis-tap, and a tired relationship audience straight-lines the same answer down every row." },
+ { id:420, text:"How world-class is the account team's relationship with your organization, on a scale of 1 to 10?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"trust and candor", tier:"stupid", sec:"B", survey:4, rg:"vanity",
+   flagTxt:"LOW-VALUE · VANITY. The wording solicits a compliment rather than evidence for a study decision." },
+ { id:421, text:"Why has your organization not raised its concerns with the account team sooner?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"trust and candor", tier:"stupid", sec:"B", survey:4, rg:"blame",
+   flagTxt:"LOW-VALUE · BLAME. The question presumes the respondent's organization is at fault for sitting on concerns. Expect defensive answers, not candor about the relationship." },
+ { id:422, text:"In the last 90 days, did you raise a problem with the account team earlier than you would have a year ago? (yes / no / no problems arose)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"trust and candor", tier:"clean", sec:"B", survey:4 },
+ { id:423, text:"Which best describes your contact with the account team? (regular working contact / occasional contact / I handle the commercial side / I have had no contact)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"relationship experience", tier:"clean", sec:"C", survey:4 },
+ { id:424, text:"Thinking of your most recent review meeting with the account team, were the actions agreed there completed by the next meeting? (yes / partly / no / I do not attend review meetings)", min:0.5, know:"Executive or IT Decision Maker", who:"itdm", cx:"Low", val:"Medium", core:false, answerBy:["exec","itdm"], defect:"CLEAN", topic:"planning and reviews", tier:"clean", sec:"C", survey:4 },
+ { id:425, text:"How many times did you meet with the account team last quarter? Choose one: 0-1 / 1-3 / 3-5 / more than 5 / Other", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"BROKEN OPTIONS", topic:"planning and reviews", tier:"defective", sec:"C", survey:4,
+   flagTxt:"BROKEN OPTIONS. 1, 3 and 5 each sit in two ranges, so two honest respondents with the same quarter can pick different boxes, and the unsure land in Other." },
+ { id:426, text:"Has the account team kept the promises it has made to your organization?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"VAGUE TIMEFRAME", topic:"trust and candor", tier:"defective", sec:"C", survey:4,
+   flagTxt:"VAGUE TIMEFRAME. No window at all: every promise ever made is in scope, so a respondent grading a kept promise from last month and one grading a broken one from three years ago answer the same item about different relationships." },
+ { id:427, text:"What is the first name of the account team's lead for your organization?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"relationship experience", tier:"stupid", sec:"C", survey:4, rg:"trivia",
+   flagTxt:"LOW-VALUE · TRIVIA. Recalling a first name does not inform the relationship-study agenda, and it reads as a test the respondent can fail." },
+ { id:428, text:"Roughly how many relationship surveys like this one have you received this year?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"relationship experience", tier:"filler", sec:"C", survey:4 },
+ { id:429, text:"Your answers are confidential and are never linked to your name or organization. Have you ever softened feedback to the account team to avoid an awkward conversation? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"trust and candor", tier:"clean", sec:"D", survey:4 },
+ { id:430, text:"Have you ever considered moving your business to a competitor because of the account team's performance? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"SENSITIVE NO ASSURANCE", topic:"renewal intent", tier:"defective", sec:"D", survey:4,
+   flagTxt:"SENSITIVE, NO ASSURANCE. Asking a named account contact to admit shopping for a competitor, with no confidentiality line and a renewal on the calendar, invites the safe answer. The truthful answer is exactly the one this question cannot collect as written." },
+ { id:431, text:"In your own words, what one change would most improve the account team's support of your organization?", min:1.0, know:"Everyone", who:"all", cx:"Medium", val:"High", core:false, answerBy:null, defect:"CLEAN", topic:"business value delivered", tier:"clean", sec:"E", survey:4 },
+ { id:432, text:"Considering everything about your organization's relationship with the account team so far, from the first introductions and the contracting, through the regular meetings and the escalations and the reviews, the plans you made together and how they turned out, the people who came and went on both sides, and how all of that adds up as one overall impression, please tell us in your own words the complete story of what working with this account team has meant for your organization and everything we could possibly do differently.", min:1.5, know:"Everyone", who:"all", cx:"Medium", val:"Medium", core:false, answerBy:null, defect:"WORDY STEM", topic:"planning and reviews", tier:"defective", sec:"E", survey:4,
+   flagTxt:"WORDY STEM. A paragraph where a sentence would do. The reading load alone spends patience before the respondent types a word. This is the one class SIMPLIFY actually fixes." },
+ { id:433, text:"Which other vendors is your organization evaluating for the services this relationship covers?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"relationship experience", tier:"stupid", sec:"F", survey:4, rg:"nosy",
+   flagTxt:"LOW-VALUE · IRRELEVANT. A customer's vendor evaluations are its own commercial business; asking has no bearing on this study and reads as intelligence gathering." },
+ { id:434, text:"Which day of the week do you prefer to receive surveys on?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"relationship experience", tier:"filler", sec:"F", survey:4 },
+ { id:435, text:"Would you like to receive a quarterly relationship newsletter? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"relationship experience", tier:"filler", sec:"F", survey:4 },
+ { id:436, text:"What device are you answering on right now? (phone / tablet / computer)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"relationship experience", tier:"filler", sec:"F", survey:4 }
+];
+RELATIONSHIP_BANK.forEach(function(q){ QUESTION_BANK.push(q); });
+/* Fixed first-play instruments for migrated levels: each level's
+   curated 12 from its own bank (6 core, all clean except five
+   teaching defectives), installed by applyInstrumentForLevel when
+   no seed is recorded for the level. Level 1's fixed instrument
+   stays QUESTIONS, a subset of its bank; unmigrated levels keep
+   QUESTIONS until their phases. */
 var LEVEL_2_FIXED_IDS = [201,202,203,205,206,209,212,214,216,218,224,230];
 var LEVEL_3_FIXED_IDS = [301,302,303,305,306,307,312,314,318,319,324,330];
+var LEVEL_4_FIXED_IDS = [401,402,403,405,406,407,412,413,415,417,424,430];
 function fixedInstrumentForLevel(n){
   if (n === 2) return LEVEL_2_FIXED_IDS.map(function(id){ return questionById(id); });
   if (n === 3) return LEVEL_3_FIXED_IDS.map(function(id){ return questionById(id); });
+  if (n === 4) return LEVEL_4_FIXED_IDS.map(function(id){ return questionById(id); });
   return QUESTIONS.slice();
 }
 function activeQuestions(){ return state.instrument || QUESTIONS; }
@@ -1284,20 +1405,20 @@ var LEVEL_AGENDA = {
   1:["overall satisfaction","customer effort","self-service gap","renewal risk"],
   2:["adoption breadth","workflow impact","trust in output","output quality","enablement gap"],
   3:["service reliability","cost visibility","migration effort","capability gaps"],
-  4:["overall satisfaction","customer effort","resolution quality"],
+  4:["account team responsiveness","trust and candor","business value delivered","escalation handling","renewal intent"],
   5:["support speed","self-service gap","product reliability","customer effort"],
   6:["overall satisfaction","renewal risk","billing clarity","resolution quality","product reliability"]
 };
 /* Per-level survey records (scope doc section 3.2). The BRD assembly,
    the level cards, and the HUD read these. Agenda and topic-to-persona
    maps live on the record: Insight credits a topic only against the
-   survey that owns it. Phases 1 to 3 write the Level 1, Level 2, and
-   Level 3 records in full (sponsor, purpose, audience). Levels 4-6
-   carry their survey name, their current agenda and constraints,
-   and the mission purpose they have always printed; their sponsor
-   and audience sections complete in their own migration phases, and
-   openBRD omits a section whose field is null rather than inventing
-   one. */
+   survey that owns it. Phases 1 to 4 write the Level 1, Level 2,
+   Level 3, and Level 4 records in full (sponsor, purpose, audience).
+   Levels 5-6 carry their survey name, their current agenda and
+   constraints, and the mission purpose they have always printed;
+   their sponsor and audience sections complete in their own
+   migration phases, and openBRD omits a section whose field is null
+   rather than inventing one. */
 var SURVEY_BASE_CONSTRAINTS = "One credit pool for the whole level, shared across attempts. Choose an audience that can answer the required topics. Preserve useful coverage while controlling burden and data contamination.";
 var SURVEYS = {
   1:{ label:"SUPPORT EXPERIENCE", title:"Support Experience Survey", sponsor:"the Support Experience team",
@@ -1314,10 +1435,11 @@ var SURVEYS = {
     audience:"People whose organizations run workloads on the platform. IT decision makers and frontline technical staff answer architecture, reliability, and migration questions, because they build and operate on the platform; cost figures sit with Partner Admin seats, and whether costs are visible sits with IT decision makers. End users of the finished applications the platform hosts cannot answer tenancy, region, or SKU questions at all, and asking them manufactures guesses.",
     agenda:LEVEL_AGENDA[3], topicKeys:AZURE_TOPIC_KEYS,
     constraints:SURVEY_BASE_CONSTRAINTS + " The sponsor is also this study's stakeholder: the Azure product team has asked for eight extra questions of its own, which is the stakeholder encounter on this level. Accept the request, rotate modules, or push back with evidence. Costs and added burden depend on your response; extra-topic answers are not simulated or scored." },
-  4:{ label:"ACCOUNT TEAM RELATIONSHIP", title:"Account Team Relationship Survey", sponsor:null,
-    purpose:"Improve the support experience using technician and end-user evidence.",
-    audience:null, agenda:LEVEL_AGENDA[4], topicKeys:TOPIC_KEYS,
-    constraints:SURVEY_BASE_CONSTRAINTS + " The tired audience requires ending goodwill 35 or higher." },
+  4:{ label:"ACCOUNT TEAM RELATIONSHIP", title:"Account Team Relationship Survey", sponsor:"the Account Management team",
+    purpose:"Decide where this relationship needs work before the next renewal cycle: whether the account team responds when it matters, whether people trust it enough to raise problems early, whether its work delivers business value, and how escalations land when something has already gone wrong. The findings set the account management team's improvement priorities for the next two quarters and are read alongside account records, never instead of them.",
+    audience:"Named contacts at accounts on the relationship program, surveyed on a cycle: trust, business value, and renewal intent are judged from executive and IT decision maker evidence; escalation handling from the frontline technicians and end users who lived the tickets; commercial process items sit with Partner Admin seats. Perception of the account team is answerable by anyone who deals with the team, which makes candor the design risk on this survey, not knowledge: the sensitive items ask people to judge a team they must keep working with, and this audience has already been surveyed three times this quarter.",
+    agenda:LEVEL_AGENDA[4], topicKeys:RELATIONSHIP_TOPIC_KEYS,
+    constraints:SURVEY_BASE_CONSTRAINTS + " The tired audience requires ending goodwill 35 or higher. Report back (3 cr) is this study's feedback commitment: a relationship audience that never hears what its answers changed stops answering, so telling these accounts what the last round fixed is what protects response on the next cycle." },
   5:{ label:"GENERAL PERCEPTIONS OF MICROSOFT", title:"General Perceptions of Microsoft Survey", sponsor:null,
     purpose:"Improve the support experience using technician and end-user evidence.",
     audience:null, agenda:LEVEL_AGENDA[5], topicKeys:TOPIC_KEYS,
@@ -1787,6 +1909,7 @@ function evidenceMission(){
     purpose: state.level === 6 ? "Inform the renewal decision using decision-maker evidence." :
       state.level === 2 ? "Measure adoption of the AI assistant using the evidence of the people who use it in their daily work." :
       state.level === 3 ? "Judge the cloud platform experience using the evidence of the people who run workloads on it." :
+      state.level === 4 ? "Judge the account team relationship using the evidence of the people who work with the team." :
       "Improve the support experience using technician and end-user evidence."
   };
 }
