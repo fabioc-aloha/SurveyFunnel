@@ -1,5 +1,55 @@
 # Changelog
 
+## 2026-11-10 - Medallion prep stage, phase 1: derived list health
+
+- Step 2 rebuilt as BUILD THE LIST with Bronze / Silver / Gold
+  panels. Each campaign segment now deals a deterministic intake mix
+  (same-system duplicates, second-source duplicates, fixable broken,
+  unfixable broken, stale), jittered per level and instrument seed
+  and shown as counts on the panel and the segment card.
+- New Silver actions: CONSOLIDATE (4 cr) merges second-source
+  duplicates; REPAIR ADDRESSES (5 cr) fixes fixable addresses and
+  quarantines the unfixable. DEDUPE is absorbed into Silver at the
+  same 4 cr; the old Step 2 dedupe toggle is gone. Suppression and
+  validation stay as Gold checks. Silver purchases are owned and
+  delta-charged like all prep.
+- Campaign list health is now derived, replacing the static segment
+  invalid rates: stale plus unrepaired broken, divided by the
+  promoted share. Base-mix endpoints before validation: Fresh 5.0%
+  no work / 3.2% full Silver, Stale 9.5% / 6.1%, Executive Blast
+  16.0% / 10.6%, Tired 5.0% / 3.8%, Global 7.0% / 4.4%. Unmerged
+  duplicates reach the run scaled by their remaining share. Quick
+  Challenges are unchanged: no stage, provided list prep, the
+  provided-list rate model.
+- The campaign report gains a LIST PREPARATION ledger (Bronze in,
+  Silver merges, repairs and quarantine, Gold promoted count, list
+  health at launch); the BRD gains a LIST PREPARATION section with
+  the dealt mix and per-action consequences; the field guide gains
+  entries for the layers, dedupe vs consolidation, repair vs
+  validation, quarantine, and derived list health.
+- Balance: the witness corpus was regenerated through the game's
+  real handlers under the derived-rate model at the same size (364
+  setups). Minimum and fixed credits-to-win are unchanged on every
+  level; 14 setups absorbed added Silver work (mostly CONSOLIDATE).
+  No prices or pools changed. Five new Node tests cover the intake
+  draw, the derived endpoints, skip consequences, and Silver
+  charging; the browser harness gains a medallion scenario for the
+  layer panels and the report ledger.
+
+## 2026-11-10 - Medallion prep stage design (documentation only)
+
+- Added [docs/medallion-prep-stage.md](docs/medallion-prep-stage.md):
+  a scoped design proposal for a playable list-preparation stage
+  (Bronze, Silver, Gold) that rebuilds Step 2. It covers the intake
+  draw and its defect classes, Silver and Gold actions with proposed
+  prices, absorption of the dedupe toggle, derived list health
+  replacing the static segment invalid rates, per-level and Quick
+  Challenge treatment, the report's list-preparation ledger, teaching
+  goals, three build phases, and seven open decisions for the owner.
+  Every number in the document is labeled a proposal.
+- Documentation only: no game code, tests, or balance changed, and
+  the deployment package is unchanged.
+
 ## 2026-11-10 - Favicon and apple touch icon
 
 - Added site icons drawn from the game's own IM sprite: the MGR_NORMAL

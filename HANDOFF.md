@@ -20,6 +20,14 @@
 - Quick Challenge stages 2 and 3 are already implemented. New Azure
   provisioning and DNS/custom-domain work remain manual and outside
   this release.
+- Local, not yet pushed: medallion prep stage phase 1 (derived list
+  health) is built and committed on top of the design commit. Step 2
+  is Bronze / Silver / Gold, campaign invalid rates are derived from
+  a dealt intake mix, and the witness corpus was regenerated at the
+  same 364 setups with unchanged minimum credits-to-win. Full local
+  gates pass (build, Node suite, browser harness with the new
+  medallion scenario). Production still runs `b45bb69` plus the
+  2026-11-10 copy, favicon, and design commits until this is pushed.
 
 ## Acceptance boundary
 

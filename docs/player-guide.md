@@ -52,12 +52,19 @@ progress or spends the campaign's credits.
 ## A campaign round, step by step
 
 1. **AUDIENCE.** Pick a segment. Read its size, persona mix,
-   relevance, contact history, List Health (percent of addresses
-   invalid), and starting goodwill before you commit.
-2. **Prepare the list.** Buy preparation with credits: email
-   validation (BrightVerify) at skip, partial, or full; dedupe;
-   suppression scrub (opt outs and recently surveyed); localization
-   review. These are simulated preparation choices, not live service integrations.
+   relevance, contact history, the intake mix its list arrives with
+   (duplicates, broken and stale records), and starting goodwill
+   before you commit.
+2. **Build the list.** The list arrives in Bronze, raw. Buy Silver
+   work with credits: dedupe (merges same-system duplicates),
+   consolidate (merges second-source duplicates, one record per
+   person), repair addresses (fixes fixable addresses, quarantines
+   the unfixable). What survives is promoted to the Gold contact
+   master; its list health is derived from what arrived and what you
+   fixed, and stale records have no fix. Then the Gold checks: email
+   validation (BrightVerify) at skip, partial, or full; suppression
+   scrub (opt outs and recently surveyed); localization review.
+   These are simulated preparation choices, not live service integrations.
 3. **INVITATION.** Pick a variant and a reminder count. Generic is
    free and weak. Honest Ask promises five minutes and explains why
    the recipient was selected; keep the questionnaire within that
@@ -112,7 +119,9 @@ Prices:
 | Send: Fresh or Stale segment | 30 |
 | Send: Executive Blast | 45 |
 | Validation (BrightVerify): partial / full | 6 / 12 (full is 18 on Blast) |
-| Dedupe | 4 |
+| Dedupe (Silver) | 4 |
+| Consolidate (Silver) | 4 |
+| Repair addresses (Silver) | 5 |
 | Suppression scrub | 4 |
 | Localization review | 8 |
 | Invite: Generic / Honest Ask / Known Name | 0 / 4 / 10 |

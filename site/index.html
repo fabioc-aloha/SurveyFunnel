@@ -711,6 +711,14 @@
       </ul>
       <h3>SIMULATION AND PRIVACY</h3>
       <p>All outcomes are simulated from your choices. The game sends no email and uses no real customer data. The same instrument and choices produce identical results from the same starting state. A retry changes that state: credits, goodwill, reputation, and owned preparation carry over.</p>
+      <h3>THE LIST: BRONZE, SILVER, GOLD</h3>
+      <ul>
+        <li><b>Bronze / Silver / Gold layers:</b> the list pipeline. Bronze holds records exactly as they arrive: duplicates, broken addresses, stale records and all. Silver is where records are cleaned: duplicates merged, addresses repaired, the unfixable quarantined. Gold is the promoted contact master: only records that survived Silver are mailed from it. Each layer's output is the next layer's input, so a defect skipped in Silver is mailed from Gold.</li>
+        <li><b>Dedupe vs consolidation:</b> dedupe merges records the same system created twice (same address, two rows). Consolidation merges records that arrived from different sources about the same person, where the addresses differ. Neither sees the other's duplicates; a list can need both.</li>
+        <li><b>Repair vs validation:</b> repair fixes an address before promotion (a known typo pattern, a moved office). Validation checks deliverability at send time and removes what would bounce. Repair works on what the list knows; validation tests what the mail system will accept. They are not substitutes.</li>
+        <li><b>Quarantine:</b> holding a record out of promotion without deleting it. An unfixable address is quarantined in Silver so it never reaches Gold; the record stays auditable instead of silently vanishing.</li>
+        <li><b>Derived list health:</b> the invalid rate is computed from what the list actually contains and what work was done on it: stale records plus unrepaired broken addresses, divided by the records promoted. It is not a fixed property of a list; the same list is healthier after Silver work and worse after none.</li>
+      </ul>
       <h3>THE THREE SCORES</h3>
       <ul>
         <li><b>Response rate:</b> completed questionnaires divided by invitations actually sent, including bounced invitations. This is the game's simplified measure, not an AAPOR response rate: eligibility and full case dispositions are not modeled. A higher rate does not establish lower nonresponse bias.</li>
@@ -766,23 +774,23 @@ var PERSONAS = {
 var PKEYS = ["exec","tech","admin","itdm","end"];
 
 var SEGMENTS = [
-  { id:"fresh", name:"Support, Fresh", n:10000, goodwill:72, relevance:1.15, relevanceTxt:"High", sendCost:30, invalidPct:0.03, lastCleaned:"Cleaned last quarter",
+  { id:"fresh", name:"Support, Fresh", n:10000, goodwill:72, relevance:1.15, relevanceTxt:"High", sendCost:30, invalidPct:0.03, lastCleaned:"Cleaned last quarter", intake:{ dupSys:0.03, dupSecond:0.02, brokenFix:0.015, brokenDead:0.005, stale:0.03 },
     timing:"3 days after a closed support case", history:"Last surveyed 6 weeks ago",
     mix:{ tech:.34, end:.30, admin:.14, itdm:.12, exec:.10 },
     blurb:"Case still fresh in memory. Relevance as good as it gets." },
-  { id:"stale", name:"Support, Stale", n:12000, goodwill:58, relevance:0.8, relevanceTxt:"Faded", sendCost:30, invalidPct:0.09, lastCleaned:"Not cleaned in 9 months",
+  { id:"stale", name:"Support, Stale", n:12000, goodwill:58, relevance:0.8, relevanceTxt:"Faded", sendCost:30, invalidPct:0.09, lastCleaned:"Not cleaned in 9 months", intake:{ dupSys:0.05, dupSecond:0.04, brokenFix:0.03, brokenDead:0.01, stale:0.055 },
     timing:"45 days after a closed support case", history:"Last surveyed 6 weeks ago",
     mix:{ tech:.34, end:.30, admin:.14, itdm:.12, exec:.10 },
     blurb:"Same people as Fresh, six weeks on. Half barely remember the case." },
-  { id:"blast", name:"Executive Blast", n:20000, goodwill:49, relevance:0.65, relevanceTxt:"Low", trap:true, sendCost:45, invalidPct:0.16, lastCleaned:"Never cleaned · assembled from old exports",
+  { id:"blast", name:"Executive Blast", n:20000, goodwill:49, relevance:0.65, relevanceTxt:"Low", trap:true, sendCost:45, invalidPct:0.16, lastCleaned:"Never cleaned · assembled from old exports", intake:{ dupSys:0.07, dupSecond:0.06, brokenFix:0.05, brokenDead:0.02, stale:0.09 },
     timing:"Cold list, no recent touchpoint", history:"Already surveyed twice this quarter",
     mix:{ exec:.55, itdm:.20, tech:.10, end:.08, admin:.07 },
     blurb:"Biggest list, fastest to burn: 2-minute patience, low relevance, goodwill pre-spent." },
-  { id:"tired", name:"Tired List · Surveyed 3×", n:9000, goodwill:25, relevance:1.05, relevanceTxt:"Decent", sendCost:30, invalidPct:0.05, lastCleaned:"Cleaned last quarter",
+  { id:"tired", name:"Tired List · Surveyed 3×", n:9000, goodwill:25, relevance:1.05, relevanceTxt:"Decent", sendCost:30, invalidPct:0.05, lastCleaned:"Cleaned last quarter", intake:{ dupSys:0.04, dupSecond:0.03, brokenFix:0.01, brokenDead:0.005, stale:0.035 },
     timing:"Recent case, but surveyed 3 times this quarter", history:"Surveyed 3 times this quarter · fatigued",
     mix:{ tech:.30, end:.32, admin:.16, itdm:.12, exec:.10 },
     blurb:"Surveyed 3× this quarter. Goodwill 25: only a short send that reports back restores it." },
-  { id:"multi", name:"Global · Five Language Groups", n:15000, goodwill:68, relevance:1.0, relevanceTxt:"Good", sendCost:30, invalidPct:0.06, lastCleaned:"Cleaned last quarter",
+  { id:"multi", name:"Global · Five Language Groups", n:15000, goodwill:68, relevance:1.0, relevanceTxt:"Good", sendCost:30, invalidPct:0.06, lastCleaned:"Cleaned last quarter", intake:{ dupSys:0.045, dupSecond:0.035, brokenFix:0.02, brokenDead:0.01, stale:0.04 },
     timing:"7 days after a closed case, across regions", history:"Last surveyed 8 weeks ago",
     mix:{ tech:.28, end:.34, admin:.16, itdm:.12, exec:.10 },
     blurb:"English is only 40% of this list; English-only sends leak elsewhere." }
@@ -1055,7 +1063,7 @@ var state = {
   qstate: {}, /* id -> keep|simplify|cut */
   sound: true, lastRound: null, running: false, speed: 1,
   bestGrade: null, bestRate: 0,
-  validation: "skip", dedupe: false, suppression: false, localization: false,
+  validation: "skip", dedupe: false, consolidate: false, repair: false, suppression: false, localization: false, intake: null,
   level: 1, abEnabled: false, abInvite: "generic", stakeholder: null, reportBack: false, langChoice: "en",
   campaignBest: {}, campaignWon: {}, unlocked: 1, abVerdictChoice: null, added: {},
   /* v1.3 attempt economy */
@@ -1315,6 +1323,49 @@ function choiceKey(){
     activeQuestions().map(function(q){ return state.qstate[q.id][0]; }).join("") + "|" +
     addBankQuestions().map(function(q){ return state.added[q.id] ? "1" : "0"; }).join("") + "|" + state.validation + "|" + (state.dedupe?1:0) + (state.suppression?1:0);
 }
+/* ================= LIST INTAKE (BRONZE / SILVER / GOLD) =================
+   Campaign list health is derived, never stored: each segment deals an
+   intake mix of five record classes, jittered deterministically per
+   level and instrument seed. Silver work removes classes; the invalid
+   rate is what the remaining broken and stale records make it. Quick
+   Challenges keep the provided-list rate (state.seg.invalidPct). The
+   intake parameters deliberately stay out of choiceKey: they enter the
+   run as rates and factors, not as a re-seed. */
+var INTAKE_CLASSES = ["dupSys", "dupSecond", "brokenFix", "brokenDead", "stale"];
+function drawIntakeMix(seg){
+  var base = (seg && seg.intake) || { dupSys: 0, dupSecond: 0, brokenFix: 0, brokenDead: 0, stale: 0 };
+  var rng = mulberry(hashStr("intake|" + state.level + "|" + (state.instrumentSeed || "")));
+  var mix = {};
+  INTAKE_CLASSES.forEach(function(k){
+    mix[k] = Math.max(0, base[k] + (rng() - 0.5) * 0.03);
+  });
+  return mix;
+}
+function intakeKey(){ return state.level + "|" + (state.instrumentSeed || "") + "|" + (state.seg ? state.seg.id : ""); }
+function currentIntake(){
+  if (!state.intake || state.intake.key !== intakeKey()) state.intake = { key: intakeKey(), mix: drawIntakeMix(state.seg) };
+  return state.intake.mix;
+}
+function intakeDerived(mix, silver){
+  var merged = (silver.dedupe ? mix.dupSys : 0) + (silver.consolidate ? mix.dupSecond : 0);
+  var quarantined = silver.repair ? mix.brokenDead : 0;
+  var promotedShare = Math.max(0.0001, 1 - merged - quarantined);
+  var unrepaired = silver.repair ? 0 : (mix.brokenFix + mix.brokenDead);
+  return { merged: merged, quarantined: quarantined, promotedShare: promotedShare,
+    invalid: (mix.stale + unrepaired) / promotedShare,
+    totalDup: mix.dupSys + mix.dupSecond,
+    remainingDup: (silver.dedupe ? 0 : mix.dupSys) + (silver.consolidate ? 0 : mix.dupSecond) };
+}
+function silverState(){ return { dedupe: !!state.dedupe, consolidate: !!state.consolidate, repair: !!state.repair }; }
+function baseInvalidRate(){
+  if (state.quickChallenge || !state.seg || !state.seg.intake) return state.seg ? state.seg.invalidPct : 0;
+  return intakeDerived(currentIntake(), silverState()).invalid;
+}
+function duplicateFactor(){
+  if (state.quickChallenge || !state.seg || !state.seg.intake) return state.dedupe ? 0 : 1;
+  var d = intakeDerived(currentIntake(), silverState());
+  return d.totalDup > 0 ? d.remainingDup / d.totalDup : 0;
+}
 /* ---- v1.3 random instrument generation (seeded, reproducible) ---- */
 function shuffleWith(rng, arr){ var a = arr.slice(); for (var i = a.length - 1; i > 0; i--){ var j = Math.floor(rng() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
 function generateInstrument(level, seedStr){
@@ -1370,13 +1421,13 @@ function randomSeedStr(){
 /* ---- v1.3 attempt-chain accounting ---- */
 function pristineBaseline(){
   var qs = {}; QUESTION_BANK.forEach(function(q){ qs[q.id] = "keep"; });
-  return { qstate: qs, added: {}, validation: "skip", dedupe: false, suppression: false, localization: false,
+  return { qstate: qs, added: {}, validation: "skip", dedupe: false, consolidate: false, repair: false, suppression: false, localization: false,
            escapes: false, stakeholder: null, abEnabled: false, reportBack: false, langChoice: "en" };
 }
 function snapshotCurrent(){
   var qs = {}; QUESTION_BANK.forEach(function(q){ qs[q.id] = state.qstate[q.id] || "keep"; });
   var ad = {}; addBankQuestions().forEach(function(q){ ad[q.id] = !!state.added[q.id]; });
-  return { qstate: qs, added: ad, validation: state.validation, dedupe: state.dedupe, suppression: state.suppression,
+  return { qstate: qs, added: ad, validation: state.validation, dedupe: state.dedupe, consolidate: state.consolidate, repair: state.repair, suppression: state.suppression,
            localization: state.localization, escapes: state.escapes, stakeholder: state.stakeholder,
            abEnabled: state.abEnabled, reportBack: state.reportBack, langChoice: state.langChoice };
 }
@@ -1818,6 +1869,8 @@ function budgetMath(ov){
   var rem = ov.reminders !== undefined ? ov.reminders : state.reminders;
   var val = ov.validation || state.validation;
   var ded = ov.dedupe !== undefined ? ov.dedupe : state.dedupe;
+  var con = ov.consolidate !== undefined ? ov.consolidate : state.consolidate;
+  var rep = ov.repair !== undefined ? ov.repair : state.repair;
   var sup = ov.suppression !== undefined ? ov.suppression : state.suppression;
   var loc = ov.localization !== undefined ? ov.localization : state.localization;
   var esc = ov.escapes !== undefined ? ov.escapes : state.escapes;
@@ -1827,6 +1880,10 @@ function budgetMath(ov){
      upgrade difference or a first purchase in this attempt is charged. */
   var valCharge = Math.max(0, validationCostFor(seg, val) - validationCostFor(seg, base.validation));
   var dedCharge = (ded && !base.dedupe) ? 4 : 0;
+  /* Silver actions charge once, like dedupe; Quick Challenges provide
+     list prep under their contract, so Silver is never charged there. */
+  var conCharge = (!state.quickChallenge && con && !base.consolidate) ? 4 : 0;
+  var repCharge = (!state.quickChallenge && rep && !base.repair) ? 5 : 0;
   var supCharge = (sup && !base.suppression) ? 4 : 0;
   var locCharge = (loc && !base.localization) ? 8 : 0;
   /* New instrument edits this attempt, measured against the baseline the
@@ -1856,7 +1913,9 @@ function budgetMath(ov){
   var langCharge = (state.langChoice === "localized" && base.langChoice !== "localized") ? 4 : 0;
   var prepItems = [
     ["Validate emails (BrightVerify) · " + val + (base.validation !== "skip" && val === base.validation ? " · OWNED" : valCharge && base.validation !== "skip" ? " · upgrade" : ""), valCharge],
-    ["Dedupe pass" + (base.dedupe ? " · OWNED" : ""), dedCharge],
+    ["Dedupe · Silver" + (base.dedupe ? " · OWNED" : ""), dedCharge],
+    ["Consolidate · Silver" + (base.consolidate ? " · OWNED" : ""), conCharge],
+    ["Repair addresses · Silver" + (base.repair ? " · OWNED" : ""), repCharge],
     ["Suppression scrub" + (base.suppression ? " · OWNED" : ""), supCharge],
     ["Localization review" + (base.localization ? " · OWNED" : ""), locCharge]
   ];
@@ -1926,13 +1985,34 @@ function renderPrep(){
     var label = ownedTier ? "OWNED" : (valRank[v[0]] > valRank[base.validation] && base.validation !== "skip" ? (v[2] - validationCostFor(state.seg, base.validation)) + " CR UPGRADE" : v[2] + " CR");
     return '<button class="segbtn' + (state.validation === v[0] ? " sel" : "") + '" data-val="' + v[0] + '"' + (belowOwned || cant ? " disabled title=\"" + (belowOwned ? "A higher tier is already owned" : "Not enough budget in the remaining pool") + "\"" : "") + '>' + v[1] + '<small>' + label + '</small></button>';
   }).join("");
-  el.innerHTML = '<div class="lever-head" style="margin-top:14px"><span class="lever-no" style="background:var(--blue)">STEP 2</span><span class="lever-title" style="font-size:12px">PREPARE THE LIST</span><span class="lever-sub">Bought before launch, same credits.</span></div>' +
-    '<div class="prepgrid">' +
-    '<div class="prow"><span class="pt">Validate emails (BrightVerify)</span><div class="valbtns">' + valBtns + '</div><div class="pe">Full checks the whole list; Partial the riskiest half. Removes most invalid addresses — a small share always survives: catch-all domains cannot be verified.</div></div>' +
-    tog("dedupe", state.dedupe, 4, "Dedupe pass", "Removes duplicate addresses: nobody gets the survey twice or counts twice.") +
-    tog("suppression", state.suppression, 4, "Suppression scrub", "Removes opt-outs and anyone surveyed in the last 30 days. Skip it: they get mailed anyway, \u22126 goodwill.") +
-    tog("localization", state.localization, 8, "Localization review", "Plain-language and locale check across the list\u2019s languages. +2 data quality.") +
-    '</div>';
+  if (state.quickChallenge){
+    el.innerHTML = '<div class="lever-head" style="margin-top:14px"><span class="lever-no" style="background:var(--blue)">STEP 2</span><span class="lever-title" style="font-size:12px">PREPARE THE LIST</span><span class="lever-sub">Bought before launch, same credits.</span></div>' +
+      '<div class="prepgrid">' +
+      '<div class="prow"><span class="pt">Validate emails (BrightVerify)</span><div class="valbtns">' + valBtns + '</div><div class="pe">Full checks the whole list; Partial the riskiest half. Removes most invalid addresses — a small share always survives: catch-all domains cannot be verified.</div></div>' +
+      tog("dedupe", state.dedupe, 4, "Dedupe pass", "Removes duplicate addresses: nobody gets the survey twice or counts twice.") +
+      tog("suppression", state.suppression, 4, "Suppression scrub", "Removes opt-outs and anyone surveyed in the last 30 days. Skip it: they get mailed anyway, \u22126 goodwill.") +
+      tog("localization", state.localization, 8, "Localization review", "Plain-language and locale check across the list\u2019s languages. +2 data quality.") +
+      '</div>';
+  } else {
+    var mix = currentIntake(), n = state.seg.n;
+    var cnt = function(k){ return fmt(Math.round(mix[k] * n)); };
+    var dNow = intakeDerived(mix, silverState());
+    var arrivedBad = Math.round((mix.dupSys + mix.dupSecond + mix.brokenFix + mix.brokenDead + mix.stale) * n);
+    var healthPct = (dNow.invalid * 100).toFixed(1);
+    var healthColor = dNow.invalid >= 0.12 ? "var(--red)" : dNow.invalid >= 0.06 ? "var(--gold)" : "var(--teal)";
+    el.innerHTML = '<div class="lever-head" style="margin-top:14px"><span class="lever-no" style="background:var(--blue)">STEP 2</span><span class="lever-title" style="font-size:12px">BUILD THE LIST</span><span class="lever-sub">Bronze in, Silver work, Gold out.</span></div>' +
+      '<div class="prepgrid">' +
+      '<div class="prow"><span class="pt">BRONZE · RECORDS IN</span><div class="pe">' + fmt(n) + ' records as they arrived: ' + cnt("dupSys") + ' same-system duplicates · ' + cnt("dupSecond") + ' second-source duplicates · ' + cnt("brokenFix") + ' fixable broken · ' + cnt("brokenDead") + ' unfixable broken · ' + cnt("stale") + ' stale. ' + fmt(Math.max(0, n - arrivedBad)) + ' arrive clean. Bronze takes records as they arrive; nothing is fixed here.</div></div>' +
+      tog("dedupe", state.dedupe, 4, "DEDUPE · SILVER", "Merges the " + cnt("dupSys") + " same-system duplicate records into one. Skip it: duplicates are mailed and can answer twice.") +
+      tog("consolidate", state.consolidate, 4, "CONSOLIDATE · SILVER", "Merges the " + cnt("dupSecond") + " second-source duplicates: one record per person. Dedupe alone cannot see these.") +
+      tog("repair", state.repair, 5, "REPAIR ADDRESSES · SILVER", "Fixes the " + cnt("brokenFix") + " fixable addresses; quarantines the " + cnt("brokenDead") + " unfixable, never promoted. Skip it: broken addresses promote and bounce.") +
+      '<div class="prow"><span class="pt">SILVER OUTPUT</span><div class="pe">' + fmt(Math.round(dNow.promotedShare * n)) + ' records after merges and quarantine.</div></div>' +
+      '<div class="prow"><span class="pt">GOLD · CONTACT MASTER</span><div class="pe">List health after your list work: <b style="color:' + healthColor + '">' + healthPct + '% invalid</b>. Stale records and broken addresses you did not repair set this rate. Validation and the suppression check run on the promoted list below.</div></div>' +
+      '<div class="prow"><span class="pt">Validate emails (BrightVerify)</span><div class="valbtns">' + valBtns + '</div><div class="pe">Full checks the whole list; Partial the riskiest half. Removes most invalid addresses — a small share always survives: catch-all domains cannot be verified.</div></div>' +
+      tog("suppression", state.suppression, 4, "Suppression scrub · GOLD CHECK", "Removes opt-outs and anyone surveyed in the last 30 days. Skip it: they get mailed anyway, \u22126 goodwill.") +
+      tog("localization", state.localization, 8, "Localization review", "Plain-language and locale check across the list\u2019s languages. +2 data quality.") +
+      '</div>';
+  }
   Array.prototype.forEach.call(el.querySelectorAll("[data-val]"), function(btn){
     btn.addEventListener("click", function(){ state.touched.prep = true; var before = budgetMath().attemptCost; state.validation = btn.getAttribute("data-val"); if (state.validation !== "skip") sndScan(); if (budgetMath().attemptCost > before) sndSpend(); else if (budgetMath().attemptCost < before) sndRefund(); else sndClick(); renderPrep(); renderSegments(); renderReadout(); });
   });
@@ -2010,7 +2090,7 @@ function resetChainState(){
   state.chainActive=false; state.bestAttemptRate=0; state.launchCost=0; state.launchedSnapshot=null; state.reportShown=false;
   state.baseline=pristineBaseline();
   state.stakeholder=null; state.abEnabled=false; state.reportBack=false; state.langChoice="en"; state.abVerdictChoice=null;
-  state.validation="skip"; state.dedupe=false; state.suppression=false; state.localization=false; state.escapes=false;
+  state.validation="skip"; state.dedupe=false; state.consolidate=false; state.repair=false; state.suppression=false; state.localization=false; state.escapes=false; state.intake=null;
   var eb=$("escBtn"); if(eb){ eb.textContent="ESCAPES: OFF"; eb.classList.remove("on"); }
   state.invite=INVITES[2]; state.reminders=1; state.added={};
   QUESTION_BANK.forEach(function(q){ state.qstate[q.id]="keep"; });
@@ -2121,7 +2201,11 @@ function renderSegments(){
       "<span>Timing: <b>" + sg.timing + "</b></span>" +
       "<span>Relevance: <b>" + sg.relevanceTxt + "</b></span>" +
       "<span>Contact history: <b>" + sg.history + "</b></span>" +
-      "<span>List health: <b style='color:" + (sg.invalidPct >= 0.12 ? "var(--red)" : sg.invalidPct >= 0.06 ? "var(--gold)" : "var(--teal)") + "'>" + Math.round(sg.invalidPct*100) + "% invalid</b> · " + sg.lastCleaned + "</span>" +
+      (state.quickChallenge || !sg.intake
+        ? "<span>List health: <b style='color:" + (sg.invalidPct >= 0.12 ? "var(--red)" : sg.invalidPct >= 0.06 ? "var(--gold)" : "var(--teal)") + "'>" + Math.round(sg.invalidPct*100) + "% invalid</b> · " + sg.lastCleaned + "</span>"
+        : (function(){ var cm = drawIntakeMix(sg); var cd = intakeDerived(cm, silverState()); var cc = function(k){ return fmt(Math.round(cm[k] * sg.n)); };
+            return "<span>Intake: <b>" + cc("dupSys") + " + " + cc("dupSecond") + " duplicates · " + cc("brokenFix") + " + " + cc("brokenDead") + " broken · " + cc("stale") + " stale</b></span>" +
+              "<span>List health after your list work: <b style='color:" + (cd.invalid >= 0.12 ? "var(--red)" : cd.invalid >= 0.06 ? "var(--gold)" : "var(--teal)") + "'>" + (cd.invalid*100).toFixed(1) + "% invalid</b></span>"; })()) +
       "<span>Send cost: <b>" + sg.sendCost + " credits</b></span></div>" +
       mixBarHTML(sg.mix) + '<div class="mixlegend">' + legend + "</div>" +
       '<div class="gwlabel"><span>GOODWILL</span><b>' + currentGoodwill + " / 100</b></div>" +
@@ -2377,7 +2461,7 @@ function tightestPersona(){
 function renderChecklist(){
   var el = $("launchCheck"); if (!el) return;
   var t = state.touched || {};
-  var prepDone = t.prep || state.validation !== "skip" || state.dedupe || state.suppression || state.localization || (state.baseline && (state.baseline.validation !== "skip" || state.baseline.dedupe || state.baseline.suppression || state.baseline.localization));
+  var prepDone = t.prep || state.validation !== "skip" || state.dedupe || state.consolidate || state.repair || state.suppression || state.localization || (state.baseline && (state.baseline.validation !== "skip" || state.baseline.dedupe || state.baseline.consolidate || state.baseline.repair || state.baseline.suppression || state.baseline.localization));
   var reviewDone = !!t.review || activeQuestions().some(function(q){ return state.qstate[q.id] !== "keep"; }) || addedCount() > 0;
   var rows = [
     ["Segment chosen (Step 1)", !!(t.seg || state.chainActive)],
@@ -2459,10 +2543,27 @@ function openBRD(){
   if (!quick && state.level === 4) constraints += " The tired audience requires ending goodwill 35 or higher.";
   if (!quick && state.level === 5) constraints += " The multilingual list is 40% English-speaking. Consider invitation language and localization review.";
   if (!quick && state.level === 6) constraints += " Executive Blast is the available audience for this study.";
+  var listPrepBRD = "";
+  if (!quick && state.seg && state.seg.intake){
+    var bm = currentIntake(), bn = state.seg.n;
+    var bc = function(k){ return fmt(Math.round(bm[k] * bn)) + " (" + (bm[k] * 100).toFixed(1) + "%)"; };
+    var bNone = intakeDerived(bm, { dedupe: false, consolidate: false, repair: false });
+    var bFull = intakeDerived(bm, { dedupe: true, consolidate: true, repair: true });
+    var bNow = intakeDerived(bm, silverState());
+    listPrepBRD = '<h3>LIST PREPARATION · BRONZE / SILVER / GOLD</h3>' +
+      '<p>The list for ' + state.seg.name + ' arrives as ' + fmt(bn) + ' Bronze records: ' + bc("dupSys") + ' same-system duplicates, ' + bc("dupSecond") + ' second-source duplicates, ' + bc("brokenFix") + ' fixable broken addresses, ' + bc("brokenDead") + ' unfixable broken addresses, ' + bc("stale") + ' stale records. The mix is dealt per instrument; the same seed always deals the same mix.</p>' +
+      '<ul>' +
+      '<li><b>DEDUPE (Silver, 4 cr)</b> merges same-system duplicates. Skipping it: duplicates are mailed and can answer twice; duplicate responses are removed at CLEAN and earn nothing.</li>' +
+      '<li><b>CONSOLIDATE (Silver, 4 cr)</b> merges second-source duplicates into one record per person. Dedupe cannot see these.</li>' +
+      '<li><b>REPAIR ADDRESSES (Silver, 5 cr)</b> fixes fixable addresses and quarantines unfixable ones out of promotion. Skipping it: broken addresses promote and bounce.</li>' +
+      '<li><b>Stale records</b> have no Silver fix: they promote and set the floor of the list\u2019s invalid rate. Validation (Gold) removes most of what remains, priced on the promoted list.</li>' +
+      '</ul>' +
+      '<p>List health is derived, not stored: invalid records (stale plus unrepaired broken) divided by promoted records. This list runs <b>' + (bNone.invalid * 100).toFixed(1) + '% invalid with no Silver work</b>, <b>' + (bFull.invalid * 100).toFixed(1) + '% with the full Silver line</b>, and <b>' + (bNow.invalid * 100).toFixed(1) + '% as currently configured</b>, before validation.</p>';
+  }
   $("brdContent").innerHTML = '<h2>BRD</h2><p>Business Requirement Document</p><h3>'+L.name+(quick?"":" · "+L.difficulty)+'</h3><h3>STUDY PURPOSE</h3><p>Collect credible answers on the required business topics below. A high response rate alone does not establish useful evidence.</p><h3>REQUIRED TOPICS AND RESPONDENTS</h3><ul>'+agendaTopics().map(function(topic){
     var personas=(TOPIC_KEYS[topic]||[]).map(function(key){return PERSONAS[key].name;}).join(" or ");
     return '<li><b>'+topic+'</b>: credible answers from '+personas+'.</li>';
-  }).join("")+'</ul><h3>ACCEPTANCE CRITERIA</h3>'+(quick ? '<p>Response strictly above '+targetPct(L.target)+'% of invitations actually sent. Data quality '+quickQualityGate()+' and Insight '+insightGate()+'+.</p>' : '<p>Pass all five evidence checks; none can compensate for another.</p>'+evidenceRequirementsHTML())+'<ul><li>Budget: '+L.budget+' credits'+(quick?' for one launch, plus a follow-up wave if a complication lands.':' across all attempts.')+'</li>'+(!quick && state.level===4?'<li>Maintain ending goodwill 35 or higher.</li>':"")+(quick?'<li>Repair all three BRD cards and resolve each extra by repair or cut; kept unresolved extras and cuts of BRD cards do not complete the challenge.</li>':"")+(tv?'<li>Twist · '+tv.name+': '+tv.acceptance+'</li>':"")+'</ul><h3>STUDY CONSTRAINTS</h3><p>'+constraints+'</p>'+(tv?'<h3>BRD TWIST · '+tv.name+'</h3><p>'+tv.brief+'</p><p>Drawn for this run from seed <b>'+state.quickChallenge.seed+'</b> with the same seeded draw that deals the instruments: the same seed always deals the same brief. A retry draws a new brief.</p>':"")+'<p>These are the active study requirements, not a forecast. Consult MPOR for game rules, scoring definitions, and simulation limitations.</p>';
+  }).join("")+'</ul><h3>ACCEPTANCE CRITERIA</h3>'+(quick ? '<p>Response strictly above '+targetPct(L.target)+'% of invitations actually sent. Data quality '+quickQualityGate()+' and Insight '+insightGate()+'+.</p>' : '<p>Pass all five evidence checks; none can compensate for another.</p>'+evidenceRequirementsHTML())+'<ul><li>Budget: '+L.budget+' credits'+(quick?' for one launch, plus a follow-up wave if a complication lands.':' across all attempts.')+'</li>'+(!quick && state.level===4?'<li>Maintain ending goodwill 35 or higher.</li>':"")+(quick?'<li>Repair all three BRD cards and resolve each extra by repair or cut; kept unresolved extras and cuts of BRD cards do not complete the challenge.</li>':"")+(tv?'<li>Twist · '+tv.name+': '+tv.acceptance+'</li>':"")+'</ul><h3>STUDY CONSTRAINTS</h3><p>'+constraints+'</p>'+(tv?'<h3>BRD TWIST · '+tv.name+'</h3><p>'+tv.brief+'</p><p>Drawn for this run from seed <b>'+state.quickChallenge.seed+'</b> with the same seeded draw that deals the instruments: the same seed always deals the same brief. A retry draws a new brief.</p>':"")+listPrepBRD+'<p>These are the active study requirements, not a forecast. Consult MPOR for game rules, scoring definitions, and simulation limitations.</p>';
   openReference("studyBRD", "brdClose", "brdBtn");
 }
 var activeReference = null;
@@ -2527,7 +2628,7 @@ $("spd2").addEventListener("click", function(){ setSpeed(2); });
 /* ================= SIMULATION ================= */
 var GATE_X = { invited: 4, delivered: 21, opened: 40, started: 60, finish: 93 };
 function effInvalidRate(){
-  var base = state.seg.invalidPct;
+  var base = baseInvalidRate();
   if (state.validation === "full") return base * 0.15;
   if (state.validation === "partial") return base * 0.45;
   return base;
@@ -2550,6 +2651,7 @@ function buildRun(animationTarget){
   var keptDefects = {};
   kept.forEach(function(q){ if (state.qstate[q.id] === "keep" && defectOf(q) !== "CLEAN") keptDefects[defectOf(q)] = true; });
   var totalMin = estMinutes(), invalidRate = effInvalidRate(), reputation = repMath();
+  var dupF = duplicateFactor();
   var cums = [], runningMin = state.escapes ? 0.5 : 0;
   kept.forEach(function(q){ runningMin += effMin(q); cums.push(runningMin); });
   var gridQ = kept.filter(function(q){ return q.flag === "mobile"; })[0];
@@ -2585,7 +2687,7 @@ function buildRun(animationTarget){
     }
     sp.events.push({ t: sp.spawnAt + 650, type: "gate", gate: "delivered" });
     if (!state.suppression && s < Math.round(seg.n * 0.05)) sp.angry = true;
-    if (!state.dedupe && rng() < 0.18) sp.dupEnv = true;
+    if (dupF > 0 && rng() < 0.18 * dupF) sp.dupEnv = true;
 
     /* OPEN */
     var invSp = inv; if(state.abEnabled && sp.abGroup==="B"){ invSp = INVITES.filter(function(x){return x.id===state.abInvite;})[0]||inv; }
@@ -2676,7 +2778,7 @@ function buildRun(animationTarget){
       var pSpeed = Math.max(0, Math.min(0.30, 0.02 + Math.max(0, totalMin - 5) * 0.015 + Math.max(0, 1 - seg.relevance) * 0.18));
       sp.qSpeed = rng() < pSpeed;
       sp.qStraight = rng() < (gridSt === "keep" ? 0.18 : gridSt === "simplify" ? 0.06 : 0.01);
-      sp.qDup = !state.dedupe && rng() < 0.09;
+      sp.qDup = dupF > 0 && rng() < 0.09 * dupF;
       sp.qFwd = rng() < (0.02 + (seg.id === "blast" ? 0.05 : 0) + (inv.id === "generic" ? 0.03 : 0));
       sp.qJunk = rng() < (keptDefects["BROKEN OPTIONS"] ? 0.16 : 0.02);
       /* defect symptom flags: index-derived pseudo-rolls, so adding the
@@ -3998,15 +4100,33 @@ function showReport(){
     worthLine(1, c.remRecovery.r1) + worthLine(2, c.remRecovery.r2) +
     '<tr class="total"><td>Ending goodwill</td><td>' + Math.max(0, gm.ending) + (gm.trips ? " · BREAKER TRIPPED" : "") + "</td></tr></table></div>";
 
+  /* list preparation ledger: what the intake held and what Silver did
+     with it, reconciled against the launch configuration */
+  if (seg.intake){
+    var lpMix = currentIntake();
+    var lpSilver = state.launchedSnapshot ? { dedupe: !!state.launchedSnapshot.dedupe, consolidate: !!state.launchedSnapshot.consolidate, repair: !!state.launchedSnapshot.repair } : silverState();
+    var lpD = intakeDerived(lpMix, lpSilver);
+    var lpCnt = function(k){ return fmt(Math.round(lpMix[k] * seg.n)); };
+    html += '<div class="reportcard"><h2>LIST PREPARATION · BRONZE TO GOLD</h2><table class="ledger">' +
+      "<tr><td>Records in (Bronze)</td><td>" + fmt(seg.n) + "</td></tr>" +
+      "<tr><td>Merged as duplicates (Silver dedupe)</td><td>" + (lpSilver.dedupe ? fmt(Math.round(lpMix.dupSys * seg.n)) + " merged" : "not deduped · " + fmt(qDup) + " duplicate responses removed later at CLEAN") + "</td></tr>" +
+      "<tr><td>Consolidated per person (Silver consolidate)</td><td>" + (lpSilver.consolidate ? fmt(Math.round(lpMix.dupSecond * seg.n)) + " merged" : "not consolidated · second-source duplicates stayed in the list") + "</td></tr>" +
+      "<tr><td>Addresses repaired (Silver repair)</td><td>" + (lpSilver.repair ? fmt(Math.round(lpMix.brokenFix * seg.n)) + " repaired" : "not repaired · broken addresses were promoted as-is") + "</td></tr>" +
+      "<tr><td>Quarantined, never promoted</td><td>" + (lpSilver.repair ? fmt(Math.round(lpMix.brokenDead * seg.n)) : "not quarantined · the " + lpCnt("brokenDead") + " unfixable addresses promoted and joined the invalid pool") + "</td></tr>" +
+      "<tr><td>Stale records promoted (no Silver fix exists)</td><td>" + lpCnt("stale") + "</td></tr>" +
+      "<tr><td>Promoted to the contact master (Gold)</td><td>" + fmt(Math.round(lpD.promotedShare * seg.n)) + "</td></tr>" +
+      '<tr class="total"><td>List health at launch (before validation)</td><td>' + (lpD.invalid * 100).toFixed(1) + "% invalid</td></tr></table></div>";
+  }
+
   /* deliverability and data */
   var bounceRatePct = c.sent ? Math.round((c.bouncedHard + c.bouncedSoft) / c.sent * 1000) / 10 : 0;
   var hardRatePct = c.sent ? Math.round(c.bouncedHard / c.sent * 1000) / 10 : 0;
   var rmR = repMath();
   var repA = rmR.after;
-  var savedBounce = Math.max(0, Math.round((seg.invalidPct - effInvalidRate()) * seg.n));
+  var savedBounce = Math.max(0, Math.round((baseInvalidRate() - effInvalidRate()) * seg.n));
   var valVerdict;
   if (state.validation === "skip"){
-    valVerdict = "No validation bought. Full validation (" + validationCostFor(seg, "full") + " cr) would have removed most invalids and saved \u2248" + fmt(Math.round((seg.invalidPct - seg.invalidPct * 0.15) * seg.n)) + " bounces this round.";
+    valVerdict = "No validation bought. Full validation (" + validationCostFor(seg, "full") + " cr) would have removed most invalids and saved \u2248" + fmt(Math.round((baseInvalidRate() - baseInvalidRate() * 0.15) * seg.n)) + " bounces this round.";
   } else {
     valVerdict = "Validation (" + state.validation + ", " + validationCostFor(seg, state.validation) + " cr) saved \u2248" + fmt(savedBounce) + " bounces. \u2248" + fmt(Math.round(effInvalidRate() * seg.n)) + " invalids still got through, because catch-all domains cannot be verified.";
   }
@@ -4022,13 +4142,13 @@ function showReport(){
     "<p style='font-size:15.5px;margin:4px 0'><b>UNOPENED \u00B7 " + fmt(c.delivered - c.opened) + "</b> sat in inboxes, never opened." + (state.reminders ? " The reminder wave" + (state.reminders > 1 ? "s" : "") + " you bought went out to exactly these inboxes." : " No reminder waves were bought to nudge them.") + "</p>" +
     "<p style='font-size:15.5px;margin:4px 0'><b>Sender reputation: " + rmR.before + " \u2192 " + repA + ".</b> " + openEffectTxt + "</p>" +
     "<p style='font-size:15.5px;margin:4px 0'><b>Validation verdict:</b> " + valVerdict + "</p>" +
-    (c.angry ? "<p style='font-size:15.5px;margin:4px 0'><b>Suppression skipped:</b> " + fmt(c.angry) + " recipients who opted out or were surveyed recently were mailed anyway. Goodwill took the hit in the ledger above. <b>Fix:</b> buy the Suppression scrub (4 cr) in PREPARE THE LIST.</p>" : "") +
-    (c.dupEnv ? "<p style='font-size:15.5px;margin:4px 0'><b>No dedupe:</b> duplicate envelopes went out during the run. <b>Fix:</b> buy the Dedupe pass (4 cr).</p>" : "") +
+    (c.angry ? "<p style='font-size:15.5px;margin:4px 0'><b>Suppression skipped:</b> " + fmt(c.angry) + " recipients who opted out or were surveyed recently were mailed anyway. Goodwill took the hit in the ledger above. <b>Fix:</b> buy the Suppression scrub (4 cr) in BUILD THE LIST.</p>" : "") +
+    (c.dupEnv ? "<p style='font-size:15.5px;margin:4px 0'><b>Duplicates mailed:</b> duplicate envelopes went out during the run. <b>Fix:</b> buy DEDUPE and CONSOLIDATE in the Silver panel (4 cr each).</p>" : "") +
     bounceBacksHTML(run.bounceBacks) +
     '<h2 style="margin-top:14px">DATA QUALITY FLAGS</h2>' +
     flagRow("Speeders", c.qSpeed, shSpeed, qSpeed, "Clicked through far too fast to have read the questions. Long, low-relevance surveys breed them. The campaign removes these responses from the usable evidence base.", "LEVER 1 relevance and LEVER 3 length: shorten the survey and send it while the case is warm.") +
     flagRow("Straight liners", c.qStraight, shStraight, qStraight, "Same answer down every row. That is the GRID BURDEN question doing exactly what grid burden does (Krosnick satisficing).", "LEVER 3: BREAK UP the grid question (3 cr), or CUT it (1 cr). A generic simplify is not offered for this class.") +
-    flagRow("Duplicates", c.qDup, sharePct(c.qDup), qDup, "The same response counted twice because duplicate addresses were never removed.", "PREP: buy the Dedupe pass (4 cr).") +
+    flagRow("Duplicates", c.qDup, sharePct(c.qDup), qDup, "The same response counted twice because duplicate records were never merged.", "PREP: buy DEDUPE and CONSOLIDATE in the Silver panel (4 cr each).") +
     flagRow("Forwarded link responses", c.qFwd, shFwd, qFwd, "The invite link got forwarded and people outside the segment answered, hurting sample fit.", "LEVER 1 and LEVER 2: tighter audience, and an invite written for the named recipient.") +
     flagRow("Junk / Other-box noise", c.qJunk, shJunk, qJunk, "Respondents who fit no option land in Other, and Other collects junk. That traces to BROKEN OPTIONS: overlapping ranges or no fitting box.", "LEVER 3: FIX OPTIONS (2 cr) so ranges are exhaustive and mutually exclusive, or CUT the question.") +
     flagRow("Suspect top-box", c.qTopBox, shTop, qTopD, "Positives inflated past credibility. A LEADING question ('How excellent...') manufactures top-box answers.", "LEVER 3: NEUTRALIZE the leading question (2 cr), or CUT it.") +

@@ -1104,6 +1104,7 @@ for (let level = 1; level <= 6; level++) {
       assert.equal(g.state.spentBefore, 0, label);
       assert.equal(g.state.attempt, 1, label);
       g.state.validation = 'full'; g.state.dedupe = true; g.state.suppression = true;
+      g.state.consolidate = setup.consolidate === true; g.state.repair = setup.repair === true;
       g.state.stakeholder = level === 3 || level === 6 ? 'pushback' : null;
       g.state.reportBack = level === 4;
       g.state.localization = level === 5;
@@ -1382,6 +1383,7 @@ test('a continuous six-level campaign remains winnable with audience carryover',
     g.selectLevel(level, true);
     Object.assign(g.state, {
       validation: 'full', dedupe: true, suppression: true, abEnabled: level === 2,
+      consolidate: setup.consolidate === true, repair: setup.repair === true,
       stakeholder: level === 3 || level === 6 ? 'pushback' : null,
       reportBack: level === 4, localization: level === 5,
       langChoice: level === 5 ? 'localized' : 'en', reminders: setup.reminders, escapes: setup.escapes
@@ -1504,7 +1506,7 @@ test('bounce-back sample is deterministic for the same run configuration', () =>
 test('a run with no bounces renders the clean bounce-backs state', () => {
   const { context: g, element } = game();
   g.selectLevel(1, false);
-  g.state.seg = { ...g.SEGMENTS.find(s => s.id === 'fresh'), n: 1, invalidPct: 0 };
+  g.state.seg = { ...g.SEGMENTS.find(s => s.id === 'fresh'), n: 1, invalidPct: 0, intake: { dupSys: 0, dupSecond: 0, brokenFix: 0, brokenDead: 0, stale: 0 } };
   g.state.validation = 'full';
   g.startRun(); g.showReport();
   assert.equal(g.tally(g.runData).sent, 1);
@@ -2212,4 +2214,100 @@ test('mood parameters come off real runs: needed count and finish window', () =>
   assert.equal(times.length, g2.tally(g2.runData).completed);
   assert.equal(fp.firstFinishT, Math.min.apply(null, times));
   assert.equal(fp.lastFinishT, Math.max.apply(null, times));
+});
+
+/* ---- Medallion prep stage, phase 1: derived list health ---- */
+
+test('medallion: intake draw is deterministic per level, seed and segment', () => {
+  const a = game().context;
+  const b = game().context;
+  a.selectLevel(1, false); b.selectLevel(1, false);
+  const fresh = a.SEGMENTS.find(s => s.id === 'fresh');
+  assert.equal(JSON.stringify(a.drawIntakeMix(fresh)), JSON.stringify(b.drawIntakeMix(fresh)),
+    'two instances with the same level and seed deal the same intake mix');
+  assert.deepEqual(a.drawIntakeMix(fresh), a.drawIntakeMix(fresh), 'the draw is a pure function');
+  const dealt = a.currentIntake();
+  assert.deepEqual(a.currentIntake(), dealt, 'the dealt intake is cached, never re-jittered mid-chain');
+  a.state.seg = a.SEGMENTS.find(s => s.id === 'stale');
+  assert.notDeepEqual(a.currentIntake(), dealt, 'switching segment redraws against the new segment mix');
+});
+
+test('medallion: derived-rate endpoints per segment bracket the old static rates', () => {
+  const { context: g } = game();
+  const none = { dedupe: false, consolidate: false, repair: false };
+  const full = { dedupe: true, consolidate: true, repair: true };
+  for (const seg of g.SEGMENTS) {
+    const mix = seg.intake;
+    const noWork = g.intakeDerived(mix, none).invalid;
+    const fullWork = g.intakeDerived(mix, full).invalid;
+    const expectNone = (mix.stale + mix.brokenFix + mix.brokenDead);
+    const expectFull = mix.stale / (1 - mix.dupSys - mix.dupSecond - mix.brokenDead);
+    assert.ok(Math.abs(noWork - expectNone) < 1e-9, `${seg.id} no-work endpoint`);
+    assert.ok(Math.abs(fullWork - expectFull) < 1e-9, `${seg.id} full-work endpoint`);
+    assert.ok(fullWork < noWork, `${seg.id}: Silver work strictly improves list health`);
+    assert.ok(seg.invalidPct <= noWork + 1e-9, `${seg.id}: the old static rate never exceeds the no-work line`);
+    assert.ok(seg.invalidPct >= fullWork - 0.005, `${seg.id}: the old static rate sits inside the derived bracket (Fresh alone dips 0.2 points under its full-work line, per the design table)`);
+  }
+});
+
+test('medallion: skipping Silver work maps to duplicate flags and a higher invalid rate', () => {
+  const { context: g } = game();
+  g.selectLevel(1, false);
+  assert.equal(g.duplicateFactor(), 1, 'no Silver work: every duplicate class reaches the run');
+  const mix = g.currentIntake();
+  g.state.dedupe = true;
+  const expectedPartial = mix.dupSecond / (mix.dupSys + mix.dupSecond);
+  assert.ok(Math.abs(g.duplicateFactor() - expectedPartial) < 1e-9,
+    'dedupe alone leaves exactly the second-source share of duplicates');
+  g.state.consolidate = true;
+  assert.equal(g.duplicateFactor(), 0, 'full Silver dedupe work: no duplicates reach the run');
+
+  g.state.dedupe = false; g.state.consolidate = false; g.state.repair = false;
+  const rawRate = g.baseInvalidRate();
+  const rawRun = g.buildRun();
+  assert.ok(rawRun.respondents.some(sp => sp.dupEnv || sp.qDup),
+    'unmerged duplicates reach the run as duplicate envelopes and duplicate responses');
+  g.state.repair = true;
+  assert.ok(g.baseInvalidRate() < rawRate, 'unrepaired broken addresses feed the invalid pool');
+  g.state.dedupe = true; g.state.consolidate = true;
+  const cleanRun = g.buildRun();
+  assert.ok(!cleanRun.respondents.some(sp => sp.dupEnv || sp.qDup),
+    'full Silver work: zero duplicate flags in the run');
+});
+
+test('medallion: Silver actions charge once, stay owned, and suppression still charges at Gold', () => {
+  const { context: g } = game();
+  g.selectLevel(1, false);
+  const row = (bm, label) => bm.prepItems.find(item => item[0].startsWith(label));
+  g.state.consolidate = true;
+  assert.equal(row(g.budgetMath(), 'Consolidate')[1], 4, 'consolidate charges 4 cr on first purchase');
+  g.state.repair = true;
+  assert.equal(row(g.budgetMath(), 'Repair addresses')[1], 5, 'repair charges 5 cr on first purchase');
+  g.state.dedupe = true;
+  assert.equal(row(g.budgetMath(), 'Dedupe')[1], 4, 'dedupe still charges 4 cr, now as a Silver action');
+  g.state.baseline = g.snapshotCurrent();
+  const owned = g.budgetMath();
+  assert.equal(row(owned, 'Consolidate')[1], 0, 'owned consolidate is never charged again');
+  assert.equal(row(owned, 'Repair addresses')[1], 0, 'owned repair is never charged again');
+  assert.equal(row(owned, 'Dedupe')[1], 0, 'owned dedupe is never charged again');
+  g.state.suppression = true;
+  assert.equal(row(g.budgetMath(), 'Suppression')[1], 4, 'suppression still charges 4 cr at Gold when not owned');
+});
+
+test('medallion: campaign report carries the list preparation ledger; quick report does not', () => {
+  const { context: g, element } = game();
+  g.selectLevel(1, false);
+  g.state.validation = 'full'; g.state.dedupe = true; g.state.suppression = true;
+  g.state.consolidate = true; g.state.repair = true;
+  g.startRun(); g.showReport();
+  const html = element('report').innerHTML;
+  assert.match(html, /LIST PREPARATION · BRONZE TO GOLD/);
+  assert.match(html, /Records in \(Bronze\)/);
+  assert.match(html, /Promoted to the contact master \(Gold\)/);
+  assert.match(html, /List health at launch \(before validation\)/);
+
+  const q = game();
+  q.context.startQuickChallenge(0, 'V000');
+  q.context.startRun(); q.context.showReport();
+  assert.doesNotMatch(q.element('report').innerHTML, /LIST PREPARATION/);
 });

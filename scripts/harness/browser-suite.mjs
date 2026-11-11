@@ -962,6 +962,100 @@ async function runCutFloorScenario(browser, gameUrl, viewport, options) {
   return run;
 }
 
+// Scenario: the medallion prep stage (phase 1). Step 2 must show the
+// Bronze / Silver / Gold layer panels with the dealt intake counts,
+// the segment cards must show derived list health instead of a static
+// rate, Silver work must improve the Gold health line, and the
+// campaign report must carry the LIST PREPARATION ledger reconciling
+// the intake against the work bought. The play line mirrors the main
+// journey's fixture-backed Level 1 winner, with the full Silver line
+// added on top.
+async function runMedallionScenario(browser, gameUrl, viewport, options) {
+  const run = newScenarioRun(viewport, options);
+  try {
+    const page = await openScenarioPage(browser, run, viewport);
+    await page.goto(gameUrl, { waitUntil: 'networkidle0', timeout: 30000 });
+    await waitForVisible(page, '#startScreen');
+    await clickAndWait(page, '#startBtn', 500);
+    await waitForVisible(page, '#setup');
+    await page.waitForSelector('#segGrid .card', { visible: true, timeout: 15000 });
+
+    const cardText = await page.evaluate(() =>
+      (document.querySelector('#segGrid')?.textContent || '').replace(/\s+/g, ' '));
+    await run.check('segment cards show the intake mix and derived list health',
+      cardText.includes('Intake:') && cardText.includes('List health after your list work:'),
+      { excerpt: cardText.slice(0, 320) });
+
+    const healthOf = () => page.evaluate(() => {
+      const text = (document.querySelector('#prepPanel')?.textContent || '').replace(/\s+/g, ' ');
+      const match = text.match(/List health after your list work: ([\d.]+)% invalid/);
+      return { text, health: match ? Number(match[1]) : null };
+    });
+    const before = await healthOf();
+    await run.check('step 2 shows the Bronze, Silver and Gold layer panels',
+      before.text.includes('BRONZE · RECORDS IN') && before.text.includes('DEDUPE · SILVER') &&
+      before.text.includes('CONSOLIDATE · SILVER') && before.text.includes('REPAIR ADDRESSES · SILVER') &&
+      before.text.includes('SILVER OUTPUT') && before.text.includes('GOLD · CONTACT MASTER') &&
+      before.health !== null,
+      { excerpt: before.text.slice(0, 400), health: before.health });
+
+    await clickAndWait(page, '[data-prep="dedupe"]', 200);
+    await clickAndWait(page, '[data-prep="consolidate"]', 200);
+    await clickAndWait(page, '[data-prep="repair"]', 200);
+    const silverState = await page.evaluate(() => ({
+      dedupe: document.querySelector('[data-prep="dedupe"]')?.textContent.trim(),
+      consolidate: document.querySelector('[data-prep="consolidate"]')?.textContent.trim(),
+      repair: document.querySelector('[data-prep="repair"]')?.textContent.trim()
+    }));
+    await run.check('all three Silver actions switch on from the layer panel',
+      silverState.dedupe === 'ON' && silverState.consolidate === 'ON' && silverState.repair === 'ON',
+      silverState);
+    const after = await healthOf();
+    await run.check('Silver work improves the derived Gold list health',
+      after.health !== null && before.health !== null && after.health < before.health,
+      { before: before.health, after: after.health });
+
+    await clickAndWait(page, '[data-val="full"]', 200);
+    await clickAndWait(page, '[data-prep="suppression"]', 200);
+    await clickAndWait(page, '[data-inv="generic"]', 200);
+    await clickAndWait(page, '[data-rem="0"]', 200);
+    await clickAndWait(page, '#qGrid .qbtn[data-q="3"][data-act="simplify"]', 300);
+    for (const id of [5, 7, 8, 10, 11, 12]) {
+      await clickAndWait(page, `#qGrid .qbtn[data-q="${id}"][data-act="cut"]`, 520);
+    }
+    await clickAndWait(page, '#launchBtn', 300);
+    await waitForVisible(page, '#runStage');
+    await waitCountdownDone(page);
+    await clickAndWait(page, '#skipBtn', 600);
+    await waitForVisible(page, '#report');
+    const ledger = await page.evaluate(() => {
+      const heading = [...document.querySelectorAll('#report h2')]
+        .find((el) => (el.textContent || '').includes('LIST PREPARATION'));
+      if (!heading) return { present: false };
+      const card = heading.closest('.reportcard') || heading.parentElement;
+      const text = (card.textContent || '').replace(/\s+/g, ' ');
+      return {
+        present: true,
+        hasRecordsIn: text.includes('Records in (Bronze)'),
+        hasPromoted: text.includes('Promoted to the contact master (Gold)'),
+        hasHealth: /List health at launch \(before validation\)/.test(text),
+        excerpt: text.slice(0, 400)
+      };
+    });
+    await run.check('campaign report carries the list preparation ledger',
+      ledger.present && ledger.hasRecordsIn && ledger.hasPromoted && ledger.hasHealth, ledger);
+    await checkNoJourneyErrors(run, 'medallion prep scenario');
+  } catch (error) {
+    await run.record('medallion prep scenario completes without a harness exception', false, {
+      error: error.message,
+      stack: String(error.stack || '').split('\n').slice(0, 8)
+    }, true);
+  } finally {
+    await closeScenarioPage(run);
+  }
+  return run;
+}
+
 async function main() {
   const options = parseArgs(process.argv.slice(2));
   const gameFile = join(options.gameDir, 'site', 'index.html');
@@ -1008,7 +1102,7 @@ async function main() {
       // Feature scenarios run once, at the first (mobile) viewport.
       // The self-test passes --no-scenarios: its negative controls only
       // need the core journey above to prove failures are caught.
-      for (const scenario of [runQuickBounceScenario, runCutFloorScenario, runCampaignBounceScenario]) {
+      for (const scenario of [runQuickBounceScenario, runCutFloorScenario, runCampaignBounceScenario, runMedallionScenario]) {
         const run = await scenario(browser, gameUrl, options.viewports[0], options);
         summary.checks.push(...run.checks);
       }

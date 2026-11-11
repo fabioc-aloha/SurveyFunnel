@@ -113,10 +113,21 @@ Percentages display up to three decimals; verdicts use unrounded ratios.
 
 Per round, the model runs in this order:
 
-1. **Delivery.** Segment invalid rate, reduced by validation
+1. **Delivery.** The campaign invalid rate is derived, never stored:
+   each segment carries a Bronze intake mix of five record classes
+   (same-system duplicates, second-source duplicates, fixable broken,
+   unfixable broken, stale), jittered deterministically per level and
+   instrument seed. Silver work removes classes (DEDUPE merges
+   same-system duplicates, CONSOLIDATE merges second-source
+   duplicates, REPAIR fixes fixable addresses and quarantines the
+   unfixable); the derived rate is stale plus unrepaired broken,
+   divided by the promoted share. Validation then reduces that rate
    (full removes 85% of invalids, partial 55%, with a modeled
    unverifiable remainder). Remainder splits into hard
    and soft bounces. Hard bounce rate drives Sender Reputation.
+   Quick Challenges keep the provided-list rate instead (the stored
+   segment rate, or the revealed true rate after a LIST REALITY
+   complication).
 2. **Opens.** Base open propensity by segment relevance and invite
    variant, adjusted by reputation (spam folder effect), sender,
    why me line, and language match.
@@ -126,7 +137,9 @@ Per round, the model runs in this order:
    clocks: patience (minutes) and knowledge (per question tags).
    Outcomes per question: continue, abandon, escape (if escapes are
    on), or guess. Late survey effects add speeders and straight
-   liners; skipped dedupe adds duplicates; open rates can add a
+   liners; duplicates still unmerged after Silver work add duplicate
+   envelopes and duplicate responses, scaled by the remaining
+   duplicate share of the intake; open rates can add a
    forwarded response share.
 5. **Goodwill and budget.** Spends and earns use `goodwillMath()` and
    the current [player guide](player-guide.md). If goodwill reaches zero, the breaker
@@ -245,7 +258,12 @@ Blast.
 These are verified strategies, not global minimum costs. The corpus
 was regenerated under the full-population evidence checks without dropping any of the
 364 previously sampled instruments. Repairs, kept sets, bank additions,
-invitations, reminders, and DK/NA were searched again. Every witness is
+invitations, reminders, and DK/NA were searched again. The corpus was
+regenerated again on 2026-11-10 under the medallion derived-rate
+model (fixtures now also record the CONSOLIDATE and REPAIR Silver
+purchases): the same 364 instruments, fixed and highest winning costs
+unchanged on every level, with 14 setups absorbing added Silver work
+(mostly CONSOLIDATE at 4 cr) to stay legal winners. Every witness is
 replayed through the card handlers, `startRun()`, and `showReport()`,
 with exact assertions for cost, individual sends/completions, rate,
 quality, usable Insight, usable sample, goodwill, and every gate. Independent witnesses start with an
