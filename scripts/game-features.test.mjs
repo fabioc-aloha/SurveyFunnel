@@ -700,7 +700,7 @@ test('the one-question floor rejects an empty launch in both modes', () => {
     g.activeQuestions().forEach(q => { g.state.qstate[q.id] = 'cut'; });
     g.renderReadout();
     assert.equal(g.keptQuestions().length, 0);
-    assert.match(element('launchCheck').innerHTML, /at least one question[\s\S]*?TO DO/);
+    assert.match(element('launchCheck').innerHTML, /At least one question kept \(Step 4\)[\s\S]*?TO DO/);
     assert.equal(element('launchBtn').disabled, true);
     assert.match(element('launchBtn').textContent, /TOO FEW QUESTIONS · MIN 1/);
     const before = [g.state.spentBefore, g.state.attempt, g.state.launchCost];
@@ -932,7 +932,7 @@ test('retry requires the minimum send cost of the available audience', () => {
   g.startRun(); g.showReport();
   assert.equal(150 - g.state.spentBefore, 35);
   assert.doesNotMatch(element('report').innerHTML, /id="againBtn"/);
-  assert.match(element('report').innerHTML, /cheapest possible send costs 45/);
+  assert.match(element('report').innerHTML, /cheapest send costs 45/);
 });
 
 test('an over-budget retry allows successive cost reductions but blocks increases', () => {
@@ -1600,10 +1600,10 @@ test('reminder presentation cannot mutate full-population statistics', () => {
   }
 });
 
-test('invite stage names the reminder as an email to people who have not opened yet, and the run screen carries both piles', () => {
+test('invite stage names the reminder as an email to non-openers, and the run screen carries both piles', () => {
   const html = readFileSync(join(root, 'site', 'index.html'), 'utf8');
   assert.match(html, /Reminder emails:/);
-  assert.match(html, /goes only to people who have not opened yet/);
+  assert.match(html, /waves go only to non-openers/);
   assert.match(html, /8 cr and −5 goodwill per wave/);
   assert.match(html, /data-rem="2">2<small>−10 GW · 16 CR<\/small>/);
   assert.match(html, /id="bouncePile"/);

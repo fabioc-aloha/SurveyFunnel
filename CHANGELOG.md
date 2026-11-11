@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-11-10 - Gameplay copy diet
+
+- Shortened copy on the gameplay surfaces only: title and level select,
+  the four setup stages, Quick Challenge setup, the run screen, and the
+  stakeholder, complication, retry, and level-failed dialogs. Tutorial
+  prose that duplicates the BRD, the report, or the field guide was
+  removed from gameplay screens; those three surfaces keep every word.
+- The setup readout now shows a short evidence-plan summary (new
+  `evidenceSummaryText()`); the full plan still renders verbatim in the
+  BRD from the unchanged `evidenceRequirementsHTML()`. Carried
+  audience-history counts stay in the readout because the next send is
+  planned against them.
+- Measured visible gameplay copy (scripted pass at 1280x800: title,
+  HUD, Level 1 setup, run screen at a fixed moment, Quick Challenge
+  setup): 3,342 words before, 2,358 after (-29%). The remaining text is
+  question text, prices, segment and card data rows, and state
+  readouts, which the change brief protects. Full before/after list:
+  [docs/copy-diet-2026-11-10.md](docs/copy-diet-2026-11-10.md).
+- Three Node test pins updated to the new copy (checklist floor row,
+  level-failed cheapest-send line, reminder label). No mechanics,
+  prices, budgets, scoring, simulation, audio, or layout changed.
+- Gates: build validation passed, Node suite 109/109, tracked harness
+  PASS 3/3 with browser checks 119/119. Committed locally only; not yet
+  pushed or deployed.
+
 ## 2026-11-02 - Population and cut-rule release deployed
 
 - Pushed gameplay release `b45bb69` directly to `main`.
