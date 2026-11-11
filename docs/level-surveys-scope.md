@@ -15,9 +15,10 @@ the Relationship core is answerable by every seat by design,
 because this level's goodwill economy cannot carry a restricted
 backbone, and the section 3.3 seat pattern is expressed through
 the topic-to-persona keys instead) are built to those decisions;
-phase 5 remains (the Level 5 perceptions bank and BRD, the
-Level 6 flagship bank with removal of the legacy-bank fallback,
-and the closing rebalance). This
+phase 5a (the Level 5 perceptions bank and BRD, the Level 6
+flagship bank, and removal of the legacy-bank fallback) is built
+2026-11-11 and pushed and deployed the same day; phase 5b, the
+closing rebalance, remains as a proposal to the owner. This
 document proposes turning each
 campaign level into a different survey, with its own questionnaire
 bank and its own BRD, replacing today's single shared bank and

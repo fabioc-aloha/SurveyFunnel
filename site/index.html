@@ -928,7 +928,31 @@ var QUESTION_REPAIRS = {
   425:["How many times did you meet with the account team last quarter? Choose one: 0 / 1 / 2-3 / 4-5 / more than 5"],
   426:["In the last 90 days, did the account team do what it said it would do? (yes / partly / no)"],
   430:['Example privacy line (use only if accurate): "Your answer will help improve the relationship program. Only the relationship research team will review individual responses."',"Have you ever considered moving your business to a competitor because of the account team's performance? (yes / no)"],
-  432:["What one change would most improve working with the account team for your organization?"]
+  432:["What one change would most improve working with the account team for your organization?"],
+ 511:["How would you rate Microsoft's pace of innovation in the last 12 months? (1-5)"],
+ 512:["How would you rate Microsoft's commitment to its customers? (1-5)"],
+ 513:["In the last 12 months, how would you rate your overall view of Microsoft? (1-5, very unfavorable to very favorable)"],
+ 514:["In the last 12 months, has your opinion of Microsoft improved, stayed the same, or worsened?"],
+ 515:["How innovative do you consider Microsoft? (1-5)","How much do you trust Microsoft? (1-5)"],
+ 516:["How would you rate Microsoft's products? (1-5)","How would you rate Microsoft's customer support? (1-5)"],
+ 518:["How would you rate Microsoft's use of artificial intelligence across its products? (1-5)"],
+ 519:["How long have you used Microsoft products? Choose one: under 1 year / 1-3 years / more than 3 years / I have not used them."],
+ 525:["Would you recommend Microsoft to a colleague? (yes / no)"],
+ 526:["How favorable is your view of Microsoft? Rate one company at a time from 1 to 5."],
+ 530:['Example privacy line (use only if accurate): "Your answer will help improve how Microsoft understands public perception. Only the perceptions research team will review individual responses."',"Have you ever posted a negative comment about Microsoft online? (yes / no)"],
+ 532:["What one change would most improve your view of Microsoft's innovation?"],
+ 611:['Example privacy line (use only if accurate): "Your answer will help improve the flagship relationship program. Only the flagship research team will review individual responses."',"How would you rate the performance of the named individuals on your Microsoft account team? (1-5)"],
+ 612:['Example privacy line (use only if accurate): "Your answer will help improve the flagship relationship program. Only the flagship research team will review individual responses."',"Has your organization begun evaluating a competitor to replace part of what Microsoft provides? (yes / no)"],
+ 613:["How would you rate the account team? Rate one area of the relationship at a time from 1 to 5."],
+ 614:["How much business value has each product area delivered? Rate one area at a time from 1 to 5."],
+ 615:["In the last 90 days, how many review meetings has your organization held with Microsoft? (0 / 1 / 2 / 3 or more)"],
+ 616:["In the last 90 days, has a Microsoft commitment to your organization been missed? (yes / no / not sure)"],
+ 617:["How would you rate the value your organization receives from its relationship with Microsoft? (1-5)"],
+ 618:["How satisfied are you with Microsoft's products? (1-5)","How satisfied are you with Microsoft's account team? (1-5)"],
+ 620:["How well has your organization's move to current Microsoft products progressed? (1-5)"],
+ 625:["How many people in your organization use Microsoft products daily? Choose one: under 100 / 100-500 / more than 500 / not sure."],
+ 630:["Would your organization consider leaving Microsoft for another provider? (yes / no)"],
+ 632:["What one change would most improve the alignment between Microsoft's direction and your organization's strategy?"]
 };
 function repairedQuestionMarkup(q){
   var prompts = QUESTION_REPAIRS[q.id] || [q.text];
@@ -1078,17 +1102,21 @@ var QUESTION_BANK = QUESTIONS.concat([
    Transitional state: unmigrated levels fall back to the legacy
    shared bank, exactly the draw they have always had. Each later
    phase migrates one level and narrows its fallback; the final
-   migration phase removes it. Phase 2 (below) migrates Level 2. */
+   migration phase removes it. Phase 2 (below) migrates Level 2.
+   Phase 5 completed the sequence: all six levels are migrated and
+   bankForLevel carries no fallback (see its own comment). */
 var LEVEL_1_BANK_IDS = [1,2,3,4,5,6,7,8,9,10,11,12,25,27,29,30,31,32,37,39,43,45,46,52,53,54,55,57,58,59,63,66,67,68,71,72];
 QUESTION_BANK.forEach(function(q){ q.survey = LEVEL_1_BANK_IDS.indexOf(q.id) >= 0 ? 1 : 0; });
 OPTIONAL_QUESTIONS.forEach(function(q){ q.survey = 1; });
 function bankForLevel(level){
-  if (level === 1 || level === 2 || level === 3 || level === 4) return QUESTION_BANK.filter(function(q){ return q.survey === level; });
-  /* Unmigrated levels (5-6) draw the legacy pool exactly as phase 1
-     left it: every entry stamped 0 or 1, in original bank order, so
-     their deals and witnesses are unchanged. The final migration
-     phase removes this. */
-  return QUESTION_BANK.filter(function(q){ return q.survey === 0 || q.survey === 1; });
+  /* Phase 5 completes the migration: every campaign level draws its
+     own bank, and the transitional legacy fallback from phases 1-4
+     is removed. The legacy entries (survey 0, and Level 1's curation
+     origin stamped 1) remain in QUESTION_BANK as the Quick
+     Challenges' union source: the drills read the union bank
+     directly by id, never bankForLevel, so their deals are
+     unchanged. */
+  return QUESTION_BANK.filter(function(q){ return q.survey === level; });
 }
 /* ================= PER-LEVEL SURVEYS · PHASE 2 =================
    Level 2 (The Split) migrates to its own survey: the Copilot
@@ -1374,19 +1402,214 @@ var RELATIONSHIP_BANK = [
  { id:436, text:"What device are you answering on right now? (phone / tablet / computer)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"relationship experience", tier:"filler", sec:"F", survey:4 }
 ];
 RELATIONSHIP_BANK.forEach(function(q){ QUESTION_BANK.push(q); });
+/* ================= PER-LEVEL SURVEYS · PHASE 5 =================
+   Level 5 (Global Fieldwork) migrates to its own survey: the
+   General Perceptions of Microsoft Survey, ids 501-536. Structure
+   follows the scope doc's derivation (A4/B18/C6/D2/E2/F4; 14 clean,
+   13 defective, 5 stupid, 4 filler; core set of 7, all clean, with
+   a creditable core question on every agenda topic). Defect
+   coverage: 10 of the 11 classes; the theme-natural classes from
+   the scope doc's Level 5 rationale are doubled (LEADING, VAGUE
+   TIMEFRAME, DOUBLE-BARRELED). The one omission is recorded here:
+   RECALL OVERLOAD. A perception has no events to recall, and the
+   scope doc names this the genre-less class on a perception
+   tracker; the class is covered on Levels 1 to 4, on Level 6, and
+   in the drills. Answerability follows the scope doc's Level 5
+   pattern, which inverts the other surveys: the object is the
+   respondent's own perception, so perception items are answerable
+   by every seat, and beyond knowledge nearly vanishes as a class.
+   Its one representative (Q517) is a factual claim smuggled into a
+   perception survey, beyond knowledge for every seat equally; the
+   seats named are only the nearest holders of the figure, and the
+   flag note says so. The survey treats its subject as a subject of
+   measurement, never as promotion: no brand claim is asserted as
+   fact anywhere in the bank, and flattery appears only as labeled
+   LEADING and vanity traps. New ids live in the 5xx range and are
+   appended after the Relationship entries. The level's mechanics
+   are unchanged: the multilingual list is 40% English-speaking,
+   localization review and the localized invite (4 cr) are this
+   study's fielding design, and response is read by language
+   group. */
+var PERCEPTIONS_TOPIC_KEYS = {
+  "overall favorability":["end","tech"], "trust":["exec","itdm"],
+  "innovation perception":["itdm","tech"], "value perception":["admin","itdm"],
+  "AI leadership perception":["itdm","exec"], "responsibility":["exec","end"],
+  "product ecosystem":["tech","end"], "perceptions experience":["end","tech"]
+};
+var PERCEPTIONS_BANK = [
+ { id:501, text:"Overall, how favorable is your view of Microsoft? (1-5, very unfavorable to very favorable)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"overall favorability", tier:"clean", sec:"A", survey:5 },
+ { id:502, text:"Overall, how much do you trust Microsoft as a company? (1-5, not at all to completely)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"trust", tier:"clean", sec:"A", survey:5 },
+ { id:503, text:"Overall, how innovative do you consider Microsoft's products and services? (1-5, not at all to extremely)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"innovation perception", tier:"clean", sec:"A", survey:5 },
+ { id:504, text:"Overall, how favorable is your view of Microsoft? (1-5, very unfavorable to very favorable)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"overall favorability", tier:"stupid", sec:"A", survey:5, rg:"dup-favorability", dup:true,
+   flagTxt:"LOW-VALUE · DUPLICATE. This repeats the overall favorability question word for word. It adds burden without new information." },
+ { id:505, text:"Overall, how would you rate the value for money of the Microsoft products and services you use? (1-5, very poor to very good)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"value perception", tier:"clean", sec:"B", survey:5 },
+ { id:506, text:"Overall, how would you rate Microsoft's leadership in artificial intelligence, compared with other technology companies? (1-5, far behind to far ahead)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"AI leadership perception", tier:"clean", sec:"B", survey:5 },
+ { id:507, text:"How likely are you to speak positively about Microsoft to a colleague? (1-5, very unlikely to very likely)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"overall favorability", tier:"clean", sec:"B", survey:5 },
+ { id:508, text:"When Microsoft makes a public commitment, how confident are you that it will follow through? (1-5)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"trust", tier:"clean", sec:"B", survey:5 },
+ { id:509, text:"In the last 12 months, have you seen a Microsoft product or feature that felt genuinely new to you? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"innovation perception", tier:"clean", sec:"B", survey:5 },
+ { id:510, text:"Thinking of the Microsoft products you use at work, how would you rate their quality for the price paid? (1-5)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"value perception", tier:"clean", sec:"B", survey:5 },
+ { id:511, text:"How much do you admire Microsoft's industry-leading innovation?", min:0.75, know:"Everyone", who:"all", cx:"Medium", val:"Medium", core:false, answerBy:null, defect:"LEADING", topic:"innovation perception", tier:"defective", sec:"B", survey:5,
+   flagTxt:"LEADING. 'Industry-leading' asserts the conclusion inside the question. Expect inflated innovation scores that flatter the brand and measure nothing." },
+ { id:512, text:"How excellent is Microsoft's commitment to its customers?", min:0.75, know:"Everyone", who:"all", cx:"Medium", val:"Medium", core:false, answerBy:null, defect:"LEADING", topic:"trust", tier:"defective", sec:"B", survey:5,
+   flagTxt:"LEADING. 'How excellent' presumes the answer before the respondent gives one. Commitment will read stronger than it is." },
+ { id:513, text:"These days, how do you feel about Microsoft?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"VAGUE TIMEFRAME", topic:"overall favorability", tier:"defective", sec:"B", survey:5,
+   flagTxt:"VAGUE TIMEFRAME. 'These days' names no window and 'feel' names no judgment, so each respondent grades a different period with a different ruler. This is how perception items dodge naming a period." },
+ { id:514, text:"Recently, has your opinion of Microsoft improved?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"VAGUE TIMEFRAME", topic:"overall favorability", tier:"defective", sec:"B", survey:5,
+   flagTxt:"VAGUE TIMEFRAME. 'Recently' is not a recall window. One respondent answers about last week, another about last year, and the trend line built from their answers is fiction." },
+ { id:515, text:"How innovative and trustworthy is Microsoft? (1-5)", min:1.0, know:"Everyone", who:"all", cx:"High", val:"Low", core:false, answerBy:null, defect:"DOUBLE-BARRELED", topic:"innovation perception", tier:"defective", sec:"B", survey:5,
+   flagTxt:"DOUBLE-BARRELED. Innovation and trust are two judgments sharing one answer; brand attributes arrive in pairs this way. A company can be one and not the other, and this item cannot tell which. Only SPLIT separates them." },
+ { id:516, text:"How would you rate Microsoft's products and its customer support, together? (1-5)", min:1.0, know:"Everyone", who:"all", cx:"High", val:"Low", core:false, answerBy:null, defect:"DOUBLE-BARRELED", topic:"product ecosystem", tier:"defective", sec:"B", survey:5,
+   flagTxt:"DOUBLE-BARRELED. Products and support are two judgments sharing one answer. Strong products with weak support and weak products with strong support land in the same box. Only SPLIT separates them." },
+ { id:517, text:"What percentage of the global cloud infrastructure market does Microsoft hold?", min:1.0, know:"The research firms' analysts only, not on this list", who:"admin", cx:"High", val:"Medium", core:false, answerBy:["admin"], flag:"knowledge", defect:"BEYOND KNOWLEDGE", topic:"product ecosystem", tier:"defective", sec:"B", survey:5,
+   flagTxt:"BEYOND KNOWLEDGE. A market-share figure is a research firm's estimate, held in reports this audience does not read; it is beyond knowledge for every seat equally. A perception survey can ask what people believe, not recite the figure. No wording fix." },
+ { id:518, text:"How would you rate the synergy of Microsoft's AI flywheel across its copilot ecosystem?", min:0.5, know:"IT Decision Maker, maybe", who:"itdm", cx:"High", val:"Medium", core:false, answerBy:["itdm"], flag:"jargon", defect:"JARGON", topic:"AI leadership perception", tier:"defective", sec:"B", survey:5,
+   flagTxt:"JARGON. Flywheel, synergy, ecosystem: strategy-deck vocabulary with no plain meaning for this audience. Respondents who cannot parse the question guess at it." },
+ { id:519, text:"How long have you used Microsoft products? Choose one: under 1 year / 1-3 years / 3-5 years / more than 3 years / Other", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"BROKEN OPTIONS", topic:"product ecosystem", tier:"defective", sec:"B", survey:5,
+   flagTxt:"BROKEN OPTIONS. 3 years sits in two ranges and 'more than 3 years' overlaps 3-5, so honest respondents with the same history pick different boxes, and the unsure land in Other." },
+ { id:520, text:"How world-class is Microsoft, on a scale of 1 to 10?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"overall favorability", tier:"stupid", sec:"B", survey:5, rg:"vanity",
+   flagTxt:"LOW-VALUE · VANITY. The wording solicits a compliment rather than evidence for a study decision." },
+ { id:521, text:"Why have you not recommended Microsoft to more of your colleagues?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"overall favorability", tier:"stupid", sec:"B", survey:5, rg:"blame",
+   flagTxt:"LOW-VALUE · BLAME. The question presumes the respondent is at fault for not advocating the brand. Expect defensive answers, not perception insight." },
+ { id:522, text:"How responsibly do you believe Microsoft handles the customer data it holds? (1-5, not at all to completely)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"responsibility", tier:"clean", sec:"B", survey:5 },
+ { id:523, text:"Thinking of everything Microsoft makes that you use, how satisfied are you overall? (1-5)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"overall favorability", tier:"clean", sec:"C", survey:5 },
+ { id:524, text:"How comfortable are you relying on Microsoft products for work that matters to you? (1-5, not at all to completely)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"trust", tier:"clean", sec:"C", survey:5 },
+ { id:525, text:"Would you disagree that Microsoft is not a company you would avoid recommending?", min:0.5, know:"Everyone, after two reads", who:"all", cx:"High", val:"Low", core:false, answerBy:null, defect:"DOUBLE NEGATIVE", topic:"overall favorability", tier:"defective", sec:"C", survey:5,
+   flagTxt:"DOUBLE NEGATIVE. Disagree, not, avoid: the item must be parsed twice, and a share of respondents will answer the opposite of what they mean." },
+ { id:526, text:"Grid: rate 10 technology companies across 5 scales each", min:2.5, know:"Everyone, slowly", who:"all", cx:"High", val:"Medium", core:false, answerBy:null, flag:"mobile", defect:"GRID BURDEN", topic:"overall favorability", tier:"defective", sec:"C", survey:5,
+   flagTxt:"GRID BURDEN. Fifty ratings in one matrix. On a phone it means pinch, scroll and mis-tap, and a broad public audience straight-lines the same answer down every row." },
+ { id:527, text:"In what year was Microsoft founded?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"product ecosystem", tier:"stupid", sec:"C", survey:5, rg:"trivia",
+   flagTxt:"LOW-VALUE · TRIVIA. A founding date does not inform the perception-study agenda, and it reads as a test the respondent can fail." },
+ { id:528, text:"Roughly how many surveys about technology companies have you received in the last year?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"perceptions experience", tier:"filler", sec:"C", survey:5 },
+ { id:529, text:"Your answers are confidential and are never linked to your name. Have you ever avoided a Microsoft product because of concerns about how it handles data? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"trust", tier:"clean", sec:"D", survey:5 },
+ { id:530, text:"Have you ever posted a negative comment about Microsoft online? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"SENSITIVE NO ASSURANCE", topic:"overall favorability", tier:"defective", sec:"D", survey:5,
+   flagTxt:"SENSITIVE, NO ASSURANCE. Admitting public criticism of a company, with no confidentiality line anywhere near it, invites the safe answer. The honest answers are exactly the ones this question cannot collect as written." },
+ { id:531, text:"In your own words, what one thing would most improve your view of Microsoft?", min:1.0, know:"Everyone", who:"all", cx:"Medium", val:"High", core:false, answerBy:null, defect:"CLEAN", topic:"overall favorability", tier:"clean", sec:"E", survey:5 },
+ { id:532, text:"Considering everything you have seen and heard about Microsoft over the years, from its products in your home and your workplace, its public statements and its ads, the news stories you have read and the opinions of people you know, and how all of that combines into one overall impression of the company's creativity, please tell us in your own words the complete story of what innovation means to you at Microsoft and everything the company could possibly do differently.", min:1.5, know:"Everyone", who:"all", cx:"Medium", val:"Medium", core:false, answerBy:null, defect:"WORDY STEM", topic:"innovation perception", tier:"defective", sec:"E", survey:5,
+   flagTxt:"WORDY STEM. A paragraph where a sentence would do. The reading load alone spends patience before the respondent types a word. This is the one class SIMPLIFY actually fixes." },
+ { id:533, text:"Which other technology companies do you personally admire? (please list up to three)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"perceptions experience", tier:"stupid", sec:"F", survey:5, rg:"nosy",
+   flagTxt:"LOW-VALUE · IRRELEVANT. A respondent's admiration for other brands has no bearing on this study. The item collects personal taste without a study purpose." },
+ { id:534, text:"Which day of the week do you prefer to receive surveys on?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"perceptions experience", tier:"filler", sec:"F", survey:5 },
+ { id:535, text:"Would you like to receive a monthly newsletter about technology trends? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"perceptions experience", tier:"filler", sec:"F", survey:5 },
+ { id:536, text:"What device are you answering on right now? (phone / tablet / computer)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"perceptions experience", tier:"filler", sec:"F", survey:5 }
+];
+PERCEPTIONS_BANK.forEach(function(q){ QUESTION_BANK.push(q); });
+/* Level 6 (The Big Quarter) migrates to its own survey: the
+   Enterprise Relationship Flagship Annual Survey, ids 601-636.
+   Structure follows the scope doc's derivation (A4/B18/C6/D2/E2/F4;
+   14 clean, 13 defective, 5 stupid, 4 filler; core set of 7, all
+   clean, with a creditable core question on every agenda topic).
+   Per decision 3, the flagship has its own bank mixing the
+   relationship subjects of Level 4 and the perception subjects of
+   Level 5; some stems are adapted from those banks (the duplicate
+   overall item, the wordy open, the assured candor item), but the
+   draw never mixes banks. Defect coverage: 10 of the 11 classes;
+   the theme-natural classes from the scope doc's Level 6 rationale
+   are doubled (SENSITIVE NO ASSURANCE, GRID BURDEN, RECALL
+   OVERLOAD). The one omission is recorded here: VAGUE TIMEFRAME.
+   The flagship's items are anchored to the agreement term, the
+   last 12 months, and the annual cycle by construction, which is
+   the anchored form the timeframe class teaches toward; the class
+   is covered on Levels 1, 2, and 4 and in the drills.
+   Answerability follows the scope doc's Level 6 pattern, the
+   tightest of the six: executives answer strategy, value, and
+   renewal intent; contract and commercial specifics sit with
+   Partner Admin seats and are beyond knowledge for everyone else
+   on the Blast list; operational detail is beyond the executive
+   seats entirely. The core set itself is answerable by every
+   seat, deliberately, on the phase-4 reasoning: the agenda items
+   are the strategy, value, and renewal judgments the Blast list
+   exists to give, and the seat pattern is expressed through the
+   topic-to-persona keys. Restrictions live where they teach, on
+   the commercial item Q610 (executive seats excluded), the jargon
+   item Q620, and the beyond-knowledge trap Q619. The survey
+   treats its subject as a subject of measurement, never as
+   promotion: no marketing claims and no facts about any real
+   account or person. New ids live in the 6xx range and are
+   appended after the Perceptions entries. The level's mechanics
+   are unchanged: the 150-credit pool, the Executive Blast
+   audience, the stakeholder encounter, and the Insight gate
+   at 70. */
+var FLAGSHIP_TOPIC_KEYS = {
+  "overall relationship":["exec","itdm"], "trust":["exec","itdm"],
+  "business value":["exec","itdm"], "renewal intent":["exec","itdm"],
+  "strategic alignment":["exec","itdm"], "commercial process":["admin","itdm"],
+  "escalation handling":["itdm","tech"], "account team responsiveness":["itdm","exec"],
+  "relationship experience":["exec","itdm"]
+};
+var FLAGSHIP_BANK = [
+ { id:601, text:"Overall, how would you rate your organization's relationship with Microsoft? (1-5, very poor to very good)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"overall relationship", tier:"clean", sec:"A", survey:6 },
+ { id:602, text:"Overall, how much does your organization trust Microsoft as a long-term partner? (1-5, not at all to completely)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"trust", tier:"clean", sec:"A", survey:6 },
+ { id:603, text:"Overall, how well does Microsoft's direction align with your organization's strategy? (1-5, not at all to completely)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"strategic alignment", tier:"clean", sec:"A", survey:6 },
+ { id:604, text:"Overall, how would you rate your organization's relationship with Microsoft? (1-5, very poor to very good)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"overall relationship", tier:"stupid", sec:"A", survey:6, rg:"dup-relationship", dup:true,
+   flagTxt:"LOW-VALUE · DUPLICATE. This repeats the overall relationship question word for word. It adds burden without new information." },
+ { id:605, text:"Overall, how much business value has your organization's relationship with Microsoft delivered in the last 12 months? (1-5, none to a great deal)", min:0.5, know:"Everyone", who:"exec", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"business value", tier:"clean", sec:"B", survey:6 },
+ { id:606, text:"How likely is your organization to renew its agreement with Microsoft when the current term ends? (1-5, very unlikely to very likely / not my decision)", min:0.5, know:"Everyone", who:"exec", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"renewal intent", tier:"clean", sec:"B", survey:6 },
+ { id:607, text:"How easy is it for your organization to get what it needs from Microsoft when it matters? (1-5)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"overall relationship", tier:"clean", sec:"B", survey:6 },
+ { id:608, text:"When Microsoft makes a commitment to your organization, how confident are you that it will be kept? (1-5)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"trust", tier:"clean", sec:"B", survey:6 },
+ { id:609, text:"How well does Microsoft understand where your organization is trying to go? (1-5)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"strategic alignment", tier:"clean", sec:"B", survey:6 },
+ { id:610, text:"Thinking of your most recent agreement renewal, how clear were the commercial terms before signing? (clear / partly clear / unclear / I was not involved)", min:0.5, know:"Partner Admin or IT Decision Maker", who:"admin", cx:"Low", val:"Medium", core:false, answerBy:["admin","itdm"], defect:"CLEAN", topic:"commercial process", tier:"clean", sec:"B", survey:6 },
+ { id:611, text:"How would you rate the performance of the named individuals on your Microsoft account team? (1-5)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"SENSITIVE NO ASSURANCE", topic:"overall relationship", tier:"defective", sec:"B", survey:6,
+   flagTxt:"SENSITIVE, NO ASSURANCE. Rating named individuals' performance, with no confidentiality line anywhere near it, in the one survey of the year the account team will read line by line. Expect safe answers and quiet refusals, not candor." },
+ { id:612, text:"Has your organization begun evaluating a competitor to replace part of what Microsoft provides? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"SENSITIVE NO ASSURANCE", topic:"renewal intent", tier:"defective", sec:"B", survey:6,
+   flagTxt:"SENSITIVE, NO ASSURANCE. Asking a named executive contact to admit competitor evaluation, with no confidentiality line and a renewal on the calendar, invites the safe answer. The truthful answer is exactly the one this question cannot collect as written." },
+ { id:613, text:"Grid: rate 12 areas of the relationship (account team, support, products, licensing, security, training, roadmap, escalation, billing, reviews, innovation, executive access) across 5 scales each", min:2.5, know:"Everyone, slowly", who:"all", cx:"High", val:"Medium", core:false, answerBy:null, flag:"mobile", defect:"GRID BURDEN", topic:"overall relationship", tier:"defective", sec:"B", survey:6,
+   flagTxt:"GRID BURDEN. Sixty ratings in one matrix: the flagship trying to rate everything. At 2-minute executive patience this is where the survey dies, and the rows that survive are straight-lined." },
+ { id:614, text:"Grid: rate 8 product areas across 4 scales each", min:2.0, know:"Everyone, slowly", who:"all", cx:"High", val:"Medium", core:false, answerBy:null, flag:"mobile", defect:"GRID BURDEN", topic:"business value", tier:"defective", sec:"B", survey:6,
+   flagTxt:"GRID BURDEN. Thirty-two ratings in one matrix. Executives straight-line the same answer down every row or abandon the survey at this screen." },
+ { id:615, text:"Over the last 12 months, how many executive briefings, escalations, and review meetings has your organization held with Microsoft, in total?", min:1.0, know:"Everyone, from memory", who:"all", cx:"High", val:"Medium", core:false, answerBy:null, defect:"RECALL OVERLOAD", topic:"relationship experience", tier:"defective", sec:"B", survey:6,
+   flagTxt:"RECALL OVERLOAD. A year of three different meeting types, counted and summed, from memory. Nobody holds that ledger; respondents invent one, and the inventions look like data." },
+ { id:616, text:"Thinking back over the full term of your current agreement, on how many occasions has a Microsoft commitment to your organization been missed?", min:1.0, know:"Everyone, from memory", who:"all", cx:"High", val:"Medium", core:false, answerBy:null, defect:"RECALL OVERLOAD", topic:"trust", tier:"defective", sec:"B", survey:6,
+   flagTxt:"RECALL OVERLOAD. The annual window is this genre's recall trap: a whole agreement term of commitments, counted, from memory. Respondents remember the worst miss and estimate the rest." },
+ { id:617, text:"How outstanding is the value your organization receives from its strategic partnership with Microsoft?", min:0.75, know:"Everyone", who:"all", cx:"Medium", val:"Medium", core:false, answerBy:null, defect:"LEADING", topic:"business value", tier:"defective", sec:"B", survey:6,
+   flagTxt:"LEADING. 'How outstanding' and 'strategic partnership' presume the verdict before the respondent gives one. Expect inflated value scores that flatter the relationship and measure nothing." },
+ { id:618, text:"How satisfied are you with Microsoft's products and its account team? (1-5)", min:1.0, know:"Everyone", who:"all", cx:"High", val:"Low", core:false, answerBy:null, defect:"DOUBLE-BARRELED", topic:"overall relationship", tier:"defective", sec:"B", survey:6,
+   flagTxt:"DOUBLE-BARRELED. Products and the account team are two judgments sharing one answer. Strong products with a weak team and weak products with a strong team land in the same box. Only SPLIT separates them." },
+ { id:619, text:"What percentage of Microsoft's enterprise revenue comes from organizations in your industry sector?", min:1.0, know:"Microsoft's finance team only, not on this list", who:"admin", cx:"High", val:"Medium", core:false, answerBy:["admin"], flag:"knowledge", defect:"BEYOND KNOWLEDGE", topic:"business value", tier:"defective", sec:"B", survey:6,
+   flagTxt:"BEYOND KNOWLEDGE. Microsoft's revenue mix sits in Microsoft's finance systems, which no seat at the customer can see. Contract and commercial specifics are beyond knowledge for everyone else on the Blast list. No wording fix." },
+ { id:620, text:"Rate the synergy realization and attach-rate performance of your estate's workload modernization journey.", min:0.5, know:"IT Decision Maker, maybe", who:"itdm", cx:"High", val:"Medium", core:false, answerBy:["itdm"], flag:"jargon", defect:"JARGON", topic:"business value", tier:"defective", sec:"B", survey:6,
+   flagTxt:"JARGON. Synergy realization, attach rate, modernization journey: vendor-side shorthand no customer executive uses. The seats this survey exists for cannot parse it; everyone guesses." },
+ { id:621, text:"How world-class is your organization's strategic partnership with Microsoft, on a scale of 1 to 10?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"overall relationship", tier:"stupid", sec:"B", survey:6, rg:"vanity",
+   flagTxt:"LOW-VALUE · VANITY. The wording solicits a compliment rather than evidence for a study decision." },
+ { id:622, text:"Why has your organization not raised its strategic concerns with Microsoft sooner?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"trust", tier:"stupid", sec:"B", survey:6, rg:"blame",
+   flagTxt:"LOW-VALUE · BLAME. The question presumes the respondent's organization is at fault for sitting on its concerns. Expect defensive answers, not candor about the relationship." },
+ { id:623, text:"In the last 12 months, did this relationship help your organization achieve an outcome it could not have reached as easily on its own? (yes / partly / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"business value", tier:"clean", sec:"C", survey:6 },
+ { id:624, text:"How confident are you that Microsoft will still be the right partner for your organization in three years? (1-5)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"strategic alignment", tier:"clean", sec:"C", survey:6 },
+ { id:625, text:"How many people in your organization use Microsoft products daily? Choose one: under 100 / 100-500 / 500-1,000 / more than 500 / Other", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"BROKEN OPTIONS", topic:"relationship experience", tier:"defective", sec:"C", survey:6,
+   flagTxt:"BROKEN OPTIONS. 500 sits in two ranges, so two honest respondents from the same organization can pick different boxes, and the unsure land in Other." },
+ { id:626, text:"In the last 90 days, has Microsoft met your organization's expectations? (yes / partly / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"overall relationship", tier:"clean", sec:"C", survey:6 },
+ { id:627, text:"In what year did your organization sign its first agreement with Microsoft?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"relationship experience", tier:"stupid", sec:"C", survey:6, rg:"trivia",
+   flagTxt:"LOW-VALUE · TRIVIA. Recalling a contract anniversary does not inform the flagship-study agenda, and it reads as a test the respondent can fail." },
+ { id:628, text:"Roughly how many enterprise relationship surveys has your organization received this year?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"relationship experience", tier:"filler", sec:"C", survey:6 },
+ { id:629, text:"Your answers are confidential and are never linked to your name or organization. Have you ever held back a concern about this relationship because raising it felt politically costly? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"trust", tier:"clean", sec:"D", survey:6 },
+ { id:630, text:"Would you disagree that Microsoft is not a partner your organization would consider leaving?", min:0.5, know:"Everyone, after two reads", who:"all", cx:"High", val:"Low", core:false, answerBy:null, defect:"DOUBLE NEGATIVE", topic:"renewal intent", tier:"defective", sec:"D", survey:6,
+   flagTxt:"DOUBLE NEGATIVE. Disagree, not, consider leaving: the item must be parsed twice, and a share of executives will answer the opposite of what they mean, on the one item the renewal read depends on." },
+ { id:631, text:"In your own words, what one change would most strengthen this relationship?", min:1.0, know:"Everyone", who:"all", cx:"Medium", val:"High", core:false, answerBy:null, defect:"CLEAN", topic:"overall relationship", tier:"clean", sec:"E", survey:6 },
+ { id:632, text:"Considering everything about your organization's relationship with Microsoft so far, from the first agreement and the early deployments, through the renewals and the escalations and the executive briefings, the commitments kept and the ones missed, the people who came and went on both sides, and how all of that adds up as one overall judgment, please tell us in your own words the complete story of how well Microsoft's direction fits where your organization is going and everything we could possibly do differently.", min:1.5, know:"Everyone", who:"all", cx:"Medium", val:"Medium", core:false, answerBy:null, defect:"WORDY STEM", topic:"strategic alignment", tier:"defective", sec:"E", survey:6,
+   flagTxt:"WORDY STEM. A paragraph where a sentence would do. At 2-minute executive patience the reading load alone ends the survey. This is the one class SIMPLIFY actually fixes." },
+ { id:633, text:"Which other vendors hold strategic-partner status with your organization? (please name them)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"relationship experience", tier:"stupid", sec:"F", survey:6, rg:"nosy",
+   flagTxt:"LOW-VALUE · IRRELEVANT. A customer's vendor portfolio is its own commercial business; asking has no bearing on this study and reads as intelligence gathering." },
+ { id:634, text:"Which day of the week do you prefer to receive surveys on?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"relationship experience", tier:"filler", sec:"F", survey:6 },
+ { id:635, text:"Would you like to receive a quarterly executive briefing newsletter? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"relationship experience", tier:"filler", sec:"F", survey:6 },
+ { id:636, text:"What device are you answering on right now? (phone / tablet / computer)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"relationship experience", tier:"filler", sec:"F", survey:6 }
+];
+FLAGSHIP_BANK.forEach(function(q){ QUESTION_BANK.push(q); });
 /* Fixed first-play instruments for migrated levels: each level's
    curated 12 from its own bank (6 core, all clean except five
    teaching defectives), installed by applyInstrumentForLevel when
    no seed is recorded for the level. Level 1's fixed instrument
-   stays QUESTIONS, a subset of its bank; unmigrated levels keep
-   QUESTIONS until their phases. */
+   stays QUESTIONS, a subset of its bank. Phase 5 migrated the last
+   two levels, so every level now deals its own fixed instrument. */
 var LEVEL_2_FIXED_IDS = [201,202,203,205,206,209,212,214,216,218,224,230];
 var LEVEL_3_FIXED_IDS = [301,302,303,305,306,307,312,314,318,319,324,330];
 var LEVEL_4_FIXED_IDS = [401,402,403,405,406,407,412,413,415,417,424,430];
+var LEVEL_5_FIXED_IDS = [501,502,503,505,506,523,510,511,513,515,517,530];
+var LEVEL_6_FIXED_IDS = [601,602,603,605,606,623,608,611,613,615,617,619];
 function fixedInstrumentForLevel(n){
   if (n === 2) return LEVEL_2_FIXED_IDS.map(function(id){ return questionById(id); });
   if (n === 3) return LEVEL_3_FIXED_IDS.map(function(id){ return questionById(id); });
   if (n === 4) return LEVEL_4_FIXED_IDS.map(function(id){ return questionById(id); });
+  if (n === 5) return LEVEL_5_FIXED_IDS.map(function(id){ return questionById(id); });
+  if (n === 6) return LEVEL_6_FIXED_IDS.map(function(id){ return questionById(id); });
   return QUESTIONS.slice();
 }
 function activeQuestions(){ return state.instrument || QUESTIONS; }
@@ -1406,19 +1629,17 @@ var LEVEL_AGENDA = {
   2:["adoption breadth","workflow impact","trust in output","output quality","enablement gap"],
   3:["service reliability","cost visibility","migration effort","capability gaps"],
   4:["account team responsiveness","trust and candor","business value delivered","escalation handling","renewal intent"],
-  5:["support speed","self-service gap","product reliability","customer effort"],
-  6:["overall satisfaction","renewal risk","billing clarity","resolution quality","product reliability"]
+  5:["overall favorability","trust","innovation perception","value perception","AI leadership perception"],
+  6:["overall relationship","trust","business value","renewal intent","strategic alignment"]
 };
 /* Per-level survey records (scope doc section 3.2). The BRD assembly,
    the level cards, and the HUD read these. Agenda and topic-to-persona
    maps live on the record: Insight credits a topic only against the
-   survey that owns it. Phases 1 to 4 write the Level 1, Level 2,
-   Level 3, and Level 4 records in full (sponsor, purpose, audience).
-   Levels 5-6 carry their survey name, their current agenda and
-   constraints, and the mission purpose they have always printed;
-   their sponsor and audience sections complete in their own
-   migration phases, and openBRD omits a section whose field is null
-   rather than inventing one. */
+   survey that owns it. All six records are written in full (sponsor,
+   purpose, audience): phases 1 to 4 wrote Levels 1 to 4, and phase 5
+   completed Levels 5 and 6. openBRD omits a section whose field is
+   null rather than inventing one; no campaign record uses that path
+   any longer. */
 var SURVEY_BASE_CONSTRAINTS = "One credit pool for the whole level, shared across attempts. Choose an audience that can answer the required topics. Preserve useful coverage while controlling burden and data contamination.";
 var SURVEYS = {
   1:{ label:"SUPPORT EXPERIENCE", title:"Support Experience Survey", sponsor:"the Support Experience team",
@@ -1440,13 +1661,15 @@ var SURVEYS = {
     audience:"Named contacts at accounts on the relationship program, surveyed on a cycle: trust, business value, and renewal intent are judged from executive and IT decision maker evidence; escalation handling from the frontline technicians and end users who lived the tickets; commercial process items sit with Partner Admin seats. Perception of the account team is answerable by anyone who deals with the team, which makes candor the design risk on this survey, not knowledge: the sensitive items ask people to judge a team they must keep working with, and this audience has already been surveyed three times this quarter.",
     agenda:LEVEL_AGENDA[4], topicKeys:RELATIONSHIP_TOPIC_KEYS,
     constraints:SURVEY_BASE_CONSTRAINTS + " The tired audience requires ending goodwill 35 or higher. Report back (3 cr) is this study's feedback commitment: a relationship audience that never hears what its answers changed stops answering, so telling these accounts what the last round fixed is what protects response on the next cycle." },
-  5:{ label:"GENERAL PERCEPTIONS OF MICROSOFT", title:"General Perceptions of Microsoft Survey", sponsor:null,
-    purpose:"Improve the support experience using technician and end-user evidence.",
-    audience:null, agenda:LEVEL_AGENDA[5], topicKeys:TOPIC_KEYS,
-    constraints:SURVEY_BASE_CONSTRAINTS + " The multilingual list is 40% English-speaking. Consider invitation language and localization review." },
-  6:{ label:"ENTERPRISE RELATIONSHIP", title:"Enterprise Relationship Flagship Annual Survey", sponsor:null,
-    purpose:"Inform the renewal decision using decision-maker evidence.",
-    audience:null, agenda:LEVEL_AGENDA[6], topicKeys:TOPIC_KEYS,
+  5:{ label:"GENERAL PERCEPTIONS OF MICROSOFT", title:"General Perceptions of Microsoft Survey", sponsor:"the Brand and Perceptions research team",
+    purpose:"Decide how Microsoft is perceived, where that perception is moving, and which parts of it the company can actually change: how favorable people feel, whether they trust the company, whether it reads as innovative and as good value, and who they believe leads in AI. The findings set the perception and communications priorities for the next year and are read alongside product and relationship evidence, never instead of it. A perception tracker is the survey that runs globally, which is why this study fields in more than 45 languages while the others field in one.",
+    audience:"A broad professional audience across five language groups: end users, frontline staff, administrators, IT decision makers, and executives, most of whom know Microsoft through its products rather than its org chart. Perception items are answerable by every seat, because a perception needs no system access: the respondent is the only authority on their own view. The one thing this audience cannot answer is a fact: market figures and internal company facts sit with no seat on this list, and a perception survey that asks for them collects guesses dressed as data.",
+    agenda:LEVEL_AGENDA[5], topicKeys:PERCEPTIONS_TOPIC_KEYS,
+    constraints:SURVEY_BASE_CONSTRAINTS + " The multilingual list is 40% English-speaking. Consider invitation language and localization review. Fielding in 45+ languages is this study's design, not a translation errand: localization review (8 cr) checks that each language version still asks the same question, and the localized invite (4 cr) puts the invitation itself in the respondent's language. Response is read by language group; a group that cannot read the invitation cannot report a perception, and its silence is a fielding failure, not a finding." },
+  6:{ label:"ENTERPRISE RELATIONSHIP", title:"Enterprise Relationship Flagship Annual Survey", sponsor:"the Enterprise Relationship team",
+    purpose:"Decide the state of the enterprise relationship before the renewal cycle: whether decision makers trust Microsoft as a long-term partner, whether the relationship delivers business value, whether it aligns with where their organizations are going, and whether they intend to renew. The findings set the enterprise team's account priorities for the year and are read alongside account records, never instead of them. This is the flagship annual: one fielding a year, so a miss cannot be repaired next quarter.",
+    audience:"Senior decision makers at enterprise accounts: the Executive Blast list, mostly executives and IT decision makers, with administrator seats holding the commercial specifics. Executives answer strategy, value, and renewal intent from their own seats; they do not answer operational detail they never touch, and asking them manufactures guesses. Contract and commercial specifics sit with Partner Admin seats and are beyond knowledge for everyone else on the Blast list. This audience gives a survey minutes, not half an hour: the flagship's risk is length and sensitivity at executive patience, not coverage.",
+    agenda:LEVEL_AGENDA[6], topicKeys:FLAGSHIP_TOPIC_KEYS,
     constraints:SURVEY_BASE_CONSTRAINTS + " Resolve the stakeholder request for eight extra questions. Costs and added burden depend on your response; extra-topic answers are not simulated or scored." + " Executive Blast is the available audience for this study." }
 };
 function surveyRecord(level){ return SURVEYS[level || state.level] || SURVEYS[1]; }
@@ -1906,7 +2129,8 @@ function evidenceMission(){
     pool: state.level === 5 ? "global" : state.level === 6 ? "leadership" : "support",
     roles: state.level === 6 ? [{ keys:["exec","itdm"], share:0.5, label:"Decision makers (executives or IT decision makers)" }] :
       [{ keys:["tech"], share:0.1, label:"Frontline technicians" }, { keys:["end"], share:0.1, label:"End users" }],
-    purpose: state.level === 6 ? "Inform the renewal decision using decision-maker evidence." :
+    purpose: state.level === 6 ? "Judge the enterprise relationship using the evidence of the decision makers who own it." :
+      state.level === 5 ? "Measure perceptions of Microsoft using the evidence of the people who hold them, in every language group the study fields." :
       state.level === 2 ? "Measure adoption of the AI assistant using the evidence of the people who use it in their daily work." :
       state.level === 3 ? "Judge the cloud platform experience using the evidence of the people who run workloads on it." :
       state.level === 4 ? "Judge the account team relationship using the evidence of the people who work with the team." :

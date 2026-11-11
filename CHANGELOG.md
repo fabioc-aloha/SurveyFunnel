@@ -1,5 +1,96 @@
 # Changelog
 
+## 2026-11-11 - Per-level surveys phase 5a: Level 5 Perceptions and Level 6 Flagship banks, fallback removed
+
+- Design: [docs/level-surveys-scope.md](docs/level-surveys-scope.md),
+  phase 5a. Levels 5 (Global Fieldwork) and 6 (The Big Quarter)
+  migrate from the legacy shared bank to their own surveys, and
+  the transitional legacy fallback is removed: every campaign
+  level now draws its own bank. Level 5 and 6 mechanics are
+  unchanged (the multilingual list, localization review and the
+  localized invite at 4 cr, the by-language funnel on Level 5;
+  the 150 cr pool, Insight gate 70, and Executive Blast on
+  Level 6).
+- Level 5 bank: 36 newly authored entries (ids 501-536; 0
+  reused) for the General Perceptions of Microsoft Survey.
+  Structure follows the scope doc's derivation: sections
+  A4/B18/C6/D2/E2/F4; 14 clean, 13 defective, 5 stupid, 4
+  filler; core set of 7, all clean, with a creditable core
+  question on every agenda topic. Defect coverage is 10 of the
+  11 classes; the theme-natural classes from the scope doc's
+  Level 5 rationale are doubled (LEADING, VAGUE TIMEFRAME,
+  DOUBLE-BARRELED). The one omission is recorded in the bank's
+  header comment: RECALL OVERLOAD (a perception has no events
+  to recall; the class is covered on Levels 1 to 4, on Level 6,
+  and in the drills). Answerability inverts the other surveys:
+  the object is the respondent's own perception, so perception
+  items are answerable by every seat, and the bank's single
+  BEYOND KNOWLEDGE item (Q517) is a factual claim smuggled into
+  a perception survey, beyond knowledge for every seat equally.
+  No brand claim is asserted as fact anywhere in the bank;
+  flattery appears only as labeled LEADING and vanity traps.
+  The Level 5 BRD is written in full (sponsor: the Brand and
+  Perceptions research team; the constraints carry the
+  localization reality: fielding in 45+ languages, localization
+  review checks that each version still asks the same
+  question, and response is read by language group). Level 5
+  deals a curated fixed 12 from its own bank on first play.
+- Level 6 bank: 36 newly authored entries (ids 601-636; 0
+  reused) for the Enterprise Relationship Flagship Annual
+  Survey. Same derived structure; core set of 7, all clean,
+  with a creditable core question on every agenda topic. Per
+  decision 3, the flagship has its own bank mixing the
+  relationship subjects of Level 4 and the perception subjects
+  of Level 5; some stems are adapted from those banks, but the
+  draw never mixes banks. Defect coverage is 10 of the 11
+  classes; the doubled classes are SENSITIVE NO ASSURANCE,
+  GRID BURDEN, and RECALL OVERLOAD. The one omission is
+  recorded in the bank's header comment: VAGUE TIMEFRAME (the
+  flagship's items are anchored to the agreement term and the
+  annual cycle by construction; the class is covered on Levels
+  1, 2, and 4 and in the drills). Answerability is the tightest
+  of the six: executives answer strategy, value, and renewal
+  intent, commercial specifics sit with Partner Admin seats,
+  and operational detail is beyond the executive seats. On the
+  phase-4 reasoning, the core set itself is answerable by
+  every seat, and the seat pattern is expressed through the
+  topic-to-persona keys; restrictions live on non-core items.
+  The Level 6 BRD is written in full (sponsor: the Enterprise
+  Relationship team; one fielding a year, read alongside
+  account records, never instead of them). Level 6 deals a
+  curated fixed 12 from its own bank on first play. All six
+  survey records are now written in full.
+- Fallback removal: `bankForLevel` carries no legacy fallback.
+  The legacy 64 entries remain in `QUESTION_BANK` as the Quick
+  Challenge union source and Level 1's curation origin; the
+  drills deal by id, never through `bankForLevel`, and Quick
+  Challenge behavior is unchanged.
+- Witnesses: the Level 5 and Level 6 corpora were regenerated
+  through the real card handlers (65 setups each: the fixed
+  first-play instrument plus 64 seeded instruments), and the
+  splice asserted every other level's entries identical before
+  and after. Level 5: fixed line 72 cr against the 70 cr
+  pre-migration baseline, seeded lines 66-85 cr, recorded lines
+  ending at 57-72 goodwill. Level 6: fixed line 87 cr against
+  the 98 cr baseline, seeded lines 83-122 cr, recorded lines
+  ending at 26-53 goodwill. The Level 5 regeneration completed
+  under the build worker; the worker was then stopped at the
+  owner's direction and the Level 6 regeneration, the splice,
+  and the final gates were finished and verified by the parent
+  agent. No tuning and no pool changes in this phase; the cost
+  deltas against baseline (Level 5 +2 fixed, Level 6 -11
+  fixed) are recorded in TODO.md as phase-5b rebalance flags.
+- Verification: build validates (3 inline scripts, 8 packaged
+  files); the Node suite passes with zero failures, including
+  the per-level bank tests (structure, defect floor, core
+  coverage, QC union integrity, fallback absence) and the
+  continuous six-level campaign; the full harness passes 3/3
+  with browser checks 152/152, including the survey-identity
+  scenario extended to Levels 5 and 6. Screenshots of the
+  Level 5 and 6 setup screens and BRDs at 390 px were reviewed
+  by eye; the survey names render on the setup banner and in
+  the BRD title.
+
 ## 2026-11-11 - Per-level surveys phase 4: Level 4 Account Team Relationship bank and BRD
 
 - Design: [docs/level-surveys-scope.md](docs/level-surveys-scope.md),

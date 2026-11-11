@@ -1201,6 +1201,46 @@ async function runSurveyIdentityScenario(browser, gameUrl, viewport, options) {
       brd4.includes('ending goodwill 35 or higher') && brd4.includes('feedback commitment'),
       { banner: banner4.slice(0, 240), excerpt: brd4.slice(0, 320) });
     await page.keyboard.press('Escape');
+    await page.waitForFunction(() => !document.querySelector('#studyBRD').classList.contains('open'), { timeout: 5000 });
+
+    await page.evaluate(() => { selectLevel(5, true); });
+    await waitForVisible(page, '#setup');
+    const banner5 = await page.evaluate(() =>
+      (document.querySelector('#levelBanner')?.textContent || '').replace(/\s+/g, ' '));
+    await clickAndWait(page, '#brdBtn', 400);
+    await page.waitForSelector('#studyBRD.open', { visible: true, timeout: 10000 });
+    const brd5 = await page.evaluate(() =>
+      (document.querySelector('#brdContent')?.textContent || '').replace(/\s+/g, ' '));
+    await run.check('Level 5 BRD renders its own Perceptions study with the localization design',
+      banner5.includes('Survey: General Perceptions of Microsoft Survey') &&
+      brd5.includes('General Perceptions of Microsoft Survey') && !brd5.includes('Support Experience Survey') &&
+      !brd5.includes('Copilot Adoption Survey') && !brd5.includes('Azure Cloud Services Survey') &&
+      !brd5.includes('Account Team Relationship Survey') &&
+      brd5.includes('SPONSOR') && brd5.includes('Brand and Perceptions research team') && brd5.includes('AUDIENCE') &&
+      brd5.includes('overall favorability') && brd5.includes('AI leadership perception') &&
+      brd5.includes('45+ languages') && brd5.includes('fielding failure, not a finding'),
+      { banner: banner5.slice(0, 240), excerpt: brd5.slice(0, 320) });
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(() => !document.querySelector('#studyBRD').classList.contains('open'), { timeout: 5000 });
+
+    await page.evaluate(() => { selectLevel(6, true); });
+    await waitForVisible(page, '#setup');
+    const banner6 = await page.evaluate(() =>
+      (document.querySelector('#levelBanner')?.textContent || '').replace(/\s+/g, ' '));
+    await clickAndWait(page, '#brdBtn', 400);
+    await page.waitForSelector('#studyBRD.open', { visible: true, timeout: 10000 });
+    const brd6 = await page.evaluate(() =>
+      (document.querySelector('#brdContent')?.textContent || '').replace(/\s+/g, ' '));
+    await run.check('Level 6 BRD renders its own Flagship study with the annual stakes and Executive Blast audience',
+      banner6.includes('Survey: Enterprise Relationship Flagship Annual Survey') &&
+      brd6.includes('Enterprise Relationship Flagship Annual Survey') && !brd6.includes('Support Experience Survey') &&
+      !brd6.includes('Copilot Adoption Survey') && !brd6.includes('Azure Cloud Services Survey') &&
+      !brd6.includes('Account Team Relationship Survey') && !brd6.includes('General Perceptions of Microsoft Survey') &&
+      brd6.includes('SPONSOR') && brd6.includes('Enterprise Relationship team') && brd6.includes('AUDIENCE') &&
+      brd6.includes('overall relationship') && brd6.includes('strategic alignment') &&
+      brd6.includes('Executive Blast is the available audience') && brd6.includes('one fielding a year'),
+      { banner: banner6.slice(0, 240), excerpt: brd6.slice(0, 320) });
+    await page.keyboard.press('Escape');
     await checkNoJourneyErrors(run, 'per-level survey identity scenario');
   } catch (error) {
     await run.record('per-level survey identity scenario completes without a harness exception', false, {
