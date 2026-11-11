@@ -4,10 +4,14 @@ Design proposal: 2026-11-11. Status: approved and in build.
 The owner approved the direction and the level-to-survey mapping in
 section 1 on 2026-11-11, and approved all seven open decisions in
 section 8 as recommended on 2026-11-11. Phase 1 (data model,
-per-level BRD, Level 1 Support Experience bank) and the Level 2
-half of phase 2 (Copilot Adoption bank, full Level 2 BRD, Level 2
-witnesses) are built to those decisions; the Level 3 bank and
-phases 3 to 5 remain. This document proposes turning each
+per-level BRD, Level 1 Support Experience bank), phase 2 (Level 2
+Copilot Adoption bank, full Level 2 BRD, Level 2 witnesses), and
+phase 3 (Level 3 Azure Cloud Services bank, full Level 3 BRD with
+the sponsor named as the study's stakeholder, Level 3 witnesses)
+are built to those decisions; phases 4 and 5 remain (Level 4 and
+Level 5 banks and BRDs, the Level 6 flagship bank with removal
+of the legacy-bank fallback, and the closing rebalance). This
+document proposes turning each
 campaign level into a different survey, with its own questionnaire
 bank and its own BRD, replacing today's single shared bank and
 single shared BRD assembly.

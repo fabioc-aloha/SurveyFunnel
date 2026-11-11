@@ -905,7 +905,18 @@ var QUESTION_REPAIRS = {
   225:["In the past 30 days, about how many times did you ask the assistant for help?"],
   226:["How many times did you use the assistant last week? Choose one: 0 / 1-2 / 3-5 / 6-10 / more than 10"],
   230:['Example privacy line (use only if accurate): "Your answer will help improve how the assistant is rolled out. Only the AI adoption research team will review individual responses."',"Have you ever pasted confidential company or customer information into the assistant? (yes / no)"],
-  232:["What one change would most improve the assistant for your work?"]
+  232:["What one change would most improve the assistant for your work?"],
+  312:["During the most recent platform outage that affected your workloads, how long did it take before service returned to normal? (under an hour / same day / longer / no outage in the last 90 days)"],
+  313:["How easy is it to connect the platform's managed services to the tools your team already uses? (1-5)"],
+  316:["How reliable was the platform service your team used most in the last 90 days? Rate one service at a time from 1 to 5."],
+  317:["How satisfied are you with the platform area your team relies on most? Rate one area at a time from 1 to 5."],
+  318:["How reliable has the platform been for your workloads in the last 90 days? (1-5)"],
+  319:["How satisfied are you with the platform's performance in the last 90 days?","How satisfied are you with the support you received when performance slowed down?"],
+  320:["In the last 30 days, did a platform incident interrupt your team's work? (yes / no)"],
+  325:["In the last 90 days, did your team move or redeploy a workload on the platform? (yes / no)"],
+  326:["How many virtual machines does your team run on the platform? Choose one: 0 / 1-10 / 11-50 / 51-100 / more than 100"],
+  330:['Example privacy line (use only if accurate): "Your answer will help improve platform security practice. Only the platform research team will review individual responses."',"Has anyone on your team shared platform administrator sign-in details to get work done faster? (yes / no)"],
+  332:["What one change would most improve moving workloads onto the platform for your team?"]
 };
 function repairedQuestionMarkup(q){
   var prompts = QUESTION_REPAIRS[q.id] || [q.text];
@@ -1060,8 +1071,8 @@ var LEVEL_1_BANK_IDS = [1,2,3,4,5,6,7,8,9,10,11,12,25,27,29,30,31,32,37,39,43,45
 QUESTION_BANK.forEach(function(q){ q.survey = LEVEL_1_BANK_IDS.indexOf(q.id) >= 0 ? 1 : 0; });
 OPTIONAL_QUESTIONS.forEach(function(q){ q.survey = 1; });
 function bankForLevel(level){
-  if (level === 1 || level === 2) return QUESTION_BANK.filter(function(q){ return q.survey === level; });
-  /* Unmigrated levels (3-6) draw the legacy pool exactly as phase 1
+  if (level === 1 || level === 2 || level === 3) return QUESTION_BANK.filter(function(q){ return q.survey === level; });
+  /* Unmigrated levels (4-6) draw the legacy pool exactly as phase 1
      left it: every entry stamped 0 or 1, in original bank order, so
      their deals and witnesses are unchanged. Phase 4 removes this. */
   return QUESTION_BANK.filter(function(q){ return q.survey === 0 || q.survey === 1; });
@@ -1151,14 +1162,110 @@ var COPILOT_BANK = [
  { id:236, text:"What device are you answering on right now? (phone / tablet / computer)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"rollout experience", tier:"filler", sec:"F", survey:2 }
 ];
 COPILOT_BANK.forEach(function(q){ QUESTION_BANK.push(q); });
+/* ================= PER-LEVEL SURVEYS · PHASE 3 =================
+   Level 3 (The Stakeholder) migrates to its own survey: the Azure
+   Cloud Services Survey, ids 301-336. Structure follows the scope
+   doc's derivation (A4/B18/C6/D2/E2/F4; 14 clean, 13 defective,
+   5 stupid, 4 filler; core set of 7, all clean, with a creditable
+   core question on every agenda topic). Defect coverage: 9 of the
+   11 classes; the theme-natural classes from the scope doc's
+   Level 3 rationale are doubled (BEYOND KNOWLEDGE, JARGON, RECALL
+   OVERLOAD, GRID BURDEN). The two omissions are recorded here:
+   VAGUE TIMEFRAME and DOUBLE NEGATIVE. This instrument's items ride
+   on dated operational windows (the last incident, the last billing
+   cycle), which is the anchored form the timeframe class teaches
+   against, and negation-stacked items live in agreement and consent
+   text rather than platform experience items; both classes are
+   covered on Levels 1 and 2 and in the drills. Answerability
+   follows the scope doc's Level 3 pattern, the densest of any bank:
+   the object is a platform other people run, so IT decision makers
+   and frontline technical seats answer architecture, reliability,
+   and migration items; cost figures sit with Partner Admin seats
+   and whether costs are visible sits with IT decision makers; end
+   users of the finished applications cannot answer tenancy, region,
+   or SKU questions at all. The survey treats its subject as a
+   subject of measurement, never as promotion: stems assert no
+   capability claims, service levels, or roadmap promises, and hype
+   wording appears only as labeled LEADING and vanity traps. New
+   ids live in the 3xx range and are appended after the Copilot
+   entries, so legacy pool order (and therefore every unmigrated
+   level's deal) is untouched. The sponsor is the Azure product
+   team, which is also this level's stakeholder: the eight extra
+   questions in the stakeholder encounter are the sponsor asking
+   for more of its own survey, and the BRD record says so. */
+var AZURE_TOPIC_KEYS = {
+  "service reliability":["itdm","tech"], "cost visibility":["admin","itdm"],
+  "migration effort":["itdm","tech"], "capability gaps":["itdm","tech"],
+  "support and documentation":["tech","end"], "security and compliance":["itdm","admin"],
+  "platform experience":["end","tech"]
+};
+var AZURE_BANK = [
+ { id:301, text:"Overall, how reliable has the cloud platform been for the workloads your team runs? (1-5, not at all to completely)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"service reliability", tier:"clean", sec:"A", survey:3 },
+ { id:302, text:"Overall, how clearly can you see what your cloud usage costs your organization? (1-5)", min:0.5, know:"IT Decision Maker or Partner Admin", who:"itdm", cx:"Low", val:"High", core:true, answerBy:["itdm","admin"], defect:"CLEAN", topic:"cost visibility", tier:"clean", sec:"A", survey:3 },
+ { id:303, text:"Overall, how well does the platform cover the capabilities your team's work needs? (1-5)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"capability gaps", tier:"clean", sec:"A", survey:3 },
+ { id:304, text:"Overall, how reliable has the cloud platform been for the workloads your team runs? (1-5, not at all to completely)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"service reliability", tier:"stupid", sec:"A", survey:3, rg:"dup-reliability", dup:true,
+   flagTxt:"LOW-VALUE · DUPLICATE. This repeats the overall reliability question word for word. It adds burden without new information." },
+ { id:305, text:"In the last 90 days, how often did a platform outage or slowdown interrupt your team's work? (never / once / a few times / often)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"service reliability", tier:"clean", sec:"B", survey:3 },
+ { id:306, text:"Thinking of the most recent full billing cycle, could you tell which of your workloads drove the cost? (yes / partly / no)", min:0.5, know:"IT Decision Maker or Partner Admin", who:"itdm", cx:"Low", val:"High", core:true, answerBy:["itdm","admin"], defect:"CLEAN", topic:"cost visibility", tier:"clean", sec:"B", survey:3 },
+ { id:307, text:"How much effort did your team's most recent move of a workload onto the platform take, compared with what you expected? (much less / about as expected / more / much more / we have not moved one)", min:0.5, know:"IT Decision Maker or Frontline Technician", who:"itdm", cx:"Low", val:"High", core:true, answerBy:["itdm","tech"], defect:"CLEAN", topic:"migration effort", tier:"clean", sec:"B", survey:3 },
+ { id:308, text:"In the last 90 days, did your team delay, redesign, or drop work because the platform lacked a capability you needed? (yes / no)", min:0.5, know:"IT Decision Maker or Frontline Technician", who:"itdm", cx:"Low", val:"High", core:true, answerBy:["itdm","tech"], defect:"CLEAN", topic:"capability gaps", tier:"clean", sec:"B", survey:3 },
+ { id:309, text:"How satisfied are you with the platform's performance for your workloads at your busiest times? (1-5)", min:0.5, know:"IT Decision Maker or Frontline Technician", who:"tech", cx:"Low", val:"Medium", core:false, answerBy:["itdm","tech"], defect:"CLEAN", topic:"service reliability", tier:"clean", sec:"B", survey:3 },
+ { id:310, text:"How easy is it to find platform documentation that answers your question when you get stuck? (1-5)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"support and documentation", tier:"clean", sec:"B", survey:3 },
+ { id:311, text:"How confident are you that your workloads on this platform meet your organization's security requirements? (1-5)", min:0.5, know:"IT Decision Maker", who:"itdm", cx:"Low", val:"Medium", core:false, answerBy:["itdm"], defect:"CLEAN", topic:"security and compliance", tier:"clean", sec:"B", survey:3 },
+ { id:312, text:"Rate the platform's RTO and RPO performance for your tier-1 workloads during the last availability-zone failover.", min:0.5, know:"IT Decision Maker, maybe", who:"itdm", cx:"High", val:"Medium", core:false, answerBy:["itdm"], flag:"jargon", defect:"JARGON", topic:"service reliability", tier:"defective", sec:"B", survey:3,
+   flagTxt:"JARGON. RTO, RPO, tier-1, availability-zone failover: four insider terms, none defined. Only the platform team can parse this; everyone else guesses." },
+ { id:313, text:"How well do the platform's PaaS offerings integrate with your CI/CD pipeline and IaC templates?", min:0.5, know:"IT Decision Maker, maybe", who:"itdm", cx:"High", val:"Medium", core:false, answerBy:["itdm"], flag:"jargon", defect:"JARGON", topic:"capability gaps", tier:"defective", sec:"B", survey:3,
+   flagTxt:"JARGON. PaaS, CI/CD, IaC: the item is written in the platform team's own shorthand. Respondents outside that team cannot tell what is being asked." },
+ { id:314, text:"What share of your organization's cloud spend goes to resources that sit idle or unused?", min:1.0, know:"Finance only, not on this list", who:"admin", cx:"High", val:"Medium", core:false, answerBy:["admin"], flag:"knowledge", defect:"BEYOND KNOWLEDGE", topic:"cost visibility", tier:"defective", sec:"B", survey:3,
+   flagTxt:"BEYOND KNOWLEDGE. The idle share of an organization's whole cloud spend sits in finance systems no one on this list can see. No wording fix: this audience cannot know this." },
+ { id:315, text:"How does the provider's internal capacity planning in your region affect the quotas your team receives?", min:1.0, know:"The provider's capacity team only, not on this list", who:"itdm", cx:"High", val:"Medium", core:false, answerBy:["itdm"], flag:"knowledge", defect:"BEYOND KNOWLEDGE", topic:"capability gaps", tier:"defective", sec:"B", survey:3,
+   flagTxt:"BEYOND KNOWLEDGE. The provider's capacity planning is internal to the provider. Respondents can see their quotas; they cannot know the planning behind them, and no wording change fixes that." },
+ { id:316, text:"Grid: rate 10 platform services across 5 scales each", min:2.5, know:"Everyone, slowly", who:"all", cx:"High", val:"Medium", core:false, answerBy:null, flag:"mobile", defect:"GRID BURDEN", topic:"service reliability", tier:"defective", sec:"B", survey:3,
+   flagTxt:"GRID BURDEN. A 10-row service matrix on a phone means pinch, scroll, mis-tap, and straight-lined rows. Half this list answers between other jobs." },
+ { id:317, text:"Grid: rate 8 platform areas (compute, storage, networking, databases, security, monitoring, support, billing) across 4 scales each", min:2.0, know:"Everyone, slowly", who:"all", cx:"High", val:"Medium", core:false, answerBy:null, flag:"mobile", defect:"GRID BURDEN", topic:"capability gaps", tier:"defective", sec:"B", survey:3,
+   flagTxt:"GRID BURDEN. Eight areas times four scales is a spreadsheet, not a question. Tired respondents straight-line the same answer down every row." },
+ { id:318, text:"How excellent is the platform's industry-leading reliability for your workloads?", min:0.75, know:"Everyone", who:"all", cx:"Medium", val:"Medium", core:false, answerBy:null, defect:"LEADING", topic:"service reliability", tier:"defective", sec:"B", survey:3,
+   flagTxt:"LEADING. 'How excellent' and 'industry-leading' presume the answer twice over. Expect inflated top-box scores that flatter the platform and measure nothing." },
+ { id:319, text:"How satisfied are you with the platform's performance and the support you received when it slowed down?", min:1.0, know:"Everyone", who:"all", cx:"High", val:"Low", core:false, answerBy:null, defect:"DOUBLE-BARRELED", topic:"service reliability", tier:"defective", sec:"B", survey:3,
+   flagTxt:"DOUBLE-BARRELED. Performance and the support around it are two judgments sharing one answer. A slow platform with good support and a fast one with poor support land in the same box. Only SPLIT separates them." },
+ { id:320, text:"Over the last 12 months, how many platform incidents affected your workloads, and how many hours of downtime did they cause in total?", min:1.0, know:"Everyone, from memory", who:"all", cx:"High", val:"Medium", core:false, answerBy:null, defect:"RECALL OVERLOAD", topic:"service reliability", tier:"defective", sec:"B", survey:3,
+   flagTxt:"RECALL OVERLOAD. A year of incidents, counted, plus a year of downtime hours, totaled, from memory. Nobody recalls this; they estimate it, and the estimates look like data." },
+ { id:321, text:"How world-class is the cloud platform, on a scale of 1 to 10?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"capability gaps", tier:"stupid", sec:"B", survey:3, rg:"vanity",
+   flagTxt:"LOW-VALUE · VANITY. The wording solicits a compliment rather than evidence for a study decision." },
+ { id:322, text:"Why has your team not moved more of its workloads onto the platform yet?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"migration effort", tier:"stupid", sec:"B", survey:3, rg:"blame",
+   flagTxt:"LOW-VALUE · BLAME. The question presumes the respondent's team is at fault for its migration pace. Expect defensive answers, not migration insight." },
+ { id:323, text:"Which best describes your part in this platform? (I run workloads on it / I approve or fund its use / I administer access and billing / I use the applications it hosts)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"platform experience", tier:"clean", sec:"C", survey:3 },
+ { id:324, text:"Thinking of your most recent support case about this platform, how long did it take to resolve? (same day / 1-3 days / longer / no case in the last 90 days)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"support and documentation", tier:"clean", sec:"C", survey:3 },
+ { id:325, text:"Over the past year, how many times has your team moved or redeployed a workload, and how long did each move take on average?", min:1.0, know:"Everyone, from memory", who:"all", cx:"High", val:"Medium", core:false, answerBy:null, defect:"RECALL OVERLOAD", topic:"migration effort", tier:"defective", sec:"C", survey:3,
+   flagTxt:"RECALL OVERLOAD. A year of migrations, counted, plus the average length of each, from one person's memory. The answers will be round numbers and wishful thinking." },
+ { id:326, text:"How many virtual machines does your team run on the platform? Choose one: 0-10 / 10-50 / 50-100 / more than 100 / Other", min:0.5, know:"IT Decision Maker or Frontline Technician", who:"itdm", cx:"Low", val:"Medium", core:false, answerBy:["itdm","tech"], defect:"BROKEN OPTIONS", topic:"capability gaps", tier:"defective", sec:"C", survey:3,
+   flagTxt:"BROKEN OPTIONS. 10, 50 and 100 each sit in two ranges, so two honest respondents with the same estate can pick different boxes, and the unsure land in Other." },
+ { id:327, text:"What was the internal codename for the platform's last major release?", min:0.5, know:"Nobody outside the building", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"platform experience", tier:"stupid", sec:"C", survey:3, rg:"trivia",
+   flagTxt:"LOW-VALUE · TRIVIA. An internal codename does not inform the platform-study agenda." },
+ { id:328, text:"Roughly how many surveys about cloud services have you received this quarter?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"platform experience", tier:"filler", sec:"C", survey:3 },
+ { id:329, text:"Your answers are confidential and are never linked to your name. Have you ever waited to report a platform problem because you were concerned about how it would reflect on your team? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"service reliability", tier:"clean", sec:"D", survey:3 },
+ { id:330, text:"Has anyone on your team shared platform administrator sign-in details to get work done faster? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"SENSITIVE NO ASSURANCE", topic:"security and compliance", tier:"defective", sec:"D", survey:3,
+   flagTxt:"SENSITIVE, NO ASSURANCE. Asking respondents to report shared administrator credentials, with no confidentiality line anywhere near it, invites denial, not data." },
+ { id:331, text:"In your own words, what one change to the platform would most help your team's work?", min:1.0, know:"Everyone", who:"all", cx:"Medium", val:"High", core:false, answerBy:null, defect:"CLEAN", topic:"capability gaps", tier:"clean", sec:"E", survey:3 },
+ { id:332, text:"Considering everything about your experience with the platform so far, from the first planning and the account setup, through the migration or build itself, the day-to-day running, the incidents and the support around them, the bills and how they were explained, and how all of that fits together as one overall impression, please tell us in your own words the complete story of what moving to this platform has meant for your team and everything we could possibly do differently.", min:1.5, know:"Everyone", who:"all", cx:"Medium", val:"Medium", core:false, answerBy:null, defect:"WORDY STEM", topic:"migration effort", tier:"defective", sec:"E", survey:3,
+   flagTxt:"WORDY STEM. A paragraph where a sentence would do. The reading load alone spends patience before the respondent types a word. This is the one class SIMPLIFY actually fixes." },
+ { id:333, text:"Which other cloud providers does your organization pay for, and how much does it spend with each?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"platform experience", tier:"stupid", sec:"F", survey:3, rg:"nosy",
+   flagTxt:"LOW-VALUE · IRRELEVANT. Competitor spend by provider has no bearing on this platform study. The item requests commercially sensitive information without a study purpose." },
+ { id:334, text:"Which day of the week do you prefer to receive surveys on?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"platform experience", tier:"filler", sec:"F", survey:3 },
+ { id:335, text:"Would you like to receive a monthly platform updates newsletter? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"platform experience", tier:"filler", sec:"F", survey:3 },
+ { id:336, text:"What device are you answering on right now? (phone / tablet / computer)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"CLEAN", topic:"platform experience", tier:"filler", sec:"F", survey:3 }
+];
+AZURE_BANK.forEach(function(q){ QUESTION_BANK.push(q); });
 /* Level 2's fixed first-play instrument: its curated 12 from its own
    bank (6 core, all clean except five teaching defectives), installed
    by applyInstrumentForLevel when no seed is recorded for the level.
    Level 1's fixed instrument stays QUESTIONS, a subset of its bank;
    unmigrated levels keep QUESTIONS until their phases. */
 var LEVEL_2_FIXED_IDS = [201,202,203,205,206,209,212,214,216,218,224,230];
+var LEVEL_3_FIXED_IDS = [301,302,303,305,306,307,312,314,318,319,324,330];
 function fixedInstrumentForLevel(n){
   if (n === 2) return LEVEL_2_FIXED_IDS.map(function(id){ return questionById(id); });
+  if (n === 3) return LEVEL_3_FIXED_IDS.map(function(id){ return questionById(id); });
   return QUESTIONS.slice();
 }
 function activeQuestions(){ return state.instrument || QUESTIONS; }
@@ -1176,7 +1283,7 @@ var TOPIC_KEYS = {
 var LEVEL_AGENDA = {
   1:["overall satisfaction","customer effort","self-service gap","renewal risk"],
   2:["adoption breadth","workflow impact","trust in output","output quality","enablement gap"],
-  3:["resolution quality","customer effort","product reliability","self-service gap"],
+  3:["service reliability","cost visibility","migration effort","capability gaps"],
   4:["overall satisfaction","customer effort","resolution quality"],
   5:["support speed","self-service gap","product reliability","customer effort"],
   6:["overall satisfaction","renewal risk","billing clarity","resolution quality","product reliability"]
@@ -1184,11 +1291,11 @@ var LEVEL_AGENDA = {
 /* Per-level survey records (scope doc section 3.2). The BRD assembly,
    the level cards, and the HUD read these. Agenda and topic-to-persona
    maps live on the record: Insight credits a topic only against the
-   survey that owns it. Phases 1 and 2 write the Level 1 and Level 2
-   records in full (sponsor, purpose, audience). Levels 3-6 carry
-   their survey name, their current agenda and constraints, and the
-   mission purpose they have always printed; their sponsor and
-   audience sections complete in their own migration phases, and
+   survey that owns it. Phases 1 to 3 write the Level 1, Level 2, and
+   Level 3 records in full (sponsor, purpose, audience). Levels 4-6
+   carry their survey name, their current agenda and constraints,
+   and the mission purpose they have always printed; their sponsor
+   and audience sections complete in their own migration phases, and
    openBRD omits a section whose field is null rather than inventing
    one. */
 var SURVEY_BASE_CONSTRAINTS = "One credit pool for the whole level, shared across attempts. Choose an audience that can answer the required topics. Preserve useful coverage while controlling burden and data contamination.";
@@ -1202,10 +1309,11 @@ var SURVEYS = {
     audience:"People who have been offered the assistant in their work. End users and frontline staff answer usage, output, and workflow questions from their own desks; on this survey they are the strong respondents. Executives cannot answer daily-use or prompt-level detail they never touch, and asking them manufactures guesses. IT decision makers answer rollout, governance, and enablement questions; budget and licensing figures sit with Partner Admin seats, and pre-release model facts sit with no seat on this list.",
     agenda:LEVEL_AGENDA[2], topicKeys:COPILOT_TOPIC_KEYS,
     constraints:SURVEY_BASE_CONSTRAINTS + " A/B testing is available: this study fields two invitation variants against the same instrument, and the comparison is about the invitation, never about two different questionnaires. Compare the invitations and report uncertainty rather than assuming a winner." },
-  3:{ label:"AZURE CLOUD SERVICES", title:"Azure Cloud Services Survey", sponsor:null,
-    purpose:"Improve the support experience using technician and end-user evidence.",
-    audience:null, agenda:LEVEL_AGENDA[3], topicKeys:TOPIC_KEYS,
-    constraints:SURVEY_BASE_CONSTRAINTS + " Resolve the stakeholder request for eight extra questions. Costs and added burden depend on your response; extra-topic answers are not simulated or scored." },
+  3:{ label:"AZURE CLOUD SERVICES", title:"Azure Cloud Services Survey", sponsor:"the Azure product team",
+    purpose:"Decide where the platform improves next: where workloads are interrupted, where costs cannot be seen, where moving a workload takes more effort than it should, and where a missing capability forces a team to redesign. The findings set the Azure product team's priorities for the next two quarters and are read alongside service telemetry, never instead of it.",
+    audience:"People whose organizations run workloads on the platform. IT decision makers and frontline technical staff answer architecture, reliability, and migration questions, because they build and operate on the platform; cost figures sit with Partner Admin seats, and whether costs are visible sits with IT decision makers. End users of the finished applications the platform hosts cannot answer tenancy, region, or SKU questions at all, and asking them manufactures guesses.",
+    agenda:LEVEL_AGENDA[3], topicKeys:AZURE_TOPIC_KEYS,
+    constraints:SURVEY_BASE_CONSTRAINTS + " The sponsor is also this study's stakeholder: the Azure product team has asked for eight extra questions of its own, which is the stakeholder encounter on this level. Accept the request, rotate modules, or push back with evidence. Costs and added burden depend on your response; extra-topic answers are not simulated or scored." },
   4:{ label:"ACCOUNT TEAM RELATIONSHIP", title:"Account Team Relationship Survey", sponsor:null,
     purpose:"Improve the support experience using technician and end-user evidence.",
     audience:null, agenda:LEVEL_AGENDA[4], topicKeys:TOPIC_KEYS,
@@ -1678,6 +1786,7 @@ function evidenceMission(){
       [{ keys:["tech"], share:0.1, label:"Frontline technicians" }, { keys:["end"], share:0.1, label:"End users" }],
     purpose: state.level === 6 ? "Inform the renewal decision using decision-maker evidence." :
       state.level === 2 ? "Measure adoption of the AI assistant using the evidence of the people who use it in their daily work." :
+      state.level === 3 ? "Judge the cloud platform experience using the evidence of the people who run workloads on it." :
       "Improve the support experience using technician and end-user evidence."
   };
 }

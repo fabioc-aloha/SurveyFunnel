@@ -1163,6 +1163,25 @@ async function runSurveyIdentityScenario(browser, gameUrl, viewport, options) {
       brd2.includes('two invitation variants against the same instrument'),
       { banner: banner2.slice(0, 240), excerpt: brd2.slice(0, 320) });
     await page.keyboard.press('Escape');
+    await page.waitForFunction(() => !document.querySelector('#studyBRD').classList.contains('open'), { timeout: 5000 });
+
+    await page.evaluate(() => { selectLevel(3, true); });
+    await waitForVisible(page, '#setup');
+    const banner3 = await page.evaluate(() =>
+      (document.querySelector('#levelBanner')?.textContent || '').replace(/\s+/g, ' '));
+    await clickAndWait(page, '#brdBtn', 400);
+    await page.waitForSelector('#studyBRD.open', { visible: true, timeout: 10000 });
+    const brd3 = await page.evaluate(() =>
+      (document.querySelector('#brdContent')?.textContent || '').replace(/\s+/g, ' '));
+    await run.check('Level 3 BRD renders its own Azure study with the sponsor as stakeholder',
+      banner3.includes('Survey: Azure Cloud Services Survey') &&
+      brd3.includes('Azure Cloud Services Survey') && !brd3.includes('Support Experience Survey') &&
+      !brd3.includes('Copilot Adoption Survey') &&
+      brd3.includes('SPONSOR') && brd3.includes('Azure product team') && brd3.includes('AUDIENCE') &&
+      brd3.includes('service reliability') && brd3.includes('capability gaps') &&
+      brd3.includes("sponsor is also this study's stakeholder"),
+      { banner: banner3.slice(0, 240), excerpt: brd3.slice(0, 320) });
+    await page.keyboard.press('Escape');
     await checkNoJourneyErrors(run, 'per-level survey identity scenario');
   } catch (error) {
     await run.record('per-level survey identity scenario completes without a harness exception', false, {
