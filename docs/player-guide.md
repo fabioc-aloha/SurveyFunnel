@@ -62,7 +62,7 @@ progress or spends the campaign's credits.
    the unfixable). What survives is promoted to the Gold contact
    master; its list health is derived from what arrived and what you
    fixed, and stale records have no fix. Then the Gold checks: email
-   validation (BrightVerify) at skip, partial, or full; suppression
+   validation (BriteVerify) at skip, partial, or full; suppression
    scrub (opt outs and recently surveyed); localization review.
    These are simulated preparation choices, not live service integrations.
 3. **INVITATION.** Pick a variant and a reminder count. Generic is
@@ -116,14 +116,15 @@ Prices:
 
 | Action | Cost |
 | --- | --- |
-| Send: Fresh or Stale segment | 30 |
+| Send: any segment except Executive Blast | 30 |
 | Send: Executive Blast | 45 |
-| Validation (BrightVerify): partial / full | 6 / 12 (full is 18 on Blast) |
+| Validation (BriteVerify): partial / full | 6 / 12 (full is 18 on Blast) |
 | Dedupe (Silver) | 4 |
 | Consolidate (Silver) | 4 |
 | Repair addresses (Silver) | 5 |
 | Suppression scrub | 4 |
 | Localization review | 8 |
+| Localized invite (Level 5) | 4 |
 | Invite: Generic / Honest Ask / Known Name | 0 / 4 / 10 |
 | Reminder, each | 8 |
 | SPLIT a double-barreled item or BREAK UP a grid | 3 |
@@ -131,6 +132,7 @@ Prices:
 | Cut a question, each | 1 |
 | Add a question from the optional bank, each | 3 |
 | Add escapes | 2 |
+| Report back line (Level 4) | 3 |
 | A/B test setup (Level 2) | 6 |
 
 The invitation batch always costs credits. Keeping an item unchanged

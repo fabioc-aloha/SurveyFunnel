@@ -468,8 +468,8 @@
   .checklist .crow.done .st{ color:var(--teal); }
   .checklist .crow.todo .st{ color:var(--gold); }
   .checklist .skipbtn2{ font-family:"Press Start 2P",monospace; font-size:9px; cursor:pointer; background:var(--panel); color:var(--ink); border:2px solid var(--line); border-radius:5px; padding:8px 9px; min-height:40px; }
-  #fieldGuide,#studyBRD{ display:none; position:fixed; inset:0; z-index:60; background:rgba(6,8,14,.82); padding:14px; overflow:auto; }
-  #fieldGuide.open,#studyBRD.open{ display:block; }
+  #fieldGuide,#studyBRD,#fishbowl{ display:none; position:fixed; inset:0; z-index:60; background:rgba(6,8,14,.82); padding:14px; overflow:auto; }
+  #fieldGuide.open,#studyBRD.open,#fishbowl.open{ display:block; }
   .fgcard{ max-width:760px; margin:10px auto 30px; background:var(--cab2); color:var(--ink); border:3px solid var(--teal); border-radius:12px; padding:18px; }
   .fgcard h2{ font-family:"Press Start 2P",monospace; font-size:13px; color:var(--gold); line-height:1.7; margin:0 0 10px; }
   .fgcard h3{ font-family:"Press Start 2P",monospace; font-size:10px; color:var(--teal); line-height:1.6; margin:16px 0 6px; }
@@ -518,6 +518,7 @@
     </div>
     <div class="spacer"></div>
     <button class="soundbtn" id="guideBtn" aria-label="Consult MPOR (Master Plan of Record)">? Consult MPOR</button>
+    <button class="soundbtn" id="fishBtn" aria-label="Consult Fishbowl (how a survey list is built)">? FISHBOWL</button>
     <button class="soundbtn" id="soundBtn" aria-label="Toggle sound">♪ SOUND: ON</button>
   </div>
 
@@ -584,6 +585,7 @@
         </div>
         <div class="grid3" id="segGrid"></div>
         <div id="prepPanel"></div>
+        <button class="soundbtn" id="fishFlowBtn" aria-label="Consult Fishbowl (how the list flows)" style="margin-top:10px">? HOW THE LIST FLOWS (FISHBOWL)</button>
       </section>
 
       <div class="grid2">
@@ -757,6 +759,37 @@
       <p>In the campaign, produce evidence stakeholders can trust and use. Pass all five checks: <b>funnel execution, evidence fitness, data integrity, audience sustainability, and operational trust</b>. Response rate is a benchmark, not a win gate. Only cleaned, account-linked responses count toward the mission's sample and role requirements; Insight is calculated again from those responses. Quality must remain 60+ and Insight 60+ (Level 6: 70+). The BRD states the mission's minimum sample and required roles. These are simulation rules, not statistical guarantees.</p>
       <p>After FINISH the report follows <b>CLEAN → MATCH → INTERPRET → PUBLISH → ACT</b>. Speeders, straight-liners, duplicate, junk, and guessed responses are removed once each; forwarded responses cannot be matched to the invited account. A failed check withholds publication and names the next action. Audience health carries across instruments in this campaign. Starting a new instrument does not refresh the audience; resetting the whole campaign does. Quick Challenges retain their own response, quality, Insight, and BRD requirements.</p>
       <div style="margin-top:16px"><button class="fgclose" id="guideClose">◀ BACK TO THE GAME</button></div>
+    </div>
+  </div>
+
+  <!-- ================= FISHBOWL OVERLAY ================= -->
+  <div id="fishbowl" role="dialog" aria-modal="true" aria-label="Fishbowl: how a survey list is built">
+    <div class="fgcard">
+      <h2>FISHBOWL</h2>
+      <p>How a survey list is built, from raw records to the responses that come back. Step 2 of this game compresses the first stages into one step; this is the whole flow it stands for.</p>
+      <h3>SOURCES</h3>
+      <p>Contact records arrive from several internal systems, including CRM. Prior survey responses are a source too. The same person can exist in several systems at once, under the same address or different ones, and one person can belong to several surveys.</p>
+      <h3>BRONZE</h3>
+      <p>Records land exactly as they arrive. No cleanup and no validation happen at this layer: what arrives is what is kept, duplicates, typos, and stale addresses included.</p>
+      <h3>SILVER</h3>
+      <p>Silver is the cleaning layer, and three kinds of work happen here. <b>Dedupe</b> merges rows one system created twice: same system, same address, two rows. <b>Consolidation</b> merges records that arrived from different sources about the same person, where the addresses differ. <b>Syntax repair</b> fixes the address typos that can be fixed. An address that cannot be repaired is flagged and is <b>not promoted</b> to Gold.</p>
+      <h3>GOLD · CONTACT MASTER</h3>
+      <p>Gold is the consolidated contact master table: one record per email address, refreshed daily, carrying the enhancements gathered from the other sources, including historical survey results. Every send is built from this table.</p>
+      <p>In the game: Step 2's three panels are this pipeline compressed into one step. The game skips the daily refresh and deals you the intake for the audience you chose.</p>
+      <h3>SAMPLING</h3>
+      <p>Sampling runs in a separate environment. It verifies a larger set of addresses than the sample needs, in bulk, then prepares the sample from the verified set, stratified by region and customer segment. Most addresses flagged "risky" are sent anyway; only invalid addresses are excluded. Excluded invalids and hard bounces are kept in tables, so they are not mailed again.</p>
+      <p>In the game: the validation choice in Step 2's Gold panel is this check, simplified to two tiers.</p>
+      <h3>PERMISSION</h3>
+      <p>Before the final sample is locked, a permission service is checked for every contact. It rules on opt-outs and returns a personalized unsubscribe link to put in the invite. The link is passed to the sending platform and is not stored. The send has to go out within 72 hours of the check; after that, the check no longer holds.</p>
+      <p>In the game: this is the suppression scrub in Step 2, without the 72-hour clock.</p>
+      <h3>THE SEND</h3>
+      <p>The prepared sample is loaded to the survey platform by API. Sends are organized by recipient time zone, so the invite lands near the top of the inbox in the morning.</p>
+      <h3>RESPONSES AND DISPOSITION</h3>
+      <p>Responses and disposition data are pulled back daily by API into the data platform. When a wave ends, the incomplete responses are flushed across as well. Waves run monthly. Results flow out to the departments that analyze them; disposition data (who was sent to, who bounced, who opted out) stays inside the survey team.</p>
+      <p>In the game: your round report is one wave, compressed. Its deliverability section is the disposition view.</p>
+      <h3>WHY IT MATTERS</h3>
+      <p>List quality is decided between Bronze and Gold, long before anyone presses send. Most of the survey problems an Instrument Manager meets at send time (bounces, duplicates, people who should never have been mailed) were baked in upstream. That is why Step 2 exists.</p>
+      <div style="margin-top:16px"><button class="fgclose" id="fishClose">◀ BACK TO THE GAME</button></div>
     </div>
   </div>
 
@@ -1912,7 +1945,7 @@ function budgetMath(ov){
   var rbCharge = (state.reportBack && !base.reportBack) ? 3 : 0;
   var langCharge = (state.langChoice === "localized" && base.langChoice !== "localized") ? 4 : 0;
   var prepItems = [
-    ["Validate emails (BrightVerify) · " + val + (base.validation !== "skip" && val === base.validation ? " · OWNED" : valCharge && base.validation !== "skip" ? " · upgrade" : ""), valCharge],
+    ["Validate emails (BriteVerify) · " + val + (base.validation !== "skip" && val === base.validation ? " · OWNED" : valCharge && base.validation !== "skip" ? " · upgrade" : ""), valCharge],
     ["Dedupe · Silver" + (base.dedupe ? " · OWNED" : ""), dedCharge],
     ["Consolidate · Silver" + (base.consolidate ? " · OWNED" : ""), conCharge],
     ["Repair addresses · Silver" + (base.repair ? " · OWNED" : ""), repCharge],
@@ -1988,7 +2021,7 @@ function renderPrep(){
   if (state.quickChallenge){
     el.innerHTML = '<div class="lever-head" style="margin-top:14px"><span class="lever-no" style="background:var(--blue)">STEP 2</span><span class="lever-title" style="font-size:12px">PREPARE THE LIST</span><span class="lever-sub">Bought before launch, same credits.</span></div>' +
       '<div class="prepgrid">' +
-      '<div class="prow"><span class="pt">Validate emails (BrightVerify)</span><div class="valbtns">' + valBtns + '</div><div class="pe">Full checks the whole list; Partial the riskiest half. Removes most invalid addresses — a small share always survives: catch-all domains cannot be verified.</div></div>' +
+      '<div class="prow"><span class="pt">Validate emails (BriteVerify)</span><div class="valbtns">' + valBtns + '</div><div class="pe">Full checks the whole list; Partial the riskiest half. Removes most invalid addresses — a small share always survives: catch-all domains cannot be verified.</div></div>' +
       tog("dedupe", state.dedupe, 4, "Dedupe pass", "Removes duplicate addresses: nobody gets the survey twice or counts twice.") +
       tog("suppression", state.suppression, 4, "Suppression scrub", "Removes opt-outs and anyone surveyed in the last 30 days. Skip it: they get mailed anyway, \u22126 goodwill.") +
       tog("localization", state.localization, 8, "Localization review", "Plain-language and locale check across the list\u2019s languages. +2 data quality.") +
@@ -2008,7 +2041,7 @@ function renderPrep(){
       tog("repair", state.repair, 5, "REPAIR ADDRESSES · SILVER", "Fixes the " + cnt("brokenFix") + " fixable addresses; quarantines the " + cnt("brokenDead") + " unfixable, never promoted. Skip it: broken addresses promote and bounce.") +
       '<div class="prow"><span class="pt">SILVER OUTPUT</span><div class="pe">' + fmt(Math.round(dNow.promotedShare * n)) + ' records after merges and quarantine.</div></div>' +
       '<div class="prow"><span class="pt">GOLD · CONTACT MASTER</span><div class="pe">List health after your list work: <b style="color:' + healthColor + '">' + healthPct + '% invalid</b>. Stale records and broken addresses you did not repair set this rate. Validation and the suppression check run on the promoted list below.</div></div>' +
-      '<div class="prow"><span class="pt">Validate emails (BrightVerify)</span><div class="valbtns">' + valBtns + '</div><div class="pe">Full checks the whole list; Partial the riskiest half. Removes most invalid addresses — a small share always survives: catch-all domains cannot be verified.</div></div>' +
+      '<div class="prow"><span class="pt">Validate emails (BriteVerify)</span><div class="valbtns">' + valBtns + '</div><div class="pe">Full checks the whole list; Partial the riskiest half. Removes most invalid addresses — a small share always survives: catch-all domains cannot be verified.</div></div>' +
       tog("suppression", state.suppression, 4, "Suppression scrub · GOLD CHECK", "Removes opt-outs and anyone surveyed in the last 30 days. Skip it: they get mailed anyway, \u22126 goodwill.") +
       tog("localization", state.localization, 8, "Localization review", "Plain-language and locale check across the list\u2019s languages. +2 data quality.") +
       '</div>';
@@ -2591,6 +2624,12 @@ function closeGuide(){ if (activeReference && activeReference.id === "fieldGuide
 var gbBtn = $("guideBtn"); if (gbBtn) gbBtn.addEventListener("click", function(){ initAudio(); sndClick(); openGuide(); });
 var gcBtn = $("guideClose"); if (gcBtn) gcBtn.addEventListener("click", function(){ sndClick(); closeGuide(); });
 var fgEl = $("fieldGuide"); if (fgEl) fgEl.addEventListener("click", function(e){ if (e.target === fgEl) closeGuide(); });
+function openFishbowl(){ openReference("fishbowl", "fishClose", "fishBtn"); }
+function closeFishbowl(){ if (activeReference && activeReference.id === "fishbowl") closeReference(); }
+var fbBtn = $("fishBtn"); if (fbBtn) fbBtn.addEventListener("click", function(){ initAudio(); sndClick(); openFishbowl(); });
+var ffBtn = $("fishFlowBtn"); if (ffBtn) ffBtn.addEventListener("click", function(){ sndClick(); openFishbowl(); });
+var fcBtn = $("fishClose"); if (fcBtn) fcBtn.addEventListener("click", function(){ sndClick(); closeFishbowl(); });
+var fbEl = $("fishbowl"); if (fbEl) fbEl.addEventListener("click", function(e){ if (e.target === fbEl) closeFishbowl(); });
 document.addEventListener("keydown", function(e){
   if (!activeReference) return;
   if (e.key === "Escape"){ e.preventDefault(); closeReference(); }
@@ -3731,7 +3770,7 @@ var BB_DOMAINS = ["northgate-logistics.example","oldmill-textiles.example","pinn
 var BB_DEAD_DOMAINS = ["quickship-2009.example","faxline-systems.example","pagerplus.example","dialup-depot.example"];
 var BB_ROLES = ["info","support","admin","sales","contact","help","billing","office"];
 var BB_CAUSE_LABEL = {
-  catchall: "Catch-all pass \u00B7 BrightVerify marked it deliverable because the domain accepts all mail",
+  catchall: "Accept-all pass \u00B7 BriteVerify flagged it accept_all: the domain accepts all mail, so the mailbox itself stays unconfirmed",
   never: "Never checked \u00B7 no validation was bought for this send",
   partial: "Partial check missed it \u00B7 partial validation scanned only the riskiest half"
 };
@@ -3798,7 +3837,12 @@ function bounceBacksHTML(bb){
     return h + "<p style='font-size:15.5px;margin:4px 0'><b>No bounce-backs.</b> Every address accepted the mail this round.</p>";
   }
   var causeLine;
-  if (bb.validation === "full") causeLine = "Every one of them passed full BrightVerify validation. Catch-all domains accept mail for any mailbox, real or not, so no validation can confirm these addresses before the send.";
+  if (bb.validation === "full"){
+    var fullParts = [];
+    if (bb.hard > 0) fullParts.push("Every hard bounce survived full BriteVerify validation: catch-all domains accept mail for any mailbox, real or not, so no validation can confirm those addresses before the send.");
+    if (bb.soft > 0) fullParts.push("The soft bounces are real mailboxes that refused this send (mailbox full, temporary failure); validation cannot prevent those.");
+    causeLine = fullParts.join(" ");
+  }
   else if (bb.validation === "partial") causeLine = fmt(bb.causes.partial) + " sat outside the riskiest half that partial validation scanned. " + fmt(bb.causes.catchall) + " passed as catch-all addresses, which no check can verify.";
   else causeLine = "None of them was ever checked: no validation was bought, so every dead address on the list was mailed.";
   h += "<p style='font-size:15.5px;margin:4px 0'><b>" + fmt(bb.total) + " addresses bounced back</b> (" + fmt(bb.hard) + " hard \u00B7 " + fmt(bb.soft) + " soft). " + causeLine + "</p>";
@@ -3809,9 +3853,10 @@ function bounceBacksHTML(bb){
     }).join("") + "</table>";
   if (bb.more > 0) h += "<p style='font-size:14.5px;margin:6px 0'>+ " + fmt(bb.more) + " more bounced addresses not shown.</p>";
   var note;
-  if (bb.validation === "full") note = "Validation removed every address it could verify. What is left is the catch-all residue: real lists keep a small share of these no matter how well they are cleaned, which is why validation shrinks the bounce list but never zeroes it.";
+  if (bb.validation === "full") note = "Validation removed every address it could verify. The hard bounces left are the catch-all residue: real lists keep a small share of these no matter how well they are cleaned, which is why validation shrinks the bounce list but never zeroes it.";
   else if (bb.validation === "partial") note = "Partial validation checked the riskiest half only. The unchecked half keeps its dead addresses, and the catch-all residue survives any tier of checking.";
   else note = "Validation would have removed most of this list before it cost sender reputation. The catch-all residue is the part no tier can remove.";
+  if (bb.soft > 0) note += " Soft bounces are a different failure: the address is real, but the mailbox was full or temporarily failing, and no tier of validation prevents those.";
   h += "<p style='font-size:14.5px;margin:6px 0'>" + note + "</p>";
   return h;
 }
@@ -4128,7 +4173,7 @@ function showReport(){
   if (state.validation === "skip"){
     valVerdict = "No validation bought. Full validation (" + validationCostFor(seg, "full") + " cr) would have removed most invalids and saved \u2248" + fmt(Math.round((baseInvalidRate() - baseInvalidRate() * 0.15) * seg.n)) + " bounces this round.";
   } else {
-    valVerdict = "Validation (" + state.validation + ", " + validationCostFor(seg, state.validation) + " cr) saved \u2248" + fmt(savedBounce) + " bounces. \u2248" + fmt(Math.round(effInvalidRate() * seg.n)) + " invalids still got through, because catch-all domains cannot be verified.";
+    valVerdict = "Validation (" + state.validation + ", " + validationCostFor(seg, state.validation) + " cr) saved \u2248" + fmt(savedBounce) + " bounces. \u2248" + fmt(Math.round(effInvalidRate() * seg.n)) + " invalids still got through, " + (state.validation === "partial" ? "because partial validation scanned only the riskiest half, and catch-all domains cannot be verified at any tier." : "because catch-all domains cannot be verified.");
   }
   var openEffectTxt = rmR.openFactor === 1 ? "Hard bounces stayed at or under 5% of sends, so opens were not penalized." : (rmR.atRisk ? "Hard bounces ran over 10% of sends: reputation tanked and spam filters cut opens roughly in half." : "Hard bounces ran over 5% of sends: reputation slipped and opens were cut by about 15%.");
   if (!state.suppression) openEffectTxt += " Mailing opted-out and recently surveyed people cost 5 reputation on top.";

@@ -119,7 +119,7 @@ For each viewport it asserts:
 - A deterministic Level 1 playthrough can be configured entirely through
   DOM clicks:
   - Fresh audience
-  - Full BrightVerify validation
+  - Full BriteVerify validation
   - Dedupe and suppression on
   - Generic Blast invitation
   - Zero reminders

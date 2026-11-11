@@ -963,6 +963,46 @@ test('modal close restores focus and releases the background', () => {
   assert.equal(g.document.activeElement, element('brdBtn'));
 });
 
+test('fishbowl help document sits alongside MPOR and BRD with both entry points', () => {
+  const html = readFileSync(join(root, 'site', 'index.html'), 'utf8');
+  assert.match(html, /id="fishBtn"[^>]*>\? FISHBOWL<\/button>/);
+  assert.match(html, /id="fishFlowBtn"[^>]*>\? HOW THE LIST FLOWS \(FISHBOWL\)<\/button>/);
+  assert.match(html, /id="fishbowl" role="dialog" aria-modal="true" aria-label="Fishbowl: how a survey list is built"/);
+  const overlay = html.slice(html.indexOf('id="fishbowl"'), html.indexOf('id="fishClose"'));
+  const sections = ['SOURCES', 'BRONZE', 'SILVER', 'GOLD · CONTACT MASTER', 'SAMPLING', 'PERMISSION', 'THE SEND', 'RESPONSES AND DISPOSITION'];
+  let last = -1;
+  for (const section of sections) {
+    const at = overlay.indexOf(`<h3>${section}</h3>`);
+    assert.ok(at > last, `fishbowl section ${section} present in pipeline order`);
+    last = at;
+  }
+  assert.match(overlay, /72 hours/);
+  assert.match(overlay, /not stored/);
+  assert.match(overlay, /larger set of addresses/i);
+  assert.match(overlay, /one record per email address/);
+  assert.match(overlay, /refreshed daily/);
+});
+
+test('fishbowl modal restores focus to either opener and releases the background', () => {
+  const { context: g, element } = game();
+  element('fishBtn').focus();
+  g.openFishbowl();
+  assert.equal(element('fishbowl').classList.contains('open'), true);
+  assert.equal(element('topbar').inert, true);
+  assert.equal(element('cabinet').inert, true);
+  assert.equal(g.document.activeElement, element('fishClose'));
+  g.closeFishbowl();
+  assert.equal(element('fishbowl').classList.contains('open'), false);
+  assert.equal(g.document.activeElement, element('fishBtn'));
+  assert.equal(element('topbar').inert, false);
+  assert.equal(element('cabinet').inert, false);
+  element('fishFlowBtn').focus();
+  g.openFishbowl();
+  assert.equal(g.document.activeElement, element('fishClose'));
+  g.closeFishbowl();
+  assert.equal(g.document.activeElement, element('fishFlowBtn'));
+});
+
 test('difficulty labels describe all six studies consistently', () => {
   const { context: g, element } = game();
   assert.deepEqual(Array.from(g.LEVELS, level => level.difficulty),

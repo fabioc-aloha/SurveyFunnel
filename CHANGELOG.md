@@ -1,5 +1,70 @@
 # Changelog
 
+## 2026-11-11 - Fact-check fixes: BriteVerify name, accept_all label, catch-all scope, guide prices
+
+- The email validator is Validity's BriteVerify; game copy and the
+  player guide spelled it "BrightVerify". Renamed everywhere it is
+  a present-tense product reference: the validation labels and the
+  budget panel in site/index.html, docs/player-guide.md, and the
+  harness README. Historical records keep the old spelling: this
+  changelog's older entries, the dated mechanics doc, captured UAT
+  artifacts, and the audit's own evidence quotes.
+- The bounce-back cause label for catch-all survivors no longer
+  claims the validator marked the address deliverable. It now
+  reads: "Accept-all pass · BriteVerify flagged it accept_all: the
+  domain accepts all mail, so the mailbox itself stays unconfirmed".
+- The "catch-all residue" note in the bounce-backs report is
+  scoped to hard bounces. The full-validation cause line splits
+  hard and soft bounces, soft bounces get their own accurate
+  description in the note (real mailboxes, full or temporarily
+  failing; validation cannot prevent them), and the partial-tier
+  validation verdict names the riskiest-half scan as a reason
+  invalids got through.
+- Player guide price table: the send row now covers every
+  30-credit segment (was "Fresh or Stale"); added the two missing
+  rows, Localized invite (Level 5) at 4 cr and Report back line
+  (Level 4) at 3 cr. Every other price in the table re-verified
+  against budgetMath and the code constants; no other mismatch.
+- Dispositions for each finding are recorded in
+  docs/fact-check-2026-11-11.md. Gates: node suite 117/117, full
+  harness PASS 3/3 (browser 141/141).
+
+## 2026-11-11 - Fishbowl help document alongside MPOR and BRD
+
+- New third reference overlay, FISHBOWL · HOW A SURVEY LIST IS
+  BUILT, in the same family as MPOR and the BRD: same dialog
+  mechanics (inert background, focus containment, Escape close,
+  opener-focus restoration) through the shared reference code.
+- Two entry points open the one overlay: a "? FISHBOWL" button in
+  the topbar next to "Consult MPOR", and a "? HOW THE LIST FLOWS
+  (FISHBOWL)" button in the Step 2 list-preparation area.
+- Eight sections in pipeline order (Sources, Bronze, Silver,
+  Gold · Contact Master, Sampling, Permission, The Send,
+  Responses and Disposition), grounded in the owner's documented
+  real system, plus a closing "Why it matters" note. Where the
+  game simplifies (daily refresh, validation tiers, the 72-hour
+  permission clock, the compressed wave report), the section
+  says so in one line instead of claiming the model.
+- Coverage: node tests for the overlay's sections, both entry
+  points, and focus restoration to either opener; browser checks
+  for both entry points, focus containment, Escape, and overflow
+  at 390px and desktop. No gameplay, economy, or scoring change.
+
+## 2026-11-11 - Fact-check audit (documentation only)
+
+- Read-only audit of every checkable factual claim in the game copy,
+  the player guide, and the design docs:
+  [docs/fact-check-2026-11-11.md](docs/fact-check-2026-11-11.md).
+  32 claims graded: 26 supported, 1 wrong, 3 misleading,
+  2 unverifiable. No game code, tests, or copy changed.
+- Headline results: no named citation's number is wrong (Groves and
+  Peytcheva 2008 verified at 59 studies, R-squared about 0.04);
+  no copy states a game abstraction as a real-world fact; the
+  player guide's price table omits two priced actions (Report back
+  line, 3 cr; Localized invite, 4 cr). The validator's name is
+  misspelled "BrightVerify" for BriteVerify in the game copy and
+  the player guide. Fixes are recorded in the audit doc, not applied.
+
 ## 2026-11-10 - Medallion prep stage, phase 1: derived list health
 
 - Step 2 rebuilt as BUILD THE LIST with Bronze / Silver / Gold

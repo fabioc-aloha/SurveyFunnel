@@ -382,6 +382,31 @@ async function runViewport(browser, gameUrl, viewport, options) {
       { consoleErrors: run.consoleErrors, pageErrors: run.pageErrors, requestFailures: run.requestFailures });
     await checkOverflow(run, 'title screen');
 
+    // Fishbowl reference overlay from the topbar: opens with all eight
+    // sections, takes focus, and Escape returns focus to the opener.
+    await clickAndWait(page, '#fishBtn', 300);
+    await waitForVisible(page, '#fishbowl');
+    const fishTop = await page.evaluate(() => {
+      const el = document.querySelector('#fishbowl');
+      const text = (el?.textContent || '').replace(/\s+/g, ' ');
+      const headings = ['SOURCES', 'BRONZE', 'SILVER', 'GOLD · CONTACT MASTER',
+        'SAMPLING', 'PERMISSION', 'THE SEND', 'RESPONSES AND DISPOSITION'];
+      return {
+        open: el?.classList.contains('open'),
+        focus: document.activeElement?.id,
+        sections: headings.filter((heading) => text.includes(heading))
+      };
+    });
+    await run.check('fishbowl opens from the topbar with all eight sections',
+      fishTop.open && fishTop.sections.length === 8, fishTop);
+    await run.check('fishbowl moves focus to its close button', fishTop.focus === 'fishClose', fishTop);
+    await checkOverflow(run, 'fishbowl overlay open from topbar');
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(() => !document.querySelector('#fishbowl').classList.contains('open'));
+    const fishEscFocus = await page.evaluate(() => document.activeElement?.id);
+    await run.check('fishbowl Escape closes and restores focus to the topbar button',
+      fishEscFocus === 'fishBtn', { focus: fishEscFocus });
+
     await clickAndWait(page, '#startBtn', 500);
     await waitForVisible(page, '#setup');
     await page.waitForSelector('#qGrid .qcard', { visible: true, timeout: 15000 });
@@ -394,6 +419,31 @@ async function runViewport(browser, gameUrl, viewport, options) {
     await scrollAndAssertReachable(run, '#questionSummary', 'Step 4 questionnaire summary');
     await scrollAndAssertReachable(run, '#qGrid', 'question cards');
     await checkOverflow(run, 'setup after scrolling through all stages');
+
+    // The second Fishbowl entry point lives in the Step 2 list-preparation
+    // area and must behave identically: same overlay, contained focus, and
+    // focus restored to this opener on close.
+    await page.$eval('#fishFlowBtn', (el) => el.scrollIntoView({ block: 'center', behavior: 'auto' }));
+    await clickAndWait(page, '#fishFlowBtn', 300);
+    await waitForVisible(page, '#fishbowl');
+    const fishStep = await page.evaluate(() => ({
+      open: document.querySelector('#fishbowl')?.classList.contains('open'),
+      focus: document.activeElement?.id
+    }));
+    await run.check('fishbowl opens from the Step 2 list-preparation button',
+      fishStep.open && fishStep.focus === 'fishClose', fishStep);
+    await checkOverflow(run, 'fishbowl overlay open from Step 2');
+    await page.keyboard.press('Tab');
+    const fishTabFocus = await page.evaluate(() => document.activeElement?.id);
+    await run.check('fishbowl keeps Tab focus inside the dialog', fishTabFocus === 'fishClose', { focus: fishTabFocus });
+    await clickAndWait(page, '#fishClose', 300);
+    const fishClosed = await page.evaluate(() => ({
+      open: document.querySelector('#fishbowl').classList.contains('open'),
+      focus: document.activeElement?.id
+    }));
+    await run.check('fishbowl close button restores focus to the Step 2 button',
+      !fishClosed.open && fishClosed.focus === 'fishFlowBtn', fishClosed);
+
     await questionButtonAudit(run);
 
     // A deterministic, fixture-backed Level 1 setup, made only with DOM clicks.
