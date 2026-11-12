@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-11-12 - Mobile QR code now encodes the short link
+
+- At the owner's direction, the title screen's mobile-player QR
+  code (assets/play-mobile-qr.svg) now encodes
+  https://aka.ms/dvc instead of the production URL. The asset
+  keeps its exact format (49x49 modules, version 6, the game's
+  cream and ink colors, single-path SVG) and its geometry on the
+  title screen. The adjacent "Open game on mobile" link still
+  points at the production URL, as the build test pins it; only
+  the QR payload changed.
+- Verification: the new asset was decoded independently before
+  shipping (ZXing, from the SVG's own module data) and again from
+  a screenshot of the QR as rendered in the game; both read
+  exactly https://aka.ms/dvc. The previous asset decoded to the
+  production URL by the same method, confirming the swap.
+
 ## 2026-11-11 - Per-level surveys phase 5b: closing rebalance
 
 - Design: [docs/level-surveys-scope.md](docs/level-surveys-scope.md),
