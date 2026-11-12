@@ -1139,7 +1139,14 @@ function bankForLevel(level){
    claims, and hype wording appears only as labeled LEADING and
    vanity traps. New ids live in the 2xx range and are appended
    after the legacy entries, so legacy pool order (and therefore
-   every unmigrated level's deal) is untouched. */
+   every unmigrated level's deal) is untouched. Phase 5b tuning
+   (2026-11-11): the substantive clean items carry realistic
+   respondent times (Q205, Q206, Q207, Q208, Q223 at 1.0 min;
+   the open-text Q231 at 1.5) while the 1-5 ratings stay at
+   0.5; two probe doses verified the cheapest winning line is
+   set by the send and list-preparation economy, not by item
+   times, so the calibration stands as burden realism, and the
+   Level 2 witnesses were regenerated against it. */
 var COPILOT_TOPIC_KEYS = {
   "adoption breadth":["end","tech"], "workflow impact":["end","tech"],
   "trust in output":["end","tech"], "output quality":["end","tech"],
@@ -1152,10 +1159,10 @@ var COPILOT_BANK = [
  { id:203, text:"Overall, how much do you trust the AI assistant's output in your work? (1-5, not at all to completely)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"trust in output", tier:"clean", sec:"A", survey:2 },
  { id:204, text:"Overall, how valuable is the AI assistant in your work? (1-5)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"workflow impact", tier:"stupid", sec:"A", survey:2, rg:"dup-value", dup:true,
    flagTxt:"LOW-VALUE · DUPLICATE. This repeats the overall value question word for word. It adds burden without new information." },
- { id:205, text:"In the last 30 days, how often was the AI assistant's first answer good enough to use with little or no editing? (never / sometimes / usually / almost always)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"output quality", tier:"clean", sec:"B", survey:2 },
- { id:206, text:"In a typical week last month, how much time did the AI assistant save you? (none / under an hour / 1-3 hours / more than 3 hours)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"workflow impact", tier:"clean", sec:"B", survey:2 },
- { id:207, text:"In the last 30 days, which of these did you use the AI assistant for? (drafting / summarizing / finding information / working with data / none of these)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"adoption breadth", tier:"clean", sec:"B", survey:2 },
- { id:208, text:"When the AI assistant gives you an answer, how often do you check it against another source before using it? (never / sometimes / usually / always)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:false, answerBy:null, defect:"CLEAN", topic:"trust in output", tier:"clean", sec:"B", survey:2 },
+ { id:205, text:"In the last 30 days, how often was the AI assistant's first answer good enough to use with little or no editing? (never / sometimes / usually / almost always)", min:1.0, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"output quality", tier:"clean", sec:"B", survey:2 },
+ { id:206, text:"In a typical week last month, how much time did the AI assistant save you? (none / under an hour / 1-3 hours / more than 3 hours)", min:1.0, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"workflow impact", tier:"clean", sec:"B", survey:2 },
+ { id:207, text:"In the last 30 days, which of these did you use the AI assistant for? (drafting / summarizing / finding information / working with data / none of these)", min:1.0, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"adoption breadth", tier:"clean", sec:"B", survey:2 },
+ { id:208, text:"When the AI assistant gives you an answer, how often do you check it against another source before using it? (never / sometimes / usually / always)", min:1.0, know:"Everyone", who:"all", cx:"Low", val:"High", core:false, answerBy:null, defect:"CLEAN", topic:"trust in output", tier:"clean", sec:"B", survey:2 },
  { id:209, text:"Have you received any training or guidance on using the AI assistant in your role? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"enablement gap", tier:"clean", sec:"B", survey:2 },
  { id:210, text:"Do you know where to find guidance on using the AI assistant well? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"enablement gap", tier:"clean", sec:"B", survey:2 },
  { id:211, text:"In the last 30 days, did you use the AI assistant to prepare for, or follow up from, a meeting? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"workflow impact", tier:"clean", sec:"B", survey:2 },
@@ -1181,7 +1188,7 @@ var COPILOT_BANK = [
    flagTxt:"LOW-VALUE · VANITY. The wording solicits hype rather than evidence for a study decision." },
  { id:222, text:"Why have you not used the AI assistant more often?", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"adoption breadth", tier:"stupid", sec:"B", survey:2, rg:"blame",
    flagTxt:"LOW-VALUE · BLAME. The question presumes the respondent is at fault for not using the assistant more. Expect defensive answers, not adoption insight." },
- { id:223, text:"Thinking of the most recent task where the assistant helped you, how much time did it save? (none / under 15 minutes / 15-60 minutes / over an hour)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"workflow impact", tier:"clean", sec:"C", survey:2 },
+ { id:223, text:"Thinking of the most recent task where the assistant helped you, how much time did it save? (none / under 15 minutes / 15-60 minutes / over an hour)", min:1.0, know:"Everyone", who:"all", cx:"Low", val:"High", core:true, answerBy:null, defect:"CLEAN", topic:"workflow impact", tier:"clean", sec:"C", survey:2 },
  { id:224, text:"Which best describes your access to the assistant? (I use it most days / I have access but rarely use it / I do not have access yet / not sure)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"adoption breadth", tier:"clean", sec:"C", survey:2 },
  { id:225, text:"Over the last 12 months, how many times have you asked the assistant for help, and how many of those answers needed a follow-up correction?", min:1.0, know:"Everyone, from memory", who:"all", cx:"High", val:"Medium", core:false, answerBy:null, defect:"RECALL OVERLOAD", topic:"adoption breadth", tier:"defective", sec:"C", survey:2,
    flagTxt:"RECALL OVERLOAD. A year of questions, counted, plus a year of corrections, counted, from memory. Nobody recalls this; they estimate it, and the estimates look like data." },
@@ -1193,7 +1200,7 @@ var COPILOT_BANK = [
  { id:229, text:"Your answers are confidential and are never linked to your name. Have you ever held back a question from the assistant because you were unsure who might see it? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Medium", core:false, answerBy:null, defect:"CLEAN", topic:"trust in output", tier:"clean", sec:"D", survey:2 },
  { id:230, text:"Have you ever pasted confidential company or customer information into the assistant? (yes / no)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"Low", core:false, answerBy:null, defect:"SENSITIVE NO ASSURANCE", topic:"concerns and risks", tier:"defective", sec:"D", survey:2,
    flagTxt:"SENSITIVE, NO ASSURANCE. Asking respondents to admit pasting confidential information, with no confidentiality line anywhere near it, invites denial, not data." },
- { id:231, text:"In your own words, what one thing would most help you get more from the AI assistant?", min:1.0, know:"Everyone", who:"all", cx:"Medium", val:"High", core:false, answerBy:null, defect:"CLEAN", topic:"enablement gap", tier:"clean", sec:"E", survey:2 },
+ { id:231, text:"In your own words, what one thing would most help you get more from the AI assistant?", min:1.5, know:"Everyone", who:"all", cx:"Medium", val:"High", core:false, answerBy:null, defect:"CLEAN", topic:"enablement gap", tier:"clean", sec:"E", survey:2 },
  { id:232, text:"Considering everything about your experience with the assistant so far, from the first announcement and the sign-up process, through the training or lack of it, the prompts you have tried, the answers you got, the times it helped and the times it got in the way, and how all of that fits together as one overall impression, please tell us in your own words the complete story of what the assistant means for your work and everything we could possibly do differently.", min:1.5, know:"Everyone", who:"all", cx:"Medium", val:"Medium", core:false, answerBy:null, defect:"WORDY STEM", topic:"enablement gap", tier:"defective", sec:"E", survey:2,
    flagTxt:"WORDY STEM. A paragraph where a sentence would do. The reading load alone spends patience before the respondent types a word. This is the one class SIMPLIFY actually fixes." },
  { id:233, text:"Which colleagues on your team refuse to use the assistant? (please name them)", min:0.5, know:"Everyone", who:"all", cx:"Low", val:"None", core:false, answerBy:null, defect:"CLEAN", topic:"rollout experience", tier:"stupid", sec:"F", survey:2, rg:"nosy",

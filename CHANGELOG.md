@@ -1,5 +1,62 @@
 # Changelog
 
+## 2026-11-11 - Per-level surveys phase 5b: closing rebalance
+
+- Design: [docs/level-surveys-scope.md](docs/level-surveys-scope.md),
+  phase 5. The full themed witness corpus (364 setups) was
+  re-verified against the recorded pre-migration baselines
+  (fixed lines 58, 67, 69, 76, 70, 98; pools 120, and 150 on
+  Level 6), the six balance invariants replayed through the
+  suite, and each level's flag dispositioned below. Per the
+  scope doc, tuning levers are question times and defect mix
+  inside a level's own bank; no pool changed.
+- Level 2 tuned. Its recorded lines were the season's outlier:
+  every winning line used zero reminders and the fixed line won
+  on the free generic invite. Six substantive clean items now
+  carry realistic respondent times (Q205, Q206, Q207, Q208,
+  Q223 at 1.0 min; the open-text Q231 at 1.5), while the 1-5
+  ratings stay at 0.5. Two probe regenerations established what
+  the times can and cannot do: at both the shipped dose and a
+  doubled dose (1.5 / 2.0), the cheapest winning line stayed at
+  60 cr before the A/B setup is counted, because a winning
+  line's floor is set by the send and list-preparation economy;
+  the doubled dose only halved the winning-line space (219 to
+  122 lines on the fixed instrument) and was rejected. The
+  shipped dose stands as burden realism: a kept Copilot
+  instrument now takes long enough that invite and trimming
+  choices register in completion. The Level 2 corpus was
+  regenerated through the real card handlers with the
+  canonical replay state (the A/B setup bought, as the suite
+  replays it): fixed line 66 cr against the 67 cr baseline,
+  seeded lines 60-86 cr, recorded lines ending at 50-76
+  goodwill. An early regeneration run with the A/B setup off
+  produced costs 6 cr low across the level; the suite's replay
+  caught the mismatch on the fixed instrument and the corpus
+  was regenerated, which is recorded here rather than silently
+  replaced.
+- Levels left untuned, with reasons. Level 1: fixed line holds
+  at its 58 cr baseline and the level is the season's EASY
+  opener; its lower seeded range (53-71) was accepted at phase
+  1. Level 3: fixed line holds at 69; the seeded maximum moved
+  +3 (92 vs 89), inside the recorded-line methodology's
+  variance. Level 4: its fixed line is cheaper (63 vs 76)
+  because the Relationship core is answerable by every seat
+  under the recorded phase-4 design decision, and the level's
+  binding difficulty is its goodwill gate (only 39 of 65
+  searched setups win at all); cost tuning would fight a
+  decision, not a drift. Level 5: fixed line 72 vs the 70
+  baseline, inside variance. Level 6: the fixed line is
+  efficient (87 vs 98) but the seeded distribution is healthy
+  (83-122, mean 96, a 64% mean pool share against the
+  baseline's 65%), so the flagship's difficulty stands.
+- Verification: build validates; the Node suite passes 143/143
+  with zero failures, including every level's recorded-setup
+  replay, the six balance invariants, and the continuous
+  six-level campaign; the full harness passes 3/3 with browser
+  checks 152/152. The per-level surveys project is complete:
+  every campaign level runs its own survey, bank, and BRD, and
+  the closing rebalance is recorded above.
+
 ## 2026-11-11 - Per-level surveys phase 5a: Level 5 Perceptions and Level 6 Flagship banks, fallback removed
 
 - Design: [docs/level-surveys-scope.md](docs/level-surveys-scope.md),

@@ -93,25 +93,15 @@ The following features remain unimplemented:
   regeneration in ~/workspace/regen-l5l6 (the worker that
   started phase 5a was stopped mid-run by the owner and its
   regeneration was finished and verified by the parent agent;
-  splice preserved all other levels entry-for-entry). Remaining:
-  phase 5b, the closing rebalance across all six levels,
-  proposed to the owner before anything is tuned, with the six
-  balance invariants replayed across the themed season.
-  Phase-5 rebalance flags so far: Level 1 seeded range lower
-  (53-71 vs 58-93 cr, fixed holds at 58); Level 2 fixed line
-  cheaper than its baseline (61 vs 67 cr, seeded 59-67 vs
-  64-93); Level 3 seeded winning range widened (59-92 vs 60-89
-  cr) and the Azure bank's restriction-dense core makes kept
-  restricted items the dominant goodwill cost, which the
-  recorded Level 3 fixed line is chosen around; Level 4 fixed
-  line cheaper than its baseline (63 vs 76 cr) and seeded range
-  narrower (59-75 vs 58-82 cr), with recorded lines ending at
-  41-47 goodwill, because the Relationship core is deliberately
-  answerable by every seat (see the phase-4 changelog entry
-  for the recorded answerability decision); Level 5 fixed line
-  72 vs the 70 baseline (seeded 66-85, goodwill 57-72); Level 6
-  fixed line 87 vs the 98 baseline (seeded 83-122, goodwill
-  26-53).
+  splice preserved all other levels entry-for-entry). Phase 5b,
+  the closing rebalance, is built and deployed 2026-11-11 (see
+  the changelog): Level 2's substantive clean items carry
+  realistic respondent times and its 65 witnesses were
+  regenerated (fixed line 66 vs the 67 baseline, seeded 60-86,
+  goodwill 50-76); the other five levels were re-verified
+  against their baselines and left untuned, with dispositions
+  recorded in the changelog. The per-level surveys project is
+  complete; no phase remains.
 
 ## Proposed automation - approval required
 

@@ -26,7 +26,7 @@
   health), the Fishbowl help overlay, and the fact-check fixes
   (BriteVerify name, accept_all label, catch-all scope, guide
   prices), deployed as `c8a1c01b` and live-verified 2026-11-11.
-- Per-level surveys phases 1 to 5a are pushed and deployed
+- Per-level surveys phases 1 to 5b are pushed and deployed
   (design in [docs/level-surveys-scope.md](docs/level-surveys-scope.md),
   all seven decisions approved as recommended 2026-11-11). Each
   level now has a survey identity: bank entries carry a `survey`
@@ -51,8 +51,9 @@
   from its own bank on first play. Witnesses were regenerated
   per migrated level (Level 1: fixed line byte-identical at
   58 cr, seeded lines 53-71 cr against the old 58-93 range;
-  Level 2: fixed line 61 cr against the 67 cr baseline, seeded
-  lines 59-67 cr against the old 64-93 range; Level 3: fixed
+  Level 2: fixed line 66 cr against the 67 cr baseline after
+  the phase-5b time calibration, seeded lines 60-86 cr against
+  the old 64-93 range; Level 3: fixed
   line 69 cr, the same cost as its baseline but a
   goodwill-lean line ending at 58 goodwill, seeded lines 59-92
   cr against the old 60-89 range; Level 4: 39 setups, fixed
@@ -70,8 +71,12 @@
   phase-4 changelog entry). Full local gates pass (build, Node
   suite green with zero failures, browser harness 152/152 with
   the survey-identity scenario covering Levels 1 to 6).
-  Remaining work is phase 5b, the closing rebalance proposal,
-  in [TODO.md](TODO.md).
+  Phase 5b, the closing rebalance, is built and deployed: only
+  Level 2 was tuned (realistic respondent times on its
+  substantive clean items, witnesses regenerated); the other
+  levels were re-verified against their baselines and left
+  untuned with dispositions in the changelog. The per-level
+  surveys project is complete.
 
 ## Acceptance boundary
 

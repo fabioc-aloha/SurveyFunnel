@@ -18,7 +18,9 @@ the topic-to-persona keys instead) are built to those decisions;
 phase 5a (the Level 5 perceptions bank and BRD, the Level 6
 flagship bank, and removal of the legacy-bank fallback) is built
 2026-11-11 and pushed and deployed the same day; phase 5b, the
-closing rebalance, remains as a proposal to the owner. This
+closing rebalance, is built and deployed 2026-11-11 (Level 2
+time calibration and witness regeneration; the other levels
+re-verified and left untuned with recorded dispositions). This
 document proposes turning each
 campaign level into a different survey, with its own questionnaire
 bank and its own BRD, replacing today's single shared bank and
