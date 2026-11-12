@@ -32,7 +32,7 @@
   level now has a survey identity: bank entries carry a `survey`
   field, Level 1 draws its own curated 36-entry Support
   Experience bank, Level 2 draws its own newly authored 36-entry
-  Copilot Adoption bank (ids 201-236), Level 3 draws its own
+  M365 Copilot Adoption bank (ids 201-236), Level 3 draws its own
   newly authored 36-entry Azure Cloud Services bank (ids
   301-336), Level 4 draws its own newly authored 36-entry
   Account Team Relationship bank (ids 401-436), Level 5 draws

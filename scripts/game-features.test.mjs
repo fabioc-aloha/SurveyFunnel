@@ -2341,7 +2341,7 @@ test('medallion: Silver actions charge once, stay owned, and suppression still c
 /* Per-level surveys, phases 1-5 (docs/level-surveys-scope.md; all
    seven decisions approved as recommended, 2026-11-11). Level 1
    migrated to its own Support Experience bank in phase 1; Level 2
-   migrated to its own Copilot Adoption bank in phase 2; Level 3
+   migrated to its own M365 Copilot Adoption bank in phase 2; Level 3
    migrated to its own Azure Cloud Services bank in phase 3;
    Level 4 migrated to its own Account Team Relationship bank in
    phase 4; phase 5 migrated Level 5 to the General Perceptions of
@@ -2446,8 +2446,8 @@ test('per-level surveys: naming reaches level cards, setup banner, and HUD', () 
   assert.match(element('levelBanner').innerHTML, /Survey: Support Experience Survey/);
   assert.match(element('hudLevel').innerHTML, /SUPPORT EXPERIENCE/);
   g.selectLevel(2, false);
-  assert.match(element('levelGrid').innerHTML, /LEVEL 2 · EASY · THE SPLIT · COPILOT \/ AI ADOPTION/);
-  assert.match(element('levelBanner').innerHTML, /Survey: Copilot Adoption Survey/);
+  assert.match(element('levelGrid').innerHTML, /LEVEL 2 · EASY · THE SPLIT · M365 COPILOT \/ AI ADOPTION/);
+  assert.match(element('levelBanner').innerHTML, /Survey: M365 Copilot Adoption Survey/);
 });
 
 test('per-level surveys: Level 1 Insight credits only its own agenda topics', () => {
@@ -2461,7 +2461,7 @@ test('per-level surveys: Level 1 Insight credits only its own agenda topics', ()
 });
 
 /* Per-level surveys, phase 2: Level 2 (The Split) migrated to the
-   Copilot Adoption Survey (ids 201-236), with its full BRD record
+   M365 Copilot Adoption Survey (ids 201-236), with its full BRD record
    and its own fixed first-play instrument. */
 test('per-level surveys: Level 2 bank has the derived structure', () => {
   const { context: g } = game();
@@ -2522,7 +2522,7 @@ test('per-level surveys: BRD renders the Level 2 study from its survey record', 
   g.selectLevel(2, false);
   g.openBRD();
   const text = element('brdContent').innerHTML;
-  assert.match(text, /Copilot Adoption Survey/);
+  assert.match(text, /M365 Copilot Adoption Survey/);
   assert.match(text, /SPONSOR/);
   assert.match(text, /AI Adoption team/);
   assert.match(text, /AUDIENCE/);

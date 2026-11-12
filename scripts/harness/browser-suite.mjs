@@ -1117,7 +1117,7 @@ async function runSurveyIdentityScenario(browser, gameUrl, viewport, options) {
       (document.querySelector('#levelGrid')?.textContent || '').replace(/\s+/g, ' '));
     await run.check('level cards name each survey beside its level',
       gridText.includes('LEVEL 1 · EASY · FIRST SEND · SUPPORT EXPERIENCE') &&
-      gridText.includes('LEVEL 2 · EASY · THE SPLIT · COPILOT / AI ADOPTION'),
+      gridText.includes('LEVEL 2 · EASY · THE SPLIT · M365 COPILOT / AI ADOPTION'),
       { excerpt: gridText.slice(0, 320) });
 
     await clickAndWait(page, '#startBtn', 500);
@@ -1138,7 +1138,7 @@ async function runSurveyIdentityScenario(browser, gameUrl, viewport, options) {
       brd.includes('Support Experience Survey') && brd.includes('SPONSOR') &&
       brd.includes('Support Experience team') && brd.includes('AUDIENCE') &&
       brd.includes('overall satisfaction') && brd.includes('renewal risk') &&
-      !brd.includes('Copilot Adoption Survey') && !brd.includes('Azure Cloud Services Survey') &&
+      !brd.includes('M365 Copilot Adoption Survey') && !brd.includes('Azure Cloud Services Survey') &&
       !brd.includes('Collect credible answers on the required business topics below'),
       { excerpt: brd.slice(0, 400) });
     await checkOverflow(run, 'Level 1 BRD open');
@@ -1156,8 +1156,8 @@ async function runSurveyIdentityScenario(browser, gameUrl, viewport, options) {
     const brd2 = await page.evaluate(() =>
       (document.querySelector('#brdContent')?.textContent || '').replace(/\s+/g, ' '));
     await run.check('Level 2 BRD renders its own Copilot study through the same model',
-      banner2.includes('Survey: Copilot Adoption Survey') &&
-      brd2.includes('Copilot Adoption Survey') && !brd2.includes('Support Experience Survey') &&
+      banner2.includes('Survey: M365 Copilot Adoption Survey') &&
+      brd2.includes('M365 Copilot Adoption Survey') && !brd2.includes('Support Experience Survey') &&
       brd2.includes('SPONSOR') && brd2.includes('AI Adoption team') && brd2.includes('AUDIENCE') &&
       brd2.includes('adoption breadth') && brd2.includes('enablement gap') &&
       brd2.includes('two invitation variants against the same instrument'),
@@ -1176,7 +1176,7 @@ async function runSurveyIdentityScenario(browser, gameUrl, viewport, options) {
     await run.check('Level 3 BRD renders its own Azure study with the sponsor as stakeholder',
       banner3.includes('Survey: Azure Cloud Services Survey') &&
       brd3.includes('Azure Cloud Services Survey') && !brd3.includes('Support Experience Survey') &&
-      !brd3.includes('Copilot Adoption Survey') &&
+      !brd3.includes('M365 Copilot Adoption Survey') &&
       brd3.includes('SPONSOR') && brd3.includes('Azure product team') && brd3.includes('AUDIENCE') &&
       brd3.includes('service reliability') && brd3.includes('capability gaps') &&
       brd3.includes("sponsor is also this study's stakeholder"),
@@ -1195,7 +1195,7 @@ async function runSurveyIdentityScenario(browser, gameUrl, viewport, options) {
     await run.check('Level 4 BRD renders its own Relationship study with the goodwill gate and report-back commitment',
       banner4.includes('Survey: Account Team Relationship Survey') &&
       brd4.includes('Account Team Relationship Survey') && !brd4.includes('Support Experience Survey') &&
-      !brd4.includes('Copilot Adoption Survey') && !brd4.includes('Azure Cloud Services Survey') &&
+      !brd4.includes('M365 Copilot Adoption Survey') && !brd4.includes('Azure Cloud Services Survey') &&
       brd4.includes('SPONSOR') && brd4.includes('Account Management team') && brd4.includes('AUDIENCE') &&
       brd4.includes('account team responsiveness') && brd4.includes('renewal intent') &&
       brd4.includes('ending goodwill 35 or higher') && brd4.includes('feedback commitment'),
@@ -1214,7 +1214,7 @@ async function runSurveyIdentityScenario(browser, gameUrl, viewport, options) {
     await run.check('Level 5 BRD renders its own Perceptions study with the localization design',
       banner5.includes('Survey: General Perceptions of Microsoft Survey') &&
       brd5.includes('General Perceptions of Microsoft Survey') && !brd5.includes('Support Experience Survey') &&
-      !brd5.includes('Copilot Adoption Survey') && !brd5.includes('Azure Cloud Services Survey') &&
+      !brd5.includes('M365 Copilot Adoption Survey') && !brd5.includes('Azure Cloud Services Survey') &&
       !brd5.includes('Account Team Relationship Survey') &&
       brd5.includes('SPONSOR') && brd5.includes('Brand and Perceptions research team') && brd5.includes('AUDIENCE') &&
       brd5.includes('overall favorability') && brd5.includes('AI leadership perception') &&
@@ -1234,7 +1234,7 @@ async function runSurveyIdentityScenario(browser, gameUrl, viewport, options) {
     await run.check('Level 6 BRD renders its own Flagship study with the annual stakes and Executive Blast audience',
       banner6.includes('Survey: Enterprise Relationship Flagship Annual Survey') &&
       brd6.includes('Enterprise Relationship Flagship Annual Survey') && !brd6.includes('Support Experience Survey') &&
-      !brd6.includes('Copilot Adoption Survey') && !brd6.includes('Azure Cloud Services Survey') &&
+      !brd6.includes('M365 Copilot Adoption Survey') && !brd6.includes('Azure Cloud Services Survey') &&
       !brd6.includes('Account Team Relationship Survey') && !brd6.includes('General Perceptions of Microsoft Survey') &&
       brd6.includes('SPONSOR') && brd6.includes('Enterprise Relationship team') && brd6.includes('AUDIENCE') &&
       brd6.includes('overall relationship') && brd6.includes('strategic alignment') &&

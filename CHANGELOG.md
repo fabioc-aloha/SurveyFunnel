@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-11-12 - Level 2 product named M365 Copilot
+
+- At the owner's direction, the Level 2 product is called
+  M365 Copilot everywhere it was called "the AI assistant" or
+  "the assistant": all 36 bank stems, the repair rewrites, two
+  flag texts, the survey record (label M365 COPILOT / AI
+  ADOPTION, title M365 Copilot Adoption Survey), and the BRD
+  purpose line. 52 product references renamed; no other level
+  used the word. The sponsor stays "the AI Adoption team" (a
+  team name, not the product).
+- Names only: no stem meaning, defect class, timing, cost, or
+  fixture changed, so every recorded winning line replays as
+  before. Test pins updated to the new label and title in the
+  Node suite and the browser suite; both pass in full.
+
 ## 2026-11-12 - Mobile QR code now encodes the short link
 
 - At the owner's direction, the title screen's mobile-player QR
