@@ -131,8 +131,12 @@ Per round, the model runs in this order:
 2. **Opens.** Base open propensity by segment relevance and invite
    variant, adjusted by reputation (spam folder effect), sender,
    why me line, and language match.
-3. **Starts.** Click to start conversion, adjusted by the honesty
-   of the stated time ask versus the real instrument length.
+3. **Starts.** Click-to-start conversion is fixed per invitation
+   variant. The stated time ask is enforced on the Honest Ask
+   through goodwill and quality instead: overrun its 5-minute
+   promise and the send spends 3 goodwill and loses 2 quality
+   points per minute over (rounded up); hit it and the send earns
+   the invitation's goodwill.
 4. **Completions.** Each recipient follows their persona through the instrument against two
    clocks: patience (minutes) and knowledge (per question tags).
    Outcomes per question: continue, abandon, escape (if escapes are

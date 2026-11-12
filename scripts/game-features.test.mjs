@@ -942,6 +942,7 @@ test('retry requires the minimum send cost of the available audience', () => {
 test('an over-budget retry allows successive cost reductions but blocks increases', () => {
   const { context: g } = game();
   g.selectLevel(2, false);
+  g.state.invite = g.INVITES[2]; g.state.reminders = 1;
   g.state.spentBefore = 85;
   assert.equal(g.budgetMath().attemptCost, 48);
   assert.equal(g.budgetChangeBlocked({ invite: g.INVITES[0] }), false);
@@ -989,6 +990,49 @@ test('BRD is visible from the top bar and throughout campaign setup', () => {
     g.closeBRD();
     assert.equal(g.document.activeElement, element(opener), `${opener} regains focus`);
   }
+});
+
+test('audiences and invitations speak the level survey, and a new chain starts unspent', () => {
+  const { context: g, element } = game();
+  const honest = g.INVITES.find(iv => iv.id === 'honest');
+  const fresh = g.SEGMENTS.find(sg => sg.id === 'fresh');
+  const stale = g.SEGMENTS.find(sg => sg.id === 'stale');
+  g.selectLevel(1, false);
+  assert.equal(g.inviteSender(honest), 'From: the Support Experience team');
+  assert.match(g.inviteSubject(honest), /5 minutes on your support case/);
+  assert.equal(g.segDisplayName(fresh), 'Support, Fresh');
+  g.selectLevel(2, false);
+  assert.equal(g.inviteSender(honest), 'From: the AI Adoption team');
+  assert.match(g.inviteSubject(honest), /5 minutes on how you use M365 Copilot/);
+  assert.equal(g.segDisplayName(fresh), 'Copilot, Fresh');
+  assert.match(g.segTiming(fresh), /offered M365 Copilot/);
+  assert.match(element('segGrid').innerHTML, /COPILOT, FRESH/);
+  assert.match(element('invGrid').innerHTML, /AI Adoption team/);
+  g.selectLevel(4, false);
+  assert.equal(g.segDisplayName(stale), 'Accounts, Stale');
+  assert.match(g.segTiming(stale), /quarterly account review/);
+  assert.equal(g.state.invite.id, 'generic');
+  assert.equal(g.state.reminders, 0);
+});
+
+test('report flags hard bounces at the 2 percent investigate line', () => {
+  const hot = game();
+  hot.context.selectLevel(1, false);
+  hot.context.state.seg = hot.context.SEGMENTS.find(sg => sg.id === 'blast');
+  hot.context.state.validation = 'skip';
+  hot.context.startRun(); hot.context.showReport();
+  const c = hot.context.tally(hot.context.runData);
+  const hardPct = Math.round(c.bouncedHard / c.sent * 1000) / 10;
+  assert.ok(hardPct >= 2, `blast with no validation runs hot (got ${hardPct}%)`);
+  assert.match(hot.element('report').innerHTML, /Hard bounces at or above the 2% line/);
+  const calm = game();
+  calm.context.selectLevel(1, false);
+  calm.context.state.validation = 'full';
+  calm.context.startRun(); calm.context.showReport();
+  const cc = calm.context.tally(calm.context.runData);
+  const calmPct = Math.round(cc.bouncedHard / cc.sent * 1000) / 10;
+  assert.ok(calmPct < 2, `fresh with full validation stays under the line (got ${calmPct}%)`);
+  assert.doesNotMatch(calm.element('report').innerHTML, /Hard bounces at or above the 2% line/);
 });
 
 test('fishbowl help document sits alongside MPOR and BRD with both entry points', () => {
@@ -1137,6 +1181,7 @@ const LEGAL_WINNER_MINIMUMS = { 1: 65, 2: 65, 3: 65, 4: 39, 5: 65, 6: 65 };
 test('goodwill ledger identifies report-back rewards and stakeholder penalties', () => {
   const { context: g, element } = game();
   g.selectLevel(4, false);
+  g.state.invite = g.INVITES[2];
   g.state.reportBack = true;
   /* Re-based on the Level 4 fixed instrument in phase 4: the launched
      instrument is its six core questions. The ledger assertions below

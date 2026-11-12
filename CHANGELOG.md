@@ -1,5 +1,39 @@
 # Changelog
 
+## 2026-11-12 - Copy fixes from the Copilot gap review (G7, G24, G26, G28)
+
+- The owner approved shipping the zero-cost fixes from the
+  Copilot survey lifecycle gap review (12 November): the items
+  that change words and defaults only, with no scoring change,
+  so every recorded winning line replays as before.
+- G7: audiences and invitations speak the level's own survey.
+  The Honest Ask now reads its sender from the survey's sponsor
+  and its subject from the survey ("From: the AI Adoption team ·
+  5 minutes on how you use M365 Copilot" on Level 2), and the
+  Fresh and Stale list cards take the survey's family name,
+  timing line, and blurb (Copilot, Azure, Accounts, Global).
+  Level 1 text is unchanged, and Quick Challenges keep the
+  drill text. Segment mechanics, mixes, prices, and invite
+  rates are untouched.
+- G24: a new attempt chain now starts on the free Generic
+  invite with no reminder preselected, instead of Known Name
+  (10 cr) plus one reminder (8 cr). Every spend is a choice.
+  Two tests that exercised the old defaults now set the invite
+  explicitly; their assertions are unchanged.
+- G26: the development notes now describe the start model as
+  the code runs it (fixed start conversion per invite; the
+  Honest Ask time promise enforced through goodwill and
+  quality), replacing a sentence that said starts respond to
+  the honesty of the time ask.
+- G28: the campaign report flags hard bounces at or above the
+  team's 2% investigate line, before the existing reputation
+  penalties at 5% and 10%. Advisory only; no threshold moved.
+- Verification: Node suite 146/146 (two new tests cover the
+  per-survey copy, the unspent default, and the 2% line on hot
+  and calm runs); browser harness PASS 3/3 at 156/156 checks;
+  Level 2 setup screenshotted at 390px with the new sender,
+  subject, and list copy rendering and no errors.
+
 ## 2026-11-12 - Each level's BRD is visible throughout setup
 
 - At the owner's direction, the per-level BRDs (which already

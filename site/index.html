@@ -1660,37 +1660,47 @@ var LEVEL_AGENDA = {
    any longer. */
 var SURVEY_BASE_CONSTRAINTS = "One credit pool for the whole level, shared across attempts. Choose an audience that can answer the required topics. Preserve useful coverage while controlling burden and data contamination.";
 var SURVEYS = {
-  1:{ label:"SUPPORT EXPERIENCE", title:"Support Experience Survey", sponsor:"the Support Experience team",
+  1:{ label:"SUPPORT EXPERIENCE", title:"Support Experience Survey", sponsor:"the Support Experience team", inviteSubject:"your support case", listFamily:"Support",
     purpose:"Decide what to fix first in the support experience: where cases slow down, where the effort falls on the customer, and where self-service fails before a case ever opens. The findings set the support team's improvement priorities for the next quarter and are read alongside case data, never instead of it.",
     audience:"Customers whose support case closed in the last 30 days: the people who lived the case, across frontline, administrator, IT decision-maker, and executive seats. Case-experience questions are answerable by whoever lived the case; contract and billing figures sit with Partner Admin seats only, and org-wide cost figures sit with no seat on this list.",
     agenda:LEVEL_AGENDA[1], topicKeys:TOPIC_KEYS, constraints:SURVEY_BASE_CONSTRAINTS },
-  2:{ label:"M365 COPILOT / AI ADOPTION", title:"M365 Copilot Adoption Survey", sponsor:"the AI Adoption team",
+  2:{ label:"M365 COPILOT / AI ADOPTION", title:"M365 Copilot Adoption Survey", sponsor:"the AI Adoption team", inviteSubject:"how you use M365 Copilot", listFamily:"Copilot", listTiming:{ fresh:"3 days after being offered M365 Copilot", stale:"45 days after being offered M365 Copilot" }, listBlurb:{ fresh:"The offer is still fresh in memory. Relevance as good as it gets.", stale:"Same people as Fresh, six weeks on. Half barely remember the offer." },
     purpose:"Decide where adoption support goes next: who is actually using M365 Copilot and for what work, where its output is trusted, where it is checked or quietly avoided, and what training and enablement are missing. The findings set the rollout team's priorities for the next two quarters and are read alongside usage telemetry, never instead of it.",
     audience:"People who have been offered M365 Copilot in their work. End users and frontline staff answer usage, output, and workflow questions from their own desks; on this survey they are the strong respondents. Executives cannot answer daily-use or prompt-level detail they never touch, and asking them manufactures guesses. IT decision makers answer rollout, governance, and enablement questions; budget and licensing figures sit with Partner Admin seats, and pre-release model facts sit with no seat on this list.",
     agenda:LEVEL_AGENDA[2], topicKeys:COPILOT_TOPIC_KEYS,
     constraints:SURVEY_BASE_CONSTRAINTS + " A/B testing is available: this study fields two invitation variants against the same instrument, and the comparison is about the invitation, never about two different questionnaires. Compare the invitations and report uncertainty rather than assuming a winner." },
-  3:{ label:"AZURE CLOUD SERVICES", title:"Azure Cloud Services Survey", sponsor:"the Azure product team",
+  3:{ label:"AZURE CLOUD SERVICES", title:"Azure Cloud Services Survey", sponsor:"the Azure product team", inviteSubject:"your Azure cloud services", listFamily:"Azure", listTiming:{ fresh:"3 days after the last Azure service milestone", stale:"45 days after the last Azure service milestone" }, listBlurb:{ fresh:"The milestone is still fresh in memory. Relevance as good as it gets.", stale:"Same people as Fresh, six weeks on. Half barely remember the milestone." },
     purpose:"Decide where the platform improves next: where workloads are interrupted, where costs cannot be seen, where moving a workload takes more effort than it should, and where a missing capability forces a team to redesign. The findings set the Azure product team's priorities for the next two quarters and are read alongside service telemetry, never instead of it.",
     audience:"People whose organizations run workloads on the platform. IT decision makers and frontline technical staff answer architecture, reliability, and migration questions, because they build and operate on the platform; cost figures sit with Partner Admin seats, and whether costs are visible sits with IT decision makers. End users of the finished applications the platform hosts cannot answer tenancy, region, or SKU questions at all, and asking them manufactures guesses.",
     agenda:LEVEL_AGENDA[3], topicKeys:AZURE_TOPIC_KEYS,
     constraints:SURVEY_BASE_CONSTRAINTS + " The sponsor is also this study's stakeholder: the Azure product team has asked for eight extra questions of its own, which is the stakeholder encounter on this level. Accept the request, rotate modules, or push back with evidence. Costs and added burden depend on your response; extra-topic answers are not simulated or scored." },
-  4:{ label:"ACCOUNT TEAM RELATIONSHIP", title:"Account Team Relationship Survey", sponsor:"the Account Management team",
+  4:{ label:"ACCOUNT TEAM RELATIONSHIP", title:"Account Team Relationship Survey", sponsor:"the Account Management team", inviteSubject:"working with your account team", listFamily:"Accounts", listTiming:{ fresh:"3 days after the quarterly account review", stale:"45 days after the quarterly account review", tired:"Recent account review, but surveyed 3 times this quarter" }, listBlurb:{ fresh:"The review is still fresh in memory. Relevance as good as it gets.", stale:"Same people as Fresh, six weeks on. Half barely remember the review." },
     purpose:"Decide where this relationship needs work before the next renewal cycle: whether the account team responds when it matters, whether people trust it enough to raise problems early, whether its work delivers business value, and how escalations land when something has already gone wrong. The findings set the account management team's improvement priorities for the next two quarters and are read alongside account records, never instead of them.",
     audience:"Named contacts at accounts on the relationship program, surveyed on a cycle: trust, business value, and renewal intent are judged from executive and IT decision maker evidence; escalation handling from the frontline technicians and end users who lived the tickets; commercial process items sit with Partner Admin seats. Perception of the account team is answerable by anyone who deals with the team, which makes candor the design risk on this survey, not knowledge: the sensitive items ask people to judge a team they must keep working with, and this audience has already been surveyed three times this quarter.",
     agenda:LEVEL_AGENDA[4], topicKeys:RELATIONSHIP_TOPIC_KEYS,
     constraints:SURVEY_BASE_CONSTRAINTS + " The tired audience requires ending goodwill 35 or higher. Report back (3 cr) is this study's feedback commitment: a relationship audience that never hears what its answers changed stops answering, so telling these accounts what the last round fixed is what protects response on the next cycle." },
-  5:{ label:"GENERAL PERCEPTIONS OF MICROSOFT", title:"General Perceptions of Microsoft Survey", sponsor:"the Brand and Perceptions research team",
+  5:{ label:"GENERAL PERCEPTIONS OF MICROSOFT", title:"General Perceptions of Microsoft Survey", sponsor:"the Brand and Perceptions research team", inviteSubject:"how you see Microsoft", listFamily:"Global", listTiming:{ fresh:"3 days after the last tracked touchpoint, across regions", multi:"7 days after the last tracked touchpoint, across regions" }, listBlurb:{ fresh:"The touchpoint is still fresh in memory. Relevance as good as it gets." },
     purpose:"Decide how Microsoft is perceived, where that perception is moving, and which parts of it the company can actually change: how favorable people feel, whether they trust the company, whether it reads as innovative and as good value, and who they believe leads in AI. The findings set the perception and communications priorities for the next year and are read alongside product and relationship evidence, never instead of it. A perception tracker is the survey that runs globally, which is why this study fields in more than 45 languages while the others field in one.",
     audience:"A broad professional audience across five language groups: end users, frontline staff, administrators, IT decision makers, and executives, most of whom know Microsoft through its products rather than its org chart. Perception items are answerable by every seat, because a perception needs no system access: the respondent is the only authority on their own view. The one thing this audience cannot answer is a fact: market figures and internal company facts sit with no seat on this list, and a perception survey that asks for them collects guesses dressed as data.",
     agenda:LEVEL_AGENDA[5], topicKeys:PERCEPTIONS_TOPIC_KEYS,
     constraints:SURVEY_BASE_CONSTRAINTS + " The multilingual list is 40% English-speaking. Consider invitation language and localization review. Fielding in 45+ languages is this study's design, not a translation errand: localization review (8 cr) checks that each language version still asks the same question, and the localized invite (4 cr) puts the invitation itself in the respondent's language. Response is read by language group; a group that cannot read the invitation cannot report a perception, and its silence is a fielding failure, not a finding." },
-  6:{ label:"ENTERPRISE RELATIONSHIP", title:"Enterprise Relationship Flagship Annual Survey", sponsor:"the Enterprise Relationship team",
+  6:{ label:"ENTERPRISE RELATIONSHIP", title:"Enterprise Relationship Flagship Annual Survey", sponsor:"the Enterprise Relationship team", inviteSubject:"your enterprise relationship",
     purpose:"Decide the state of the enterprise relationship before the renewal cycle: whether decision makers trust Microsoft as a long-term partner, whether the relationship delivers business value, whether it aligns with where their organizations are going, and whether they intend to renew. The findings set the enterprise team's account priorities for the year and are read alongside account records, never instead of them. This is the flagship annual: one fielding a year, so a miss cannot be repaired next quarter.",
     audience:"Senior decision makers at enterprise accounts: the Executive Blast list, mostly executives and IT decision makers, with administrator seats holding the commercial specifics. Executives answer strategy, value, and renewal intent from their own seats; they do not answer operational detail they never touch, and asking them manufactures guesses. Contract and commercial specifics sit with Partner Admin seats and are beyond knowledge for everyone else on the Blast list. This audience gives a survey minutes, not half an hour: the flagship's risk is length and sensitivity at executive patience, not coverage.",
     agenda:LEVEL_AGENDA[6], topicKeys:FLAGSHIP_TOPIC_KEYS,
     constraints:SURVEY_BASE_CONSTRAINTS + " Resolve the stakeholder request for eight extra questions. Costs and added burden depend on your response; extra-topic answers are not simulated or scored." + " Executive Blast is the available audience for this study." }
 };
 function surveyRecord(level){ return SURVEYS[level || state.level] || SURVEYS[1]; }
+/* Gap review G7 (2026-11-12): in campaign play the list and the
+   Honest Ask speak the level's own survey, not support. Segment
+   mechanics, mixes, prices, and invite rates are unchanged; only
+   the words come from the survey record. Quick Challenges keep
+   the drill text. */
+function segDisplayName(sg){ if (state.quickChallenge) return sg.name; var fam = surveyRecord().listFamily; if (fam && (sg.id === "fresh" || sg.id === "stale")) return fam + ", " + (sg.id === "fresh" ? "Fresh" : "Stale"); return sg.name; }
+function segTiming(sg){ var t = state.quickChallenge ? null : surveyRecord().listTiming; return (t && t[sg.id]) || sg.timing; }
+function segBlurb(sg){ var b = state.quickChallenge ? null : surveyRecord().listBlurb; return (b && b[sg.id]) || sg.blurb; }
+function inviteSender(iv){ if (iv.id === "honest" && !state.quickChallenge) return "From: " + surveyRecord().sponsor; return iv.sender; }
+function inviteSubject(iv){ if (iv.id === "honest" && !state.quickChallenge) return "Subject: \u201C5 minutes on " + surveyRecord().inviteSubject + "\u201D"; return iv.subject; }
 function topicKeysFor(topic){ var s = surveyRecord(); return (s.topicKeys && s.topicKeys[topic]) || TOPIC_KEYS[topic] || []; }
 function agendaTopics(){ return state.quickChallenge ? state.quickChallenge.topics : (surveyRecord().agenda || LEVEL_AGENDA[1]); }
 function insightGate(){ return state.level === 6 ? 70 : 60; }
@@ -1736,7 +1746,7 @@ function addBankQuestions(){
 
 /* ================= STATE ================= */
 var state = {
-  seg: SEGMENTS[0], invite: INVITES[2], reminders: 1, escapes: false,
+  seg: SEGMENTS[0], invite: INVITES[0], reminders: 0, escapes: false,
   qstate: {}, /* id -> keep|simplify|cut */
   sound: true, lastRound: null, running: false, speed: 1,
   bestGrade: null, bestRate: 0,
@@ -2601,7 +2611,7 @@ function budgetMath(ov){
     ["Localization review" + (base.localization ? " · OWNED" : ""), locCharge]
   ];
   var execItems = [
-    ["Send · " + seg.name + " (per send)", seg.sendCost],
+    ["Send · " + segDisplayName(seg) + " (per send)", seg.sendCost],
     ["Invite (per send) · " + inv.name, inv.cost],
     ["Reminders · " + rem + " \u00D7 8", rem * 8],
     ["New edits this attempt (class fixes " + nSimp + " at verb prices, cut " + nCut + " \u00D7 1, restore " + nRestore + " \u00D7 1, add " + nAdd + " \u00D7 3)", editCharge],
@@ -2784,7 +2794,7 @@ function resetChainState(){
   state.stakeholder=null; state.abEnabled=false; state.reportBack=false; state.langChoice="en"; state.abVerdictChoice=null;
   state.validation="skip"; state.dedupe=false; state.consolidate=false; state.repair=false; state.suppression=false; state.localization=false; state.escapes=false; state.intake=null;
   var eb=$("escBtn"); if(eb){ eb.textContent="ESCAPES: OFF"; eb.classList.remove("on"); }
-  state.invite=INVITES[2]; state.reminders=1; state.added={};
+  state.invite=INVITES[0]; state.reminders=0; state.added={};
   QUESTION_BANK.forEach(function(q){ state.qstate[q.id]="keep"; });
 }
 function applyInstrumentForLevel(n){
@@ -2886,11 +2896,11 @@ function renderSegments(){
     if (state.quickChallenge && state.quickChallenge.wave === 2) lockedSeg = true;
     var cantSeg = lockedSeg || (state.seg.id !== sg.id && budgetChangeBlocked({seg: sg}));
     return '<button class="card' + (state.seg.id === sg.id ? " sel" : "") + '" data-seg="' + sg.id + '"' + (cantSeg ? " disabled title=\"" + (lockedSeg ? "Segment locked during an attempt chain. Start a New Game to change segment." : "Not enough budget in the remaining pool for this send") + "\"" : "") + '>' + (lockedSeg ? '<div style="font-size:12px;color:var(--gold);font-weight:700">LOCKED · ATTEMPT CHAIN IN PROGRESS</div>' : "") + '<div class="budget-warning" style="font-size:12px;color:var(--red);font-weight:700"'+(!lockedSeg && cantSeg ? "" : " hidden")+'>NOT ENOUGH BUDGET FOR THIS SEND</div>' +
-      '<div class="pxname">' + sg.name.toUpperCase() + (sg.trap ? '<span class="trap">RISK</span>' : "") + '</div>' +
-      "<p>" + sg.blurb + "</p>" +
+      '<div class="pxname">' + segDisplayName(sg).toUpperCase() + (sg.trap ? '<span class="trap">RISK</span>' : "") + '</div>' +
+      "<p>" + segBlurb(sg) + "</p>" +
       '<div class="rows">' +
       "<span>Size: <b>" + sg.n.toLocaleString("en-US") + " invites</b></span>" +
-      "<span>Timing: <b>" + sg.timing + "</b></span>" +
+      "<span>Timing: <b>" + segTiming(sg) + "</b></span>" +
       "<span>Relevance: <b>" + sg.relevanceTxt + "</b></span>" +
       "<span>Contact history: <b>" + sg.history + "</b></span>" +
       (state.quickChallenge || !sg.intake
@@ -2917,7 +2927,7 @@ function renderInvites(){
     var cantInv = state.invite.id !== iv.id && budgetChangeBlocked({invite: iv});
     return '<button class="card' + (state.invite.id === iv.id ? " sel" : "") + '" data-inv="' + iv.id + '"' + (cantInv ? " disabled title=\"Not enough budget\"" : "") + '>' +
       '<div class="pxname">' + iv.name.toUpperCase() + ' · ' + iv.cost + ' CR</div><div class="budget-warning" style="font-size:12px;color:var(--red);font-weight:700"'+(cantInv ? "" : " hidden")+'>NOT ENOUGH BUDGET</div>' +
-      '<div class="rows"><span>' + iv.sender + '</span><span>' + iv.subject + "</span></div>" +
+      '<div class="rows"><span>' + inviteSender(iv) + '</span><span>' + inviteSubject(iv) + "</span></div>" +
       "<p style='margin-top:6px'>" + iv.lines.join(" ") + "</p>" +
       '<div class="rows"><span>' + iv.note + "</span></div></button>";
   }).join("");
@@ -3183,7 +3193,7 @@ function renderReadout(){
   renderAgenda();
   renderChecklist();
   $("readout").innerHTML =
-    "<span>Segment <b>" + state.seg.name + "</b></span>" +
+    "<span>Segment <b>" + segDisplayName(state.seg) + "</b></span>" +
     "<span>Questions <b>" + kept.length + "</b> dealt (core " + coreKept + "/" + coreTotalAvailable() + ") · Instrument #" + state.instrumentSeed + "</span>" +
     '<span class="' + estCls + '">Est. length <b>' + est + " min" + estLabel + "</b></span>" +
     "<span>Goodwill <b>" + gm.start + (gm.fatigue ? " (carried " + gm.carry + " \u2212 " + gm.fatigue + " fatigue)" : "") + " \u2192 " + Math.max(0, gm.ending) + "</b></span>" +
@@ -3240,7 +3250,7 @@ function openBRD(openerId){
     var bFull = intakeDerived(bm, { dedupe: true, consolidate: true, repair: true });
     var bNow = intakeDerived(bm, silverState());
     listPrepBRD = '<h3>LIST PREPARATION · BRONZE / SILVER / GOLD</h3>' +
-      '<p>The list for ' + state.seg.name + ' arrives as ' + fmt(bn) + ' Bronze records: ' + bc("dupSys") + ' same-system duplicates, ' + bc("dupSecond") + ' second-source duplicates, ' + bc("brokenFix") + ' fixable broken addresses, ' + bc("brokenDead") + ' unfixable broken addresses, ' + bc("stale") + ' stale records. The mix is dealt per instrument; the same seed always deals the same mix.</p>' +
+      '<p>The list for ' + segDisplayName(state.seg) + ' arrives as ' + fmt(bn) + ' Bronze records: ' + bc("dupSys") + ' same-system duplicates, ' + bc("dupSecond") + ' second-source duplicates, ' + bc("brokenFix") + ' fixable broken addresses, ' + bc("brokenDead") + ' unfixable broken addresses, ' + bc("stale") + ' stale records. The mix is dealt per instrument; the same seed always deals the same mix.</p>' +
       '<ul>' +
       '<li><b>DEDUPE (Silver, 4 cr)</b> merges same-system duplicates. Skipping it: duplicates are mailed and can answer twice; duplicate responses are removed at CLEAN and earn nothing.</li>' +
       '<li><b>CONSOLIDATE (Silver, 4 cr)</b> merges second-source duplicates into one record per person. Dedupe cannot see these.</li>' +
@@ -4806,7 +4816,7 @@ function showReport(){
 
   /* goodwill ledger */
   html += '<div class="reportcard"><h2>GOODWILL LEDGER · THE BREAKER PANEL</h2><table class="ledger">' +
-    "<tr><td>Starting goodwill (" + seg.name + (gm.carry !== seg.goodwill ? ", carried from last attempt: " + gm.carry : "") + ")</td><td>" + gm.start + "</td></tr>" +
+    "<tr><td>Starting goodwill (" + segDisplayName(seg) + (gm.carry !== seg.goodwill ? ", carried from last attempt: " + gm.carry : "") + ")</td><td>" + gm.start + "</td></tr>" +
     (gm.fatigue ? "<tr><td>Re-send fatigue (attempt " + state.attempt + " mails this segment again)</td><td>\u2212" + gm.fatigue + " (already in the start figure)</td></tr>" : "") +
     (gm.spendRem ? "<tr><td>Reminders (" + state.reminders + " \u00D7 5)</td><td>\u2212" + gm.spendRem + "</td></tr>" : "") +
     (gm.spendExtra ? "<tr><td>Questions past the 6-question lean core (" + gm.extra + " \u00D7 2)</td><td>\u2212" + gm.spendExtra + "</td></tr>" : "") +
@@ -4859,6 +4869,7 @@ function showReport(){
   html += '<div class="reportcard"><h2>DELIVERABILITY AND DATA</h2>' +
     '<div class="simnote">What the mail system and the data itself did, priced against the prep you bought or skipped. This attempt cost <b>' + (state.launchCost || 0) + " credits</b>; level pool spent so far <b>" + spentAfter + " / " + BUDGET_TOTAL + "</b>, leaving <b>" + remainingAfter + " credits</b>.</div>" +
     "<p style='font-size:15.5px;margin:4px 0'><b>Delivered " + fmt(simDelivered) + " of " + fmt(simSent) + " sent.</b> Bounced " + fmt(simBounced) + " (" + fmt(c.bouncedHard) + " hard (dead addresses) and " + fmt(c.bouncedSoft) + " soft (full or failing mailboxes). Bounce rate <b>" + bounceRatePct + "%</b>, hard bounce rate <b>" + hardRatePct + "%</b>.</p>" +
+    (hardRatePct >= 2 ? "<p style='font-size:15.5px;margin:4px 0'><b>Hard bounces at or above the 2% line (" + hardRatePct + "%).</b> The team funnel standard investigates list quality at 2% hard bounces, well before the reputation penalties at 5% and 10%. Check the list before the next send.</p>" : "") +
     "<p style='font-size:15.5px;margin:4px 0'><b>UNOPENED \u00B7 " + fmt(c.delivered - c.opened) + "</b> sat in inboxes, never opened." + (state.reminders ? " The reminder wave" + (state.reminders > 1 ? "s" : "") + " you bought went out to exactly these inboxes." : " No reminder waves were bought to nudge them.") + "</p>" +
     "<p style='font-size:15.5px;margin:4px 0'><b>Sender reputation: " + rmR.before + " \u2192 " + repA + ".</b> " + openEffectTxt + "</p>" +
     "<p style='font-size:15.5px;margin:4px 0'><b>Validation verdict:</b> " + valVerdict + "</p>" +

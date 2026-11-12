@@ -84,6 +84,20 @@
   own BRD, and the agenda heading, now "BRD REQUIRED TOPICS").
   Visibility only; no BRD content changed. Gates: Node suite
   144/144, browser harness PASS 3/3 at 156/156 checks.
+- Gap-review copy fixes (2026-11-12): from the Copilot survey
+  lifecycle gap review, the owner approved the zero-cost items.
+  G7: the Honest Ask sender and subject and the Fresh/Stale list
+  name, timing, and blurb now come from the level's survey
+  record (Quick Challenges keep the drill text). G24: a new
+  attempt chain starts on the free Generic invite with no
+  reminder preselected. G26: development notes aligned to the
+  start model the code runs. G28: the report flags hard bounces
+  at or above the team's 2% investigate line (advisory only).
+  No scoring changed; no witnesses regenerated. Gates: Node
+  suite 146/146, browser harness PASS 3/3 at 156/156 checks.
+  The remaining gap-review items await the owner's scope call;
+  the scoring items (G9, G5, G6, G2) should ship as one batch
+  with a single witness regeneration.
 
 ## Acceptance boundary
 
