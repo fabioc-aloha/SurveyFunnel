@@ -77,6 +77,13 @@
   levels were re-verified against their baselines and left
   untuned with dispositions in the changelog. The per-level
   surveys project is complete.
+- BRD visibility release (2026-11-12): the owner reported not
+  seeing the per-level BRDs in some levels, so the BRD is now
+  reachable from four labeled "? BRD" entry points (top bar on
+  any screen, setup button, a banner notice naming the level's
+  own BRD, and the agenda heading, now "BRD REQUIRED TOPICS").
+  Visibility only; no BRD content changed. Gates: Node suite
+  144/144, browser harness PASS 3/3 at 156/156 checks.
 
 ## Acceptance boundary
 

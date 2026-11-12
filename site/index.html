@@ -50,6 +50,16 @@
   }
   .soundbtn.off{ color:#ff5d6c; }
   .soundbtn:active{ transform:translateY(2px); box-shadow:none; }
+  .soundbtn.brd-top{ background:var(--gold); border-color:#141826; color:#141826; }
+  .soundbtn.brd-main{ background:var(--gold); border-color:#ffe9a3; color:#241a00; }
+  .brdnotice{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin:0 0 14px; padding:11px 12px; background:#102a25; border:3px solid var(--teal); border-radius:8px; }
+  .brdnotice b{ display:block; font-family:"Press Start 2P",monospace; font-size:9px; line-height:1.6; color:var(--gold); margin-bottom:4px; }
+  .brdnotice span{ display:block; font-size:13.5px; line-height:1.45; color:var(--ink); }
+  .brdopen,.brdmini{ font-family:"Press Start 2P",monospace; cursor:pointer; background:var(--gold); color:#241a00; border:3px solid #ffe9a3; border-radius:6px; box-shadow:0 3px 0 rgba(0,0,0,.35); }
+  .brdopen{ flex:0 0 auto; font-size:11px; min-height:44px; padding:10px 14px; }
+  .brdmini{ font-size:9px; min-height:40px; padding:8px 10px; }
+  .brdopen:active,.brdmini:active{ transform:translateY(2px); box-shadow:none; }
+  @media(max-width:560px){ .brdnotice{ flex-direction:column; align-items:stretch; } .brdopen{ width:100%; } }
 
   /* ---------- cabinet ---------- */
   .cabinet{
@@ -338,7 +348,7 @@
   .tag.stupid{ color:#2b0006; background:var(--orange); border-color:var(--orange); font-weight:700; }
   .tag.filler{ color:#231a00; background:var(--gold); border-color:var(--gold); font-weight:700; }
   .agenda{ background:var(--panel); border:3px solid var(--line); border-radius:8px; padding:11px; margin-top:12px; }
-  .agenda .at{ font-family:"Press Start 2P",monospace; font-size:9px; color:var(--teal); line-height:1.6; margin-bottom:7px; }
+  .agenda .at{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; font-family:"Press Start 2P",monospace; font-size:9px; color:var(--teal); line-height:1.6; margin-bottom:7px; }
   .agenda .arow{ display:flex; justify-content:space-between; gap:8px; font-size:13.5px; color:var(--dim); padding:3px 0; }
   .agenda .arow b{ color:var(--ink); text-transform:capitalize; }
   .agenda .ok{ color:var(--teal); font-weight:700; white-space:nowrap; }
@@ -517,6 +527,7 @@
       <div class="logo" style="font-size:clamp(15px,3.2vw,24px);line-height:1.3;">DEAR VALUED CUSTOMER</div>
     </div>
     <div class="spacer"></div>
+    <button class="soundbtn brd-top" id="topBrdBtn" aria-label="Open the BRD (Business Requirement Document) for the selected level">? BRD</button>
     <button class="soundbtn" id="guideBtn" aria-label="Consult MPOR (Master Plan of Record)">? Consult MPOR</button>
     <button class="soundbtn" id="fishBtn" aria-label="Consult Fishbowl (how a survey list is built)">? FISHBOWL</button>
     <button class="soundbtn" id="soundBtn" aria-label="Toggle sound">♪ SOUND: ON</button>
@@ -571,7 +582,7 @@
 
     <!-- ================= SETUP ================= -->
     <div id="setup" style="display:none">
-      <button class="soundbtn" id="brdBtn" aria-label="Consult BRD (Business Requirement Document)" style="margin-bottom:14px">? Consult BRD</button>
+      <button class="soundbtn brd-main" id="brdBtn" aria-label="Open the BRD (Business Requirement Document) for this level" style="margin-bottom:14px">? BRD</button>
       <button class="segbtn" id="quickExit" hidden>BACK TO LEVELS</button>
       <div class="budgetpanel" id="budgetPanel" aria-label="Campaign budget"></div>
       <div id="levelBanner"></div>
@@ -2697,17 +2708,28 @@ function curLevel(){
   }
   return LEVELS[state.level-1];
 }
+function brdNoticeHTML(){
+  var title = state.quickChallenge ? state.quickChallenge.name : surveyRecord().title;
+  var own = state.quickChallenge ? "THIS CHALLENGE HAS ITS OWN BRD" : "THIS LEVEL HAS ITS OWN BRD";
+  return '<div class="brdnotice"><div><b>' + own + '</b><span>' + title + ' · Read the purpose, sponsor, audience, required topics, acceptance criteria, and constraints before you launch.</span></div><button class="brdopen" id="setupBrdBtn" aria-label="Open the BRD for ' + title + '">? BRD</button></div>';
+}
+function wireBrdNotice(){
+  var b = $("setupBrdBtn");
+  if (b) b.addEventListener("click", function(){ sndClick(); openBRD("setupBrdBtn"); });
+}
 function renderLevelUI(){
   var L=curLevel();
   var hl=$("hudLevel"); if(hl) hl.innerHTML="LEVEL "+L.id+" · "+L.difficulty+" · <b>"+L.name+"</b> · "+surveyRecord(L.id).label+" · ATTEMPT "+state.attempt+" · INSTRUMENT #"+state.instrumentSeed;
   var ht=$("hudTarget"); if(ht) ht.innerHTML=(state.quickChallenge ? "TARGET RESPONSE RATE <b>&gt; " : "RESPONSE BENCHMARK <b>")+targetPct(L.target)+"%</b>"+(L.id===4?" · END GOODWILL 35+":"");
   $("hudGates").innerHTML=state.quickChallenge ? "WIN NEEDS QUALITY <b>"+quickQualityGate()+"+</b> · INSIGHT <b>"+insightGate()+"+</b>" : "WIN: <b>FIVE EVIDENCE CHECKS</b> · USABLE INSIGHT <b>"+insightGate()+"+</b>";
   var lb=$("levelBanner"); if(lb) lb.innerHTML='<div class="lever" style="border-color:var(--gold)"><div class="lever-head"><span class="lever-no">LEVEL '+L.id+'</span><span class="lever-title">'+L.name+'</span><span class="lever-sub">'+L.desc+' Budget '+L.budget+' cr · <b style="color:var(--ink)">'+activeQuestions().length+' questions</b> dealt · Survey: '+surveyRecord(L.id).title+'.</span></div></div>';
+  if(lb && !state.quickChallenge){ lb.innerHTML += brdNoticeHTML(); wireBrdNotice(); }
   if (state.quickChallenge){
     var tv = quickVariant();
     hl.textContent = "QUICK CHALLENGE · " + L.name;
     lb.innerHTML = '<div class="lever"><h2>' + L.name + '</h2><p>Repair the three BRD cards (Fresh audience, Honest Ask invite provided). Three unrequested extras arrived: repair or cut each. Reach response above ' + targetPct(L.target) + '%, quality ' + quickQualityGate() + '+, Insight ' + insightGate() + '+.</p>' + (tv ? '<p><b>BRD TWIST · ' + tv.name + ':</b> ' + tv.acceptance + '</p>' : '') + '<p><b>AGENDA:</b> ' + agendaTopics().join(" · ") + '</p>' +
       (state.quickChallenge.wave === 2 ? '<p><b>WAVE 2 · COMPLICATION: ' + quickComplicationTitle(state.quickChallenge.comp) + '.</b> Same pool, no refill: wave 1 spent ' + (state.quickChallenge.wave1 ? state.quickChallenge.wave1.cost : 0) + ' of 48 cr. The verdict reads both waves together.</p>' : '') + '</div>';
+    lb.innerHTML += brdNoticeHTML(); wireBrdNotice();
   }
   // level grid
   var grid=$("levelGrid"); if(grid){ grid.innerHTML=LEVELS.map(function(lv){ var locked=lv.id>state.unlocked; var best=state.campaignBest[lv.id]; return '<button class="lvlcard'+(locked?" locked":"")+(lv.id===state.level?" sel":"")+'" data-level="'+lv.id+'" '+(locked?"disabled":"")+'>'+'<div class="ln">LEVEL '+lv.id+' · '+lv.difficulty+' · '+lv.name+' · '+surveyRecord(lv.id).label+(locked?" · 🔒 LOCKED":"")+'</div><h3>'+lv.name+'</h3><p>'+lv.desc+'</p>'+(best?'<div class="best">BEST: '+best+'</div>':"")+'</button>';}).join("");
@@ -2976,7 +2998,9 @@ function renderAgenda(){
       : (qs.length ? '<span class="miss">ONLY LOW-VALUE ITEMS · EARNS 0</span>' : '<span class="miss">NOT COVERED</span>');
     return '<div class="arow"><b>' + topic + '</b>' + status + '</div>';
   }).join("");
-  el.innerHTML = '<div class="at">LEVEL AGENDA · INSIGHT NEEDS ' + insightGate() + '+ · TOPICS MUST BE ASKED, SOUND, ANSWERABLE, ANSWERED BY KEY PERSONAS</div>' + rows;
+  el.innerHTML = '<div class="at"><span>BRD REQUIRED TOPICS · LEVEL AGENDA · INSIGHT NEEDS ' + insightGate() + '+ · TOPICS MUST BE ASKED, SOUND, ANSWERABLE, ANSWERED BY KEY PERSONAS</span><button class="brdmini" id="agendaBrdBtn" aria-label="Open the BRD for this level">? BRD</button></div>' + rows;
+  var agendaBrdBtn = $("agendaBrdBtn");
+  if (agendaBrdBtn) agendaBrdBtn.addEventListener("click", function(){ sndClick(); openBRD("agendaBrdBtn"); });
 }
 /* Cut permission is independent of study acceptance. Every question
    may be removed except the last; refused cuts change no state or cost. */
@@ -3141,7 +3165,7 @@ function renderChecklist(){
     ["Agenda coverage seen (Step 4 panel)", !!(reviewDone || t.agenda)],
     ["At least one question kept (Step 4)", keptQuestions().length >= instrumentFloor()]
   ];
-  el.innerHTML = '<div class="ct">READY TO LAUNCH? · INFORMATION ONLY · THE BUTTON ENFORCES BUDGET + MINIMUM</div>' +
+  el.innerHTML = '<div class="ct">READY TO LAUNCH? · OPEN THIS LEVEL\'S OWN BRD WITH ? BRD · INFORMATION ONLY · THE BUTTON ENFORCES BUDGET + MINIMUM</div>' +
     rows.map(function(r, i){
       return '<div class="crow ' + (r[1] ? "done" : "todo") + '"><span>' + (r[1] ? "✓ " : "○ ") + r[0] + '</span><span class="st">' + (r[1] ? "DONE" : "TO DO") + '</span>' +
         (i === 3 && !r[1] ? '<button class="skipbtn2" id="skipReviewBtn">SKIP REVIEW</button>' : "") + "</div>";
@@ -3203,7 +3227,7 @@ $("soundBtn").addEventListener("click", function(){
   toggleMute();
 });
 /* MPOR overlay */
-function openBRD(){
+function openBRD(openerId){
   var L = curLevel(), quick = !!state.quickChallenge;
   var tv = quick ? quickVariant() : null;
   var constraints = quick ? "Repair the three BRD cards and resolve the three unrequested extras within " + L.budget + " credits; one launch. If a complication lands after the report, one follow-up wave may be mailed from the same pool, which does not refill. Three questions in this drill were not asked for in this BRD: treat them as scope creep and judge each on its merits. The Fresh audience, full validation, dedupe, suppression, and Honest Ask invitation with no reminders are provided. Retry starts fresh without changing campaign progress." :
@@ -3247,7 +3271,7 @@ function openBRD(){
         return '<li><b>'+topic+'</b>: credible answers from '+personas+'.</li>';
       }).join("")+'</ul><h3>ACCEPTANCE CRITERIA</h3>'+'<p>Pass all five evidence checks; none can compensate for another.</p>'+evidenceRequirementsHTML()+'<ul><li>Budget: '+L.budget+' credits across all attempts.</li>'+(state.level===4?'<li>Maintain ending goodwill 35 or higher.</li>':"")+'</ul><h3>STUDY CONSTRAINTS</h3><p>'+constraints+'</p>'+listPrepBRD+'<p>These are the active study requirements, not a forecast. Consult MPOR for game rules, scoring definitions, and simulation limitations.</p>';
   }
-  openReference("studyBRD", "brdClose", "brdBtn");
+  openReference("studyBRD", "brdClose", openerId || "brdBtn");
 }
 var activeReference = null;
 function openReference(id, closeId, openerId){
@@ -3266,7 +3290,8 @@ function closeReference(){
   opener.focus({preventScroll:true});
 }
 function closeBRD(){ if (activeReference && activeReference.id === "studyBRD") closeReference(); }
-$("brdBtn").addEventListener("click",function(){sndClick();openBRD();});
+$("brdBtn").addEventListener("click",function(){sndClick();openBRD("brdBtn");});
+var topBrdBtn = $("topBrdBtn"); if (topBrdBtn) topBrdBtn.addEventListener("click",function(){sndClick();openBRD("topBrdBtn");});
 $("brdClose").addEventListener("click",function(){sndClick();closeBRD();});
 $("studyBRD").addEventListener("click",function(e){if(e.target===this)closeBRD();});
 function openGuide(){ openReference("fieldGuide", "guideClose", "guideBtn"); }

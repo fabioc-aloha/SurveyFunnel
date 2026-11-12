@@ -1120,6 +1120,19 @@ async function runSurveyIdentityScenario(browser, gameUrl, viewport, options) {
       gridText.includes('LEVEL 2 · EASY · THE SPLIT · M365 COPILOT / AI ADOPTION'),
       { excerpt: gridText.slice(0, 320) });
 
+    const topBrdText = await page.$eval('#topBrdBtn', (el) => (el.textContent || '').trim());
+    await run.check('top bar carries a short ? BRD link', topBrdText === '? BRD', { topBrdText });
+    await clickAndWait(page, '#topBrdBtn', 400);
+    await page.waitForSelector('#studyBRD.open', { visible: true, timeout: 10000 });
+    const topBrd = await page.evaluate(() =>
+      (document.querySelector('#brdContent')?.textContent || '').replace(/\s+/g, ' '));
+    await run.check('top ? BRD opens the selected level BRD before setup',
+      topBrd.includes('Support Experience Survey'), { excerpt: topBrd.slice(0, 240) });
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(() => !document.querySelector('#studyBRD').classList.contains('open'), { timeout: 5000 });
+    const topFocusAfter = await page.evaluate(() => document.activeElement?.id || '');
+    await run.check('top BRD Escape restores focus to the top link', topFocusAfter === 'topBrdBtn', { topFocusAfter });
+
     await clickAndWait(page, '#startBtn', 500);
     await waitForVisible(page, '#setup');
     const bannerText = await page.evaluate(() =>
@@ -1129,8 +1142,11 @@ async function runSurveyIdentityScenario(browser, gameUrl, viewport, options) {
     await run.check('setup banner and HUD name the Level 1 survey',
       bannerText.includes('Survey: Support Experience Survey') && hudText.includes('SUPPORT EXPERIENCE'),
       { banner: bannerText.slice(0, 240), hud: hudText.slice(0, 240) });
+    await run.check('setup banner announces the level own BRD beside its link',
+      bannerText.includes('THIS LEVEL HAS ITS OWN BRD') && bannerText.includes('Read the purpose, sponsor, audience'),
+      { banner: bannerText.slice(0, 320) });
 
-    await clickAndWait(page, '#brdBtn', 400);
+    await clickAndWait(page, '#setupBrdBtn', 400);
     await page.waitForSelector('#studyBRD.open', { visible: true, timeout: 10000 });
     const brd = await page.evaluate(() =>
       (document.querySelector('#brdContent')?.textContent || '').replace(/\s+/g, ' '));
@@ -1145,13 +1161,13 @@ async function runSurveyIdentityScenario(browser, gameUrl, viewport, options) {
     await page.keyboard.press('Escape');
     await page.waitForFunction(() => !document.querySelector('#studyBRD').classList.contains('open'), { timeout: 5000 });
     const focusAfter = await page.evaluate(() => document.activeElement?.id || '');
-    await run.check('BRD Escape closes and restores focus to the opener', focusAfter === 'brdBtn', { focusAfter });
+    await run.check('BRD Escape closes and restores focus to the opener', focusAfter === 'setupBrdBtn', { focusAfter });
 
     await page.evaluate(() => { selectLevel(2, true); });
     await waitForVisible(page, '#setup');
     const banner2 = await page.evaluate(() =>
       (document.querySelector('#levelBanner')?.textContent || '').replace(/\s+/g, ' '));
-    await clickAndWait(page, '#brdBtn', 400);
+    await clickAndWait(page, '#agendaBrdBtn', 400);
     await page.waitForSelector('#studyBRD.open', { visible: true, timeout: 10000 });
     const brd2 = await page.evaluate(() =>
       (document.querySelector('#brdContent')?.textContent || '').replace(/\s+/g, ' '));

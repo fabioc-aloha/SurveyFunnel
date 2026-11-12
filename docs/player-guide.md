@@ -251,11 +251,14 @@ a separate coaching banner or lesson recap. Setup steps are numbered
 1 to 4, and the ready checklist above LAUNCH shows what you have
 decided so far; it never blocks you.
 
-**? Consult BRD** opens the **Business Requirement Document** for the
-active study from setup. It lists required topics and respondent groups,
-sample, role, quality, and Insight requirements, credit budget, and level-specific
-constraints. Quick Challenge has its own BRD. Unlike MPOR's shared rules,
-the BRD changes with the level; consulting it does not change your choices.
+**? BRD** in the top bar opens the **Business Requirement Document** for
+the selected or active study from any screen. Setup repeats the link at
+the top, in a banner naming that level's own BRD, and beside the BRD
+required topics in the agenda panel. It lists required topics and
+respondent groups, sample, role, quality, and Insight requirements,
+credit budget, and level-specific constraints. Quick Challenge has its
+own BRD. Unlike MPOR's shared rules, the BRD changes with the level;
+consulting it does not change your choices.
 
 ## Personas
 

@@ -967,6 +967,30 @@ test('modal close restores focus and releases the background', () => {
   assert.equal(g.document.activeElement, element('brdBtn'));
 });
 
+test('BRD is visible from the top bar and throughout campaign setup', () => {
+  const html = readFileSync(join(root, 'site', 'index.html'), 'utf8');
+  assert.match(html, /id="topBrdBtn"[^>]*>\? BRD<\/button>/);
+  assert.match(html, /id="brdBtn"[^>]*>\? BRD<\/button>/);
+  const { context: g, element } = game();
+  for (let level = 1; level <= 6; level++) {
+    g.selectLevel(level, false);
+    const banner = element('levelBanner').innerHTML;
+    assert.match(banner, /THIS LEVEL HAS ITS OWN BRD/);
+    assert.ok(banner.includes(g.surveyRecord(level).title), `setup banner names the Level ${level} BRD`);
+    assert.match(banner, /id="setupBrdBtn"[^>]*>\? BRD<\/button>/);
+    assert.match(element('agendaPanel').innerHTML, /BRD REQUIRED TOPICS/);
+    assert.match(element('agendaPanel').innerHTML, /id="agendaBrdBtn"[^>]*>\? BRD<\/button>/);
+    assert.match(element('launchCheck').innerHTML, /OPEN THIS LEVEL'S OWN BRD WITH \? BRD/);
+  }
+  for (const opener of ['topBrdBtn', 'setupBrdBtn', 'agendaBrdBtn']) {
+    element(opener).focus();
+    g.openBRD(opener);
+    assert.equal(element('studyBRD').classList.contains('open'), true);
+    g.closeBRD();
+    assert.equal(g.document.activeElement, element(opener), `${opener} regains focus`);
+  }
+});
+
 test('fishbowl help document sits alongside MPOR and BRD with both entry points', () => {
   const html = readFileSync(join(root, 'site', 'index.html'), 'utf8');
   assert.match(html, /id="fishBtn"[^>]*>\? FISHBOWL<\/button>/);

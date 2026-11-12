@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-11-12 - Each level's BRD is visible throughout setup
+
+- At the owner's direction, the per-level BRDs (which already
+  existed, one per level, since the per-level surveys project)
+  are now easy to find. The owner reported not seeing them in
+  some levels, so this release changes visibility only; no BRD
+  content changed, and the shared front section stays shared,
+  as approved in the per-level design.
+- Four entry points, all labeled "? BRD" in gold: a top bar
+  button that works from any screen and opens the selected
+  level's BRD; the setup screen's own button; a notice under
+  the setup banner ("THIS LEVEL HAS ITS OWN BRD", naming the
+  survey, with its own button); and a button beside the agenda
+  heading, which now reads "BRD REQUIRED TOPICS". The launch
+  checklist heading also points at the level's own BRD.
+  Opening the BRD from any entry point returns focus to that
+  control on close, and opening it never changes setup state.
+- Verification: Node suite 144/144 including a new visibility
+  test covering all six levels; browser harness PASS 3/3 with
+  156/156 checks, including the top bar opening the selected
+  BRD from the start screen and Escape restoring focus.
+  Screenshots at 390px showed the gold button prominent in the
+  top bar and the banner notice clear, with zero page errors
+  and no horizontal overflow.
+
 ## 2026-11-12 - Level 2 product named M365 Copilot
 
 - At the owner's direction, the Level 2 product is called

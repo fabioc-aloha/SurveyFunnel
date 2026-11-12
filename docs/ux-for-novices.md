@@ -28,9 +28,11 @@ and gaps are recorded in the [changelog](../CHANGELOG.md) and
   publication is withheld and what to change.
 - **Audience continuity.** A new instrument retains cohort health and
   contact history; the setup explains the whole-campaign reset boundary.
-- **Study requirements.** Consult BRD on the setup screen opens the
-  active study's Business Requirement Document: topics, respondent groups,
-  acceptance gates, budget, and constraints. Shared game rules stay in MPOR.
+- **Study requirements.** A **? BRD** link stays in the top bar, and
+  setup repeats it at the top, in the level banner, and beside the BRD
+  required topics. It opens the active study's Business Requirement
+  Document: topics, respondent groups, acceptance gates, budget, and
+  constraints. Shared game rules stay in MPOR.
 
 ## Legibility floor
 

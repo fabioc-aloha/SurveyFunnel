@@ -434,6 +434,11 @@ It includes level constraints and the Quick Challenge
 repair requirement without modifying campaign or setup state. Keep its
 criteria aligned with scoring when adding or changing a level.
 
+BRD entry points are the top-bar `? BRD`, the setup-top `? BRD`, the
+level banner's own-BRD link, and the agenda panel's `? BRD`. They call
+`openBRD(openerId)` with their own id so modal focus returns to the
+control the player used.
+
 MPOR and BRD share modal focus management: background controls are inert,
 Tab and Shift-Tab stay inside the active dialog, Escape closes it, and
 closing restores focus to the opener. Browser checks remain necessary
