@@ -150,8 +150,10 @@ Per round, the model runs in this order:
    stops new invitations and ends the run for anyone still in the
    funnel. Only completions before the trip count.
 6. **Evidence processing.** After FINISH, remove duplicate, junk, speeder,
-   straight-lined, and guessed completions in that order, counting each
-   rejection once. MATCH then excludes forwarded responses, whose invited
+   and straight-lined completions in that order, counting each
+   rejection once. Guessed completions stay in the usable base (real
+   cleaning cannot detect a guess) and are counted on the evidence
+   object as `containedGuesses` for the report. MATCH then excludes forwarded responses, whose invited
    account is unknown. Non-forwarded completions receive synthetic account
    identifiers; this is a teaching model, not an external account lookup.
    Recompute Insight using the matched records, so rejected roles cannot
@@ -169,9 +171,25 @@ Per round, the model runs in this order:
 minimum usable sample, and role shares. Mission minima are 750, 1,000,
 1,000, 675, 900, and 1,500 simulated responses for Levels 1-6.
 Levels 1-4 require the Support pool, Level 5 Global, and Level 6
-Leadership. Levels 1-5 require technicians and end users each at 10%+
-of the usable base; the finale requires executives and IT decision
-makers together at 50%+. Each required group needs at least one respondent.
+Leadership. Levels 1, 2, and 5 require technicians and end users each at 10%+
+of the usable base; Level 3 requires people who run workloads (IT
+decision makers or frontline technicians) together at 30%+; Level 4
+requires decision makers (executives or IT decision makers) together
+at 15%+; the finale requires executives and IT decision makers
+together at 50%+. Each required group needs at least one respondent.
+Level 1 also enforces its BRD eligibility window (the list's timing
+must fall within 30 days of the triggering event, read from the
+segment's `touchDays` against the survey record's `eligibilityDays`),
+and Level 5 requires every language group present in the usable base
+at 5%+. Operational trust additionally fails when any opted-out or
+recently surveyed person was mailed (suppression off), and requires
+every required topic ANSWERED CREDIBLY, not merely scored. The
+suppression scrub removes its records before the send (fate
+`suppressed`, counted in the tally, excluded from sent). The Honest
+Ask time promise is player-set (3, 5, 8, or 10 minutes, default 5)
+via `state.promiseMinutes`, read through `effectivePromise()`; the
+Known Name goodwill earn requires a prior contact in the audience
+portfolio.
 Account matching must retain at least 80% of cleaned completions.
 
 Quality must be 60+. `qualityAssessment()` uses the guessed-completion

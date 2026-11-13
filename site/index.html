@@ -768,7 +768,7 @@
       </ul>
       <h3>WIN GATES</h3>
       <p>In the campaign, produce evidence stakeholders can trust and use. Pass all five checks: <b>funnel execution, evidence fitness, data integrity, audience sustainability, and operational trust</b>. Response rate is a benchmark, not a win gate. Only cleaned, account-linked responses count toward the mission's sample and role requirements; Insight is calculated again from those responses. Quality must remain 60+ and Insight 60+ (Level 6: 70+). The BRD states the mission's minimum sample and required roles. These are simulation rules, not statistical guarantees.</p>
-      <p>After FINISH the report follows <b>CLEAN → MATCH → INTERPRET → PUBLISH → ACT</b>. Speeders, straight-liners, duplicate, junk, and guessed responses are removed once each; forwarded responses cannot be matched to the invited account. A failed check withholds publication and names the next action. Audience health carries across instruments in this campaign. Starting a new instrument does not refresh the audience; resetting the whole campaign does. Quick Challenges retain their own response, quality, Insight, and BRD requirements.</p>
+      <p>After FINISH the report follows <b>CLEAN → MATCH → INTERPRET → PUBLISH → ACT</b>. Speeders, straight-liners, duplicate, and junk responses are removed once each; forwarded responses cannot be matched to the invited account. Guessed responses stay in the data, because real cleaning cannot detect them; the report counts the guesses it can see and prices them in Quality and Insight. A failed check withholds publication and names the next action. Audience health carries across instruments in this campaign. Starting a new instrument does not refresh the audience; resetting the whole campaign does. Quick Challenges retain their own response, quality, Insight, and BRD requirements.</p>
       <div style="margin-top:16px"><button class="fgclose" id="guideClose">◀ BACK TO THE GAME</button></div>
     </div>
   </div>
@@ -818,23 +818,23 @@ var PERSONAS = {
 var PKEYS = ["exec","tech","admin","itdm","end"];
 
 var SEGMENTS = [
-  { id:"fresh", name:"Support, Fresh", n:10000, goodwill:72, relevance:1.15, relevanceTxt:"High", sendCost:30, invalidPct:0.03, lastCleaned:"Cleaned last quarter", intake:{ dupSys:0.03, dupSecond:0.02, brokenFix:0.015, brokenDead:0.005, stale:0.03 },
+  { id:"fresh", touchDays:3, name:"Support, Fresh", n:10000, goodwill:72, relevance:1.15, relevanceTxt:"High", sendCost:30, invalidPct:0.03, lastCleaned:"Cleaned last quarter", intake:{ dupSys:0.03, dupSecond:0.02, brokenFix:0.015, brokenDead:0.005, stale:0.03 },
     timing:"3 days after a closed support case", history:"Last surveyed 6 weeks ago",
     mix:{ tech:.34, end:.30, admin:.14, itdm:.12, exec:.10 },
     blurb:"Case still fresh in memory. Relevance as good as it gets." },
-  { id:"stale", name:"Support, Stale", n:12000, goodwill:58, relevance:0.8, relevanceTxt:"Faded", sendCost:30, invalidPct:0.09, lastCleaned:"Not cleaned in 9 months", intake:{ dupSys:0.05, dupSecond:0.04, brokenFix:0.03, brokenDead:0.01, stale:0.055 },
+  { id:"stale", touchDays:45, name:"Support, Stale", n:12000, goodwill:58, relevance:0.8, relevanceTxt:"Faded", sendCost:30, invalidPct:0.09, lastCleaned:"Not cleaned in 9 months", intake:{ dupSys:0.05, dupSecond:0.04, brokenFix:0.03, brokenDead:0.01, stale:0.055 },
     timing:"45 days after a closed support case", history:"Last surveyed 6 weeks ago",
     mix:{ tech:.34, end:.30, admin:.14, itdm:.12, exec:.10 },
     blurb:"Same people as Fresh, six weeks on. Half barely remember the case." },
-  { id:"blast", name:"Executive Blast", n:20000, goodwill:49, relevance:0.65, relevanceTxt:"Low", trap:true, sendCost:45, invalidPct:0.16, lastCleaned:"Never cleaned · assembled from old exports", intake:{ dupSys:0.07, dupSecond:0.06, brokenFix:0.05, brokenDead:0.02, stale:0.09 },
+  { id:"blast", touchDays:null, name:"Executive Blast", n:20000, goodwill:49, relevance:0.65, relevanceTxt:"Low", trap:true, sendCost:45, invalidPct:0.16, lastCleaned:"Never cleaned · assembled from old exports", intake:{ dupSys:0.07, dupSecond:0.06, brokenFix:0.05, brokenDead:0.02, stale:0.09 },
     timing:"Cold list, no recent touchpoint", history:"Already surveyed twice this quarter",
     mix:{ exec:.55, itdm:.20, tech:.10, end:.08, admin:.07 },
     blurb:"Biggest list, fastest to burn: 2-minute patience, low relevance, goodwill pre-spent." },
-  { id:"tired", name:"Tired List · Surveyed 3×", n:9000, goodwill:25, relevance:1.05, relevanceTxt:"Decent", sendCost:30, invalidPct:0.05, lastCleaned:"Cleaned last quarter", intake:{ dupSys:0.04, dupSecond:0.03, brokenFix:0.01, brokenDead:0.005, stale:0.035 },
+  { id:"tired", touchDays:7, name:"Tired List · Surveyed 3×", n:9000, goodwill:25, relevance:1.05, relevanceTxt:"Decent", sendCost:30, invalidPct:0.05, lastCleaned:"Cleaned last quarter", intake:{ dupSys:0.04, dupSecond:0.03, brokenFix:0.01, brokenDead:0.005, stale:0.035 },
     timing:"Recent case, but surveyed 3 times this quarter", history:"Surveyed 3 times this quarter · fatigued",
     mix:{ tech:.30, end:.32, admin:.16, itdm:.12, exec:.10 },
     blurb:"Surveyed 3× this quarter. Goodwill 25: only a short send that reports back restores it." },
-  { id:"multi", name:"Global · Five Language Groups", n:15000, goodwill:68, relevance:1.0, relevanceTxt:"Good", sendCost:30, invalidPct:0.06, lastCleaned:"Cleaned last quarter", intake:{ dupSys:0.045, dupSecond:0.035, brokenFix:0.02, brokenDead:0.01, stale:0.04 },
+  { id:"multi", touchDays:7, name:"Global · Five Language Groups", n:15000, goodwill:68, relevance:1.0, relevanceTxt:"Good", sendCost:30, invalidPct:0.06, lastCleaned:"Cleaned last quarter", intake:{ dupSys:0.045, dupSecond:0.035, brokenFix:0.02, brokenDead:0.01, stale:0.04 },
     timing:"7 days after a closed case, across regions", history:"Last surveyed 8 weeks ago",
     mix:{ tech:.28, end:.34, admin:.16, itdm:.12, exec:.10 },
     blurb:"English is only 40% of this list; English-only sends leak elsewhere." }
@@ -1660,7 +1660,7 @@ var LEVEL_AGENDA = {
    any longer. */
 var SURVEY_BASE_CONSTRAINTS = "One credit pool for the whole level, shared across attempts. Choose an audience that can answer the required topics. Preserve useful coverage while controlling burden and data contamination.";
 var SURVEYS = {
-  1:{ label:"SUPPORT EXPERIENCE", title:"Support Experience Survey", sponsor:"the Support Experience team", inviteSubject:"your support case", listFamily:"Support",
+  1:{ label:"SUPPORT EXPERIENCE", title:"Support Experience Survey", sponsor:"the Support Experience team", inviteSubject:"your support case", listFamily:"Support", eligibilityDays:30,
     purpose:"Decide what to fix first in the support experience: where cases slow down, where the effort falls on the customer, and where self-service fails before a case ever opens. The findings set the support team's improvement priorities for the next quarter and are read alongside case data, never instead of it.",
     audience:"Customers whose support case closed in the last 30 days: the people who lived the case, across frontline, administrator, IT decision-maker, and executive seats. Case-experience questions are answerable by whoever lived the case; contract and billing figures sit with Partner Admin seats only, and org-wide cost figures sit with no seat on this list.",
     agenda:LEVEL_AGENDA[1], topicKeys:TOPIC_KEYS, constraints:SURVEY_BASE_CONSTRAINTS },
@@ -1680,12 +1680,12 @@ var SURVEYS = {
     agenda:LEVEL_AGENDA[4], topicKeys:RELATIONSHIP_TOPIC_KEYS,
     constraints:SURVEY_BASE_CONSTRAINTS + " The tired audience requires ending goodwill 35 or higher. Report back (3 cr) is this study's feedback commitment: a relationship audience that never hears what its answers changed stops answering, so telling these accounts what the last round fixed is what protects response on the next cycle." },
   5:{ label:"GENERAL PERCEPTIONS OF MICROSOFT", title:"General Perceptions of Microsoft Survey", sponsor:"the Brand and Perceptions research team", inviteSubject:"how you see Microsoft", listFamily:"Global", listTiming:{ fresh:"3 days after the last tracked touchpoint, across regions", multi:"7 days after the last tracked touchpoint, across regions" }, listBlurb:{ fresh:"The touchpoint is still fresh in memory. Relevance as good as it gets." },
-    purpose:"Decide how Microsoft is perceived, where that perception is moving, and which parts of it the company can actually change: how favorable people feel, whether they trust the company, whether it reads as innovative and as good value, and who they believe leads in AI. The findings set the perception and communications priorities for the next year and are read alongside product and relationship evidence, never instead of it. A perception tracker is the survey that runs globally, which is why this study fields in more than 45 languages while the others field in one.",
+    purpose:"Decide how Microsoft is perceived, where that perception is moving, and which parts of it the company can actually change: how favorable people feel, whether they trust the company, whether it reads as innovative and as good value, and who they believe leads in AI. The findings set the perception and communications priorities for the next year and are read alongside product and relationship evidence, never instead of it. A perception tracker is the survey that runs globally, which is why the real study fields in more than 45 languages; this simulation compresses them into five language groups.",
     audience:"A broad professional audience across five language groups: end users, frontline staff, administrators, IT decision makers, and executives, most of whom know Microsoft through its products rather than its org chart. Perception items are answerable by every seat, because a perception needs no system access: the respondent is the only authority on their own view. The one thing this audience cannot answer is a fact: market figures and internal company facts sit with no seat on this list, and a perception survey that asks for them collects guesses dressed as data.",
     agenda:LEVEL_AGENDA[5], topicKeys:PERCEPTIONS_TOPIC_KEYS,
     constraints:SURVEY_BASE_CONSTRAINTS + " The multilingual list is 40% English-speaking. Consider invitation language and localization review. Fielding in 45+ languages is this study's design, not a translation errand: localization review (8 cr) checks that each language version still asks the same question, and the localized invite (4 cr) puts the invitation itself in the respondent's language. Response is read by language group; a group that cannot read the invitation cannot report a perception, and its silence is a fielding failure, not a finding." },
   6:{ label:"ENTERPRISE RELATIONSHIP", title:"Enterprise Relationship Flagship Annual Survey", sponsor:"the Enterprise Relationship team", inviteSubject:"your enterprise relationship",
-    purpose:"Decide the state of the enterprise relationship before the renewal cycle: whether decision makers trust Microsoft as a long-term partner, whether the relationship delivers business value, whether it aligns with where their organizations are going, and whether they intend to renew. The findings set the enterprise team's account priorities for the year and are read alongside account records, never instead of them. This is the flagship annual: one fielding a year, so a miss cannot be repaired next quarter.",
+    purpose:"Decide the state of the enterprise relationship before the renewal cycle: whether decision makers trust Microsoft as a long-term partner, whether the relationship delivers business value, whether it aligns with where their organizations are going, and whether they intend to renew. The findings set the enterprise team's account priorities for the year and are read alongside account records, never instead of them. This is the flagship annual: one fielding a year, and a re-send reaches the same executives again at full goodwill cost, so a miss is expensive to repair.",
     audience:"Senior decision makers at enterprise accounts: the Executive Blast list, mostly executives and IT decision makers, with administrator seats holding the commercial specifics. Executives answer strategy, value, and renewal intent from their own seats; they do not answer operational detail they never touch, and asking them manufactures guesses. Contract and commercial specifics sit with Partner Admin seats and are beyond knowledge for everyone else on the Blast list. This audience gives a survey minutes, not half an hour: the flagship's risk is length and sensitivity at executive patience, not coverage.",
     agenda:LEVEL_AGENDA[6], topicKeys:FLAGSHIP_TOPIC_KEYS,
     constraints:SURVEY_BASE_CONSTRAINTS + " Resolve the stakeholder request for eight extra questions. Costs and added burden depend on your response; extra-topic answers are not simulated or scored." + " Executive Blast is the available audience for this study." }
@@ -1698,9 +1698,22 @@ function surveyRecord(level){ return SURVEYS[level || state.level] || SURVEYS[1]
    the drill text. */
 function segDisplayName(sg){ if (state.quickChallenge) return sg.name; var fam = surveyRecord().listFamily; if (fam && (sg.id === "fresh" || sg.id === "stale")) return fam + ", " + (sg.id === "fresh" ? "Fresh" : "Stale"); return sg.name; }
 function segTiming(sg){ var t = state.quickChallenge ? null : surveyRecord().listTiming; return (t && t[sg.id]) || sg.timing; }
+function segEligibilityNote(sg){
+  var d = state.quickChallenge ? 0 : (surveyRecord().eligibilityDays || 0);
+  if (!d) return "";
+  var inside = sg.touchDays !== null && sg.touchDays !== undefined && sg.touchDays <= d;
+  return '<div class="rows"><span' + (inside ? "" : ' style="color:var(--red)"') + '>' + (inside ? "Inside the BRD audience window (" + d + " days)" : "Outside the BRD audience window (" + d + " days): the evidence check will hold this send") + '</span></div>';
+}
 function segBlurb(sg){ var b = state.quickChallenge ? null : surveyRecord().listBlurb; return (b && b[sg.id]) || sg.blurb; }
 function inviteSender(iv){ if (iv.id === "honest" && !state.quickChallenge) return "From: " + surveyRecord().sponsor; return iv.sender; }
-function inviteSubject(iv){ if (iv.id === "honest" && !state.quickChallenge) return "Subject: \u201C5 minutes on " + surveyRecord().inviteSubject + "\u201D"; return iv.subject; }
+function effectivePromise(){ return state.invite.id === "honest" ? (state.promiseMinutes || 5) : state.invite.promise; }
+function inviteLines(iv){ if (iv.id === "honest") return ["Why-me line included. The " + (state.promiseMinutes || 5) + "-minute promise: hit it, earn +4 goodwill; overrun, spend goodwill and lose quality."]; return iv.lines; }
+function inviteSubject(iv){
+  if (state.quickChallenge) return iv.subject;
+  if (iv.id === "honest") return "Subject: \u201C" + (state.promiseMinutes || 5) + " minutes on " + surveyRecord().inviteSubject + "\u201D";
+  if (iv.id === "known"){ var kh2 = audienceHistory(); if (!(kh2 && kh2.contacts > 0)) return "Subject: \u201CA short survey from a name you know\u201D"; }
+  return iv.subject;
+}
 function topicKeysFor(topic){ var s = surveyRecord(); return (s.topicKeys && s.topicKeys[topic]) || TOPIC_KEYS[topic] || []; }
 function agendaTopics(){ return state.quickChallenge ? state.quickChallenge.topics : (surveyRecord().agenda || LEVEL_AGENDA[1]); }
 function insightGate(){ return state.level === 6 ? 70 : 60; }
@@ -1751,7 +1764,7 @@ var state = {
   sound: true, lastRound: null, running: false, speed: 1,
   bestGrade: null, bestRate: 0,
   validation: "skip", dedupe: false, consolidate: false, repair: false, suppression: false, localization: false, intake: null,
-  level: 1, abEnabled: false, abInvite: "generic", stakeholder: null, reportBack: false, langChoice: "en",
+  level: 1, abEnabled: false, abInvite: "generic", stakeholder: null, reportBack: false, langChoice: "en", promiseMinutes: 5,
   campaignBest: {}, campaignWon: {}, unlocked: 1, abVerdictChoice: null, added: {},
   /* v1.3 attempt economy */
   attempt: 1, spentBefore: 0, history: [], goodwillCarry: null, repCarry: 90,
@@ -2156,6 +2169,8 @@ function evidenceMission(){
     minimumN: minimums[state.level - 1],
     pool: state.level === 5 ? "global" : state.level === 6 ? "leadership" : "support",
     roles: state.level === 6 ? [{ keys:["exec","itdm"], share:0.5, label:"Decision makers (executives or IT decision makers)" }] :
+      state.level === 3 ? [{ keys:["itdm","tech"], share:0.3, label:"People who run workloads (IT decision makers or frontline technicians)" }] :
+      state.level === 4 ? [{ keys:["exec","itdm"], share:0.15, label:"Decision makers (executives or IT decision makers)" }] :
       [{ keys:["tech"], share:0.1, label:"Frontline technicians" }, { keys:["end"], share:0.1, label:"End users" }],
     purpose: state.level === 6 ? "Judge the enterprise relationship using the evidence of the decision makers who own it." :
       state.level === 5 ? "Measure perceptions of Microsoft using the evidence of the people who hold them, in every language group the study fields." :
@@ -2170,7 +2185,7 @@ function evidenceRequirementsHTML(){
   return '<p><b>' + mission.purpose + '</b> Minimum usable sample: <b>' + fmt(mission.minimumN) +
     '</b> simulated responses from the <b>' + mission.pool + '</b> audience pool. Required roles: ' + mission.roles.map(function(role){ return role.label + ' (' + Math.round(role.share * 100) + '%+ of usable responses, at least one respondent)'; }).join('; ') +
     '. Match at least 80% of cleaned responses to the invited account. Retain at least 60% of completions after cleaning; quality 60+ and usable Insight ' + insightGate() +
-    '+. Validate the list and dedupe; a Global audience also needs localization review and a localized invitation.</p>' +
+    '+. Every required topic must come back answered credibly; a topic lost to a cut, a wrong audience, or suspect data holds the level.' + (surveyRecord().eligibilityDays ? ' The audience list must sit inside the BRD eligibility window (' + surveyRecord().eligibilityDays + ' days).' : '') + ' Mailing an opted-out or recently surveyed person fails operational trust; the suppression scrub removes those records before the send. Guessed responses stay in the usable base, priced in Quality and Insight. Validate the list and dedupe; a Global audience also needs localization review and a localized invitation.</p>' +
     '<p>Response benchmark: ' + targetPct(curLevel().target) + '%, not a win gate. Every recipient is simulated individually; minimums are mission rules, not confidence or representativeness guarantees.</p>' +
     '<p>Audience portfolio: ' + (history ? history.contacts + ' previous sends across ' + history.instruments.length + ' instrument(s); ' + history.suppressionOverrides + ' repeat-contact suppression override(s).' : 'No previous sends in this campaign audience pool.') +
     ' Fresh, Stale, and Tired share the Support pool; Global and Executive Blast have separate pools. Suppression reduces contact fatigue; it does not erase it. A new instrument retains this history.</p>' +
@@ -2770,17 +2785,27 @@ function chooseStakeholder(choice){
   }
   sndClick(); renderStakeholder(); renderReadout(); return true;
 }
+function abPlanText(){
+  var armN = Math.round(state.seg.n * (state.suppression ? 0.95 : 1) / 2);
+  var delivered = 1 - effInvalidRate();
+  function pComp(iv){ return delivered * iv.open * iv.start * 0.45; }
+  var ivB = INVITES.filter(function(x){ return x.id === state.abInvite; })[0] || state.invite;
+  var pA = pComp(state.invite), pB = pComp(ivB);
+  var se = armN > 0 ? 1.96 * Math.sqrt(Math.max(0, pA * (1 - pA)) / armN + Math.max(0, pB * (1 - pB)) / armN) : 0;
+  return "Planning estimate: about " + fmt(armN) + " invitations per arm. Gaps under \u00B1" + (Math.round(se * 1000) / 10) + " pts will read TOO CLOSE TO CALL in the report. Assumes about 45% of starters finish; the report rules on the realized counts.";
+}
 function renderABPanel(){
   var el=$("abPanel"); if(!el) return;
   if(state.level!==2){ el.innerHTML=""; return; }
   if(state.abInvite===state.invite.id) state.abInvite=INVITES.filter(function(iv){return iv.id!==state.invite.id;})[0].id;
-  el.innerHTML='<section class="lever"><div class="lever-head"><span class="lever-no" style="background:var(--purple)">A/B TEST · LEVEL 2</span><span class="lever-title" style="font-size:12px">THE SPLIT</span><span class="lever-sub">6 cr flat: the segment splits into random halves — A gets your invite, B another variant. Sprites: A teal, B gold.</span></div><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="bigswitch'+(state.abEnabled?" on":"")+'" id="abToggle">'+(state.abEnabled?"A/B: ON · 6 CR":"A/B: OFF")+'</button>'+INVITES.map(function(iv){return '<button class="segbtn'+(state.abInvite===iv.id?" sel":"")+'" data-abinv="'+iv.id+'"'+(state.invite.id===iv.id?' disabled title="Choose a different invite for B"':"")+'>'+iv.name.toUpperCase()+'<small>VARIANT B</small></button>';}).join("")+'</div></section>';
+  el.innerHTML='<section class="lever"><div class="lever-head"><span class="lever-no" style="background:var(--purple)">A/B TEST · LEVEL 2</span><span class="lever-title" style="font-size:12px">THE SPLIT</span><span class="lever-sub">6 cr flat: the segment splits into random halves — A gets your invite, B another variant. Sprites: A teal, B gold.</span></div><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="bigswitch'+(state.abEnabled?" on":"")+'" id="abToggle">'+(state.abEnabled?"A/B: ON · 6 CR":"A/B: OFF")+'</button>'+INVITES.map(function(iv){return '<button class="segbtn'+(state.abInvite===iv.id?" sel":"")+'" data-abinv="'+iv.id+'"'+(state.invite.id===iv.id?' disabled title="Choose a different invite for B"':"")+'>'+iv.name.toUpperCase()+'<small>VARIANT B</small></button>';}).join("")+'</div>' + (state.abEnabled ? '<p style="font-size:13.5px;margin-top:8px">' + abPlanText() + '</p>' : "") + '</section>';
   var t=$("abToggle"); if(t) t.addEventListener("click",function(){ if(!state.abEnabled && budgetMath().total+6>BUDGET_TOTAL){ sndError(); return;} state.abEnabled=!state.abEnabled; sndCompare(); if(state.abEnabled) sndSpend(); renderABPanel(); renderReadout();});
   Array.prototype.forEach.call(el.querySelectorAll("[data-abinv]"),function(b){b.addEventListener("click",function(){if(b.disabled)return; state.abInvite=b.getAttribute("data-abinv"); sndClick(); renderABPanel();});});
 }
 function renderLevelExtras(){
   var el=$("levelExtras"); if(!el) return; var html="";
-  if(state.level===4) html+='<section class="lever"><div class="lever-head"><span class="lever-no">LEVEL 4</span><span class="lever-title" style="font-size:12px">REPORT BACK LINE · 3 CR</span><span class="lever-sub">Adds “Report back: what changed last time” to the invite. Restores goodwill: +18 if short (≤7 kept), else +8. Ending goodwill must be 35+ to win.</span></div><button class="bigswitch'+(state.reportBack?" on":"")+'" id="rbToggle">'+(state.reportBack?"REPORT BACK: ON · 3 CR":"REPORT BACK: OFF")+'</button></section>';
+  var rbHistory = audienceHistory();
+  if(state.level===4 || (rbHistory && rbHistory.contacts > 0)) html+='<section class="lever"><div class="lever-head"><span class="lever-no">' + (state.level===4 ? "LEVEL 4" : "ANY LEVEL") + '</span><span class="lever-title" style="font-size:12px">REPORT BACK LINE · 3 CR</span><span class="lever-sub">Adds “Report back: what changed last time” to the invite. Restores goodwill: +18 if short (≤7 kept), else +8.' + (state.level===4 ? " Ending goodwill must be 35+ to win." : " Available because this audience pool has heard from you before: the line only makes sense once there is a last time to report on.") + '</span></div><button class="bigswitch'+(state.reportBack?" on":"")+'" id="rbToggle">'+(state.reportBack?"REPORT BACK: ON · 3 CR":"REPORT BACK: OFF")+'</button></section>';
   if(state.level===5) html+='<section class="lever"><div class="lever-head"><span class="lever-no">LEVEL 5</span><span class="lever-title" style="font-size:12px">INVITE LANGUAGE</span><span class="lever-sub">English only free; localized invite 4 cr (the prep localization review is separate, 8 cr). List: EN 40% · ES 20% · PT 15% · DE 13% · JA 12%.</span></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="segbtn'+(state.langChoice==="en"?" sel":"")+'" data-lang="en">ENGLISH ONLY<small>FREE</small></button><button class="segbtn'+(state.langChoice==="localized"?" sel":"")+'" data-lang="localized">LOCALIZED<small>4 CR</small></button></div></section>';
   el.innerHTML=html;
   var rb=$("rbToggle"); if(rb) rb.addEventListener("click",function(){state.reportBack=!state.reportBack; sndClick(); renderLevelExtras(); renderReadout();});
@@ -2794,7 +2819,7 @@ function resetChainState(){
   state.stakeholder=null; state.abEnabled=false; state.reportBack=false; state.langChoice="en"; state.abVerdictChoice=null;
   state.validation="skip"; state.dedupe=false; state.consolidate=false; state.repair=false; state.suppression=false; state.localization=false; state.escapes=false; state.intake=null;
   var eb=$("escBtn"); if(eb){ eb.textContent="ESCAPES: OFF"; eb.classList.remove("on"); }
-  state.invite=INVITES[0]; state.reminders=0; state.added={};
+  state.invite=INVITES[0]; state.reminders=0; state.added={}; state.promiseMinutes=5;
   QUESTION_BANK.forEach(function(q){ state.qstate[q.id]="keep"; });
 }
 function applyInstrumentForLevel(n){
@@ -2897,7 +2922,7 @@ function renderSegments(){
     var cantSeg = lockedSeg || (state.seg.id !== sg.id && budgetChangeBlocked({seg: sg}));
     return '<button class="card' + (state.seg.id === sg.id ? " sel" : "") + '" data-seg="' + sg.id + '"' + (cantSeg ? " disabled title=\"" + (lockedSeg ? "Segment locked during an attempt chain. Start a New Game to change segment." : "Not enough budget in the remaining pool for this send") + "\"" : "") + '>' + (lockedSeg ? '<div style="font-size:12px;color:var(--gold);font-weight:700">LOCKED · ATTEMPT CHAIN IN PROGRESS</div>' : "") + '<div class="budget-warning" style="font-size:12px;color:var(--red);font-weight:700"'+(!lockedSeg && cantSeg ? "" : " hidden")+'>NOT ENOUGH BUDGET FOR THIS SEND</div>' +
       '<div class="pxname">' + segDisplayName(sg).toUpperCase() + (sg.trap ? '<span class="trap">RISK</span>' : "") + '</div>' +
-      "<p>" + segBlurb(sg) + "</p>" +
+      "<p>" + segBlurb(sg) + "</p>" + segEligibilityNote(sg) +
       '<div class="rows">' +
       "<span>Size: <b>" + sg.n.toLocaleString("en-US") + " invites</b></span>" +
       "<span>Timing: <b>" + segTiming(sg) + "</b></span>" +
@@ -2928,9 +2953,15 @@ function renderInvites(){
     return '<button class="card' + (state.invite.id === iv.id ? " sel" : "") + '" data-inv="' + iv.id + '"' + (cantInv ? " disabled title=\"Not enough budget\"" : "") + '>' +
       '<div class="pxname">' + iv.name.toUpperCase() + ' · ' + iv.cost + ' CR</div><div class="budget-warning" style="font-size:12px;color:var(--red);font-weight:700"'+(cantInv ? "" : " hidden")+'>NOT ENOUGH BUDGET</div>' +
       '<div class="rows"><span>' + inviteSender(iv) + '</span><span>' + inviteSubject(iv) + "</span></div>" +
-      "<p style='margin-top:6px'>" + iv.lines.join(" ") + "</p>" +
+      "<p style='margin-top:6px'>" + inviteLines(iv).join(" ") + "</p>" +
       '<div class="rows"><span>' + iv.note + "</span></div></button>";
   }).join("");
+  if (state.invite.id === "honest" && !state.quickChallenge){
+    $("invGrid").innerHTML += '<div class="rows" style="margin-top:10px"><span>TIME PROMISE PRINTED IN THE INVITATION</span></div><div style="display:flex;gap:8px;flex-wrap:wrap">' + [3, 5, 8, 10].map(function(pr){ return '<button class="segbtn' + (effectivePromise() === pr ? " sel" : "") + '" data-promise="' + pr + '">' + pr + ' MIN</button>'; }).join("") + '</div><p style="font-size:13px;margin-top:6px">Your instrument is estimated at ' + estMinutes() + ' min. Overrun the printed promise and the send spends goodwill and loses quality.</p>';
+    Array.prototype.forEach.call(document.querySelectorAll("[data-promise]"), function(b){
+      b.addEventListener("click", function(){ state.promiseMinutes = parseInt(b.getAttribute("data-promise"), 10); sndClick(); renderInvites(); renderReadout(); });
+    });
+  }
   Array.prototype.forEach.call(document.querySelectorAll("[data-inv]"), function(b){
     b.addEventListener("click", function(){
       var before = budgetMath().attemptCost;
@@ -3145,9 +3176,9 @@ function goodwillMath(stakeholder){
   var spendStake = stakeholderImpact(stakeholder).goodwill;
   var earn = 0, spendOver = 0, over = 0;
   if (state.invite.id === "honest"){
-    over = Math.max(0, estMinutes(stakeholder) - state.invite.promise);
+    over = Math.max(0, estMinutes(stakeholder) - effectivePromise());
     if (over > 0) spendOver = 3; else earn = state.invite.earn;
-  } else if (state.invite.id === "known"){ earn = state.invite.earn; }
+  } else if (state.invite.id === "known"){ var kh = audienceHistory(); earn = (kh && kh.contacts > 0) ? state.invite.earn : 0; }
   var spend = spendRem + spendExtra + spendUnans + spendOver + spendNoSupp + spendStake + spendStupid;
   var earnReport = state.reportBack ? (kept.length<=7 ? 18 : 8) : 0;
   earn += earnReport;
@@ -3400,6 +3431,7 @@ function buildRun(animationTarget){
       guessed:false, escapedUsed:false, fate:null, dropCause:null, dropQ:0, via:"base",
       events:[], done:false, counted:false, surveyStart:0, patienceTotal: P.patience };
     if (gm.trips && sp.spawnAt > BREAKER_STOP_T){ sp.fate = "notsent"; sp.done = true; respondents.push(sp); continue; }
+    if (state.suppression && s < Math.round(seg.n * 0.05)){ sp.fate = "suppressed"; sp.done = true; respondents.push(sp); continue; }
     sp.angry = false; sp.dupEnv = false;
     sp.qSpeed = false; sp.qStraight = false; sp.qDup = false; sp.qFwd = false; sp.qJunk = false; sp.qTopBox = false; sp.qMush = false; sp.qRefusal = false; sp.qInconsist = false; sp.qEstimate = false;
 
@@ -3623,10 +3655,11 @@ function evaluateEvidence(run, c, quality){
   var finished = run.respondents.filter(function(sp){ return sp.fate === "finish" || sp.fate === "guessfinish"; });
   var removed = { speed:0, straight:0, duplicate:0, junk:0, guess:0 };
   var cleaned = finished.filter(function(sp){
-    var reason = sp.qDup ? "duplicate" : sp.qJunk ? "junk" : sp.qSpeed ? "speed" : sp.qStraight ? "straight" : sp.guessed ? "guess" : null;
+    var reason = sp.qDup ? "duplicate" : sp.qJunk ? "junk" : sp.qSpeed ? "speed" : sp.qStraight ? "straight" : null;
     if (reason) removed[reason]++;
     return !reason;
   });
+  var containedGuesses = finished.filter(function(sp){ return sp.guessed; }).length;
   var matched = cleaned.filter(function(sp){ return !!sp.accountId; });
   var usableCounts = tally({ respondents:matched });
   var insight = computeInsight(usableCounts, run);
@@ -3638,15 +3671,27 @@ function evaluateEvidence(run, c, quality){
     return { label:role.label, count:count, share:matched.length ? count / matched.length : 0,
       met:count > 0 && count >= matched.length * role.share };
   });
+  var topicsCredible = insight.topics.every(function(t){ return t.status === "ANSWERED CREDIBLY"; });
+  var lostTopics = insight.topics.filter(function(t){ return t.status !== "ANSWERED CREDIBLY"; });
+  var eligDays = surveyRecord().eligibilityDays || 0;
+  var eligibleOk = !eligDays || (state.seg.touchDays !== null && state.seg.touchDays !== undefined && state.seg.touchDays <= eligDays);
+  var eligNote = eligDays ? (eligibleOk ? " List timing inside the BRD eligibility window (" + eligDays + " days)." : " List timing outside the BRD eligibility window: " + segTiming(state.seg) + "; the BRD audience is defined within " + eligDays + " days of the triggering event, so this list sits outside the study population.") : "";
+  var langOk = true, langNote = "";
+  if (state.level === 5 && state.seg.id === "multi"){
+    var langGroups = Object.keys(usableCounts.perLang || {});
+    var weakLang = langGroups.filter(function(k){ return usableCounts.perLang[k].invited > 0 && (n ? usableCounts.perLang[k].completed / n : 0) < 0.05; });
+    langOk = weakLang.length === 0;
+    langNote = langGroups.length ? " Language groups in the usable base: " + langGroups.map(function(k){ return k.toUpperCase() + " " + Math.round((n ? usableCounts.perLang[k].completed / n : 0) * 100) + "%"; }).join(", ") + " (each at least 5%)." : "";
+  }
   var history = audienceHistory();
   var minimumHealth = state.level === 4 ? 35 : 1;
   var checks = [
     { id:"funnel", name:"Funnel execution", met:c.sent > 0 && c.completed > 0 && !run.gm.trips,
       detail:fmt(c.completed) + " completions from " + fmt(c.sent) + " simulated recipients sent. Response benchmark " + targetPct(curLevel().target) + "%; rate is diagnostic.",
       action:"Repair delivery and questionnaire burden; keep the goodwill breaker from interrupting fieldwork." },
-    { id:"fitness", name:"Evidence fitness", met:audienceGroup(state.seg) === mission.pool && n >= mission.minimumN && associated >= 0.8 && roles.every(function(role){ return role.met; }),
+    { id:"fitness", name:"Evidence fitness", met:audienceGroup(state.seg) === mission.pool && eligibleOk && langOk && n >= mission.minimumN && associated >= 0.8 && roles.every(function(role){ return role.met; }),
       detail:"Audience pool " + audienceGroup(state.seg) + "; required " + mission.pool + ". " + fmt(n) + " usable simulated responses; minimum " + fmt(mission.minimumN) + ". Account match " + Math.round(associated * 100) + "%; minimum 80%. " +
-        roles.map(function(role){ return role.label + ": " + fmt(role.count) + " (" + Math.round(role.share * 100) + "%), " + (role.met ? "PASS" : "HOLD"); }).join("; "),
+        roles.map(function(role){ return role.label + ": " + fmt(role.count) + " (" + Math.round(role.share * 100) + "%), " + (role.met ? "PASS" : "HOLD"); }).join("; ") + eligNote + langNote + " Margin of error on the usable base " + moeText(n) + " (95%, worst case).",
       action:"Choose an audience containing the required roles, remove barriers to their answers, and collect enough account-linked evidence before reporting." },
     { id:"integrity", name:"Data integrity", met:cleaned.length > 0 && quality >= 60 && retained >= 0.6,
       detail:"Quality " + quality + "/100 (60+); " + Math.round(retained * 100) + "% of completions retained after cleaning (60%+).",
@@ -3656,22 +3701,63 @@ function evaluateEvidence(run, c, quality){
         (history ? history.contacts + " previous send(s) in this audience pool. " : "First campaign send in this audience pool. ") +
         (state.suppression ? "Suppression applied." : "Suppression not applied; repeat contact cannot pass."),
       action:"Apply suppression, reduce reminders and burden, and report back what changed. A new instrument does not reset audience health." },
-    { id:"trust", name:"Operational trust", met:state.validation !== "skip" && state.dedupe &&
+    { id:"trust", name:"Operational trust", met:state.validation !== "skip" && state.dedupe && !(c.angry > 0) && topicsCredible &&
         (state.seg.id !== "multi" || state.localization && state.langChoice === "localized") && insight.score >= insightGate(),
       detail:"List validation " + state.validation + "; dedupe " + (state.dedupe ? "on" : "off") + ". Usable Insight " + insight.score + " (minimum " + insightGate() + "). " +
-        (state.seg.id === "multi" ? "Global audience requires localization review and a localized invitation. " : "") + "The context note discloses the response base and limits.",
+        (state.seg.id === "multi" ? "Global audience requires localization review and a localized invitation. " : "") + (c.angry > 0 ? " Permission: " + fmt(c.angry) + " opted-out or recently surveyed people were mailed anyway; permission is not optional, so this check cannot pass. " : " Permission held: no opted-out or recently surveyed person was mailed. ") + (lostTopics.length ? "Required topics not answered credibly: " + lostTopics.map(function(t){ return t.topic + " (" + t.status.toLowerCase() + ")"; }).join(", ") + ". " : "Every required topic answered credibly. ") + "The context note discloses the response base and limits.",
       action:"Complete list validation and dedupe, cover the agenda with usable responses, and review language choices for a Global audience." }
   ];
   return { mission:mission, cleaned:cleaned.length, matched:matched.length, usableN:n, retained:retained,
-    associated:associated, removed:removed, roles:roles, insight:insight, checks:checks,
+    associated:associated, removed:removed, containedGuesses:containedGuesses, roles:roles, insight:insight, checks:checks,
     won:checks.every(function(check){ return check.met; }) };
+}
+function moeText(n){ return n > 0 ? "±" + (1.96 * Math.sqrt(0.25 / n) * 100).toFixed(1) + " pts" : "no base"; }
+function brdAcceptanceHTML(evidence, run, c){
+  var sv = surveyRecord();
+  var rows = [];
+  rows.push(["The decision this study supports", evidence.won, sv.purpose]);
+  evidence.insight.topics.forEach(function(t){ rows.push(["Required topic: " + t.topic, t.status === "ANSWERED CREDIBLY", t.status + ". " + t.reason]); });
+  var fit = evidence.checks.filter(function(x){ return x.id === "fitness"; })[0];
+  rows.push(["Audience rule", fit.met, "The BRD audience: " + sv.audience.split(":")[0] + ". Sent: " + segDisplayName(state.seg) + " from the " + audienceGroup(state.seg) + " pool."]);
+  var roleTxt = evidence.roles.map(function(r){ return r.label + " " + fmt(r.count) + " (" + moeText(r.count) + ")"; }).join("; ");
+  rows.push(["Minimum base and required roles", evidence.usableN >= evidence.mission.minimumN && evidence.roles.every(function(r){ return r.met; }), fmt(evidence.usableN) + " usable responses against a minimum of " + fmt(evidence.mission.minimumN) + " (" + moeText(evidence.usableN) + " at 95% on the usable base, worst case). " + roleTxt + "."]);
+  var minHealth = state.level === 4 ? 35 : 1;
+  rows.push(["Audience health constraint", !run.gm.trips && run.gm.ending >= minHealth, "Ending goodwill " + Math.max(0, run.gm.ending) + " against a floor of " + minHealth + "."]);
+  if (state.stakeholder){ var imp = stakeholderImpact(); rows.push(["Stakeholder request for eight extra questions", true, "Your response: " + imp.title + ". " + imp.response]); }
+  if (state.level === 5){ rows.push(["Language coverage", !!(state.localization && state.langChoice === "localized"), "Five language groups in this simulation. Localization review " + (state.localization ? "bought" : "not bought") + "; invitation " + (state.langChoice === "localized" ? "localized" : "English only") + "."]); }
+  return '<div class="reportcard"><h2>BRD ACCEPTANCE · LINE BY LINE</h2><p>The last step of the process: this run, scored against the document that commissioned it.</p>' + rows.map(function(r){ return '<p style="font-size:15.5px;margin:4px 0"><b>' + (r[1] ? "MET" : "NOT MET") + " · " + r[0] + ".</b> " + r[2] + "</p>"; }).join("") + '</div>';
+}
+function dispositionHTML(evidence, run, c){
+  var I = evidence.usableN, P = 0;
+  var removedComplete = Math.max(0, c.completed - evidence.usableN);
+  var R = c.drops.nostart + c.drops.patience + c.drops.knowledge + c.drops.mobile;
+  var NC = c.drops.noopen, UO = c.bouncedHard + c.bouncedSoft, BR = c.drops.breaker;
+  var O = removedComplete + BR;
+  var D = (I + P) + (R + NC + O) + UO;
+  var rr3 = D ? I / D : 0, rr4 = D ? (I + P) / D : 0;
+  var gameRate = c.sent ? c.completed / c.sent : 0;
+  var startRate = c.started ? c.completed / c.started : 0;
+  function row(k, v, note){ return '<tr><td>' + k + '</td><td>' + fmt(v) + '</td><td>' + note + '</td></tr>'; }
+  return '<div class="reportcard"><h2>FINAL DISPOSITIONS · EVERY CASE ACCOUNTED FOR</h2>' +
+    '<p>Frame: ' + fmt(run.respondents.length) + ' records. ' + fmt(c.suppressed || 0) + ' removed by the suppression scrub before the send; ' + fmt(c.sent) + ' sent, and every sent case ends in exactly one row below (the rows sum to ' + fmt(D) + ').</p>' +
+    '<table class="mini"><tr><th>Final outcome</th><th>Cases</th><th>Reading</th></tr>' +
+    row("Complete (I)", I, "Finished, retained after cleaning, matched to the invited account: the usable evidence base.") +
+    row("Partial (P)", P, "This game counts no usable partials: a started survey that stops early is a break-off, below.") +
+    row("Refusal and break-off (R)", R, "Opened but never started, plus starts that dropped on patience, knowledge, or mobile burden.") +
+    row("Non-contact (NC)", NC, "Delivered, never opened, reminders included.") +
+    row("Other (O)", O, "Completed but removed at cleaning or unmatched, plus sends stopped when the goodwill breaker tripped.") +
+    row("Unknown eligibility (UO)", UO, "Bounced, hard and soft: never delivered, so eligibility is unknown, not disproven.") +
+    '</table>' +
+    '<p style="font-size:15.5px"><b>Rates on this run:</b> the game rate (completions / sent) ' + pct(gameRate * 100) + '; AAPOR RR3 (completes / all cases, unknowns counted eligible) ' + pct(rr3 * 100) + '; RR4 (completes plus usable partials) ' + pct(rr4 * 100) + ', the same as RR3 here because the game counts no partials; completion among starts ' + pct(startRate * 100) + '.</p>' +
+    '<p style="font-size:15px">The eligibility estimate e is 1.00 in this simulation: no case is proven ineligible, so bounced and silent cases count as eligible. The team funnel standard sets e from frame quality and states it; a lower e would raise RR3 and RR4.</p></div>';
 }
 function evidenceReportHTML(evidence, run, c){
   var failed = evidence.checks.filter(function(check){ return !check.met; });
   var stages = [
     ["FINISH", fmt(c.completed) + " completed simulated responses"],
     ["CLEAN", fmt(evidence.cleaned) + " retained; removed once each: " +
-      Object.keys(evidence.removed).map(function(key){ return key + " " + fmt(evidence.removed[key]); }).join(", ")],
+      Object.keys(evidence.removed).filter(function(key){ return key !== "guess"; }).map(function(key){ return key + " " + fmt(evidence.removed[key]); }).join(", ") +
+      (evidence.containedGuesses ? "; " + fmt(evidence.containedGuesses) + " completions contain a guess the team could not have detected, so they stay in the usable base and are priced in Quality and Insight instead" : "")],
     ["MATCH", fmt(evidence.usableN) + " account-linked; " + fmt(evidence.cleaned - evidence.matched) + " unmatched and excluded"],
     ["INTERPRET", "Usable Insight " + evidence.insight.score + "; required roles and sample checked after exclusions"],
     ["PUBLISH", evidence.won ? "READY WITH LIMITS: all five checks passed" : "WITHHOLD: " + failed.map(function(check){ return check.name; }).join(", ")],
@@ -3679,13 +3765,13 @@ function evidenceReportHTML(evidence, run, c){
   ];
   return '<div class="reportcard"><h2>EVIDENCE FITNESS SCORECARD</h2><p>Every check must pass. A higher response rate cannot offset missing evidence or a failed control.</p><div class="evidence-grid">' +
     evidence.checks.map(function(check){ return '<section class="evidence-check' + (check.met ? "" : " hold") + '" data-evidence="' + check.id + '"><h3>' + check.name + ': ' + (check.met ? "PASS" : "HOLD") + '</h3><p>' + check.detail + '</p></section>'; }).join("") +
-    '</div></div><div class="reportcard"><h2>AFTER FINISH: EVIDENCE TO ACTION</h2>' +
+    '</div></div>' + '<div class="reportcard"><h2>AFTER FINISH: EVIDENCE TO ACTION</h2>' +
     stages.map(function(stage){ return '<p><b>' + stage[0] + '</b>: ' + stage[1] + '</p>'; }).join("") +
     '<h3>CONTEXT NOTE</h3><p>' + evidence.mission.purpose + ' Baseline: response rate uses invitations actually sent, including bounces; the usable sample excludes flagged and unmatched responses. ' +
-    fmt(run.respondents.length) + ' individual recipient records were simulated; ' + fmt(evidence.matched) + ' usable responses. Animation groups do not determine these counts. These mission thresholds do not establish statistical precision, population representativeness, or construct validity. No real customer records are collected or stored.</p></div>';
+    fmt(run.respondents.length) + ' individual recipient records were simulated; ' + fmt(evidence.matched) + ' usable responses. Animation groups do not determine these counts. These mission thresholds do not establish statistical precision, population representativeness, or construct validity. No real customer records are collected or stored.</p></div>' + brdAcceptanceHTML(evidence, run, c) + dispositionHTML(evidence, run, c);
 }
 function tally(run){
-  var c = { invited:0, sent:0, delivered:0, bouncedHard:0, bouncedSoft:0, angry:0, dupEnv:0, qSpeed:0, qStraight:0, qDup:0, qFwd:0, qJunk:0, qTopBox:0, qMush:0, qRefusal:0, qInconsist:0, qEstimate:0, guessByQ:{}, opened:0, started:0, completed:0, guessed:0, guessedAny:0, escapesUsed:0,
+  var c = { invited:0, sent:0, delivered:0, bouncedHard:0, bouncedSoft:0, angry:0, suppressed:0, dupEnv:0, qSpeed:0, qStraight:0, qDup:0, qFwd:0, qJunk:0, qTopBox:0, qMush:0, qRefusal:0, qInconsist:0, qEstimate:0, guessByQ:{}, opened:0, started:0, completed:0, guessed:0, guessedAny:0, escapesUsed:0,
     drops:{ noopen:0, nostart:0, patience:0, knowledge:0, mobile:0, breaker:0 },
     dropPersona:{}, dropQ:{}, remRecovery:{ r1:0, r2:0 }, perPersona:{}, perAB:{A:{invited:0,completed:0},B:{invited:0,completed:0}}, perLang:{} };
   PKEYS.forEach(function(k){ c.perPersona[k] = { invited:0, opened:0, completed:0 }; });
@@ -3694,6 +3780,7 @@ function tally(run){
     c.invited++;
     sp.events.forEach(function(e){ if (e.type === "guess" && e.qid) c.guessByQ[e.qid] = (c.guessByQ[e.qid]||0)+1; });
     if (sp.fate === "notsent") return;
+    if (sp.fate === "suppressed"){ c.suppressed++; return; }
     c.sent++;
     if(c.perAB[sp.abGroup]) c.perAB[sp.abGroup].invited++;
     if(!c.perLang[sp.lang]) c.perLang[sp.lang]={invited:0,completed:0};
@@ -4423,7 +4510,7 @@ function extraReportHTML(c){
     var ch=state.stakeholder||"pushback";
     var txt= ch==="accept"?"Detective: ACCEPT modeled the eight-question request as +4 min, −10 goodwill, and 10 cr. Check the patience leak above.": ch==="rotate"?"Detective: Rotating modules are modeled as +1 minute, −3 goodwill, and 4 credits. Extra-topic answers are not simulated or scored.":"Detective: PUSH BACK kept the instrument focused (0 cr). The cost is a stakeholder conversation, not added survey burden.";
     var impact=stakeholderImpact();
-    h+='<div class="reportcard"><h2>STAKEHOLDER DEBRIEF</h2><p><b>YOUR RESPONSE:</b> '+impact.title+'</p><p>'+txt+'</p><p><b>STAKEHOLDER:</b> '+impact.response+'</p><p>Evidence from this send: '+fmt(c.completed)+' of '+fmt(c.sent)+' simulated recipients completed · '+estMinutes()+' minutes · '+Math.max(0,gmEndingForReport())+' ending goodwill · '+fmt(c.drops.patience)+' patience drop-offs. Extra-topic coverage is not scored separately.</p></div>';
+    h+='<div class="reportcard"><h2>STAKEHOLDER DEBRIEF</h2><p><b>YOUR RESPONSE:</b> '+impact.title+'</p><p>'+txt+'</p><p><b>STAKEHOLDER:</b> '+impact.response+'</p><p>Evidence from this send: '+fmt(c.completed)+' of '+fmt(c.sent)+' simulated recipients completed · '+estMinutes()+' minutes · '+Math.max(0,gmEndingForReport())+' ending goodwill · '+fmt(c.drops.patience)+' patience drop-offs. Extra-topic coverage is not scored separately.' + (ch==="rotate" ? " Rotating modules: each module was shown to about half the respondents, so its questions read on a base of about " + fmt(Math.round(c.completed/2)) + " completions, not the full base." : "") + '</p></div>';
   }
   if(state.level===4){
     h+='<div class="reportcard"><h2>TIRED LIST · GOODWILL GATE</h2><p style="font-size:15.5px">Ending goodwill: <b>'+Math.max(0,gmEndingForReport())+' / must be 35+</b>. '+(state.reportBack?"Report back line was on (3 cr): what changed last time did the restoring.":"No report back line — the list got another ask with no proof the last one mattered.")+' Short instrument (≤7 kept) restores the most.</p></div>';
@@ -4635,7 +4722,7 @@ function qualityAssessment(run, c){
   });
   var keptCore = run.kept.filter(function(q){ return q.core; }).length;
   var missingCore = Math.max(0, coreTotalAvailable() - keptCore);
-  var overMin = state.invite.id === "honest" ? Math.max(0, Math.ceil(estMinutes() - state.invite.promise)) : 0;
+  var overMin = state.invite.id === "honest" ? Math.max(0, Math.ceil(estMinutes() - effectivePromise())) : 0;
   var qGuess = Math.round(160 * c.guessed / Math.max(1, c.invited)), qNobody = 3 * nobodyCan,
     qOver = 2 * overMin, qCore = 10 * missingCore, qEsc = state.escapes && c.escapesUsed > 0 ? 5 : 0;
   function sharePct(n){ return c.completed ? Math.round(n / c.completed * 1000) / 10 : 0; }

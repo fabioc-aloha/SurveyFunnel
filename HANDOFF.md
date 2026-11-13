@@ -95,9 +95,44 @@
   at or above the team's 2% investigate line (advisory only).
   No scoring changed; no witnesses regenerated. Gates: Node
   suite 146/146, browser harness PASS 3/3 at 156/156 checks.
-  The remaining gap-review items await the owner's scope call;
-  the scoring items (G9, G5, G6, G2) should ship as one batch
-  with a single witness regeneration.
+- Gap-fix wave (2026-11-13): the owner directed applying as
+  many gap fixes as possible, and the scoring items shipped as
+  one batch with a single witness regeneration, as planned.
+  G9: operational trust requires every required topic ANSWERED
+  CREDIBLY. G5: the fitness check enforces the BRD audience
+  window where the BRD states a testable one (Level 1's 30
+  days; other levels define audiences by role and offer). G6:
+  skipping the suppression scrub fails trust when opted-out or
+  recently surveyed people would be mailed, and the scrub now
+  removes those records before the send (counted as suppressed
+  in the frame, never in the sent base). G2: role rules read
+  from the BRD (Level 3: workload runners at 30%; Level 4:
+  decision makers at 15% combined; Level 5 adds a 5% floor per
+  language group in the usable base). G18: guessed completions
+  stay in the usable base and are priced in Quality and
+  Insight; cleaning no longer removes them. G12: the Honest
+  Ask promise is the player's choice (3/5/8/10 minutes) and
+  the Known Name earn requires a prior pool contact. Display
+  additions: BRD ACCEPTANCE and FINAL DISPOSITIONS (AAPOR)
+  report cards (G15, G17), report-back on any contacted pool
+  (G21), rotated-module base in the debrief (G22), the A/B
+  planning estimate (G23 display half), and the Level 5 and 6
+  purpose corrections (G19, G20). Witnesses regenerated in
+  full: 390 setups, 65 per level, zero seeds lost; Level 4 now
+  wins all 65 deals (was 39; its test minimum is 65). Fixed
+  lines: 62, 66, 62, 63, 72, 87 cr against the 58, 66, 69, 63,
+  72, 87 of the per-level corpus; no pool changed. Gates: Node
+  suite 150/150, browser harness PASS 3/3 at 156/156 checks.
+  The remaining gap items are the phase-sized builds in the
+  approved process-consistency program
+  (docs/process-consistency-scope.md, all six decisions approved
+  2026-11-12): Phase A is the scorecard export (G16) and the
+  declared-winner consequence (G23); then simulated findings
+  (G8, G14), BRD intake (G1), sampling (G4), the mid-field
+  checkpoint with the 72-hour clock (G13, G6 remainder), and
+  reminder retargeting last (G27). Outside the program: G3,
+  G10, G11 (needs the owner's design call), G25, and medallion
+  phases 2-3.
 
 ## Acceptance boundary
 

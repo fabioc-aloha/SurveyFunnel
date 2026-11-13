@@ -66,9 +66,12 @@ progress or spends the campaign's credits.
    scrub (opt outs and recently surveyed); localization review.
    These are simulated preparation choices, not live service integrations.
 3. **INVITATION.** Pick a variant and a reminder count. Generic is
-   free and weak. Honest Ask promises five minutes and explains why
-   the recipient was selected; keep the questionnaire within that
-   promise. Known Name opens best and costs coordination.
+   free and weak. Honest Ask states a time promise you choose
+   (3, 5, 8, or 10 minutes) and explains why the recipient was
+   selected; keep the questionnaire within the printed promise.
+   Known Name opens best and costs coordination; it earns its
+   goodwill only once the audience pool has heard from you before,
+   and on a first contact its subject makes no claim about a fix.
 4. **QUESTIONNAIRE.** The fixed starting instrument has 12 questions;
    New Game deals 9 to 16. Keep, apply the card's class-specific repair,
    or cut each question. Watch the estimated
@@ -132,7 +135,7 @@ Prices:
 | Cut a question, each | 1 |
 | Add a question from the optional bank, each | 3 |
 | Add escapes | 2 |
-| Report back line (Level 4) | 3 |
+| Report back line (Level 4; other levels once the pool has been contacted) | 3 |
 | A/B test setup (Level 2) | 6 |
 
 The invitation batch always costs credits. Keeping an item unchanged
@@ -326,12 +329,20 @@ The usable sample is the actual number of cleaned, account-linked
 recipient records. Animation cohorts neither inflate this count nor
 determine its size. These are programmed simulation outcomes, not
 observations of real customers.
-Cleaning excludes duplicate, junk, speeder, straight-lined, and guessed
-responses, once each in that order. Forwarded responses have no verified
+Cleaning excludes duplicate, junk, speeder, and straight-lined
+responses, once each in that order. Guessed responses stay in the
+usable sample: real cleaning cannot detect them. The report counts
+the guesses it can see and prices them in Quality and Insight. Forwarded responses have no verified
 invited-account association and are excluded at MATCH. The original quality
 score still diagnoses fieldwork defects; cleaning does not erase their
 penalties. Publication requires all five checks, and the ACT step names
 the corrections needed or the decision the evidence can support.
+Every required topic must come back answered credibly, Level 1's
+list must sit inside its BRD's 30-day audience window, mailing an
+opted-out or recently surveyed person fails operational trust
+(the scrub removes those records before the send), and the report
+closes with a line-by-line BRD acceptance and a final disposition
+for every sent case, with AAPOR RR3 and RR4 beside the game rate.
 
 Guessed-completion and duplicate deductions use their rates among
 invited recipients, not raw population-sized counts. Their game weights

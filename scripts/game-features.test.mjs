@@ -1015,6 +1015,76 @@ test('audiences and invitations speak the level survey, and a new chain starts u
   assert.equal(g.state.reminders, 0);
 });
 
+test('gap wave: topics, eligibility, and permission gates hold a send that used to win', () => {
+  const { context: g, element } = game();
+  // G5: Level 1's Stale list sits outside the BRD's 30-day audience window.
+  g.selectLevel(1, false);
+  g.state.seg = g.SEGMENTS.find(sg => sg.id === 'stale');
+  g.state.validation = 'full'; g.state.dedupe = true; g.state.suppression = true;
+  g.startRun(); g.showReport();
+  const fit = g.state.lastRound.evidence.checks.find(check => check.id === 'fitness');
+  assert.equal(fit.met, false);
+  assert.match(fit.detail, /eligibility window/);
+  assert.match(element('segGrid').innerHTML, /Outside the BRD audience window/);
+  // G6: mailing without the scrub fails operational trust on a first send.
+  const hot = game();
+  hot.context.selectLevel(1, false);
+  hot.context.state.validation = 'full'; hot.context.state.dedupe = true; hot.context.state.suppression = false;
+  hot.context.startRun(); hot.context.showReport();
+  const trust = hot.context.state.lastRound.evidence.checks.find(check => check.id === 'trust');
+  assert.equal(trust.met, false);
+  assert.match(trust.detail, /Permission: .* were mailed anyway/);
+  // G6: with the scrub, the records leave before the send.
+  const calm = game();
+  calm.context.selectLevel(1, false);
+  calm.context.state.validation = 'full'; calm.context.state.dedupe = true; calm.context.state.suppression = true;
+  calm.context.startRun();
+  const c = calm.context.tally(calm.context.runData);
+  assert.equal(c.suppressed, 500);
+  assert.equal(c.sent, 9500);
+});
+
+test('gap wave: report carries BRD acceptance and final dispositions that sum to sent', () => {
+  const { context: g, element } = game();
+  g.selectLevel(1, false);
+  g.state.validation = 'full'; g.state.dedupe = true; g.state.suppression = true;
+  g.startRun(); g.showReport();
+  const html = element('report').innerHTML;
+  assert.match(html, /BRD ACCEPTANCE · LINE BY LINE/);
+  assert.match(html, /Required topic:/);
+  assert.match(html, /FINAL DISPOSITIONS · EVERY CASE ACCOUNTED FOR/);
+  assert.ok(html.includes('the rows sum to ' + g.fmt(g.tally(g.runData).sent)), 'dispositions reconcile to sent');
+  assert.match(html, /AAPOR RR3/);
+});
+
+test('gap wave: the Honest Ask promise is the player choice, and Known Name makes no false claim on a first contact', () => {
+  const { context: g } = game();
+  g.selectLevel(1, false);
+  const honest = g.INVITES.find(iv => iv.id === 'honest');
+  const known = g.INVITES.find(iv => iv.id === 'known');
+  g.state.invite = honest;
+  const est = g.estMinutes();
+  const low = Math.max(1, Math.floor(est) - 1);
+  g.state.promiseMinutes = low;
+  assert.ok(g.inviteSubject(honest).includes(low + ' minutes on your support case'), 'the printed promise is the chosen one');
+  assert.ok(g.goodwillMath().over > 0, 'a promise under the estimate overruns');
+  g.state.promiseMinutes = Math.ceil(est) + 2;
+  assert.equal(g.goodwillMath().over, 0);
+  assert.match(g.inviteSubject(known), /A short survey from a name you know/);
+  g.state.audiencePortfolio = { support: { contacts: 1, instruments: [], responses: {}, suppressionOverrides: 0, health: 99 } };
+  assert.match(g.inviteSubject(known), /You told us, we fixed it/);
+});
+
+test('gap wave: report-back line appears on any level once the pool has been contacted', () => {
+  const fresh = game();
+  fresh.context.selectLevel(1, false);
+  assert.doesNotMatch(fresh.element('levelExtras').innerHTML, /REPORT BACK LINE/);
+  const again = game();
+  again.context.state.audiencePortfolio = { support: { contacts: 2, instruments: [], responses: {}, suppressionOverrides: 0, health: 80 } };
+  again.context.selectLevel(2, false);
+  assert.match(again.element('levelExtras').innerHTML, /REPORT BACK LINE/);
+});
+
 test('report flags hard bounces at the 2 percent investigate line', () => {
   const hot = game();
   hot.context.selectLevel(1, false);
@@ -1177,9 +1247,10 @@ const winningSetups = JSON.parse(readFileSync(join(root, 'scripts', 'fixtures', 
    again under the five independent checks. Every witness is replayed through
    the card handlers, startRun, and showReport below. Each is an independent
    campaign start; the separate continuous-campaign test checks carryover. */
-const LEGAL_WINNER_MINIMUMS = { 1: 65, 2: 65, 3: 65, 4: 39, 5: 65, 6: 65 };
+const LEGAL_WINNER_MINIMUMS = { 1: 65, 2: 65, 3: 65, 4: 65, 5: 65, 6: 65 };
 test('goodwill ledger identifies report-back rewards and stakeholder penalties', () => {
   const { context: g, element } = game();
+  g.state.audiencePortfolio = { support: { contacts: 1, instruments: [], responses: {}, suppressionOverrides: 0, health: 99 } };
   g.selectLevel(4, false);
   g.state.invite = g.INVITES[2];
   g.state.reportBack = true;
@@ -1377,7 +1448,7 @@ test('sample, quality, retention, and matching thresholds are inclusive and inde
   assert.equal(g.evaluateEvidence(run, g.tally(run), 100).checks.find(check => check.id === 'fitness').met, false);
 });
 
-test('cleaning removes overlapping flags once and never gives rejected roles Insight credit', () => {
+test('cleaning removes overlapping flags once, contains guesses in the usable base, and never gives rejected roles Insight credit', () => {
   const { context: g } = evidenceScenario();
   const run = evidenceRun(g, ['tech', 'end', 'itdm', 'tech', 'end', 'tech', 'end'], {
     2: { qSpeed: true, qStraight: true, qDup: true, qJunk: true, guessed: true },
@@ -1385,8 +1456,9 @@ test('cleaning removes overlapping flags once and never gives rejected roles Ins
   });
   const counts = g.tally(run);
   const evidence = g.evaluateEvidence(run, counts, 100);
-  assert.equal(evidence.cleaned, 500);
-  assert.equal(Object.values(evidence.removed).reduce((sum, n) => sum + n, 0), 1250);
+  assert.equal(evidence.cleaned, 750);
+  assert.equal(evidence.containedGuesses, 500);
+  assert.equal(Object.values(evidence.removed).reduce((sum, n) => sum + n, 0), 1000);
   assert.ok(evidence.insight.score < g.computeInsight(counts, run).score);
   assert.ok(evidence.insight.topics.some(topic => /Missing persona/.test(topic.reason)));
   assert.equal(JSON.stringify(g.evaluateEvidence(run, counts, 100)), JSON.stringify(evidence));

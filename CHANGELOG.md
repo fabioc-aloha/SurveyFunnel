@@ -1,5 +1,98 @@
 # Changelog
 
+## 2026-11-13 - Gap-fix wave: the BRD's own rules now hold the send (G9, G5, G6, G2, G18, G12, G15, G17, G21, G22, G23, G19, G20)
+
+- The owner directed applying as many fixes as possible from
+  the Copilot survey lifecycle gap review (12 November). The
+  scoring changes shipped as one batch with a single witness
+  regeneration, as planned. The remaining gap items are the
+  phase-sized builds in the approved process-consistency
+  program (docs/process-consistency-scope.md): scorecard
+  export and the declared-winner consequence first, then
+  simulated findings.
+- G9: operational trust now requires every BRD required topic
+  to be ANSWERED CREDIBLY. A run that loses a required topic
+  can no longer win, and the check names the topics that were
+  not answered credibly.
+- G5: the evidence check enforces the BRD audience window
+  where the BRD states a testable one. Level 1's survey covers
+  cases closed in the last 30 days, so the Stale list (45 days)
+  and Executive Blast (no case window) fail the fitness check
+  on Level 1, and the segment cards say so before the send.
+  Other levels' BRDs define audiences by role and offer, which
+  the segment mixes already represent, so no window is
+  enforced there.
+- G6: permission is a gate, not a tax. A send without the
+  suppression scrub now fails operational trust when anyone on
+  the list had opted out or was recently surveyed, and the
+  scrub itself removes those records before the send: the
+  report's frame counts them as suppressed and they never
+  enter the sent base.
+- G2: acceptance reads from the BRD instead of a uniform role
+  rule. Level 3 requires people who run workloads (IT decision
+  makers or frontline technicians) at 30% of the usable base;
+  Level 4 requires decision makers (executives or IT decision
+  makers) at 15% (one combined bloc: the tired list is exactly
+  10% executive before attrition, so split floors would sit on
+  a knife's edge, and the per-topic gates still force
+  executive and ITDM evidence on Level 4's trust topics).
+  Levels 1, 2, and 5 keep technician 10% plus end user 10%;
+  Level 6 keeps its 50% executive/ITDM rule. Level 5's fitness
+  check also requires every language group in the usable base
+  to contribute at least 5% of it. Minimum samples are
+  unchanged, and the fitness detail now states the margin of
+  error on the usable base.
+- G18: cleaning no longer removes guessed completions. They
+  stay in the usable base, exactly as an undetectable guess
+  would in a real study, and are priced in Quality and Insight
+  instead. The CLEAN stage line, the MPOR overlay, the player
+  guide, and the development notes all say the same thing.
+- G12: the Honest Ask time promise is the player's choice
+  (3, 5, 8, or 10 minutes), and goodwill and quality read the
+  chosen promise. The Known Name goodwill earn now requires a
+  prior contact in the audience pool; on a first contact it no
+  longer claims "You told us, we fixed it" and earns nothing.
+- G15: the report carries a BRD ACCEPTANCE card scoring the
+  run line by line against the document that commissioned it:
+  the decision, one row per required topic, the audience rule,
+  the minimum base and roles with the margin of error, the
+  audience health constraint, the stakeholder row on Levels 3
+  and 6, and the language row on Level 5.
+- G17: the report carries a FINAL DISPOSITIONS card in AAPOR
+  categories (Complete, Partial, Refusal and break-off,
+  Non-contact, Other, Unknown eligibility) whose rows sum to
+  the sent base by construction, with the game response rate,
+  AAPOR RR3 and RR4 (equal here; the game counts no usable
+  partials), and the stated eligibility estimate.
+- G21: the report-back lever is available on any level once
+  the audience pool has been contacted before; Level 4's lever
+  is unchanged. G22: the stakeholder debrief for a rotated
+  instrument states the per-module base (about half the
+  completions). G23 display half: the A/B panel shows a
+  planning estimate per arm and the uncertainty gap under
+  which the report reads TOO CLOSE TO CALL; the cross-level
+  consequence is in the process-consistency program. G19:
+  Level 6's purpose states the flagship fields once a year and
+  a re-send reaches the same executives at full goodwill cost.
+  G20 wording half: Level 5's purpose states the real study
+  fields in more than 45 languages and the simulation
+  compresses them into five language groups.
+- Witnesses: the full corpus was regenerated under the new
+  rules, all 390 setups (65 per level), zero seeds lost.
+  Level 4 now wins on all 65 deals (it had 39 under the old
+  rules; its recorded minimum rises to 65). Fixed lines:
+  Level 1 62 cr (was 58), Level 2 66 cr (unchanged), Level 3
+  62 cr (was 69), Level 4 63 cr (unchanged), Level 5 72 cr
+  (unchanged), Level 6 87 cr (unchanged). Seeded ranges:
+  56-78, 61-108, 60-89, 62-77, 66-100, 84-127 against pools of
+  120 (150 on Level 6); no pool changed.
+- Verification: Node suite 150/150 (four new gap-wave tests
+  cover the gates, the report cards, the promise choice, and
+  the report-back availability); browser harness PASS 3/3 at
+  156/156 checks; the report's BRD ACCEPTANCE and FINAL
+  DISPOSITIONS cards and the Level 1 Stale card's window line
+  screenshotted at 390px and read.
+
 ## 2026-11-12 - Copy fixes from the Copilot gap review (G7, G24, G26, G28)
 
 - The owner approved shipping the zero-cost fixes from the
