@@ -306,7 +306,18 @@ The seed sample is not an exhaustive guarantee over the random generator.
 Response rate is completes/sent, including bounced invitations, not an
 AAPOR response rate. Quality and Insight are teaching-game indices.
 DK/NA represents item nonresponse, not proof of clean or valid data.
-The A/B verdict changes feedback only, not scores.
+The A/B verdict changes feedback only, not scores. Declaring a
+winner against a TOO CLOSE TO CALL verdict sets the campaign flag
+`abDeclaredClose`: the next stakeholder debrief names it once
+(`abCloseNamed`), the ACT step of that report recommends
+re-running the split at adequate size, and the season grade names
+it for the rest of the campaign. Both flags clear only on a full
+campaign reset. The report's scorecard export
+(`scorecardText`) renders the mission, the five checks, the BRD
+acceptance rows, the AAPOR dispositions, and the context note as
+Markdown from the same row and data builders the HTML cards use
+(`brdAcceptanceRows`, `dispositionData`, `contextNoteText`), so
+the file and the page cannot drift.
 
 ## Tuning
 

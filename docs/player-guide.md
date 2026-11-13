@@ -146,6 +146,11 @@ An over-budget setup cannot launch; reduce costs before sending.
 
 ## After a round: Try Again or New Game
 
+The round report carries a **Download scorecard** button. It saves
+the report as a Markdown file: the mission, the five checks, the
+BRD acceptance rows, the final dispositions with RR3 and RR4, and
+the context note. It is the artifact you would hand to the sponsor.
+
 - **Try Again (continue).** Your level budget is one pool for the
   whole level, not a refill. You return to setup with the credits
   you have left, your prep purchases and your edited questionnaire
@@ -363,6 +368,9 @@ starting state. A retry changes credits, goodwill, reputation, and owned prep.
    invitation design, and questionnaire repair.
 2. **The Split - Easy.** Optional randomized A/B invitation comparison.
    Interpret uncertainty; the verdict buttons do not change scores.
+   Declaring a winner on a gap inside the uncertainty range goes on
+   the campaign record anyway: the next stakeholder debrief and the
+   season grade name the call.
 3. **The Stakeholder - Medium.** Mid build, a stakeholder demands 8 more
    questions. Accept, push back, or rotate modules.
 4. **The Tired List - Hard.** A fatigued segment at low goodwill. Win it

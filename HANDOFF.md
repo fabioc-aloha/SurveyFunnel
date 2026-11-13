@@ -133,6 +133,21 @@
   reminder retargeting last (G27). Outside the program: G3,
   G10, G11 (needs the owner's design call), G25, and medallion
   phases 2-3.
+- Process-consistency Phase A (2026-11-13): G16, the report's
+  DOWNLOAD SCORECARD button saves a Markdown scorecard
+  (mission, key numbers, five checks, BRD acceptance rows,
+  AAPOR dispositions with RR3/RR4, context note) rendered from
+  the same builders as the HTML cards. G23, declaring an A/B
+  winner against a TOO CLOSE TO CALL verdict sets a campaign
+  flag: the next stakeholder debrief names it once, that
+  report's ACT step recommends re-running the split at
+  adequate size, and the season grade names it for the rest of
+  the campaign; no score change; flags clear only on a full
+  campaign reset. No scoring changed and no witnesses were
+  regenerated. Gates: Node suite 152/152, browser harness PASS
+  3/3 at 156/156 checks. Next in the program: Phase B,
+  simulated findings (G8) with within-cell reading (G14);
+  findings also join the scorecard export there.
 
 ## Acceptance boundary
 

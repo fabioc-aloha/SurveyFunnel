@@ -1,5 +1,41 @@
 # Changelog
 
+## 2026-11-13 - Process-consistency Phase A: the scorecard export (G16) and the declared-winner consequence (G23)
+
+- Phase A of the approved process-consistency program
+  (docs/process-consistency-scope.md), completing the ACT
+  stage remainders: the report becomes a file the player can
+  hand to a sponsor, and a declared A/B winner stops being
+  free.
+- G16: the report carries a DOWNLOAD SCORECARD button. It
+  saves a Markdown file with the mission, the key numbers,
+  the five checks, the BRD acceptance rows, the final
+  dispositions with RR3 and RR4, and the context note. The
+  file renders from the same builders as the HTML cards
+  (brdAcceptanceRows, dispositionData, contextNoteText), so
+  the export and the page cannot drift. Simulated findings
+  join the export in Phase B, when they exist.
+- G23: declaring a winner against a TOO CLOSE TO CALL
+  verdict sets a campaign flag. The next stakeholder debrief
+  names it ("a winner was declared on a gap inside the
+  uncertainty range"), the ACT step of that same report
+  recommends re-running the split at adequate size, and the
+  season grade names it for the rest of the campaign. No
+  score changes; the consequence is reputational, which is
+  the honest kind for this act. The flags clear only on a
+  full campaign reset.
+- Consistency pass: the player guide (the scorecard, and the
+  Level 2 record), the development notes (flag mechanics and
+  the shared builders), and the MPOR overlay's PUBLISH to
+  ACT paragraph all describe both changes.
+- Verification: Node suite 152/152 (two new tests cover the
+  export contents and the naming chain); browser harness
+  PASS 3/3 at 156/156 checks. No scoring changed, so no
+  witnesses were regenerated. The export was generated from
+  a won Level 1 run and read in full (its dispositions sum
+  to the sent base), and the button was screenshotted on
+  the report at 390px.
+
 ## 2026-11-13 - Gap-fix wave: the BRD's own rules now hold the send (G9, G5, G6, G2, G18, G12, G15, G17, G21, G22, G23, G19, G20)
 
 - The owner directed applying as many fixes as possible from

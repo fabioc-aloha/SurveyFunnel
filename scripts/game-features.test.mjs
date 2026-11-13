@@ -1085,6 +1085,45 @@ test('gap wave: report-back line appears on any level once the pool has been con
   assert.match(again.element('levelExtras').innerHTML, /REPORT BACK LINE/);
 });
 
+test('phase A: the scorecard export carries the mission, checks, acceptance, dispositions, and context note as Markdown', () => {
+  const { context: g, element } = game();
+  g.selectLevel(1, false);
+  g.state.validation = 'full'; g.state.dedupe = true; g.state.suppression = true;
+  g.startRun(); g.showReport();
+  const ev = g.state.lastRound.evidence;
+  const text = g.scorecardText(ev, g.runData, g.tally(g.runData), { verdict: 'ROUND WON', grade: 'A' });
+  assert.match(text, /^# Dear Valued Customer · Scorecard/m);
+  assert.match(text, /## Mission/);
+  assert.match(text, /## The five checks/);
+  for (const check of ev.checks) assert.ok(text.includes(check.name + ': ' + (check.met ? 'PASS' : 'HOLD')), 'scorecard names check ' + check.id);
+  assert.match(text, /## BRD acceptance/);
+  assert.match(text, /MET · Required topic:/);
+  assert.match(text, /## Final dispositions \(AAPOR\)/);
+  assert.match(text, /Unknown eligibility \(UO\):/);
+  assert.match(text, /AAPOR RR3/);
+  assert.match(text, /## Context note/);
+  assert.match(text, /do not establish statistical precision/);
+  assert.ok(element('report').innerHTML.includes('id="scorecardBtn"'), 'the report offers the download');
+});
+
+test('phase A: a declared winner on a too-close split is named by the next debrief, the ACT step, and the season grade', () => {
+  const { context: g, element } = game();
+  g.state.unlocked = 6;
+  g.state.abDeclaredClose = true;
+  g.selectLevel(3, false);
+  g.state.stakeholder = 'pushback';
+  g.state.validation = 'full'; g.state.dedupe = true; g.state.suppression = true;
+  g.startRun(); g.showReport();
+  const html = element('report').innerHTML;
+  assert.match(html, /ON THE RECORD:.*a winner was declared on a gap inside the uncertainty range/);
+  assert.match(html, /Re-run the Level 2 split at adequate size/);
+  assert.equal(g.state.abCloseNamed, true, 'the first debrief after the call names it once');
+  const second = g.extraReportHTML(g.tally(g.runData));
+  assert.doesNotMatch(second, /ON THE RECORD/);
+  g.showCampaign();
+  assert.match(element('campaignScreen').innerHTML, /On the record:.*a winner was declared on a gap inside the uncertainty range/);
+});
+
 test('report flags hard bounces at the 2 percent investigate line', () => {
   const hot = game();
   hot.context.selectLevel(1, false);

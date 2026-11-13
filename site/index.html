@@ -768,7 +768,7 @@
       </ul>
       <h3>WIN GATES</h3>
       <p>In the campaign, produce evidence stakeholders can trust and use. Pass all five checks: <b>funnel execution, evidence fitness, data integrity, audience sustainability, and operational trust</b>. Response rate is a benchmark, not a win gate. Only cleaned, account-linked responses count toward the mission's sample and role requirements; Insight is calculated again from those responses. Quality must remain 60+ and Insight 60+ (Level 6: 70+). The BRD states the mission's minimum sample and required roles. These are simulation rules, not statistical guarantees.</p>
-      <p>After FINISH the report follows <b>CLEAN → MATCH → INTERPRET → PUBLISH → ACT</b>. Speeders, straight-liners, duplicate, and junk responses are removed once each; forwarded responses cannot be matched to the invited account. Guessed responses stay in the data, because real cleaning cannot detect them; the report counts the guesses it can see and prices them in Quality and Insight. A failed check withholds publication and names the next action. Audience health carries across instruments in this campaign. Starting a new instrument does not refresh the audience; resetting the whole campaign does. Quick Challenges retain their own response, quality, Insight, and BRD requirements.</p>
+      <p>After FINISH the report follows <b>CLEAN → MATCH → INTERPRET → PUBLISH → ACT</b>. Speeders, straight-liners, duplicate, and junk responses are removed once each; forwarded responses cannot be matched to the invited account. Guessed responses stay in the data, because real cleaning cannot detect them; the report counts the guesses it can see and prices them in Quality and Insight. A failed check withholds publication and names the next action. The report's Download scorecard button saves the publishable artifact (mission, checks, BRD acceptance, dispositions, context note) as a Markdown file. Declaring an A/B winner on a gap inside the uncertainty range goes on the campaign record: the next stakeholder debrief and the season grade name it. Audience health carries across instruments in this campaign. Starting a new instrument does not refresh the audience; resetting the whole campaign does. Quick Challenges retain their own response, quality, Insight, and BRD requirements.</p>
       <div style="margin-top:16px"><button class="fgclose" id="guideClose">◀ BACK TO THE GAME</button></div>
     </div>
   </div>
@@ -1770,7 +1770,7 @@ var state = {
   attempt: 1, spentBefore: 0, history: [], goodwillCarry: null, repCarry: 90,
   baseline: null, chainActive: false, bestAttemptRate: 0, launchCost: 0, launchedSnapshot: null,
   reportShown: false, instrument: null, instrumentSeed: "A001", randomMode: false, campaignSeed: null, addBankIds: [],
-  campaignBonus: {}, levelSeeds: {},
+  campaignBonus: {}, levelSeeds: {}, abDeclaredClose: false, abCloseNamed: false,
   musicOn: true, sfxOn: true, muted: false, musicVol: 0.5, sfxVol: 0.8,
   hints: true, touched: { seg: false, prep: false, invite: false },
   quickChallenge: null, audiencePortfolio: {}
@@ -3712,7 +3712,7 @@ function evaluateEvidence(run, c, quality){
     won:checks.every(function(check){ return check.met; }) };
 }
 function moeText(n){ return n > 0 ? "±" + (1.96 * Math.sqrt(0.25 / n) * 100).toFixed(1) + " pts" : "no base"; }
-function brdAcceptanceHTML(evidence, run, c){
+function brdAcceptanceRows(evidence, run, c){
   var sv = surveyRecord();
   var rows = [];
   rows.push(["The decision this study supports", evidence.won, sv.purpose]);
@@ -3725,34 +3725,81 @@ function brdAcceptanceHTML(evidence, run, c){
   rows.push(["Audience health constraint", !run.gm.trips && run.gm.ending >= minHealth, "Ending goodwill " + Math.max(0, run.gm.ending) + " against a floor of " + minHealth + "."]);
   if (state.stakeholder){ var imp = stakeholderImpact(); rows.push(["Stakeholder request for eight extra questions", true, "Your response: " + imp.title + ". " + imp.response]); }
   if (state.level === 5){ rows.push(["Language coverage", !!(state.localization && state.langChoice === "localized"), "Five language groups in this simulation. Localization review " + (state.localization ? "bought" : "not bought") + "; invitation " + (state.langChoice === "localized" ? "localized" : "English only") + "."]); }
+  return rows;
+}
+function brdAcceptanceHTML(evidence, run, c){
+  var rows = brdAcceptanceRows(evidence, run, c);
   return '<div class="reportcard"><h2>BRD ACCEPTANCE · LINE BY LINE</h2><p>The last step of the process: this run, scored against the document that commissioned it.</p>' + rows.map(function(r){ return '<p style="font-size:15.5px;margin:4px 0"><b>' + (r[1] ? "MET" : "NOT MET") + " · " + r[0] + ".</b> " + r[2] + "</p>"; }).join("") + '</div>';
 }
-function dispositionHTML(evidence, run, c){
+function dispositionData(evidence, run, c){
   var I = evidence.usableN, P = 0;
   var removedComplete = Math.max(0, c.completed - evidence.usableN);
   var R = c.drops.nostart + c.drops.patience + c.drops.knowledge + c.drops.mobile;
   var NC = c.drops.noopen, UO = c.bouncedHard + c.bouncedSoft, BR = c.drops.breaker;
   var O = removedComplete + BR;
   var D = (I + P) + (R + NC + O) + UO;
-  var rr3 = D ? I / D : 0, rr4 = D ? (I + P) / D : 0;
-  var gameRate = c.sent ? c.completed / c.sent : 0;
-  var startRate = c.started ? c.completed / c.started : 0;
+  return { frame: run.respondents.length, suppressed: c.suppressed || 0, sent: c.sent, total: D,
+    rows: [["Complete (I)", I, "Finished, retained after cleaning, matched to the invited account: the usable evidence base."],
+      ["Partial (P)", P, "This game counts no usable partials: a started survey that stops early is a break-off, below."],
+      ["Refusal and break-off (R)", R, "Opened but never started, plus starts that dropped on patience, knowledge, or mobile burden."],
+      ["Non-contact (NC)", NC, "Delivered, never opened, reminders included."],
+      ["Other (O)", O, "Completed but removed at cleaning or unmatched, plus sends stopped when the goodwill breaker tripped."],
+      ["Unknown eligibility (UO)", UO, "Bounced, hard and soft: never delivered, so eligibility is unknown, not disproven."]],
+    gameRate: c.sent ? c.completed / c.sent : 0, rr3: D ? I / D : 0, rr4: D ? (I + P) / D : 0,
+    startRate: c.started ? c.completed / c.started : 0 };
+}
+function dispositionHTML(evidence, run, c){
+  var d = dispositionData(evidence, run, c);
   function row(k, v, note){ return '<tr><td>' + k + '</td><td>' + fmt(v) + '</td><td>' + note + '</td></tr>'; }
   return '<div class="reportcard"><h2>FINAL DISPOSITIONS · EVERY CASE ACCOUNTED FOR</h2>' +
-    '<p>Frame: ' + fmt(run.respondents.length) + ' records. ' + fmt(c.suppressed || 0) + ' removed by the suppression scrub before the send; ' + fmt(c.sent) + ' sent, and every sent case ends in exactly one row below (the rows sum to ' + fmt(D) + ').</p>' +
+    '<p>Frame: ' + fmt(d.frame) + ' records. ' + fmt(d.suppressed) + ' removed by the suppression scrub before the send; ' + fmt(d.sent) + ' sent, and every sent case ends in exactly one row below (the rows sum to ' + fmt(d.total) + ').</p>' +
     '<table class="mini"><tr><th>Final outcome</th><th>Cases</th><th>Reading</th></tr>' +
-    row("Complete (I)", I, "Finished, retained after cleaning, matched to the invited account: the usable evidence base.") +
-    row("Partial (P)", P, "This game counts no usable partials: a started survey that stops early is a break-off, below.") +
-    row("Refusal and break-off (R)", R, "Opened but never started, plus starts that dropped on patience, knowledge, or mobile burden.") +
-    row("Non-contact (NC)", NC, "Delivered, never opened, reminders included.") +
-    row("Other (O)", O, "Completed but removed at cleaning or unmatched, plus sends stopped when the goodwill breaker tripped.") +
-    row("Unknown eligibility (UO)", UO, "Bounced, hard and soft: never delivered, so eligibility is unknown, not disproven.") +
+    d.rows.map(function(r){ return row(r[0], r[1], r[2]); }).join("") +
     '</table>' +
-    '<p style="font-size:15.5px"><b>Rates on this run:</b> the game rate (completions / sent) ' + pct(gameRate * 100) + '; AAPOR RR3 (completes / all cases, unknowns counted eligible) ' + pct(rr3 * 100) + '; RR4 (completes plus usable partials) ' + pct(rr4 * 100) + ', the same as RR3 here because the game counts no partials; completion among starts ' + pct(startRate * 100) + '.</p>' +
+    '<p style="font-size:15.5px"><b>Rates on this run:</b> the game rate (completions / sent) ' + pct(d.gameRate * 100) + '; AAPOR RR3 (completes / all cases, unknowns counted eligible) ' + pct(d.rr3 * 100) + '; RR4 (completes plus usable partials) ' + pct(d.rr4 * 100) + ', the same as RR3 here because the game counts no partials; completion among starts ' + pct(d.startRate * 100) + '.</p>' +
     '<p style="font-size:15px">The eligibility estimate e is 1.00 in this simulation: no case is proven ineligible, so bounced and silent cases count as eligible. The team funnel standard sets e from frame quality and states it; a lower e would raise RR3 and RR4.</p></div>';
+}
+function contextNoteText(evidence, run){
+  return evidence.mission.purpose + ' Baseline: response rate uses invitations actually sent, including bounces; the usable sample excludes flagged and unmatched responses. ' +
+    fmt(run.respondents.length) + ' individual recipient records were simulated; ' + fmt(evidence.matched) + ' usable responses. Animation groups do not determine these counts. These mission thresholds do not establish statistical precision, population representativeness, or construct validity. No real customer records are collected or stored.';
+}
+function scorecardText(evidence, run, c, opts){
+  opts = opts || {};
+  var sv = surveyRecord();
+  var lines = [];
+  lines.push("# Dear Valued Customer · Scorecard");
+  lines.push("");
+  lines.push("Level " + state.level + " · " + sv.title + " · Instrument #" + state.instrumentSeed + " · Attempt " + state.attempt);
+  lines.push("Verdict: " + (opts.verdict || (evidence.won ? "ROUND WON" : "TARGET MISSED")) + (opts.grade ? " · Grade " + opts.grade : "") + " · Simulated run; no real customer records are collected or stored.");
+  lines.push("");
+  lines.push("## Mission");
+  lines.push(evidence.mission.purpose);
+  lines.push("Minimum usable sample: " + fmt(evidence.mission.minimumN) + " from the " + evidence.mission.pool + " pool.");
+  lines.push("");
+  lines.push("## Key numbers");
+  lines.push("Usable sample " + fmt(evidence.usableN) + " of " + fmt(c.sent) + " sent" + (opts.respRate != null ? "; response rate " + pct(opts.respRate * 100) + (opts.targetRate != null ? " against a " + Math.round(opts.targetRate * 100) + "% benchmark" : "") : "") + (opts.quality != null ? "; data quality " + opts.quality : "") + "; Insight Value " + evidence.insight.score + ".");
+  lines.push("");
+  lines.push("## The five checks");
+  evidence.checks.forEach(function(ch){ lines.push("- " + ch.name + ": " + (ch.met ? "PASS" : "HOLD") + " · " + ch.detail); });
+  lines.push("");
+  lines.push("## BRD acceptance");
+  brdAcceptanceRows(evidence, run, c).forEach(function(r){ lines.push("- " + (r[1] ? "MET" : "NOT MET") + " · " + r[0] + ". " + r[2]); });
+  lines.push("");
+  var d = dispositionData(evidence, run, c);
+  lines.push("## Final dispositions (AAPOR)");
+  lines.push("Frame: " + fmt(d.frame) + " records. " + fmt(d.suppressed) + " removed by the suppression scrub before the send; " + fmt(d.sent) + " sent, and every sent case ends in exactly one row below (the rows sum to " + fmt(d.total) + ").");
+  d.rows.forEach(function(r){ lines.push("- " + r[0] + ": " + fmt(r[1]) + " · " + r[2]); });
+  lines.push("Rates: the game rate (completions / sent) " + pct(d.gameRate * 100) + "; AAPOR RR3 (completes / all cases, unknowns counted eligible) " + pct(d.rr3 * 100) + "; RR4 (completes plus usable partials) " + pct(d.rr4 * 100) + ", the same as RR3 here because the game counts no partials; completion among starts " + pct(d.startRate * 100) + ".");
+  lines.push("The eligibility estimate e is 1.00 in this simulation: no case is proven ineligible, so bounced and silent cases count as eligible. The team funnel standard sets e from frame quality and states it; a lower e would raise RR3 and RR4.");
+  lines.push("");
+  lines.push("## Context note");
+  lines.push(contextNoteText(evidence, run));
+  return lines.join("\n") + "\n";
 }
 function evidenceReportHTML(evidence, run, c){
   var failed = evidence.checks.filter(function(check){ return !check.met; });
+  var actText = evidence.won ? "Use the evidence for the stated mission, disclose its limits, and close the loop before another instrument contacts this audience." : failed.map(function(check){ return check.action; }).join(" ");
+  if (state.abDeclaredClose && !state.abCloseNamed && (state.level === 3 || state.level === 6)) actText += " Re-run the Level 2 split at adequate size before treating the declared winner as settled.";
   var stages = [
     ["FINISH", fmt(c.completed) + " completed simulated responses"],
     ["CLEAN", fmt(evidence.cleaned) + " retained; removed once each: " +
@@ -3761,14 +3808,13 @@ function evidenceReportHTML(evidence, run, c){
     ["MATCH", fmt(evidence.usableN) + " account-linked; " + fmt(evidence.cleaned - evidence.matched) + " unmatched and excluded"],
     ["INTERPRET", "Usable Insight " + evidence.insight.score + "; required roles and sample checked after exclusions"],
     ["PUBLISH", evidence.won ? "READY WITH LIMITS: all five checks passed" : "WITHHOLD: " + failed.map(function(check){ return check.name; }).join(", ")],
-    ["ACT", evidence.won ? "Use the evidence for the stated mission, disclose its limits, and close the loop before another instrument contacts this audience." : failed.map(function(check){ return check.action; }).join(" ")]
+    ["ACT", actText]
   ];
   return '<div class="reportcard"><h2>EVIDENCE FITNESS SCORECARD</h2><p>Every check must pass. A higher response rate cannot offset missing evidence or a failed control.</p><div class="evidence-grid">' +
     evidence.checks.map(function(check){ return '<section class="evidence-check' + (check.met ? "" : " hold") + '" data-evidence="' + check.id + '"><h3>' + check.name + ': ' + (check.met ? "PASS" : "HOLD") + '</h3><p>' + check.detail + '</p></section>'; }).join("") +
     '</div></div>' + '<div class="reportcard"><h2>AFTER FINISH: EVIDENCE TO ACTION</h2>' +
     stages.map(function(stage){ return '<p><b>' + stage[0] + '</b>: ' + stage[1] + '</p>'; }).join("") +
-    '<h3>CONTEXT NOTE</h3><p>' + evidence.mission.purpose + ' Baseline: response rate uses invitations actually sent, including bounces; the usable sample excludes flagged and unmatched responses. ' +
-    fmt(run.respondents.length) + ' individual recipient records were simulated; ' + fmt(evidence.matched) + ' usable responses. Animation groups do not determine these counts. These mission thresholds do not establish statistical precision, population representativeness, or construct validity. No real customer records are collected or stored.</p></div>' + brdAcceptanceHTML(evidence, run, c) + dispositionHTML(evidence, run, c);
+    '<h3>CONTEXT NOTE</h3><p>' + contextNoteText(evidence, run) + '</p></div>' + brdAcceptanceHTML(evidence, run, c) + dispositionHTML(evidence, run, c);
 }
 function tally(run){
   var c = { invited:0, sent:0, delivered:0, bouncedHard:0, bouncedSoft:0, angry:0, suppressed:0, dupEnv:0, qSpeed:0, qStraight:0, qDup:0, qFwd:0, qJunk:0, qTopBox:0, qMush:0, qRefusal:0, qInconsist:0, qEstimate:0, guessByQ:{}, opened:0, started:0, completed:0, guessed:0, guessedAny:0, escapesUsed:0,
@@ -4224,7 +4270,7 @@ function showCampaign(){
   var el=$("campaignScreen"); el.style.display="block";
   var won=Object.keys(state.campaignWon).filter(function(k){return state.campaignWon[k];}).length;
   var avg=gradeRankAvg(); var seasonDone=!!state.campaignWon[6];
-  el.innerHTML='<div class="reportcard"><h2>'+(seasonDone?"★ SEASON COMPLETE ★":"CAMPAIGN · SEASON PROGRESS")+'</h2><div class="simnote">Session only — nothing is stored beyond this page. All results simulated.</div><p style="font-size:16px"><b>Levels won: '+won+' / 6</b> · Average grade: <b>'+(avg||"—")+'</b></p>'+LEVELS.map(function(lv){return '<p style="font-size:15px;margin:5px 0">Level '+lv.id+" · "+lv.difficulty+" · "+lv.name+" — "+(state.campaignWon[lv.id]?"<b>WON</b> · Best "+(state.campaignBest[lv.id]||"")+(state.campaignBonus[lv.id]!=null?" · BUDGET BONUS: "+state.campaignBonus[lv.id]+" CR LEFT WHEN WON":"") : (lv.id<=state.unlocked?"Not won yet":"🔒 Locked"))+"</p>";}).join("")+'<p style="font-size:16px;margin-top:12px"><b>'+(seasonDone?"Overall grade: "+avg+" · You ran the Big Quarter without burning the list. That is the whole craft: reach, respect, and data you can defend.": won>=3?"Verdict: Half the season in the bank. The breaker is learning to trust you.": won>=1?"Verdict: First win banked. Keep changing one lever at a time.":"Verdict: No wins yet. Start with Level 1: Fresh segment, full validation, dedupe, Honest Ask, trim to the core with escapes on.")+'</b></p><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px"><button class="againbtn" id="campBack">◀ LEVELS</button><button class="againbtn" id="campPlay" style="background:var(--gold)">▶ PLAY NEXT</button></div></div>';
+  el.innerHTML='<div class="reportcard"><h2>'+(seasonDone?"★ SEASON COMPLETE ★":"CAMPAIGN · SEASON PROGRESS")+'</h2><div class="simnote">Session only — nothing is stored beyond this page. All results simulated.</div><p style="font-size:16px"><b>Levels won: '+won+' / 6</b> · Average grade: <b>'+(avg||"—")+'</b></p>'+LEVELS.map(function(lv){return '<p style="font-size:15px;margin:5px 0">Level '+lv.id+" · "+lv.difficulty+" · "+lv.name+" — "+(state.campaignWon[lv.id]?"<b>WON</b> · Best "+(state.campaignBest[lv.id]||"")+(state.campaignBonus[lv.id]!=null?" · BUDGET BONUS: "+state.campaignBonus[lv.id]+" CR LEFT WHEN WON":"") : (lv.id<=state.unlocked?"Not won yet":"🔒 Locked"))+"</p>";}).join("")+(state.abDeclaredClose?'<p style="font-size:15px;margin:5px 0"><b>On the record:</b> a winner was declared on a gap inside the uncertainty range in the Level 2 split.</p>':"")+'<p style="font-size:16px;margin-top:12px"><b>'+(seasonDone?"Overall grade: "+avg+" · You ran the Big Quarter without burning the list. That is the whole craft: reach, respect, and data you can defend.": won>=3?"Verdict: Half the season in the bank. The breaker is learning to trust you.": won>=1?"Verdict: First win banked. Keep changing one lever at a time.":"Verdict: No wins yet. Start with Level 1: Fresh segment, full validation, dedupe, Honest Ask, trim to the core with escapes on.")+'</b></p><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px"><button class="againbtn" id="campBack">◀ LEVELS</button><button class="againbtn" id="campPlay" style="background:var(--gold)">▶ PLAY NEXT</button></div></div>';
   if (seasonDone) setTimeout(sndSeason, 250);
   $("campBack").addEventListener("click",function(){ el.style.display="none"; $("startScreen").style.display="block"; renderLevelUI(); window.scrollTo({top:0,behavior:"smooth"}); });
   $("campPlay").addEventListener("click",function(){ var next=LEVELS.filter(function(lv){return !state.campaignWon[lv.id] && lv.id<=state.unlocked;})[0]||LEVELS[0]; selectLevel(next.id,true); });
@@ -4510,7 +4556,9 @@ function extraReportHTML(c){
     var ch=state.stakeholder||"pushback";
     var txt= ch==="accept"?"Detective: ACCEPT modeled the eight-question request as +4 min, −10 goodwill, and 10 cr. Check the patience leak above.": ch==="rotate"?"Detective: Rotating modules are modeled as +1 minute, −3 goodwill, and 4 credits. Extra-topic answers are not simulated or scored.":"Detective: PUSH BACK kept the instrument focused (0 cr). The cost is a stakeholder conversation, not added survey burden.";
     var impact=stakeholderImpact();
-    h+='<div class="reportcard"><h2>STAKEHOLDER DEBRIEF</h2><p><b>YOUR RESPONSE:</b> '+impact.title+'</p><p>'+txt+'</p><p><b>STAKEHOLDER:</b> '+impact.response+'</p><p>Evidence from this send: '+fmt(c.completed)+' of '+fmt(c.sent)+' simulated recipients completed · '+estMinutes()+' minutes · '+Math.max(0,gmEndingForReport())+' ending goodwill · '+fmt(c.drops.patience)+' patience drop-offs. Extra-topic coverage is not scored separately.' + (ch==="rotate" ? " Rotating modules: each module was shown to about half the respondents, so its questions read on a base of about " + fmt(Math.round(c.completed/2)) + " completions, not the full base." : "") + '</p></div>';
+    var abRecord = "";
+    if (state.abDeclaredClose && !state.abCloseNamed){ abRecord = '<p><b>ON THE RECORD:</b> a winner was declared on a gap inside the uncertainty range in the Level 2 split. This debrief is the first since that call, so it names it; the season grade carries it too.</p>'; state.abCloseNamed = true; }
+    h+='<div class="reportcard"><h2>STAKEHOLDER DEBRIEF</h2><p><b>YOUR RESPONSE:</b> '+impact.title+'</p><p>'+txt+'</p><p><b>STAKEHOLDER:</b> '+impact.response+'</p><p>Evidence from this send: '+fmt(c.completed)+' of '+fmt(c.sent)+' simulated recipients completed · '+estMinutes()+' minutes · '+Math.max(0,gmEndingForReport())+' ending goodwill · '+fmt(c.drops.patience)+' patience drop-offs. Extra-topic coverage is not scored separately.' + (ch==="rotate" ? " Rotating modules: each module was shown to about half the respondents, so its questions read on a base of about " + fmt(Math.round(c.completed/2)) + " completions, not the full base." : "") + '</p>' + abRecord + '</div>';
   }
   if(state.level===4){
     h+='<div class="reportcard"><h2>TIRED LIST · GOODWILL GATE</h2><p style="font-size:15.5px">Ending goodwill: <b>'+Math.max(0,gmEndingForReport())+' / must be 35+</b>. '+(state.reportBack?"Report back line was on (3 cr): what changed last time did the restoring.":"No report back line — the list got another ask with no proof the last one mattered.")+' Short instrument (≤7 kept) restores the most.</p></div>';
@@ -5099,6 +5147,8 @@ function showReport(){
     histEntries.map(function(h){ return '<p style="font-size:15px;margin:4px 0">Attempt ' + h.attempt + ': <b>' + pct(h.rate * 100) + '</b> response · quality <b>' + h.quality + '</b>' + (h.insight !== undefined ? ' · insight <b>' + h.insight + '</b>' : '') + ' · spent ' + h.spent + ' cr' + (h.won ? ' · <b>WON</b>' : '') + '</p>'; }).join("") +
     '<p style="font-size:15px;margin-top:8px">Best attempt rate so far: <b>' + pct(Math.max(state.bestAttemptRate, respRate) * 100) + '</b> · Credits remaining: <b>' + remainingAfter + ' / ' + BUDGET_TOTAL + '</b></p></div>';
 
+  html += '<div class="againrow"><button class="againbtn" id="scorecardBtn">⬇ DOWNLOAD SCORECARD</button><span style="font-size:14px;color:var(--dim)">Saves this report as a Markdown file: mission, five checks, BRD acceptance, dispositions, and the context note.</span></div>';
+
   var minSend = minimumSendCost();
   var canRetry = remainingAfter >= minSend;
   var levelFailed = !won && !canRetry;
@@ -5149,8 +5199,14 @@ function showReport(){
     if (gb){ gb.classList.add("stamp"); sndStamp(); }
     if (won) spawnConfetti();
   }, 180);
+  var scb=$("scorecardBtn"); if(scb) scb.addEventListener("click",function(){
+    var text=scorecardText(evidence, run, c, { verdict: won ? "ROUND WON" : fastUseless ? "FAST AND USELESS" : gm.trips ? "BREAKER TRIPPED" : "TARGET MISSED", grade: grade, quality: quality, respRate: respRate, targetRate: targetRate });
+    var blob=new Blob([text],{type:"text/markdown"}); var url=URL.createObjectURL(blob);
+    var a=document.createElement("a"); a.href=url; a.download="dvc-scorecard-level"+state.level+"-"+state.instrumentSeed+".md";
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+  });
   var rb1=$("abRunBigger"); if(rb1) rb1.addEventListener("click",function(){ $("abVerdictMsg").innerHTML="<b>Inconclusive result.</b> A larger randomized sample in both invitation groups could give a more precise estimate. This verdict does not change scores."; sndNeutral(); });
-  var dc1=$("abDeclare"); if(dc1) dc1.addEventListener("click",function(){ $("abVerdictMsg").innerHTML="<b>Not defensible yet.</b> This comparison does not provide enough evidence to declare a superior invitation. Report its limits and collect more data. This verdict does not change scores."; sndWrong(); });
+  var dc1=$("abDeclare"); if(dc1) dc1.addEventListener("click",function(){ state.abDeclaredClose = true; $("abVerdictMsg").innerHTML="<b>Not defensible yet.</b> This comparison does not provide enough evidence to declare a superior invitation. Report its limits and collect more data. This verdict does not change scores. The declaration is on the campaign record: the next stakeholder debrief and the season grade will name it."; sndWrong(); });
   var ab2=$("againBtn"); if(ab2) ab2.addEventListener("click", function(){
     sndCoin();
     state.attempt++;
@@ -5186,6 +5242,7 @@ function newGameSameLevel(){
 }
 function resetCampaignNewGame(){
   state.campaignWon = {}; state.campaignBest = {}; state.campaignBonus = {};
+  state.abDeclaredClose = false; state.abCloseNamed = false;
   state.audiencePortfolio = {};
   state.unlocked = 1; state.bestGrade = null; state.bestRate = 0; state.lastRound = null;
   state.randomMode = true; state.campaignSeed = randomSeedStr(); state.levelSeeds = {};
