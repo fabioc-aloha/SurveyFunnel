@@ -768,7 +768,7 @@
       </ul>
       <h3>WIN GATES</h3>
       <p>In the campaign, produce evidence stakeholders can trust and use. Pass all five checks: <b>funnel execution, evidence fitness, data integrity, audience sustainability, and operational trust</b>. Response rate is a benchmark, not a win gate. Only cleaned, account-linked responses count toward the mission's sample and role requirements; Insight is calculated again from those responses. Quality must remain 60+ and Insight 60+ (Level 6: 70+). The BRD states the mission's minimum sample and required roles. These are simulation rules, not statistical guarantees.</p>
-      <p>After FINISH the report follows <b>CLEAN → MATCH → INTERPRET → PUBLISH → ACT</b>. Speeders, straight-liners, duplicate, and junk responses are removed once each; forwarded responses cannot be matched to the invited account. Guessed responses stay in the data, because real cleaning cannot detect them; the report counts the guesses it can see and prices them in Quality and Insight. A failed check withholds publication and names the next action. The report's Download scorecard button saves the publishable artifact (mission, checks, BRD acceptance, dispositions, context note) as a Markdown file. Declaring an A/B winner on a gap inside the uncertainty range goes on the campaign record: the next stakeholder debrief and the season grade name it. Audience health carries across instruments in this campaign. Starting a new instrument does not refresh the audience; resetting the whole campaign does. Quick Challenges retain their own response, quality, Insight, and BRD requirements.</p>
+      <p>After FINISH the report follows <b>CLEAN → MATCH → INTERPRET → PUBLISH → ACT</b>. Speeders, straight-liners, duplicate, and junk responses are removed once each; forwarded responses cannot be matched to the invited account. Guessed responses stay in the data, because real cleaning cannot detect them; the report counts the guesses it can see and prices them in Quality and Insight. INTERPRET answers the BRD's decision questions with simulated findings read off the usable base; a topic that did not answer credibly reads CANNOT SAY there, and no number is invented for it. A failed check withholds publication and names the next action. The report's Download scorecard button saves the publishable artifact (mission, checks, BRD acceptance, dispositions, context note) as a Markdown file. Declaring an A/B winner on a gap inside the uncertainty range goes on the campaign record: the next stakeholder debrief and the season grade name it. Audience health carries across instruments in this campaign. Starting a new instrument does not refresh the audience; resetting the whole campaign does. Quick Challenges retain their own response, quality, Insight, and BRD requirements.</p>
       <div style="margin-top:16px"><button class="fgclose" id="guideClose">◀ BACK TO THE GAME</button></div>
     </div>
   </div>
@@ -1663,31 +1663,59 @@ var SURVEYS = {
   1:{ label:"SUPPORT EXPERIENCE", title:"Support Experience Survey", sponsor:"the Support Experience team", inviteSubject:"your support case", listFamily:"Support", eligibilityDays:30,
     purpose:"Decide what to fix first in the support experience: where cases slow down, where the effort falls on the customer, and where self-service fails before a case ever opens. The findings set the support team's improvement priorities for the next quarter and are read alongside case data, never instead of it.",
     audience:"Customers whose support case closed in the last 30 days: the people who lived the case, across frontline, administrator, IT decision-maker, and executive seats. Case-experience questions are answerable by whoever lived the case; contract and billing figures sit with Partner Admin seats only, and org-wide cost figures sit with no seat on this list.",
-    agenda:LEVEL_AGENDA[1], topicKeys:TOPIC_KEYS, constraints:SURVEY_BASE_CONSTRAINTS },
+    agenda:LEVEL_AGENDA[1], topicKeys:TOPIC_KEYS, constraints:SURVEY_BASE_CONSTRAINTS,
+    decisions:{ "overall satisfaction":{ q:"What share of customers rate the overall support experience favorably?", scale:"pct", unit:"favorable" },
+      "customer effort":{ q:"How much effort did the case take the customer, on a 0 to 10 scale where 10 is the most effort?", scale:"mean" },
+      "self-service gap":{ q:"What share of customers say self-service failed them before the case opened?", scale:"pct", unit:"failed by self-service" },
+      "renewal risk":{ q:"What share of customers say this experience put the renewal at risk?", scale:"pct", unit:"say renewal is at risk" } } },
   2:{ label:"M365 COPILOT / AI ADOPTION", title:"M365 Copilot Adoption Survey", sponsor:"the AI Adoption team", inviteSubject:"how you use M365 Copilot", listFamily:"Copilot", listTiming:{ fresh:"3 days after being offered M365 Copilot", stale:"45 days after being offered M365 Copilot" }, listBlurb:{ fresh:"The offer is still fresh in memory. Relevance as good as it gets.", stale:"Same people as Fresh, six weeks on. Half barely remember the offer." },
     purpose:"Decide where adoption support goes next: who is actually using M365 Copilot and for what work, where its output is trusted, where it is checked or quietly avoided, and what training and enablement are missing. The findings set the rollout team's priorities for the next two quarters and are read alongside usage telemetry, never instead of it.",
     audience:"People who have been offered M365 Copilot in their work. End users and frontline staff answer usage, output, and workflow questions from their own desks; on this survey they are the strong respondents. Executives cannot answer daily-use or prompt-level detail they never touch, and asking them manufactures guesses. IT decision makers answer rollout, governance, and enablement questions; budget and licensing figures sit with Partner Admin seats, and pre-release model facts sit with no seat on this list.",
     agenda:LEVEL_AGENDA[2], topicKeys:COPILOT_TOPIC_KEYS,
+    decisions:{ "adoption breadth":{ q:"What share of people offered M365 Copilot use it every week?", scale:"pct", unit:"use it weekly" },
+      "workflow impact":{ q:"What share say M365 Copilot changes how their real work gets done?", scale:"pct", unit:"say it changes their work" },
+      "trust in output":{ q:"What share say they trust the output of M365 Copilot for their work?", scale:"pct", unit:"trust the output" },
+      "output quality":{ q:"How do users rate the quality of M365 Copilot output, on a 0 to 10 scale?", scale:"mean" },
+      "enablement gap":{ q:"What share say they lack the training or guidance to use M365 Copilot well?", scale:"pct", unit:"lack training or guidance" } },
     constraints:SURVEY_BASE_CONSTRAINTS + " A/B testing is available: this study fields two invitation variants against the same instrument, and the comparison is about the invitation, never about two different questionnaires. Compare the invitations and report uncertainty rather than assuming a winner." },
   3:{ label:"AZURE CLOUD SERVICES", title:"Azure Cloud Services Survey", sponsor:"the Azure product team", inviteSubject:"your Azure cloud services", listFamily:"Azure", listTiming:{ fresh:"3 days after the last Azure service milestone", stale:"45 days after the last Azure service milestone" }, listBlurb:{ fresh:"The milestone is still fresh in memory. Relevance as good as it gets.", stale:"Same people as Fresh, six weeks on. Half barely remember the milestone." },
     purpose:"Decide where the platform improves next: where workloads are interrupted, where costs cannot be seen, where moving a workload takes more effort than it should, and where a missing capability forces a team to redesign. The findings set the Azure product team's priorities for the next two quarters and are read alongside service telemetry, never instead of it.",
     audience:"People whose organizations run workloads on the platform. IT decision makers and frontline technical staff answer architecture, reliability, and migration questions, because they build and operate on the platform; cost figures sit with Partner Admin seats, and whether costs are visible sits with IT decision makers. End users of the finished applications the platform hosts cannot answer tenancy, region, or SKU questions at all, and asking them manufactures guesses.",
     agenda:LEVEL_AGENDA[3], topicKeys:AZURE_TOPIC_KEYS,
+    decisions:{ "service reliability":{ q:"What share say Azure services run their workloads without interruption?", scale:"pct", unit:"run uninterrupted" },
+      "cost visibility":{ q:"What share say they can see and explain what their Azure workloads cost?", scale:"pct", unit:"can see their costs" },
+      "migration effort":{ q:"How much effort did moving a workload to Azure take, on a 0 to 10 scale where 10 is the most effort?", scale:"mean" },
+      "capability gaps":{ q:"What share say a missing Azure capability forced them to redesign or work around the platform?", scale:"pct", unit:"hit a capability gap" } },
     constraints:SURVEY_BASE_CONSTRAINTS + " The sponsor is also this study's stakeholder: the Azure product team has asked for eight extra questions of its own, which is the stakeholder encounter on this level. Accept the request, rotate modules, or push back with evidence. Costs and added burden depend on your response; extra-topic answers are not simulated or scored." },
   4:{ label:"ACCOUNT TEAM RELATIONSHIP", title:"Account Team Relationship Survey", sponsor:"the Account Management team", inviteSubject:"working with your account team", listFamily:"Accounts", listTiming:{ fresh:"3 days after the quarterly account review", stale:"45 days after the quarterly account review", tired:"Recent account review, but surveyed 3 times this quarter" }, listBlurb:{ fresh:"The review is still fresh in memory. Relevance as good as it gets.", stale:"Same people as Fresh, six weeks on. Half barely remember the review." },
     purpose:"Decide where this relationship needs work before the next renewal cycle: whether the account team responds when it matters, whether people trust it enough to raise problems early, whether its work delivers business value, and how escalations land when something has already gone wrong. The findings set the account management team's improvement priorities for the next two quarters and are read alongside account records, never instead of them.",
     audience:"Named contacts at accounts on the relationship program, surveyed on a cycle: trust, business value, and renewal intent are judged from executive and IT decision maker evidence; escalation handling from the frontline technicians and end users who lived the tickets; commercial process items sit with Partner Admin seats. Perception of the account team is answerable by anyone who deals with the team, which makes candor the design risk on this survey, not knowledge: the sensitive items ask people to judge a team they must keep working with, and this audience has already been surveyed three times this quarter.",
     agenda:LEVEL_AGENDA[4], topicKeys:RELATIONSHIP_TOPIC_KEYS,
+    decisions:{ "account team responsiveness":{ q:"What share say the account team responds when it matters?", scale:"pct", unit:"say it responds when it matters" },
+      "trust and candor":{ q:"What share say they trust the account team enough to raise problems early?", scale:"pct", unit:"raise problems early" },
+      "business value delivered":{ q:"What share say the account team's work delivers clear business value?", scale:"pct", unit:"see clear business value" },
+      "escalation handling":{ q:"What share say escalations land well when something has already gone wrong?", scale:"pct", unit:"say escalations land well" },
+      "renewal intent":{ q:"What share say they intend to renew?", scale:"pct", unit:"intend to renew" } },
     constraints:SURVEY_BASE_CONSTRAINTS + " The tired audience requires ending goodwill 35 or higher. Report back (3 cr) is this study's feedback commitment: a relationship audience that never hears what its answers changed stops answering, so telling these accounts what the last round fixed is what protects response on the next cycle." },
   5:{ label:"GENERAL PERCEPTIONS OF MICROSOFT", title:"General Perceptions of Microsoft Survey", sponsor:"the Brand and Perceptions research team", inviteSubject:"how you see Microsoft", listFamily:"Global", listTiming:{ fresh:"3 days after the last tracked touchpoint, across regions", multi:"7 days after the last tracked touchpoint, across regions" }, listBlurb:{ fresh:"The touchpoint is still fresh in memory. Relevance as good as it gets." },
     purpose:"Decide how Microsoft is perceived, where that perception is moving, and which parts of it the company can actually change: how favorable people feel, whether they trust the company, whether it reads as innovative and as good value, and who they believe leads in AI. The findings set the perception and communications priorities for the next year and are read alongside product and relationship evidence, never instead of it. A perception tracker is the survey that runs globally, which is why the real study fields in more than 45 languages; this simulation compresses them into five language groups.",
     audience:"A broad professional audience across five language groups: end users, frontline staff, administrators, IT decision makers, and executives, most of whom know Microsoft through its products rather than its org chart. Perception items are answerable by every seat, because a perception needs no system access: the respondent is the only authority on their own view. The one thing this audience cannot answer is a fact: market figures and internal company facts sit with no seat on this list, and a perception survey that asks for them collects guesses dressed as data.",
     agenda:LEVEL_AGENDA[5], topicKeys:PERCEPTIONS_TOPIC_KEYS,
+    decisions:{ "overall favorability":{ q:"What share view Microsoft favorably overall?", scale:"pct", unit:"favorable" },
+      "trust":{ q:"What share say they trust Microsoft as a company?", scale:"pct", unit:"trust Microsoft" },
+      "innovation perception":{ q:"What share say Microsoft is innovative?", scale:"pct", unit:"say innovative" },
+      "value perception":{ q:"What share say Microsoft products are good value for what they cost?", scale:"pct", unit:"see good value" },
+      "AI leadership perception":{ q:"What share say Microsoft leads in AI?", scale:"pct", unit:"say Microsoft leads in AI" } },
     constraints:SURVEY_BASE_CONSTRAINTS + " The multilingual list is 40% English-speaking. Consider invitation language and localization review. Fielding in 45+ languages is this study's design, not a translation errand: localization review (8 cr) checks that each language version still asks the same question, and the localized invite (4 cr) puts the invitation itself in the respondent's language. Response is read by language group; a group that cannot read the invitation cannot report a perception, and its silence is a fielding failure, not a finding." },
   6:{ label:"ENTERPRISE RELATIONSHIP", title:"Enterprise Relationship Flagship Annual Survey", sponsor:"the Enterprise Relationship team", inviteSubject:"your enterprise relationship",
     purpose:"Decide the state of the enterprise relationship before the renewal cycle: whether decision makers trust Microsoft as a long-term partner, whether the relationship delivers business value, whether it aligns with where their organizations are going, and whether they intend to renew. The findings set the enterprise team's account priorities for the year and are read alongside account records, never instead of them. This is the flagship annual: one fielding a year, and a re-send reaches the same executives again at full goodwill cost, so a miss is expensive to repair.",
     audience:"Senior decision makers at enterprise accounts: the Executive Blast list, mostly executives and IT decision makers, with administrator seats holding the commercial specifics. Executives answer strategy, value, and renewal intent from their own seats; they do not answer operational detail they never touch, and asking them manufactures guesses. Contract and commercial specifics sit with Partner Admin seats and are beyond knowledge for everyone else on the Blast list. This audience gives a survey minutes, not half an hour: the flagship's risk is length and sensitivity at executive patience, not coverage.",
     agenda:LEVEL_AGENDA[6], topicKeys:FLAGSHIP_TOPIC_KEYS,
+    decisions:{ "overall relationship":{ q:"How do decision makers rate the overall relationship, on a 0 to 10 scale?", scale:"mean" },
+      "trust":{ q:"What share say they trust Microsoft as a long-term partner?", scale:"pct", unit:"trust the partnership" },
+      "business value":{ q:"What share say the relationship delivers business value?", scale:"pct", unit:"see business value" },
+      "renewal intent":{ q:"What share say they intend to renew?", scale:"pct", unit:"intend to renew" },
+      "strategic alignment":{ q:"What share say Microsoft's direction aligns with where their organization is going?", scale:"pct", unit:"say the direction aligns" } },
     constraints:SURVEY_BASE_CONSTRAINTS + " Resolve the stakeholder request for eight extra questions. Costs and added burden depend on your response; extra-topic answers are not simulated or scored." + " Executive Blast is the available audience for this study." }
 };
 function surveyRecord(level){ return SURVEYS[level || state.level] || SURVEYS[1]; }
@@ -3650,8 +3678,7 @@ function renderPopulationProgress(run, time){
   return progress;
 }
 
-function evaluateEvidence(run, c, quality){
-  var mission = evidenceMission();
+function cleanAndMatch(run){
   var finished = run.respondents.filter(function(sp){ return sp.fate === "finish" || sp.fate === "guessfinish"; });
   var removed = { speed:0, straight:0, duplicate:0, junk:0, guess:0 };
   var cleaned = finished.filter(function(sp){
@@ -3659,8 +3686,14 @@ function evaluateEvidence(run, c, quality){
     if (reason) removed[reason]++;
     return !reason;
   });
-  var containedGuesses = finished.filter(function(sp){ return sp.guessed; }).length;
-  var matched = cleaned.filter(function(sp){ return !!sp.accountId; });
+  return { finished: finished, cleaned: cleaned, removed: removed,
+    containedGuesses: finished.filter(function(sp){ return sp.guessed; }).length,
+    matched: cleaned.filter(function(sp){ return !!sp.accountId; }) };
+}
+function evaluateEvidence(run, c, quality){
+  var mission = evidenceMission();
+  var cm = cleanAndMatch(run);
+  var finished = cm.finished, removed = cm.removed, cleaned = cm.cleaned, containedGuesses = cm.containedGuesses, matched = cm.matched;
   var usableCounts = tally({ respondents:matched });
   var insight = computeInsight(usableCounts, run);
   var n = matched.length;
@@ -3707,16 +3740,119 @@ function evaluateEvidence(run, c, quality){
         (state.seg.id === "multi" ? "Global audience requires localization review and a localized invitation. " : "") + (c.angry > 0 ? " Permission: " + fmt(c.angry) + " opted-out or recently surveyed people were mailed anyway; permission is not optional, so this check cannot pass. " : " Permission held: no opted-out or recently surveyed person was mailed. ") + (lostTopics.length ? "Required topics not answered credibly: " + lostTopics.map(function(t){ return t.topic + " (" + t.status.toLowerCase() + ")"; }).join(", ") + ". " : "Every required topic answered credibly. ") + "The context note discloses the response base and limits.",
       action:"Complete list validation and dedupe, cover the agenda with usable responses, and review language choices for a Global audience." }
   ];
-  return { mission:mission, cleaned:cleaned.length, matched:matched.length, usableN:n, retained:retained,
+  var evObj = { mission:mission, cleaned:cleaned.length, matched:matched.length, usableN:n, retained:retained,
     associated:associated, removed:removed, containedGuesses:containedGuesses, roles:roles, insight:insight, checks:checks,
     won:checks.every(function(check){ return check.met; }) };
+  evObj.findings = computeFindings(evObj, run, c);
+  return evObj;
 }
 function moeText(n){ return n > 0 ? "±" + (1.96 * Math.sqrt(0.25 / n) * 100).toFixed(1) + " pts" : "no base"; }
+function moeMeanText(n){ return n > 0 ? "±" + (1.96 * 2.6 / Math.sqrt(n)).toFixed(1) : "no base"; }
+/* Findings (G8 + G14, process-consistency Phase B): each BRD
+   decision question is answered from a latent value seeded per
+   topic and instrument, observed through the run's usable base.
+   Noise scales with 1/sqrt(base); an unfixed defect on the
+   topic's representing question biases the read the way it
+   biases real data. A topic that did not answer credibly
+   returns CANNOT SAY, tied to the topics gate. Findings gate
+   nothing in v1; they are read and quoted. */
+function computeFindings(evidence, run, c){
+  var sv = surveyRecord();
+  var decisions = sv.decisions || {};
+  var matched = cleanAndMatch(run).matched;
+  var kept = run.kept || [];
+  function marginFor(scale, n){ return scale === "mean" ? moeMeanText(n) : moeText(n); }
+  return evidence.insight.topics.map(function(t){
+    var dq = decisions[t.topic];
+    if (!dq) return null;
+    if (t.status !== "ANSWERED CREDIBLY" || !t.q){
+      return { topic: t.topic, question: dq.q, scale: dq.scale, canSay: false, status: t.status,
+        reason: t.status === "LOST" ? "the topic did not come back at all, so there is nothing to read." : "the topic came back with suspect data, so no number is quoted for it." };
+    }
+    var q = null;
+    for (var i = 0; i < kept.length; i++) if (kept[i].id === t.q) q = kept[i];
+    var cont = t.contamination || 0;
+    var defect = q ? defectOf(q) : "CLEAN";
+    var unfixed = !!q && tierOf(q) === "defective" && state.qstate[q.id] !== "simplify";
+    var baseSet = matched;
+    if (q && q.answerBy) baseSet = matched.filter(function(sp){ return q.answerBy.indexOf(sp.persona) >= 0; });
+    var base = baseSet.length;
+    var seedBase = state.level + "|" + state.instrumentSeed + "|" + t.topic;
+    var latent = dq.scale === "mean" ? 5.2 + mulberry(hashStr("finding|" + seedBase))() * 3.4 : 34 + mulberry(hashStr("finding|" + seedBase))() * 40;
+    function observe(n, stream){
+      if (!n) return null;
+      var sd = dq.scale === "mean" ? 2.6 / Math.sqrt(n) : Math.sqrt(Math.max(0.04, (latent / 100) * (1 - latent / 100)) / n) * 100;
+      var z = (stream() + stream() + stream() - 1.5) / 1.5;
+      var est = latent + z * sd * 3;
+      if (unfixed && cont > 0){
+        if (defect === "LEADING") est += dq.scale === "mean" ? cont * 1.3 : cont * 18;
+        else if (defect === "DOUBLE-BARRELED") est += ((dq.scale === "mean" ? 5 : 50) - est) * cont * 0.6;
+        else if (defect === "BROKEN OPTIONS") est += (stream() - 0.5) * 2 * cont * (dq.scale === "mean" ? 1.4 : 14);
+      }
+      return dq.scale === "mean" ? Math.max(0, Math.min(10, Math.round(est * 10) / 10)) : Math.max(1, Math.min(99, Math.round(est)));
+    }
+    function textFor(v){ return dq.scale === "mean" ? (Math.round(v * 10) / 10).toFixed(1) + " / 10" : v + "% " + (dq.unit || ""); }
+    var estimate = observe(base, mulberry(hashStr("obs|" + seedBase)));
+    if (estimate === null){
+      return { topic: t.topic, question: dq.q, scale: dq.scale, canSay: false, status: t.status,
+        reason: "no usable respondent in this run could answer it, so there is nothing to read." };
+    }
+    var biasNote = null;
+    if (unfixed && cont > 0){
+      if (defect === "LEADING") biasNote = "Read high: Q" + t.q + " was kept with its LEADING defect unfixed, and leading questions push favorable answers up.";
+      else if (defect === "DOUBLE-BARRELED") biasNote = "Read muddy: Q" + t.q + " was kept with its DOUBLE-BARRELED defect unfixed; two questions in one pull the answer toward the middle.";
+      else if (defect === "BROKEN OPTIONS") biasNote = "Read scattered: Q" + t.q + " was kept with its BROKEN OPTIONS defect unfixed; a broken scale scatters answers, so the true value is less certain than the margin suggests.";
+      else biasNote = "Read with care: Q" + t.q + " was kept with its " + defect + " defect unfixed (observed contamination " + Math.round(cont * 100) + "% of completions).";
+    }
+    var keys = topicKeysFor(t.topic);
+    function cell(label, set, streamSeed){
+      if (set.length < 30) return { label: label, n: set.length, thin: true };
+      var v = observe(set.length, mulberry(hashStr(streamSeed)));
+      return { label: label, n: set.length, thin: false, estimate: v, estimateText: textFor(v), margin: marginFor(dq.scale, set.length) };
+    }
+    var keySet = baseSet.filter(function(sp){ return keys.indexOf(sp.persona) >= 0; });
+    var restSet = baseSet.filter(function(sp){ return keys.indexOf(sp.persona) < 0; });
+    var keyLabel = keys.map(function(k){ return (PERSONAS[k] ? PERSONAS[k].name : k) + "s"; }).join(" and ");
+    var cells = [ cell(keyLabel, keySet, "cellkey|" + seedBase), cell("Everyone else", restSet, "cellrest|" + seedBase) ];
+    return { topic: t.topic, question: dq.q, scale: dq.scale, canSay: true, status: t.status, estimate: estimate,
+      estimateText: textFor(estimate), margin: marginFor(dq.scale, base), base: base, biasNote: biasNote, cells: cells };
+  }).filter(function(f){ return !!f; });
+}
+function findingCellsText(f){
+  if (!f.canSay || !f.cells) return "";
+  function one(cell){
+    return cell.thin ? cell.label + ": too thin to read (n " + fmt(cell.n) + ")" : cell.label + " " + cell.estimateText + " (" + cell.margin + ", n " + fmt(cell.n) + ")";
+  }
+  return "Within the base: " + one(f.cells[0]) + "; " + one(f.cells[1]) + ".";
+}
+function findingsHTML(evidence, run, c){
+  var findings = evidence.findings || [];
+  if (!findings.length) return "";
+  return '<div class="reportcard"><h2>FINDINGS · WHAT THE EVIDENCE SAYS</h2>' +
+    '<div class="simnote">Simulated findings, read off the usable base of this run. A topic that did not answer credibly reads CANNOT SAY; no number is invented for it.</div>' +
+    findings.map(function(f){
+      var h = '<div class="dropitem"><div class="dh">' + f.question + '</div>';
+      if (!f.canSay) h += '<p><b>CANNOT SAY.</b> ' + f.reason + '</p>';
+      else {
+        h += '<p style="font-size:16px"><b>' + f.estimateText + '</b> · base ' + fmt(f.base) + ' usable · margin ' + f.margin + '</p>';
+        if (f.biasNote) h += '<p>' + f.biasNote + '</p>';
+        h += '<p>' + findingCellsText(f) + '</p>';
+      }
+      return h + '</div>';
+    }).join("") + '</div>';
+}
 function brdAcceptanceRows(evidence, run, c){
   var sv = surveyRecord();
   var rows = [];
   rows.push(["The decision this study supports", evidence.won, sv.purpose]);
   evidence.insight.topics.forEach(function(t){ rows.push(["Required topic: " + t.topic, t.status === "ANSWERED CREDIBLY", t.status + ". " + t.reason]); });
+  var dqMap = sv.decisions || {};
+  evidence.insight.topics.forEach(function(t){
+    if (!dqMap[t.topic]) return;
+    var f = (evidence.findings || []).filter(function(x){ return x.topic === t.topic; })[0];
+    if (!f) return;
+    rows.push(["Decision question: " + t.topic, f.canSay, dqMap[t.topic].q + (f.canSay ? " Finding: " + f.estimateText + " (" + f.margin + ", base " + fmt(f.base) + " usable)." : " Cannot say: the topic was not answered credibly.")]);
+  });
   var fit = evidence.checks.filter(function(x){ return x.id === "fitness"; })[0];
   rows.push(["Audience rule", fit.met, "The BRD audience: " + sv.audience.split(":")[0] + ". Sent: " + segDisplayName(state.seg) + " from the " + audienceGroup(state.seg) + " pool."]);
   var roleTxt = evidence.roles.map(function(r){ return r.label + " " + fmt(r.count) + " (" + moeText(r.count) + ")"; }).join("; ");
@@ -3791,6 +3927,19 @@ function scorecardText(evidence, run, c, opts){
   d.rows.forEach(function(r){ lines.push("- " + r[0] + ": " + fmt(r[1]) + " · " + r[2]); });
   lines.push("Rates: the game rate (completions / sent) " + pct(d.gameRate * 100) + "; AAPOR RR3 (completes / all cases, unknowns counted eligible) " + pct(d.rr3 * 100) + "; RR4 (completes plus usable partials) " + pct(d.rr4 * 100) + ", the same as RR3 here because the game counts no partials; completion among starts " + pct(d.startRate * 100) + ".");
   lines.push("The eligibility estimate e is 1.00 in this simulation: no case is proven ineligible, so bounced and silent cases count as eligible. The team funnel standard sets e from frame quality and states it; a lower e would raise RR3 and RR4.");
+  if (evidence.findings && evidence.findings.length){
+    lines.push("");
+    lines.push("## Findings");
+    evidence.findings.forEach(function(f){
+      lines.push("- " + f.question);
+      if (!f.canSay) lines.push("  CANNOT SAY. " + f.reason);
+      else {
+        lines.push("  " + f.estimateText + " · base " + fmt(f.base) + " usable · margin " + f.margin + ".");
+        if (f.biasNote) lines.push("  " + f.biasNote);
+        lines.push("  " + findingCellsText(f));
+      }
+    });
+  }
   lines.push("");
   lines.push("## Context note");
   lines.push(contextNoteText(evidence, run));
@@ -3800,6 +3949,7 @@ function evidenceReportHTML(evidence, run, c){
   var failed = evidence.checks.filter(function(check){ return !check.met; });
   var actText = evidence.won ? "Use the evidence for the stated mission, disclose its limits, and close the loop before another instrument contacts this audience." : failed.map(function(check){ return check.action; }).join(" ");
   if (state.abDeclaredClose && !state.abCloseNamed && (state.level === 3 || state.level === 6)) actText += " Re-run the Level 2 split at adequate size before treating the declared winner as settled.";
+  if (evidence.findings){ var hf = evidence.findings.filter(function(f){ return f.canSay; })[0]; if (hf) actText += " Headline finding: " + hf.topic + " reads " + hf.estimateText + " (" + hf.margin + ")."; }
   var stages = [
     ["FINISH", fmt(c.completed) + " completed simulated responses"],
     ["CLEAN", fmt(evidence.cleaned) + " retained; removed once each: " +
@@ -3814,7 +3964,7 @@ function evidenceReportHTML(evidence, run, c){
     evidence.checks.map(function(check){ return '<section class="evidence-check' + (check.met ? "" : " hold") + '" data-evidence="' + check.id + '"><h3>' + check.name + ': ' + (check.met ? "PASS" : "HOLD") + '</h3><p>' + check.detail + '</p></section>'; }).join("") +
     '</div></div>' + '<div class="reportcard"><h2>AFTER FINISH: EVIDENCE TO ACTION</h2>' +
     stages.map(function(stage){ return '<p><b>' + stage[0] + '</b>: ' + stage[1] + '</p>'; }).join("") +
-    '<h3>CONTEXT NOTE</h3><p>' + contextNoteText(evidence, run) + '</p></div>' + brdAcceptanceHTML(evidence, run, c) + dispositionHTML(evidence, run, c);
+    '<h3>CONTEXT NOTE</h3><p>' + contextNoteText(evidence, run) + '</p></div>' + brdAcceptanceHTML(evidence, run, c) + dispositionHTML(evidence, run, c) + findingsHTML(evidence, run, c);
 }
 function tally(run){
   var c = { invited:0, sent:0, delivered:0, bouncedHard:0, bouncedSoft:0, angry:0, suppressed:0, dupEnv:0, qSpeed:0, qStraight:0, qDup:0, qFwd:0, qJunk:0, qTopBox:0, qMush:0, qRefusal:0, qInconsist:0, qEstimate:0, guessByQ:{}, opened:0, started:0, completed:0, guessed:0, guessedAny:0, escapesUsed:0,
@@ -4512,19 +4662,19 @@ function computeInsight(c, run){
     var keys = topicKeysFor(topic);
     var personaOk = keys.some(function(k){ return c.perPersona[k] && c.perPersona[k].completed > 0; });
     if (!personaOk) return { topic: topic, status: "LOST", earned: 0, reason: "Missing persona: no finisher was a " + keys.map(function(k){ return PERSONAS[k].name; }).join(" or ") + ", the group this topic is about. Who responds decides what the data can say." };
-    var best = -1, bestQ = null, bestWhy = "";
+    var best = -1, bestQ = null, bestWhy = "", bestCont = 0;
     answerable.forEach(function(q){
-      var tier = tierOf(q), e, why;
+      var tier = tierOf(q), e, why, cont = 0;
       if (tier === "clean"){ e = share; why = "clean question Q" + q.id; }
       else if (tier === "filler"){ e = share * 0.5; why = "only filler Q" + q.id + " covered it (half credit)"; }
       else if (state.qstate[q.id] === "simplify"){ e = share; why = "defective Q" + q.id + " correctly fixed with " + fixVerbFor(q); }
-      else { var cont = contamination(q); e = share * (1 - cont); why = "Q" + q.id + " kept with its " + defectOf(q) + " defect unfixed; observed contamination " + Math.round(cont * 100) + "% of completions"; }
-      if (e > best){ best = e; bestQ = q; bestWhy = why; }
+      else { cont = contamination(q); e = share * (1 - cont); why = "Q" + q.id + " kept with its " + defectOf(q) + " defect unfixed; observed contamination " + Math.round(cont * 100) + "% of completions"; }
+      if (e > best){ best = e; bestQ = q; bestWhy = why; bestCont = cont; }
     });
     var earned = best;
     if (answerable.length > 1) earned = Math.min(share, earned + share * 0.10); /* second question on the topic: +10% of share */
     var status = earned >= share * 0.99 ? "ANSWERED CREDIBLY" : "ANSWERED WITH SUSPECT DATA";
-    return { topic: topic, status: status, earned: Math.round(earned * 10) / 10, reason: "Earned " + (Math.round(earned * 10) / 10) + " of " + (Math.round(share * 10) / 10) + ": " + bestWhy + (answerable.length > 1 ? ", with a second question on the topic adding depth." : ".") };
+    return { topic: topic, status: status, earned: Math.round(earned * 10) / 10, q: bestQ ? bestQ.id : null, contamination: Math.round(bestCont * 1000) / 1000, reason: "Earned " + (Math.round(earned * 10) / 10) + " of " + (Math.round(share * 10) / 10) + ": " + bestWhy + (answerable.length > 1 ? ", with a second question on the topic adding depth." : ".") };
   });
   var score = topics.reduce(function(a, t){ return a + t.earned; }, 0);
   var stupidKept = kept.filter(function(q){ return tierOf(q) === "stupid"; }).length;

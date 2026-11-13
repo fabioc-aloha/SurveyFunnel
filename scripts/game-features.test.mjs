@@ -1124,6 +1124,71 @@ test('phase A: a declared winner on a too-close split is named by the next debri
   assert.match(element('campaignScreen').innerHTML, /On the record:.*a winner was declared on a gap inside the uncertainty range/);
 });
 
+test('phase B: a won run answers every decision question, in the report, the acceptance card, the ACT line, and the export', () => {
+  const { context: g, element } = game();
+  g.selectLevel(1, false);
+  g.state.validation = 'full'; g.state.dedupe = true; g.state.suppression = true;
+  g.state.qstate = {};
+  for (let id = 1; id <= 12; id++) g.state.qstate[id] = 'keep';
+  g.state.qstate[3] = 'simplify';
+  for (const id of [5, 7, 8, 10, 11, 12]) g.state.qstate[id] = 'cut';
+  g.startRun(); g.showReport();
+  const ev = g.state.lastRound.evidence;
+  assert.equal(ev.findings.length, 4, 'one finding per agenda topic');
+  for (const f of ev.findings) {
+    assert.equal(f.canSay, true, f.topic + ' answers');
+    assert.ok(f.base > 0, f.topic + ' has a base');
+    assert.equal(f.cells[0].n + f.cells[1].n, f.base, f.topic + ' cells partition the base');
+    if (f.scale === 'pct') assert.ok(f.estimate >= 1 && f.estimate <= 99, f.topic + ' pct in range');
+    else assert.ok(f.estimate >= 0 && f.estimate <= 10, f.topic + ' mean in range');
+  }
+  const html = element('report').innerHTML;
+  assert.match(html, /FINDINGS · WHAT THE EVIDENCE SAYS/);
+  assert.match(html, /Headline finding:/);
+  assert.match(html, /Decision question:/);
+  const text = g.scorecardText(ev, g.runData, g.tally(g.runData), {});
+  assert.match(text, /## Findings/);
+  const again = g.evaluateEvidence(g.runData, g.tally(g.runData), 90);
+  assert.equal(JSON.stringify(again.findings), JSON.stringify(ev.findings), 'findings are deterministic for a run');
+});
+
+test('phase B: lost and suspect topics read cannot say, never a number', () => {
+  const { context: g } = game();
+  g.selectLevel(1, false);
+  g.state.validation = 'full'; g.state.dedupe = true; g.state.suppression = true;
+  g.startRun(); g.showReport();
+  const ev = g.state.lastRound.evidence;
+  const clone = JSON.parse(JSON.stringify(ev));
+  clone.insight.topics[0].status = 'LOST';
+  clone.insight.topics[1].status = 'ANSWERED WITH SUSPECT DATA';
+  const findings = g.computeFindings(clone, g.runData, g.tally(g.runData));
+  assert.equal(findings[0].canSay, false);
+  assert.equal(findings[0].estimate, undefined, 'a lost topic gets no estimate');
+  assert.equal(findings[1].canSay, false, 'suspect data is not answered credibly');
+  assert.equal(findings[1].estimate, undefined);
+  assert.equal(findings[2].canSay, true, 'untouched topics still answer');
+});
+
+test('phase B: an unfixed leading question pushes its finding up, and a cell under 30 usable reads too thin', () => {
+  const { context: g } = game();
+  g.selectLevel(1, false);
+  const q26 = g.questionById(26);
+  assert.equal(g.defectOf(q26), 'LEADING');
+  const respondents = [];
+  for (let i = 0; i < 400; i++) respondents.push({ fate: 'finish', accountId: 'a' + i, persona: i % 2 ? 'tech' : 'end' });
+  const run = { kept: [q26], respondents };
+  const mk = cont => ({ insight: { topics: [{ topic: 'overall satisfaction', status: 'ANSWERED CREDIBLY', q: 26, contamination: cont }] }, usableN: 400 });
+  const biased = g.computeFindings(mk(0.4), run, {})[0];
+  const clean = g.computeFindings(mk(0), run, {})[0];
+  assert.equal(biased.canSay, true);
+  assert.ok(biased.estimate >= clean.estimate + 5, `leading bias lifts the read (${biased.estimate} vs ${clean.estimate})`);
+  assert.match(biased.biasNote, /Read high/);
+  assert.equal(clean.biasNote, null);
+  assert.equal(biased.cells[0].thin, true, 'no executives or ITDMs in the fabricated base');
+  assert.equal(biased.cells[0].n, 0);
+  assert.equal(biased.cells[1].n, 400);
+});
+
 test('report flags hard bounces at the 2 percent investigate line', () => {
   const hot = game();
   hot.context.selectLevel(1, false);

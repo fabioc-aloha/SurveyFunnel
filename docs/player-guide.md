@@ -148,8 +148,20 @@ An over-budget setup cannot launch; reduce costs before sending.
 
 The round report carries a **Download scorecard** button. It saves
 the report as a Markdown file: the mission, the five checks, the
-BRD acceptance rows, the final dispositions with RR3 and RR4, and
-the context note. It is the artifact you would hand to the sponsor.
+BRD acceptance rows, the final dispositions with RR3 and RR4, the
+findings, and the context note. It is the artifact you would hand
+to the sponsor.
+
+The report's **Findings** card answers the BRD's decision
+questions, one per required topic, from the run's usable base:
+an estimate, its margin, and a within-cell read for the topic's
+key audience against everyone else. A cell under 30 usable
+responses reads "too thin to read" instead of printing a number.
+A topic that did not answer credibly reads **CANNOT SAY**, and no
+number is invented for it. A finding whose question was kept with
+its defect unfixed carries a warning: a leading question reads
+high, a double-barreled one reads muddy, and broken options
+scatter the read.
 
 - **Try Again (continue).** Your level budget is one pool for the
   whole level, not a refill. You return to setup with the credits

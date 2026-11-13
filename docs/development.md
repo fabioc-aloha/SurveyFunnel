@@ -314,10 +314,29 @@ re-running the split at adequate size, and the season grade names
 it for the rest of the campaign. Both flags clear only on a full
 campaign reset. The report's scorecard export
 (`scorecardText`) renders the mission, the five checks, the BRD
-acceptance rows, the AAPOR dispositions, and the context note as
-Markdown from the same row and data builders the HTML cards use
-(`brdAcceptanceRows`, `dispositionData`, `contextNoteText`), so
-the file and the page cannot drift.
+acceptance rows, the AAPOR dispositions, the findings, and the
+context note as Markdown from the same row and data builders
+the HTML cards use (`brdAcceptanceRows`, `dispositionData`,
+`contextNoteText`), so the file and the page cannot drift.
+
+Findings (`computeFindings`, attached to the evidence object in
+`evaluateEvidence`) answer each survey's decision questions
+(`decisions` on the survey record, one per agenda topic). Each
+estimate observes a latent value seeded per topic and instrument
+(`mulberry(hashStr("finding|..."))`) through the topic's usable
+base: the matched respondents who could answer the topic's
+representing question, which `computeInsight` now records on
+each topic (`q`, `contamination`). Observation noise is
+calibrated so the scatter of repeated reads matches the printed
+margin. An unfixed defect on the representing question biases
+the estimate (leading pushes up, double-barreled pulls to the
+middle, broken options scatter) and the finding carries the
+warning. Only ANSWERED CREDIBLY topics get a number; LOST and
+suspect topics read CANNOT SAY. Each finding also reads within
+cells (the topic's key personas against the rest, from the same
+matched base); a cell under 30 usable responses is too thin to
+read. Findings gate nothing in v1; the ACT line quotes the
+first answerable finding as the headline.
 
 ## Tuning
 

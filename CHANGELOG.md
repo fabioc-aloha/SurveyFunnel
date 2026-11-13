@@ -1,5 +1,54 @@
 # Changelog
 
+## 2026-11-13 - Process-consistency Phase B: simulated findings (G8) and within-cell reading (G14)
+
+- Phase B of the approved process-consistency program
+  (docs/process-consistency-scope.md), completing the
+  INTERPRET stage: the report no longer stops at a score.
+  The BRD's decision questions now get answers.
+- Each survey record gains a `decisions` map: one decision
+  question per agenda topic, decomposed from its purpose
+  text, on a stated scale (percent favorable-style shares,
+  or a 0 to 10 mean where the question reads as a score).
+- `computeFindings(evidence, run, c)` observes a latent
+  value seeded per topic and instrument through the topic's
+  usable base (the matched respondents who could answer the
+  topic's representing question; `computeInsight` now
+  records that question and its contamination on each
+  topic). Observation noise is calibrated so the scatter of
+  repeated reads matches the printed margin. Findings are
+  deterministic for a given run.
+- A topic that is not ANSWERED CREDIBLY reads CANNOT SAY and
+  gets no number, tied to the topics gate. An unfixed defect
+  on the representing question biases the estimate the way
+  it biases real data (leading pushes up, double-barreled
+  pulls to the middle, broken options scatter) and the
+  finding carries the warning.
+- G14: each finding also reads within cells, the topic's
+  key personas against everyone else, each cell with its
+  base and margin; a cell under 30 usable responses reads
+  "too thin to read" instead of printing a number.
+- Findings render in a FINDINGS card after the
+  dispositions, join the BRD acceptance card as one row per
+  decision question, join the scorecard export, and the ACT
+  line quotes the first answerable finding as the headline.
+  Findings gate nothing in v1 (program decision 1): they
+  are consequences, read and quoted. The cleaning filter
+  shared by evidence and findings is extracted as
+  `cleanAndMatch(run)`; behavior is unchanged.
+- Consistency pass: the player guide (the Findings card and
+  the scorecard contents), the development notes (the
+  findings model), and the MPOR overlay's pipeline paragraph
+  (INTERPRET) all describe the stage.
+- Verification: Node suite 155/155 (three new tests cover
+  the full findings path on a won run, the cannot-say
+  branches, and the leading-bias plus thin-cell rules);
+  browser harness PASS 3/3 at 156/156 checks. No scoring,
+  prices, or win rules changed, so no witnesses were
+  regenerated; the 390 recorded winners replay unchanged.
+  The FINDINGS card was screenshotted on a won Level 1
+  report at 390px and read.
+
 ## 2026-11-13 - Process-consistency Phase A: the scorecard export (G16) and the declared-winner consequence (G23)
 
 - Phase A of the approved process-consistency program

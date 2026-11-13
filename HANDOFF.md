@@ -133,6 +133,23 @@
   reminder retargeting last (G27). Outside the program: G3,
   G10, G11 (needs the owner's design call), G25, and medallion
   phases 2-3.
+- Process-consistency Phase B (2026-11-13): G8 simulated
+  findings are live. Every survey record carries decision
+  questions (one per agenda topic, from its purpose text);
+  `computeFindings` observes a per-topic, per-instrument
+  latent value through the run's usable base with
+  margin-calibrated noise. Topics that are not ANSWERED
+  CREDIBLY read CANNOT SAY; unfixed defects on the
+  representing question bias the read (leading up,
+  double-barreled to the middle, broken options scattered)
+  with a printed warning. G14 reads each finding within
+  cells (key personas vs the rest; under 30 usable is too
+  thin to read). Findings render after the dispositions,
+  join the acceptance card and the scorecard export, and
+  the ACT line quotes the headline finding. They gate
+  nothing in v1. Gates: Node suite 155/155, browser harness
+  PASS 3/3 at 156/156 checks; no witnesses regenerated.
+  Next in the program: Phase C, BRD intake (G1).
 - Process-consistency Phase A (2026-11-13): G16, the report's
   DOWNLOAD SCORECARD button saves a Markdown scorecard
   (mission, key numbers, five checks, BRD acceptance rows,
