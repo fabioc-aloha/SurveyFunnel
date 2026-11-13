@@ -133,6 +133,21 @@
   reminder retargeting last (G27). Outside the program: G3,
   G10, G11 (needs the owner's design call), G25, and medallion
   phases 2-3.
+- Process-consistency Phase C (2026-11-13): G1 BRD intake
+  is live. A Step 0 COMMISSION panel (state.commission,
+  reset per chain) sets precision (standard, or extended at
+  1.5 times the base minimum) and at most one topic demoted
+  to should-answer, negotiated with the sponsor. The BRD
+  prints an AS COMMISSIONED block; the acceptance card
+  scores against the commissioned values; the demoted topic
+  leaves the topics gate but its finding still reads CANNOT
+  SAY when not credible. Default commission reproduces the
+  shipped missions exactly (invariant test, all six levels);
+  no witnesses regenerated. Gates: Node suite 158/158,
+  browser harness PASS 3/3 at 156/156 checks. Remaining in
+  the program: Phase D sampling (G4, rides on medallion
+  phase 3 literal counts), Phase E checkpoint (G13) with
+  the 72-hour clock, Phase F reminder retargeting (G27).
 - Process-consistency Phase B (2026-11-13): G8 simulated
   findings are live. Every survey record carries decision
   questions (one per agenda topic, from its purpose text);

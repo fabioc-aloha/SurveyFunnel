@@ -51,6 +51,14 @@ progress or spends the campaign's credits.
 
 ## A campaign round, step by step
 
+0. **COMMISSION.** Before anything else, sign the BRD at Step 0.
+   Choose the precision the study is scored against: standard
+   minimums, or extended (the minimum usable base raised by
+   half). You may also negotiate one topic exception with the
+   sponsor: a required topic demoted to should-answer is still
+   measured and reported, but it does not hold the level. Your
+   choices print in the BRD as AS COMMISSIONED, and the report's
+   acceptance card scores the run against them.
 1. **AUDIENCE.** Pick a segment. Read its size, persona mix,
    relevance, contact history, the intake mix its list arrives with
    (duplicates, broken and stale records), and starting goodwill

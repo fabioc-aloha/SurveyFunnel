@@ -338,6 +338,22 @@ matched base); a cell under 30 usable responses is too thin to
 read. Findings gate nothing in v1; the ACT line quotes the
 first answerable finding as the headline.
 
+BRD intake (`state.commission`, reset with the chain in
+`resetChainState`) commissions the study at Step 0
+(`renderIntake`): precision standard or extended, and at most
+one topic demoted to should-answer. `evidenceMission` applies
+the commission: extended raises `minimumN` to 1.5 times
+`baseMinimumN`, and the default commission returns exactly the
+shipped minimums, pools, and roles (an invariant test pins all
+six levels). `evaluateEvidence` excludes the demoted topic
+from the topics gate and names the exception in the trust
+detail; the BRD prints an AS COMMISSIONED block
+(`evidenceRequirementsHTML`), and the acceptance card records
+the commission and annotates the demoted topic's row. The
+demoted topic's finding still reads CANNOT SAY when the topic
+does not answer credibly: the exception relaxes the gate,
+never the reporting.
+
 ## Tuning
 
 Start with the data tables in `site/index.html` and the mission rules

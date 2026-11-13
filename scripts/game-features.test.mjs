@@ -1189,6 +1189,65 @@ test('phase B: an unfixed leading question pushes its finding up, and a cell und
   assert.equal(biased.cells[1].n, 400);
 });
 
+test('phase C: the default commission reproduces the shipped missions exactly on every level', () => {
+  const { context: g } = game();
+  const minimums = [750, 1000, 1000, 675, 900, 1500];
+  const pools = ['support', 'support', 'support', 'support', 'global', 'leadership'];
+  for (let n = 1; n <= 6; n++) {
+    g.selectLevel(n, false);
+    const m = g.evidenceMission();
+    assert.equal(m.minimumN, minimums[n - 1], 'level ' + n + ' minimum unchanged');
+    assert.equal(m.baseMinimumN, minimums[n - 1]);
+    assert.equal(m.pool, pools[n - 1], 'level ' + n + ' pool unchanged');
+    assert.equal(g.commissionState().precision, 'standard');
+    assert.equal(g.commissionState().demoted, null);
+  }
+  assert.match(g.evidenceRequirementsHTML(), /AS COMMISSIONED/);
+});
+
+test('phase C: extended precision raises the scored minimum and a standard-winning base no longer passes fitness', () => {
+  const { context: g } = game();
+  g.selectLevel(1, false);
+  g.state.commission = { precision: 'extended', demoted: null };
+  assert.equal(g.evidenceMission().minimumN, 1125);
+  assert.match(g.evidenceRequirementsHTML(), /extended\. The minimum usable base is 1,125/);
+  g.state.validation = 'full'; g.state.dedupe = true; g.state.suppression = true;
+  g.state.qstate = {};
+  for (let id = 1; id <= 12; id++) g.state.qstate[id] = 'keep';
+  g.state.qstate[3] = 'simplify';
+  for (const id of [5, 7, 8, 10, 11, 12]) g.state.qstate[id] = 'cut';
+  g.startRun(); g.showReport();
+  const ev = g.state.lastRound.evidence;
+  assert.equal(ev.usableN, 894, 'the standard winning base is unchanged');
+  assert.equal(ev.checks.filter(x => x.id === 'fitness')[0].met, false, '894 usable no longer meets the commissioned 1,125');
+});
+
+test('phase C: a demoted topic is reported but does not hold the level', () => {
+  function play(g, demoted) {
+    g.selectLevel(1, false);
+    if (demoted) g.state.commission = { precision: 'standard', demoted };
+    g.state.validation = 'full'; g.state.dedupe = true; g.state.suppression = true;
+    g.state.qstate = {};
+    for (let id = 1; id <= 12; id++) g.state.qstate[id] = 'keep';
+    g.state.qstate[3] = 'simplify';
+    for (const id of [5, 7, 8, 10, 11, 12]) g.state.qstate[id] = 'cut';
+    for (const q of g.activeQuestions()) if (q.topic === 'renewal risk') g.state.qstate[q.id] = 'cut';
+    g.startRun(); g.showReport();
+    return g.state.lastRound.evidence;
+  }
+  const a = game(); const evA = play(a.context, null);
+  assert.equal(evA.insight.topics.filter(t => t.topic === 'renewal risk')[0].status, 'LOST');
+  assert.equal(evA.checks.filter(x => x.id === 'trust')[0].met, false, 'a lost required topic holds the level');
+  assert.equal(evA.won, false);
+  const b = game(); const evB = play(b.context, 'renewal risk');
+  assert.equal(evB.checks.filter(x => x.id === 'trust')[0].met, true, 'the negotiated exception relaxes the gate');
+  assert.equal(evB.won, true);
+  assert.match(evB.checks.filter(x => x.id === 'trust')[0].detail, /Negotiated exception: renewal risk was commissioned as should-answer/);
+  assert.equal(evB.findings.filter(f => f.topic === 'renewal risk')[0].canSay, false, 'the demoted topic is still reported honestly: cannot say');
+  assert.match(b.element('report').innerHTML, /should-answer, as commissioned/);
+  assert.match(b.element('report').innerHTML, /As commissioned/);
+});
+
 test('report flags hard bounces at the 2 percent investigate line', () => {
   const hot = game();
   hot.context.selectLevel(1, false);

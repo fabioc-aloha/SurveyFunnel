@@ -589,6 +589,13 @@
       <div id="stakeholderPanel"></div>
       <div id="abPanel"></div>
       <div id="levelExtras"></div>
+      <section class="lever" id="intakeLever" aria-label="Step 0 commission the study">
+        <div class="lever-head">
+          <span class="lever-no">STEP 0</span><span class="lever-title">COMMISSION</span>
+          <span class="lever-sub">Sign the BRD before you build. The acceptance card scores this run against what you commission here.</span>
+        </div>
+        <div id="intakePanel"></div>
+      </section>
       <section class="lever" id="audienceLever" aria-label="Lever 1 audience">
         <div class="lever-head">
           <span class="lever-no">STEP 1</span><span class="lever-title">AUDIENCE</span>
@@ -1798,7 +1805,7 @@ var state = {
   attempt: 1, spentBefore: 0, history: [], goodwillCarry: null, repCarry: 90,
   baseline: null, chainActive: false, bestAttemptRate: 0, launchCost: 0, launchedSnapshot: null,
   reportShown: false, instrument: null, instrumentSeed: "A001", randomMode: false, campaignSeed: null, addBankIds: [],
-  campaignBonus: {}, levelSeeds: {}, abDeclaredClose: false, abCloseNamed: false,
+  campaignBonus: {}, levelSeeds: {}, abDeclaredClose: false, abCloseNamed: false, commission: null,
   musicOn: true, sfxOn: true, muted: false, musicVol: 0.5, sfxVol: 0.8,
   hints: true, touched: { seg: false, prep: false, invite: false },
   quickChallenge: null, audiencePortfolio: {}
@@ -2191,10 +2198,13 @@ function recordAudienceRun(run, c){
     suppressionOverrides: (previous ? previous.suppressionOverrides : 0) + (previous && !state.suppression ? 1 : 0)
   };
 }
+function commissionState(){ return state.commission || { precision: "standard", demoted: null }; }
 function evidenceMission(){
   var minimums = [750, 1000, 1000, 675, 900, 1500];
+  var baseMinimumN = minimums[state.level - 1];
   return {
-    minimumN: minimums[state.level - 1],
+    minimumN: commissionState().precision === "extended" ? Math.round(baseMinimumN * 1.5) : baseMinimumN,
+    baseMinimumN: baseMinimumN,
     pool: state.level === 5 ? "global" : state.level === 6 ? "leadership" : "support",
     roles: state.level === 6 ? [{ keys:["exec","itdm"], share:0.5, label:"Decision makers (executives or IT decision makers)" }] :
       state.level === 3 ? [{ keys:["itdm","tech"], share:0.3, label:"People who run workloads (IT decision makers or frontline technicians)" }] :
@@ -2214,6 +2224,7 @@ function evidenceRequirementsHTML(){
     '</b> simulated responses from the <b>' + mission.pool + '</b> audience pool. Required roles: ' + mission.roles.map(function(role){ return role.label + ' (' + Math.round(role.share * 100) + '%+ of usable responses, at least one respondent)'; }).join('; ') +
     '. Match at least 80% of cleaned responses to the invited account. Retain at least 60% of completions after cleaning; quality 60+ and usable Insight ' + insightGate() +
     '+. Every required topic must come back answered credibly; a topic lost to a cut, a wrong audience, or suspect data holds the level.' + (surveyRecord().eligibilityDays ? ' The audience list must sit inside the BRD eligibility window (' + surveyRecord().eligibilityDays + ' days).' : '') + ' Mailing an opted-out or recently surveyed person fails operational trust; the suppression scrub removes those records before the send. Guessed responses stay in the usable base, priced in Quality and Insight. Validate the list and dedupe; a Global audience also needs localization review and a localized invitation.</p>' +
+    '<p><b>AS COMMISSIONED.</b> Precision: ' + (commissionState().precision === "extended" ? 'extended. The minimum usable base is ' + fmt(mission.minimumN) + ', the standard ' + fmt(mission.baseMinimumN) + ' raised by half, and the acceptance card scores against the commissioned figure.' : 'standard. The minimum usable base is ' + fmt(mission.minimumN) + '.') + (commissionState().demoted ? ' Topic exception: <b>' + commissionState().demoted + '</b> is commissioned as should-answer, negotiated with ' + surveyRecord().sponsor + '. It is reported like every topic, but it does not hold the level.' : ' No topic exceptions were negotiated: every required topic must answer credibly.') + '</p>' +
     '<p>Response benchmark: ' + targetPct(curLevel().target) + '%, not a win gate. Every recipient is simulated individually; minimums are mission rules, not confidence or representativeness guarantees.</p>' +
     '<p>Audience portfolio: ' + (history ? history.contacts + ' previous sends across ' + history.instruments.length + ' instrument(s); ' + history.suppressionOverrides + ' repeat-contact suppression override(s).' : 'No previous sends in this campaign audience pool.') +
     ' Fresh, Stale, and Tired share the Support pool; Global and Executive Blast have separate pools. Suppression reduces contact fatigue; it does not erase it. A new instrument retains this history.</p>' +
@@ -2789,7 +2800,7 @@ function renderLevelUI(){
     Array.prototype.forEach.call(grid.querySelectorAll("[data-level]"),function(b){ b.addEventListener("click",function(){ selectLevel(parseInt(b.getAttribute("data-level"),10),false); }); });
   }
   var sl=$("seasonLine"); if(sl){ var won=Object.keys(state.campaignWon).filter(function(k){return state.campaignWon[k];}).length; sl.textContent="SEASON: "+won+" / 6 LEVELS WON"; }
-  renderStakeholder(); renderABPanel(); renderLevelExtras(); var als=$("abLockedSlot"); if(als) als.style.display = state.level>=2 ? "none" : "";
+  renderStakeholder(); renderABPanel(); renderLevelExtras(); renderIntake(); var als=$("abLockedSlot"); if(als) als.style.display = state.level>=2 ? "none" : "";
 }
 function renderStakeholder(){
   var el=$("stakeholderPanel"); if(!el) return;
@@ -2830,6 +2841,26 @@ function renderABPanel(){
   var t=$("abToggle"); if(t) t.addEventListener("click",function(){ if(!state.abEnabled && budgetMath().total+6>BUDGET_TOTAL){ sndError(); return;} state.abEnabled=!state.abEnabled; sndCompare(); if(state.abEnabled) sndSpend(); renderABPanel(); renderReadout();});
   Array.prototype.forEach.call(el.querySelectorAll("[data-abinv]"),function(b){b.addEventListener("click",function(){if(b.disabled)return; state.abInvite=b.getAttribute("data-abinv"); sndClick(); renderABPanel();});});
 }
+function renderIntake(){
+  var el = $("intakePanel"), lever = $("intakeLever"); if (!el || !lever) return;
+  if (state.quickChallenge){ lever.style.display = "none"; return; }
+  lever.style.display = "";
+  var comm = commissionState();
+  var base = evidenceMission().baseMinimumN;
+  var topics = agendaTopics();
+  el.innerHTML = '<p style="font-size:14px;margin:2px 0 8px"><b>Precision.</b> The minimum usable base this study is scored against.</p>' +
+    '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
+    '<button class="segbtn' + (comm.precision === "standard" ? " sel" : "") + '" data-precision="standard">STANDARD<small>MIN ' + fmt(base) + ' USABLE</small></button>' +
+    '<button class="segbtn' + (comm.precision === "extended" ? " sel" : "") + '" data-precision="extended">EXTENDED<small>MIN ' + fmt(Math.round(base * 1.5)) + ' USABLE</small></button>' +
+    '</div>' +
+    '<p style="font-size:14px;margin:12px 0 8px"><b>Topic exception.</b> At most one required topic may be demoted to should-answer, negotiated with ' + surveyRecord().sponsor + '. It is still measured and reported; it just does not hold the level.</p>' +
+    '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
+    '<button class="segbtn' + (!comm.demoted ? " sel" : "") + '" data-demote="">NO EXCEPTION<small>EVERY TOPIC MUST ANSWER</small></button>' +
+    topics.map(function(t){ return '<button class="segbtn' + (comm.demoted === t ? " sel" : "") + '" data-demote="' + t + '">' + t.toUpperCase() + '<small>SHOULD-ANSWER</small></button>'; }).join("") +
+    '</div>';
+  Array.prototype.forEach.call(el.querySelectorAll("[data-precision]"), function(b){ b.addEventListener("click", function(){ state.commission = commissionState(); state.commission.precision = b.getAttribute("data-precision"); sndClick(); renderIntake(); renderReadout(); }); });
+  Array.prototype.forEach.call(el.querySelectorAll("[data-demote]"), function(b){ b.addEventListener("click", function(){ state.commission = commissionState(); state.commission.demoted = b.getAttribute("data-demote") || null; sndClick(); renderIntake(); renderReadout(); }); });
+}
 function renderLevelExtras(){
   var el=$("levelExtras"); if(!el) return; var html="";
   var rbHistory = audienceHistory();
@@ -2846,6 +2877,7 @@ function resetChainState(){
   state.baseline=pristineBaseline();
   state.stakeholder=null; state.abEnabled=false; state.reportBack=false; state.langChoice="en"; state.abVerdictChoice=null;
   state.validation="skip"; state.dedupe=false; state.consolidate=false; state.repair=false; state.suppression=false; state.localization=false; state.escapes=false; state.intake=null;
+  state.commission = { precision: "standard", demoted: null };
   var eb=$("escBtn"); if(eb){ eb.textContent="ESCAPES: OFF"; eb.classList.remove("on"); }
   state.invite=INVITES[0]; state.reminders=0; state.added={}; state.promiseMinutes=5;
   QUESTION_BANK.forEach(function(q){ state.qstate[q.id]="keep"; });
@@ -3704,8 +3736,11 @@ function evaluateEvidence(run, c, quality){
     return { label:role.label, count:count, share:matched.length ? count / matched.length : 0,
       met:count > 0 && count >= matched.length * role.share };
   });
-  var topicsCredible = insight.topics.every(function(t){ return t.status === "ANSWERED CREDIBLY"; });
-  var lostTopics = insight.topics.filter(function(t){ return t.status !== "ANSWERED CREDIBLY"; });
+  var demotedTopic = commissionState().demoted;
+  var topicsCredible = insight.topics.every(function(t){ return t.status === "ANSWERED CREDIBLY" || t.topic === demotedTopic; });
+  var lostTopics = insight.topics.filter(function(t){ return t.status !== "ANSWERED CREDIBLY" && t.topic !== demotedTopic; });
+  var demotedStatus = demotedTopic ? (insight.topics.filter(function(t){ return t.topic === demotedTopic; })[0] || {}).status : null;
+  var demoteNote = demotedTopic ? (demotedStatus === "ANSWERED CREDIBLY" ? " Negotiated exception: " + demotedTopic + " was commissioned as should-answer and answered credibly anyway. " : " Negotiated exception: " + demotedTopic + " was commissioned as should-answer, so it does not hold this check. ") : "";
   var eligDays = surveyRecord().eligibilityDays || 0;
   var eligibleOk = !eligDays || (state.seg.touchDays !== null && state.seg.touchDays !== undefined && state.seg.touchDays <= eligDays);
   var eligNote = eligDays ? (eligibleOk ? " List timing inside the BRD eligibility window (" + eligDays + " days)." : " List timing outside the BRD eligibility window: " + segTiming(state.seg) + "; the BRD audience is defined within " + eligDays + " days of the triggering event, so this list sits outside the study population.") : "";
@@ -3737,7 +3772,7 @@ function evaluateEvidence(run, c, quality){
     { id:"trust", name:"Operational trust", met:state.validation !== "skip" && state.dedupe && !(c.angry > 0) && topicsCredible &&
         (state.seg.id !== "multi" || state.localization && state.langChoice === "localized") && insight.score >= insightGate(),
       detail:"List validation " + state.validation + "; dedupe " + (state.dedupe ? "on" : "off") + ". Usable Insight " + insight.score + " (minimum " + insightGate() + "). " +
-        (state.seg.id === "multi" ? "Global audience requires localization review and a localized invitation. " : "") + (c.angry > 0 ? " Permission: " + fmt(c.angry) + " opted-out or recently surveyed people were mailed anyway; permission is not optional, so this check cannot pass. " : " Permission held: no opted-out or recently surveyed person was mailed. ") + (lostTopics.length ? "Required topics not answered credibly: " + lostTopics.map(function(t){ return t.topic + " (" + t.status.toLowerCase() + ")"; }).join(", ") + ". " : "Every required topic answered credibly. ") + "The context note discloses the response base and limits.",
+        (state.seg.id === "multi" ? "Global audience requires localization review and a localized invitation. " : "") + (c.angry > 0 ? " Permission: " + fmt(c.angry) + " opted-out or recently surveyed people were mailed anyway; permission is not optional, so this check cannot pass. " : " Permission held: no opted-out or recently surveyed person was mailed. ") + (lostTopics.length ? "Required topics not answered credibly: " + lostTopics.map(function(t){ return t.topic + " (" + t.status.toLowerCase() + ")"; }).join(", ") + ". " : "Every required topic answered credibly. ") + demoteNote + "The context note discloses the response base and limits.",
       action:"Complete list validation and dedupe, cover the agenda with usable responses, and review language choices for a Global audience." }
   ];
   var evObj = { mission:mission, cleaned:cleaned.length, matched:matched.length, usableN:n, retained:retained,
@@ -3845,7 +3880,10 @@ function brdAcceptanceRows(evidence, run, c){
   var sv = surveyRecord();
   var rows = [];
   rows.push(["The decision this study supports", evidence.won, sv.purpose]);
-  evidence.insight.topics.forEach(function(t){ rows.push(["Required topic: " + t.topic, t.status === "ANSWERED CREDIBLY", t.status + ". " + t.reason]); });
+  evidence.insight.topics.forEach(function(t){
+    var demoted = commissionState().demoted === t.topic;
+    rows.push(["Required topic: " + t.topic + (demoted ? " (should-answer, as commissioned)" : ""), t.status === "ANSWERED CREDIBLY" || demoted, t.status + ". " + t.reason + (demoted ? " Commissioned as should-answer: the negotiated exception, agreed with " + sv.sponsor + ", so this topic does not hold the level." : "")]);
+  });
   var dqMap = sv.decisions || {};
   evidence.insight.topics.forEach(function(t){
     if (!dqMap[t.topic]) return;
@@ -3853,6 +3891,8 @@ function brdAcceptanceRows(evidence, run, c){
     if (!f) return;
     rows.push(["Decision question: " + t.topic, f.canSay, dqMap[t.topic].q + (f.canSay ? " Finding: " + f.estimateText + " (" + f.margin + ", base " + fmt(f.base) + " usable)." : " Cannot say: the topic was not answered credibly.")]);
   });
+  var comm = commissionState();
+  rows.push(["As commissioned", true, "Precision " + comm.precision + ": minimum usable base " + fmt(evidence.mission.minimumN) + (comm.precision === "extended" ? " (the standard " + fmt(evidence.mission.baseMinimumN) + " raised by half)" : "") + ". " + (comm.demoted ? "Exception: " + comm.demoted + " demoted to should-answer, negotiated with " + sv.sponsor + "." : "No topic exceptions negotiated.")]);
   var fit = evidence.checks.filter(function(x){ return x.id === "fitness"; })[0];
   rows.push(["Audience rule", fit.met, "The BRD audience: " + sv.audience.split(":")[0] + ". Sent: " + segDisplayName(state.seg) + " from the " + audienceGroup(state.seg) + " pool."]);
   var roleTxt = evidence.roles.map(function(r){ return r.label + " " + fmt(r.count) + " (" + moeText(r.count) + ")"; }).join("; ");

@@ -1,5 +1,45 @@
 # Changelog
 
+## 2026-11-13 - Process-consistency Phase C: BRD intake (G1)
+
+- Phase C of the approved process-consistency program
+  (docs/process-consistency-scope.md), completing the
+  COMMISSION stage: the BRD is no longer read-only. The
+  player signs it before building anything.
+- A Step 0 COMMISSION panel opens the setup screen. Two
+  choices, both binding: precision (standard minimums, or
+  extended, the minimum usable base raised by half) and one
+  topic exception (a required topic demoted to
+  should-answer, negotiated with the survey's sponsor).
+  Sponsor, audience, and decision stay fixed per level, as
+  the survey records state them.
+- The commission prints in the BRD as an AS COMMISSIONED
+  block, and the report's acceptance card scores against
+  the commissioned values: its minimum-base row reads the
+  commissioned minimum, the demoted topic's row is
+  annotated as the negotiated exception, and an As
+  commissioned row records the contract.
+- The demoted topic leaves the topics gate in operational
+  trust (the trust detail names the exception either way),
+  but reporting never relaxes: its finding still reads
+  CANNOT SAY when the topic does not answer credibly.
+- Invariant, pinned by a test: with the default commission
+  (standard, no exception), every level's mission is
+  exactly the shipped one (minimums 750 / 1,000 / 1,000 /
+  675 / 900 / 1,500, pools and roles unchanged), so the
+  390 recorded winners replay unchanged. A second test
+  shows extended precision binding (the standard winning
+  base of 894 fails fitness against a commissioned 1,125),
+  and a third shows the exception flipping a level whose
+  only failure was the demoted topic.
+- Consistency pass: the player guide gains step 0 in its
+  walkthrough, and the development notes record the
+  commission mechanics and the invariant.
+- Verification: Node suite 158/158 (three new tests);
+  browser harness PASS 3/3 at 156/156 checks. The Step 0
+  panel was screenshotted on Level 1 setup at 390px and
+  read.
+
 ## 2026-11-13 - Process-consistency Phase B: simulated findings (G8) and within-cell reading (G14)
 
 - Phase B of the approved process-consistency program
