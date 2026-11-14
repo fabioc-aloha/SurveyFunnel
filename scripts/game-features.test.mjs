@@ -1248,6 +1248,87 @@ test('phase C: a demoted topic is reported but does not hold the level', () => {
   assert.match(b.element('report').innerHTML, /As commissioned/);
 });
 
+function projection(run) {
+  return JSON.stringify(run.respondents.map(sp => [sp.fate, sp.via, sp.persona, sp.accountId || '', sp.guessed ? 1 : 0, sp.bounceHard ? 1 : 0]));
+}
+function phaseESetup(g, reminders) {
+  g.selectLevel(1, false);
+  g.state.validation = 'full'; g.state.dedupe = true; g.state.suppression = true;
+  g.state.reminders = reminders;
+  g.state.qstate = {};
+  for (let id = 1; id <= 12; id++) g.state.qstate[id] = 'keep';
+  g.state.qstate[3] = 'simplify';
+  for (const id of [5, 7, 8, 10, 11, 12]) g.state.qstate[id] = 'cut';
+}
+
+test('phase E: a checkpoint that changes nothing reproduces the one-shot run bit for bit', () => {
+  const { context: g } = game();
+  phaseESetup(g, 2);
+  const full = g.buildRun();
+  const rc = g.buildRunStart();
+  g.simulateRange(rc, 0, rc.mid);
+  g.simulateRange(rc, rc.mid, rc.seg.n);
+  const split = g.finishRun(rc);
+  assert.equal(projection(split), projection(full), 'every respondent lands identically');
+  assert.equal(JSON.stringify(g.tally(split)), JSON.stringify(g.tally(full)));
+});
+
+test('phase E: firing the next wave at the checkpoint reopens first-half inboxes and costs the second half a wave', () => {
+  const { context: g } = game();
+  phaseESetup(g, 1);
+  const rcHold = g.buildRunStart();
+  g.simulateRange(rcHold, 0, rcHold.mid); g.simulateRange(rcHold, rcHold.mid, rcHold.seg.n);
+  const hold = g.finishRun(rcHold);
+  const rcFire = g.buildRunStart();
+  g.simulateRange(rcFire, 0, rcFire.mid);
+  g.fireReminderWave(rcFire);
+  assert.ok(rcFire.firedWave.converted > 0, 'the fired wave reopens some first-half inboxes');
+  g.simulateRange(rcFire, rcFire.mid, rcFire.seg.n);
+  const fire = g.finishRun(rcFire);
+  const openedPastGate = run => run.respondents.slice(0, run.respondents.length / 2)
+    .filter(sp => ['finish', 'guessfinish', 'drop', 'nostart'].includes(sp.fate)).length;
+  assert.ok(openedPastGate(fire) > openedPastGate(hold), 'the first half opens more after firing: the trade is real');
+  assert.notEqual(projection(fire), projection(hold), 'the run itself changed');
+});
+
+test('phase E: the 72-hour clock binds only past day 3, and a lapse mails the opted-out second half', () => {
+  const { context: g } = game();
+  phaseESetup(g, 1);
+  assert.equal(g.fieldworkDays(), 3);
+  assert.equal(g.clockExpires(), false);
+  phaseESetup(g, 2);
+  assert.equal(g.fieldworkDays(), 4);
+  assert.equal(g.clockExpires(), true);
+  const rcOk = g.buildRunStart();
+  g.simulateRange(rcOk, 0, rcOk.mid); g.simulateRange(rcOk, rcOk.mid, rcOk.seg.n);
+  const okRun = g.finishRun(rcOk);
+  assert.equal(g.tally(okRun).angry, 0, 'permission held: nobody opted out is mailed');
+  const rcLapse = g.buildRunStart();
+  g.simulateRange(rcLapse, 0, rcLapse.mid);
+  rcLapse.permissionLapsed = true;
+  g.simulateRange(rcLapse, rcLapse.mid, rcLapse.seg.n);
+  const lapseRun = g.finishRun(rcLapse);
+  const lt = g.tally(lapseRun);
+  assert.ok(lt.angry > 0, 'the lapsed second half mails people who opted out during fieldwork');
+  assert.equal(lt.suppressed, g.tally(okRun).suppressed, 'the scrub itself is unchanged; the lapse is about the check, not the list');
+});
+
+test('phase E: the launch flow pauses at the checkpoint card and continues on command', () => {
+  const { context: g, element } = game();
+  phaseESetup(g, 2);
+  g.launchEntry();
+  assert.ok(g.state.checkpoint, 'the flow pauses mid-field');
+  assert.match(element('checkpointScreen').innerHTML, /MID-FIELD CHECKPOINT/);
+  assert.match(element('checkpointScreen').innerHTML, /PERMISSION WINDOW/);
+  assert.match(element('checkpointScreen').innerHTML, /PROJECTED/);
+  const costBefore = g.state.launchCost;
+  g.continueFromCheckpoint();
+  assert.equal(g.state.checkpoint, null);
+  assert.equal(g.state.checkpointRecheck, true, 'the default at an affordable pool is to re-check');
+  assert.equal(g.state.launchCost, costBefore + 4, 'the re-check charges the attempt');
+  assert.equal(g.runData.respondents.length, g.state.seg.n, 'the second half simulated after continue');
+});
+
 test('report flags hard bounces at the 2 percent investigate line', () => {
   const hot = game();
   hot.context.selectLevel(1, false);

@@ -154,6 +154,21 @@ An over-budget setup cannot launch; reduce costs before sending.
 
 ## After a round: Try Again or New Game
 
+During the run, a campaign send pauses at a **mid-field
+checkpoint** halfway through the list. The card shows the
+funnel so far (sent, bounces with the hard-bounce rate,
+opens, starts, completes) and a projection if the second
+half behaves like the first. You get one action: hold, or
+fire the next reminder wave now, at the first half's
+unopened inboxes; the second half then mails with one fewer
+wave. The checkpoint also states the fieldwork day.
+Fieldwork runs two days plus a day per reminder wave, and
+the permission check stamped at setup covers 72 hours: if
+fieldwork would run past day 3, re-check the permission at
+the checkpoint (4 cr) or let it lapse and mail people who
+opted out during fieldwork, which fails operational trust.
+Holding at the checkpoint changes nothing about the run.
+
 The round report carries a **Download scorecard** button. It saves
 the report as a Markdown file: the mission, the five checks, the
 BRD acceptance rows, the final dispositions with RR3 and RR4, the

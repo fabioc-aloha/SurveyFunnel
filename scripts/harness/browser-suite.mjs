@@ -313,6 +313,11 @@ async function restoreButtonAudit(run) {
   return data;
 }
 
+async function passCheckpoint(page) {
+  const shown = await page.$eval('#checkpointScreen', (el) => el.style.display !== 'none' && !!document.querySelector('#checkpointContinue')).catch(() => false);
+  if (shown) await clickAndWait(page, '#checkpointContinue', 300);
+}
+
 async function clickAndWait(page, selector, delay = 250) {
   await page.waitForSelector(selector, { visible: true, timeout: 15000 });
   await page.$eval(selector, (el) => el.scrollIntoView({ block: 'center', behavior: 'auto' }));
@@ -488,6 +493,7 @@ async function runViewport(browser, gameUrl, viewport, options) {
     const launchEnabled = await page.$eval('#launchBtn', (button) => !button.disabled).catch(() => false);
     await run.check('launch button is enabled for scripted setup', launchEnabled, { selector: '#launchBtn' });
     await clickAndWait(page, '#launchBtn', 300);
+    await passCheckpoint(page);
     await waitForVisible(page, '#runStage');
     await run.check('launch opens run screen', await isVisible(page, '#runStage'), { selector: '#runStage' });
     await waitCountdownDone(page);
@@ -741,6 +747,7 @@ async function runQuickBounceScenario(browser, gameUrl, viewport, options) {
     }
     await clickAndWait(page, '#qGrid .qbtn[data-q="57"][data-act="cut"]', 600);
     await clickAndWait(page, '#launchBtn', 300);
+    await passCheckpoint(page);
     await waitForVisible(page, '#runStage');
     await waitCountdownDone(page);
     await clickAndWait(page, '#skipBtn', 600);
@@ -775,6 +782,7 @@ async function runQuickBounceScenario(browser, gameUrl, viewport, options) {
     await run.check('wave 2 prep panel is live with the voided validation back at SKIP',
       prepState.skipPresent && prepState.skipSelected === true && prepState.fullPresent, prepState);
     await clickAndWait(page, '#launchBtn', 300);
+    await passCheckpoint(page);
     await waitForVisible(page, '#runStage');
     await waitCountdownDone(page);
     await clickAndWait(page, '#spd2', 150);
@@ -856,6 +864,7 @@ async function runCampaignBounceScenario(browser, gameUrl, viewport, options) {
     await assertSelected(run, '[data-rem="0"]', 'zero reminders for the bouncing campaign run');
 
     await clickAndWait(page, '#launchBtn', 300);
+    await passCheckpoint(page);
     await waitForVisible(page, '#runStage');
     await waitCountdownDone(page);
     await clickAndWait(page, '#spd2', 150);
@@ -1074,6 +1083,7 @@ async function runMedallionScenario(browser, gameUrl, viewport, options) {
       await clickAndWait(page, `#qGrid .qbtn[data-q="${id}"][data-act="cut"]`, 520);
     }
     await clickAndWait(page, '#launchBtn', 300);
+    await passCheckpoint(page);
     await waitForVisible(page, '#runStage');
     await waitCountdownDone(page);
     await clickAndWait(page, '#skipBtn', 600);

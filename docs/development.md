@@ -338,6 +338,28 @@ matched base); a cell under 30 usable responses is too thin to
 read. Findings gate nothing in v1; the ACT line quotes the
 first answerable finding as the headline.
 
+The run engine is split at the median recipient:
+`buildRunStart` (seeded stream, persona bag, run context),
+`simulateRange` (the recipient loop over an index range),
+`simulateFromOpen` (the post-open pipeline, shared by the
+loop and the checkpoint), and `finishRun` (breaker pass and
+assembly); `buildRun` composes all four in one pass. Campaign
+launches route through `startCheckpointFlow`, which
+simulates the first half, pauses on the checkpoint card, and
+resumes in `continueFromCheckpoint`. Holding reproduces the
+one-shot run bit for bit (an invariant test compares every
+respondent and the tally), which is what keeps the witness
+corpus valid. The one checkpoint action fires a reminder
+wave early: `fireReminderWave` re-rolls the first half's
+non-openers on a separate checkpoint stream and sets
+`wavesAdjust` so the second half mails with one fewer wave.
+Fieldwork days are `2 + reminders`; past day 3 the 72-hour
+permission window binds: re-checking charges the attempt
+4 cr (`RECHECK_COST`), and a lapse marks the second half's
+fresh opt-outs (an index-derived 5 percent from the daily
+refresh) as mailed-angry. Quick Challenges keep the one-shot
+path and never see the checkpoint.
+
 BRD intake (`state.commission`, reset with the chain in
 `resetChainState`) commissions the study at Step 0
 (`renderIntake`): precision standard or extended, and at most

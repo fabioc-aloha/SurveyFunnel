@@ -1,5 +1,52 @@
 # Changelog
 
+## 2026-11-13 - Process-consistency Phase E: the mid-field checkpoint (G13) and the 72-hour clock (G6)
+
+- Phase E of the approved process-consistency program
+  (docs/process-consistency-scope.md), completing the
+  FIELDWORK stage: a campaign send is no longer one-shot.
+- The run engine is split at the median recipient
+  (buildRunStart / simulateRange / simulateFromOpen /
+  finishRun; buildRun composes them in one pass, unchanged
+  for Quick Challenges and the witness replay). A campaign
+  launch simulates the first half, pauses on a MID-FIELD
+  CHECKPOINT card (interim funnel, hard-bounce rate so far,
+  projected completes), and sends the second half on the
+  player's command.
+- Holding reproduces the one-shot run bit for bit: an
+  invariant test compares every respondent and the full
+  tally between the composed and split paths, so the 390
+  recorded winners replay unchanged and no regeneration
+  was needed.
+- The one bounded action (decision 4): fire the next
+  reminder wave now. It re-rolls the first half's
+  non-openers on a separate checkpoint stream (2,050
+  unopened inboxes on the reference Level 1 play) and the
+  second half mails with one fewer wave: a timing trade,
+  not a free wave. The report's deliverability card tells
+  the story either way.
+- The 72-hour permission window (the G6 remainder) binds
+  at the same checkpoint. Fieldwork runs two days plus a
+  day per reminder wave; past day 3 the player re-checks
+  permission (4 cr, charged to the attempt) or lets it
+  lapse, in which case people who opted out during
+  fieldwork (a 5 percent index-derived slice of the second
+  half, from the daily refresh) are mailed anyway and
+  operational trust fails on the angry count, as it does
+  when the scrub is skipped. The BRD now states the window
+  and the day rule.
+- Consistency pass: the player guide gains the checkpoint
+  in its After a round section, and the development notes
+  record the split engine, the fire trade, and the clock.
+  The browser suite passes campaign launches through the
+  checkpoint (hold) via a new helper.
+- Verification: Node suite 162/162 (four new tests: the
+  bit-for-bit hold invariant, the fire trade, the clock
+  binding and lapse, and the launch flow pausing and
+  continuing); browser harness PASS 3/3 at 156/156 checks.
+  The checkpoint card was screenshotted on Level 1 at
+  390px and read.
+
 ## 2026-11-13 - Process-consistency Phase C: BRD intake (G1)
 
 - Phase C of the approved process-consistency program

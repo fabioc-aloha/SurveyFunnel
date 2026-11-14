@@ -692,6 +692,7 @@
 
     <!-- ================= REPORT ================= -->
     <div id="report"></div>
+    <div id="checkpointScreen" style="display:none"></div>
     <div id="campaignScreen" style="display:none"></div>
   </div>
 
@@ -1806,6 +1807,7 @@ var state = {
   baseline: null, chainActive: false, bestAttemptRate: 0, launchCost: 0, launchedSnapshot: null,
   reportShown: false, instrument: null, instrumentSeed: "A001", randomMode: false, campaignSeed: null, addBankIds: [],
   campaignBonus: {}, levelSeeds: {}, abDeclaredClose: false, abCloseNamed: false, commission: null,
+  checkpoint: null, checkpointRecheck: false, checkpointLapsed: false, firedWaveInfo: null,
   musicOn: true, sfxOn: true, muted: false, musicVol: 0.5, sfxVol: 0.8,
   hints: true, touched: { seg: false, prep: false, invite: false },
   quickChallenge: null, audiencePortfolio: {}
@@ -2223,7 +2225,7 @@ function evidenceRequirementsHTML(){
   return '<p><b>' + mission.purpose + '</b> Minimum usable sample: <b>' + fmt(mission.minimumN) +
     '</b> simulated responses from the <b>' + mission.pool + '</b> audience pool. Required roles: ' + mission.roles.map(function(role){ return role.label + ' (' + Math.round(role.share * 100) + '%+ of usable responses, at least one respondent)'; }).join('; ') +
     '. Match at least 80% of cleaned responses to the invited account. Retain at least 60% of completions after cleaning; quality 60+ and usable Insight ' + insightGate() +
-    '+. Every required topic must come back answered credibly; a topic lost to a cut, a wrong audience, or suspect data holds the level.' + (surveyRecord().eligibilityDays ? ' The audience list must sit inside the BRD eligibility window (' + surveyRecord().eligibilityDays + ' days).' : '') + ' Mailing an opted-out or recently surveyed person fails operational trust; the suppression scrub removes those records before the send. Guessed responses stay in the usable base, priced in Quality and Insight. Validate the list and dedupe; a Global audience also needs localization review and a localized invitation.</p>' +
+    '+. Every required topic must come back answered credibly; a topic lost to a cut, a wrong audience, or suspect data holds the level.' + (surveyRecord().eligibilityDays ? ' The audience list must sit inside the BRD eligibility window (' + surveyRecord().eligibilityDays + ' days).' : '') + ' Mailing an opted-out or recently surveyed person fails operational trust; the suppression scrub removes those records before the send. The permission check behind the scrub is stamped at setup and covers 72 hours of fieldwork; fieldwork runs two days plus a day per reminder wave, and a longer fielding is re-checked at the mid-field checkpoint. Guessed responses stay in the usable base, priced in Quality and Insight. Validate the list and dedupe; a Global audience also needs localization review and a localized invitation.</p>' +
     '<p><b>AS COMMISSIONED.</b> Precision: ' + (commissionState().precision === "extended" ? 'extended. The minimum usable base is ' + fmt(mission.minimumN) + ', the standard ' + fmt(mission.baseMinimumN) + ' raised by half, and the acceptance card scores against the commissioned figure.' : 'standard. The minimum usable base is ' + fmt(mission.minimumN) + '.') + (commissionState().demoted ? ' Topic exception: <b>' + commissionState().demoted + '</b> is commissioned as should-answer, negotiated with ' + surveyRecord().sponsor + '. It is reported like every topic, but it does not hold the level.' : ' No topic exceptions were negotiated: every required topic must answer credibly.') + '</p>' +
     '<p>Response benchmark: ' + targetPct(curLevel().target) + '%, not a win gate. Every recipient is simulated individually; minimums are mission rules, not confidence or representativeness guarantees.</p>' +
     '<p>Audience portfolio: ' + (history ? history.contacts + ' previous sends across ' + history.instruments.length + ' instrument(s); ' + history.suppressionOverrides + ' repeat-contact suppression override(s).' : 'No previous sends in this campaign audience pool.') +
@@ -3458,7 +3460,7 @@ function repMath(){
 var RUN_MS = 30000;
 var BREAKER_STOP_T = 10500;
 
-function buildRun(animationTarget){
+function buildRunStart(){
   var rng = mulberry(hashStr(choiceKey()));
   var seg = state.seg, inv = state.invite, gm = goodwillMath();
   if (!Number.isInteger(seg.n) || seg.n <= 0) throw new Error("Simulation population must be a positive integer.");
@@ -3480,49 +3482,14 @@ function buildRun(animationTarget){
   /* shuffle deterministically */
   for (var i = bag.length-1; i>0; i--){ var j = Math.floor(rng()*(i+1)); var t = bag[i]; bag[i]=bag[j]; bag[j]=t; }
 
-  var respondents = [];
-  var spawnWindow = 13000;
-  for (var s = 0; s < seg.n; s++){
-    var pk = bag[s], P = PERSONAS[pk];
-    var langRoll = rng();
-    var spLang = seg.id === "multi" ? (langRoll < 0.4 ? "en" : langRoll < 0.6 ? "es" : langRoll < 0.75 ? "pt" : langRoll < 0.88 ? "de" : "ja") : "en";
-    var sp = { i:s, persona:pk, lang:spLang, abGroup:(state.abEnabled ? (s%2===0?"A":"B") : "A"), x:GATE_X.invited, top: 30 + rng()*62, state:"wait",
-      spawnAt: 400 + (s/seg.n)*spawnWindow + rng()*500, mobile: rng() < 0.6,
-      guessed:false, escapedUsed:false, fate:null, dropCause:null, dropQ:0, via:"base",
-      events:[], done:false, counted:false, surveyStart:0, patienceTotal: P.patience };
-    if (gm.trips && sp.spawnAt > BREAKER_STOP_T){ sp.fate = "notsent"; sp.done = true; respondents.push(sp); continue; }
-    if (state.suppression && s < Math.round(seg.n * 0.05)){ sp.fate = "suppressed"; sp.done = true; respondents.push(sp); continue; }
-    sp.angry = false; sp.dupEnv = false;
-    sp.qSpeed = false; sp.qStraight = false; sp.qDup = false; sp.qFwd = false; sp.qJunk = false; sp.qTopBox = false; sp.qMush = false; sp.qRefusal = false; sp.qInconsist = false; sp.qEstimate = false;
-
-    /* BOUNCE at DELIVERED gate */
-    if (rng() < invalidRate){
-      sp.fate = "bounced"; sp.bounceHard = rng() < 0.7;
-      sp.events.push({ t: sp.spawnAt + 650, type:"drop", cause:"bounce", x: GATE_X.delivered + rng()*3 });
-      respondents.push(sp); continue;
-    }
-    sp.events.push({ t: sp.spawnAt + 650, type: "gate", gate: "delivered" });
-    if (!state.suppression && s < Math.round(seg.n * 0.05)) sp.angry = true;
-    if (dupF > 0 && rng() < 0.18 * dupF) sp.dupEnv = true;
-
-    /* OPEN */
-    var invSp = inv; if(state.abEnabled && sp.abGroup==="B"){ invSp = INVITES.filter(function(x){return x.id===state.abInvite;})[0]||inv; }
-    var langOpenFactor = (sp.lang!=="en" && state.langChoice!=="localized") ? 0.45 : 1;
-    if(sp.lang!=="en" && state.localization) langOpenFactor = state.langChoice==="localized" ? 1 : 0.6;
-    var healthFactor = state.quickChallenge ? 1 : Math.max(0.5, Math.min(1, gm.start / seg.goodwill));
-    var pOpen = invSp.open * seg.relevance * reputation.openFactor * (state.localization ? 1.03 : 1) * (pk === "exec" ? 0.8 : pk === "admin" ? 1.1 : 1) * langOpenFactor * healthFactor;
-    var opened = rng() < pOpen, via = "base";
-    if (!opened){
-      for (var r = 1; r <= state.reminders && !opened; r++){
-        if (rng() < 0.22){ opened = true; via = "r" + r; }
-      }
-    }
-    sp.via = via;
-    var tOpen = sp.spawnAt + 900 + rng()*700 + (via === "r1" ? 1800 : via === "r2" ? 3400 : 0);
-    if (!opened){
-      sp.fate = "noopen"; sp.events.push({ t: sp.spawnAt + 1100, type:"drop", cause:"noopen", x: 12 + rng()*10 });
-      respondents.push(sp); continue;
-    }
+  return { rng: rng, seg: seg, inv: inv, gm: gm, kept: kept, keptDefects: keptDefects, totalMin: totalMin,
+    invalidRate: invalidRate, reputation: reputation, dupF: dupF, cums: cums, gridSt: gridSt, bag: bag,
+    respondents: [], wavesAdjust: 0, permissionLapsed: false, mid: Math.floor(seg.n / 2), firedWave: null };
+}
+function simulateFromOpen(rc, sp, invSp, tOpen, rng){
+  var kept = rc.kept, cums = rc.cums, gridSt = rc.gridSt, totalMin = rc.totalMin, seg = rc.seg, inv = rc.inv;
+  var dupF = rc.dupF, keptDefects = rc.keptDefects;
+  var pk = sp.persona, P = PERSONAS[sp.persona];
     sp.events.push({ t: tOpen, type:"gate", gate:"opened" });
     if (sp.angry) sp.events.push({ t: tOpen - 500, type:"angry", x: GATE_X.invited + 4 });
     if (sp.dupEnv) sp.events.push({ t: tOpen - 300, type:"dupe", x: GATE_X.delivered + 4 });
@@ -3530,7 +3497,7 @@ function buildRun(animationTarget){
     /* START */
     if (rng() > invSp.start){
       sp.fate = "nostart"; sp.events.push({ t: tOpen + 1000, type:"drop", cause:"nostart", x: GATE_X.opened + 5 + rng()*8 });
-      respondents.push(sp); continue;
+      return;
     }
     var tStart = tOpen + 900 + rng()*500;
     sp.events.push({ t: tStart, type:"gate", gate:"started" });
@@ -3607,8 +3574,63 @@ function buildRun(animationTarget){
       sp.accountId = sp.qFwd ? null : "SIM-" + audienceGroup(seg) + "-" + sp.i;
       sp.events.push({ t: tStart + 7600 + rng()*500, type:"finish" });
     }
+}
+function simulateRange(rc, from, to){
+  var rng = rc.rng, seg = rc.seg, inv = rc.inv, gm = rc.gm;
+  var invalidRate = rc.invalidRate, reputation = rc.reputation, dupF = rc.dupF, bag = rc.bag;
+  var respondents = rc.respondents;
+  var spawnWindow = 13000;
+  for (var s = from; s < to; s++){
+    var pk = bag[s], P = PERSONAS[pk];
+    var langRoll = rng();
+    var spLang = seg.id === "multi" ? (langRoll < 0.4 ? "en" : langRoll < 0.6 ? "es" : langRoll < 0.75 ? "pt" : langRoll < 0.88 ? "de" : "ja") : "en";
+    var sp = { i:s, persona:pk, lang:spLang, abGroup:(state.abEnabled ? (s%2===0?"A":"B") : "A"), x:GATE_X.invited, top: 30 + rng()*62, state:"wait",
+      spawnAt: 400 + (s/seg.n)*spawnWindow + rng()*500, mobile: rng() < 0.6,
+      guessed:false, escapedUsed:false, fate:null, dropCause:null, dropQ:0, via:"base",
+      events:[], done:false, counted:false, surveyStart:0, patienceTotal: P.patience };
+    if (gm.trips && sp.spawnAt > BREAKER_STOP_T){ sp.fate = "notsent"; sp.done = true; respondents.push(sp); continue; }
+    var inSuppBlock = s < Math.round(seg.n * 0.05);
+    var suppressedHere = state.suppression && !(rc.permissionLapsed && s >= rc.mid);
+    if (suppressedHere && inSuppBlock){ sp.fate = "suppressed"; sp.done = true; respondents.push(sp); continue; }
+    sp.angry = false; sp.dupEnv = false;
+    sp.qSpeed = false; sp.qStraight = false; sp.qDup = false; sp.qFwd = false; sp.qJunk = false; sp.qTopBox = false; sp.qMush = false; sp.qRefusal = false; sp.qInconsist = false; sp.qEstimate = false;
+
+    /* BOUNCE at DELIVERED gate */
+    if (rng() < invalidRate){
+      sp.fate = "bounced"; sp.bounceHard = rng() < 0.7;
+      sp.events.push({ t: sp.spawnAt + 650, type:"drop", cause:"bounce", x: GATE_X.delivered + rng()*3 });
+      respondents.push(sp); continue;
+    }
+    sp.events.push({ t: sp.spawnAt + 650, type: "gate", gate: "delivered" });
+    if (!suppressedHere && inSuppBlock) sp.angry = true;
+    if (rc.permissionLapsed && s >= rc.mid && (s - rc.mid) % 20 === 0) sp.angry = true; /* fresh opt-outs from the daily refresh, mailed without a valid check */
+    if (dupF > 0 && rng() < 0.18 * dupF) sp.dupEnv = true;
+
+    /* OPEN */
+    var invSp = inv; if(state.abEnabled && sp.abGroup==="B"){ invSp = INVITES.filter(function(x){return x.id===state.abInvite;})[0]||inv; }
+    var langOpenFactor = (sp.lang!=="en" && state.langChoice!=="localized") ? 0.45 : 1;
+    if(sp.lang!=="en" && state.localization) langOpenFactor = state.langChoice==="localized" ? 1 : 0.6;
+    var healthFactor = state.quickChallenge ? 1 : Math.max(0.5, Math.min(1, gm.start / seg.goodwill));
+    var pOpen = invSp.open * seg.relevance * reputation.openFactor * (state.localization ? 1.03 : 1) * (pk === "exec" ? 0.8 : pk === "admin" ? 1.1 : 1) * langOpenFactor * healthFactor;
+    var opened = rng() < pOpen, via = "base";
+    if (!opened){
+      var waveCount = Math.max(0, state.reminders + (rc.wavesAdjust || 0));
+      for (var r = 1; r <= waveCount && !opened; r++){
+        if (rng() < 0.22){ opened = true; via = "r" + r; }
+      }
+    }
+    sp.via = via;
+    var tOpen = sp.spawnAt + 900 + rng()*700 + (via === "r1" ? 1800 : via === "r2" ? 3400 : 0);
+    if (!opened){
+      sp.fate = "noopen"; sp.events.push({ t: sp.spawnAt + 1100, type:"drop", cause:"noopen", x: 12 + rng()*10 });
+      respondents.push(sp); continue;
+    }
+    simulateFromOpen(rc, sp, invSp, tOpen, rng);
     respondents.push(sp);
   }
+}
+function finishRun(rc, animationTarget){
+  var respondents = rc.respondents, gm = rc.gm, kept = rc.kept;
   if (gm.trips){
     respondents.forEach(function(sp){
       if (sp.fate === "notsent") return;
@@ -3631,6 +3653,12 @@ function buildRun(animationTarget){
   return { respondents:respondents, sprites:groupRespondents(respondents, animationTarget),
     timeline:buildProgressTimeline(respondents), gm:gm, kept:kept };
 }
+function buildRun(animationTarget){
+  var rc = buildRunStart();
+  simulateRange(rc, 0, rc.seg.n);
+  return finishRun(rc, animationTarget);
+}
+
 
 function groupRespondents(respondents, targetUnits){
   if (targetUnits === undefined) targetUnits = 160;
@@ -4466,6 +4494,98 @@ function showCampaign(){
   $("campPlay").addEventListener("click",function(){ var next=LEVELS.filter(function(lv){return !state.campaignWon[lv.id] && lv.id<=state.unlocked;})[0]||LEVELS[0]; selectLevel(next.id,true); });
   window.scrollTo({top:0,behavior:"smooth"});
 }
+var RECHECK_COST = 4;
+function fieldworkDays(){ return 2 + state.reminders; }
+function clockExpires(){ return fieldworkDays() > 3; }
+function fireReminderWave(rc){
+  var crng = mulberry(hashStr("checkpoint|" + choiceKey()));
+  var converted = 0;
+  rc.respondents.forEach(function(sp){
+    if (sp.fate !== "noopen") return;
+    if (crng() < 0.22){
+      sp.events = sp.events.filter(function(e){ return !(e.type === "drop" && e.cause === "noopen"); });
+      var invSp = rc.inv;
+      if (state.abEnabled && sp.abGroup === "B") invSp = INVITES.filter(function(x){ return x.id === state.abInvite; })[0] || rc.inv;
+      sp.via = "r" + Math.max(1, state.reminders);
+      simulateFromOpen(rc, sp, invSp, sp.spawnAt + 5200 + crng() * 600, crng);
+      converted++;
+    }
+  });
+  rc.wavesAdjust = -1;
+  rc.firedWave = { converted: converted };
+}
+function renderCheckpointCard(){
+  var cp = state.checkpoint; if (!cp) return;
+  var rc = cp.rc, el = $("checkpointScreen");
+  var c1 = tally({ respondents: rc.respondents });
+  var days = fieldworkDays(), expires = clockExpires();
+  var hardPct = c1.sent ? (100 * c1.bouncedHard / c1.sent) : 0;
+  var projected = Math.round(c1.completed * rc.seg.n / cp.mid);
+  var canAffordRecheck = (BUDGET_TOTAL - state.spentBefore - state.launchCost) >= RECHECK_COST;
+  var h = '<div class="reportcard"><h2>\u23F8 MID-FIELD CHECKPOINT \u00B7 DAY ' + Math.ceil(days / 2) + ' OF ' + days + '</h2>' +
+    '<div class="simnote">Fieldwork pauses halfway through the list. What has landed so far is real; the second half has not mailed yet. Simulation only.</div>' +
+    '<p style="font-size:15.5px;margin:4px 0"><b>SO FAR \u00B7 ' + fmt(c1.sent) + '</b> sent \u00B7 <b>' + fmt(c1.bouncedHard + c1.bouncedSoft) + '</b> bounced (hard ' + hardPct.toFixed(1) + '%) \u00B7 <b>' + fmt(c1.opened) + '</b> opened \u00B7 <b>' + fmt(c1.started) + '</b> started \u00B7 <b>' + fmt(c1.completed) + '</b> completed.</p>' +
+    '<p style="font-size:15.5px;margin:4px 0"><b>PROJECTED \u00B7 ' + fmt(projected) + '</b> completes if the second half behaves like the first.</p>';
+  if (expires){
+    h += '<p style="font-size:15.5px;margin:10px 0 4px"><b>PERMISSION WINDOW.</b> The permission check stamped at setup covers 72 hours. Fieldwork runs ' + days + ' days (the send takes two days across time zones, plus a day per reminder wave), so the second half would mail outside the window.</p>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
+      '<button class="segbtn' + (cp.recheck ? ' sel' : '') + '" data-recheck="1"' + (canAffordRecheck ? '' : ' disabled') + '>RE-CHECK PERMISSION<small>' + (canAffordRecheck ? RECHECK_COST + ' CR \u00B7 THE SECOND HALF STAYS COVERED' : 'POOL TOO LOW TO COVER IT') + '</small></button>' +
+      '<button class="segbtn' + (!cp.recheck ? ' sel' : '') + '" data-recheck="0">LET IT LAPSE<small>PEOPLE WHO OPT OUT DURING FIELDWORK GET MAILED ANYWAY</small></button></div>';
+  } else {
+    h += '<p style="font-size:15.5px;margin:10px 0 4px"><b>PERMISSION WINDOW.</b> Fieldwork runs ' + days + ' days, inside the 72 hours the permission check stamped at setup covers. Nothing to renew.</p>';
+  }
+  h += '<p style="font-size:15.5px;margin:12px 0 4px"><b>ONE ACTION.</b></p><div style="display:flex;gap:8px;flex-wrap:wrap">' +
+    '<button class="segbtn' + (cp.choice === 'hold' ? ' sel' : '') + '" data-choice="hold">HOLD<small>FIELD THE SECOND HALF AS PLANNED</small></button>';
+  if (state.reminders > 0){
+    h += '<button class="segbtn' + (cp.choice === 'fire' ? ' sel' : '') + '" data-choice="fire">FIRE THE NEXT WAVE NOW<small>' + fmt(c1.drops.noopen) + ' FIRST-HALF INBOXES STILL UNOPENED \u00B7 THE SECOND HALF THEN GETS ONE FEWER WAVE</small></button>';
+  }
+  h += '</div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px"><button class="againbtn" id="checkpointContinue" style="background:var(--gold)">\u25B6 SEND THE SECOND HALF</button></div></div>';
+  el.innerHTML = h;
+  Array.prototype.forEach.call(el.querySelectorAll("[data-choice]"), function(b){ b.addEventListener("click", function(){ cp.choice = b.getAttribute("data-choice"); sndClick(); renderCheckpointCard(); }); });
+  Array.prototype.forEach.call(el.querySelectorAll("[data-recheck]"), function(b){ b.addEventListener("click", function(){ cp.recheck = b.getAttribute("data-recheck") === "1"; sndClick(); renderCheckpointCard(); }); });
+  $("checkpointContinue").addEventListener("click", continueFromCheckpoint);
+}
+function startCheckpointFlow(){
+  if (state.running) return;
+  if (budgetMath().total > BUDGET_TOTAL){ sndSad(); return; }
+  if (keptQuestions().length < instrumentFloor()){
+    sndError(); renderReadout(); logLine("Keep at least one question before launch."); return;
+  }
+  if ((state.level===3||state.level===6) && !state.stakeholder) state.stakeholder="pushback";
+  state.launchCost = budgetMath().attemptCost;
+  state.launchedSnapshot = snapshotCurrent();
+  state.chainActive = true;
+  state.reportShown = false;
+  state.running = true;
+  state.checkpointRecheck = false; state.checkpointLapsed = false; state.firedWaveInfo = null;
+  var rc = buildRunStart();
+  simulateRange(rc, 0, rc.mid);
+  state.checkpoint = { rc: rc, mid: rc.mid, choice: "hold",
+    recheck: (BUDGET_TOTAL - state.spentBefore - state.launchCost) >= RECHECK_COST };
+  $("setup").style.display = "none";
+  $("startScreen").style.display = "none";
+  $("report").style.display = "none";
+  $("runStage").style.display = "none";
+  $("checkpointScreen").style.display = "block";
+  renderCheckpointCard();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+function continueFromCheckpoint(){
+  var cp = state.checkpoint; if (!cp) return;
+  var rc = cp.rc;
+  if (cp.choice === "fire" && state.reminders > 0) fireReminderWave(rc);
+  if (clockExpires()){
+    if (cp.recheck){ state.launchCost += RECHECK_COST; state.checkpointRecheck = true; }
+    else { rc.permissionLapsed = true; state.checkpointLapsed = true; }
+  }
+  state.firedWaveInfo = rc.firedWave;
+  simulateRange(rc, rc.mid, rc.seg.n);
+  runData = finishRun(rc);
+  state.checkpoint = null;
+  $("checkpointScreen").style.display = "none";
+  beginRunPresentation();
+}
+function launchEntry(){ if (state.quickChallenge) startRun(); else startCheckpointFlow(); }
 function startRun(){
   if (state.running) return;
   if (budgetMath().total > BUDGET_TOTAL){ sndSad(); return; }
@@ -4478,7 +4598,11 @@ function startRun(){
   state.chainActive = true;
   state.reportShown = false;
   state.running = true;
+  state.checkpointRecheck = false; state.checkpointLapsed = false; state.firedWaveInfo = null;
   runData = buildRun();
+  beginRunPresentation();
+}
+function beginRunPresentation(){
   var thisRun = runData;
   finishedCount = 0; guessShown = 0; tripFired = false; virtualT = 0; lastNow = null;
   $("setup").style.display = "none";
@@ -4659,7 +4783,7 @@ function tick(now){
   if (!allDone){ rafId = requestAnimationFrame(tick); }
   else { rafId = null; var completedRun = runData; setTimeout(function(){ if (state.running && runData === completedRun) showReport(); }, 700); }
 }
-$("launchBtn").addEventListener("click", startRun);
+$("launchBtn").addEventListener("click", launchEntry);
 $("skipBtn").addEventListener("click", function(){
   if (rafId) cancelAnimationFrame(rafId); rafId = null;
   $("countdownOverlay").classList.remove("show");
@@ -5199,6 +5323,9 @@ function showReport(){
     "<p style='font-size:15.5px;margin:4px 0'><b>Sender reputation: " + rmR.before + " \u2192 " + repA + ".</b> " + openEffectTxt + "</p>" +
     "<p style='font-size:15.5px;margin:4px 0'><b>Validation verdict:</b> " + valVerdict + "</p>" +
     (c.angry ? "<p style='font-size:15.5px;margin:4px 0'><b>Suppression skipped:</b> " + fmt(c.angry) + " recipients who opted out or were surveyed recently were mailed anyway. Goodwill took the hit in the ledger above. <b>Fix:</b> buy the Suppression scrub (4 cr) in BUILD THE LIST.</p>" : "") +
+    (state.firedWaveInfo ? "<p style='font-size:15.5px;margin:4px 0'><b>Checkpoint \u00B7</b> At the mid-field checkpoint you fired a reminder wave early: it reopened " + fmt(state.firedWaveInfo.converted) + " of the first half's unopened inboxes, and the second half mailed with one fewer wave.</p>" : "") +
+    (state.checkpointRecheck ? "<p style='font-size:15.5px;margin:4px 0'><b>Permission re-check \u00B7</b> Fieldwork ran " + fieldworkDays() + " days, past the 72 hours the setup permission check covers. You re-checked at the checkpoint (" + RECHECK_COST + " cr), so the second half mailed inside the window.</p>" : "") +
+    (state.checkpointLapsed ? "<p style='font-size:15.5px;margin:4px 0'><b>Permission lapsed \u00B7</b> Fieldwork ran " + fieldworkDays() + " days, past the 72 hours the setup permission check covers, and no re-check was bought: people who opted out during fieldwork were mailed anyway.</p>" : "") +
     (c.dupEnv ? "<p style='font-size:15.5px;margin:4px 0'><b>Duplicates mailed:</b> duplicate envelopes went out during the run. <b>Fix:</b> buy DEDUPE and CONSOLIDATE in the Silver panel (4 cr each).</p>" : "") +
     bounceBacksHTML(run.bounceBacks) +
     '<h2 style="margin-top:14px">DATA QUALITY FLAGS</h2>' +

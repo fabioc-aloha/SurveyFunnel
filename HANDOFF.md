@@ -133,6 +133,24 @@
   reminder retargeting last (G27). Outside the program: G3,
   G10, G11 (needs the owner's design call), G25, and medallion
   phases 2-3.
+- Process-consistency Phase E (2026-11-13): G13 mid-field
+  checkpoint and the G6 72-hour clock are live. The run
+  engine is split at the median recipient (buildRunStart /
+  simulateRange / simulateFromOpen / finishRun; buildRun
+  composes them one-shot for QC and the witness replay).
+  Campaign launches pause on a checkpoint card: interim
+  funnel, projection, one action (hold, or fire the next
+  reminder wave early at the first half's non-openers,
+  costing the second half a wave). Hold is bit-for-bit
+  identical to the one-shot run (invariant test), so no
+  witnesses regenerated. Fieldwork days = 2 + reminders;
+  past day 3 the permission window binds: re-check for
+  4 cr or lapse and mail the second half's fresh opt-outs
+  (angry, trust fails). Gates: Node suite 162/162, browser
+  harness PASS 3/3 at 156/156 checks. Remaining in the
+  program: Phase D sampling (G4, rides on medallion
+  phase 3 literal counts) and Phase F reminder
+  retargeting (G27).
 - Process-consistency Phase C (2026-11-13): G1 BRD intake
   is live. A Step 0 COMMISSION panel (state.commission,
   reset per chain) sets precision (standard, or extended at
