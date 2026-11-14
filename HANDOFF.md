@@ -133,6 +133,16 @@
   reminder retargeting last (G27). Outside the program: G3,
   G10, G11 (needs the owner's design call), G25, and medallion
   phases 2-3.
+- Animation performance pass (2026-11-14): the owner
+  reported stutter on iPhone. Sprites now move by
+  translate3d transforms, pile geometry is measured once
+  per run instead of every frame, patience bars are
+  cached per sprite and written on change only; the
+  per-frame tick cost fell 3.2x in the throttled headless
+  probe (11.6 ms mean to 3.6 ms). Presentation only, no
+  outcome changes; gates: Node 165/165, browser harness
+  PASS 3/3 at 156/156. The on-device smoothness verdict
+  is the owner's.
 - Process-consistency Phase F (2026-11-14): G27 reminder
   retargeting is live. Reminder waves go to everyone who
   has not completed yet: non-openers reopen, and dropped

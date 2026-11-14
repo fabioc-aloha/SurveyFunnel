@@ -1,5 +1,45 @@
 # Changelog
 
+## 2026-11-14 - Run animation performance pass
+
+- The owner reported heavy stutter in the run animation
+  on iPhone. Diagnosis, measured on the scripted Level 1
+  play in throttled headless Chromium: the per-frame tick
+  cost averaged 11.6 ms of main-thread time (median 8.9,
+  p90 22.9) on ~308 cohort sprites, before any painting.
+- Three causes, all in the frame loop: sprites moved by
+  rewriting `left` every frame, which lays out and
+  repaints every sprite every frame (`will-change:
+  left, top` does not composite); the pile geometry was
+  measured with three getBoundingClientRect calls at the
+  top of every frame, forcing a synchronous layout ahead
+  of the frame's writes; and every in-survey sprite ran
+  two DOM queries per frame to locate its patience bar.
+- Fixes, presentation only: sprites move by translate3d
+  transforms against a track width measured at run start
+  (the old left writes remain as a fallback where no
+  layout engine exists, the headless test DOM); pile
+  geometry is measured once per run and once after a
+  resize, which the fixed-size (76 by 32) stacks make
+  safe, and routeSpriteToPile keeps its on-demand
+  fallback; each sprite caches its patience bar element
+  and writes it only when the rounded value changes; the
+  goodwill and reputation chips write only on change.
+  The pile landing transition animates transform instead
+  of left; the shake and cheer keyframes animate margins,
+  so they compose with the transform unchanged.
+- Measured after: tick cost averaged 3.6 ms (median 2.9,
+  p90 8.1) on the identical scripted run, a 3.2x cut.
+  The simulation, the witness corpus, and every outcome
+  are untouched; the scripted play produces identical
+  report numbers (4,338 unopened, 407 resumed finishers).
+- Gates at ship: node suite 165/165; browser harness
+  PASS 3/3, 156/156.
+- Caveat, stated in the ship report: this environment
+  renders in software and cannot reproduce the iPhone
+  compositor, so the owner's on-device check is the
+  deciding verdict on smoothness, as with the audio.
+
 ## 2026-11-14 - Process-consistency Phase F: reminders go to non-completers (G27)
 
 - Phase F of the approved process-consistency program
