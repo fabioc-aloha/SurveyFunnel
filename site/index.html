@@ -312,6 +312,7 @@
   .sprite .pat > div{ height:100%; background:var(--teal); }
   .sprite.in-survey .pat{ display:block; }
   .sprite.guessed{ filter:grayscale(1) brightness(.75); }
+  .sprite.reminded{ box-shadow:0 0 0 2px var(--gold), 0 0 10px rgba(255,209,102,.55); }
   .sprite .dropicon{
     position:absolute; top:-24px; left:50%; transform:translateX(-50%); font-size:15px; z-index:3;
     background:#0a0d18; border:2px solid var(--line); border-radius:4px; padding:0 3px; line-height:1.3; display:none;
@@ -613,7 +614,7 @@
           </div>
           <div id="invGrid" style="display:grid; gap:10px;"></div>
           <div class="segctl" role="group" aria-label="Reminder emails">
-            <span class="lbl"><b style="color:var(--ink)">Reminder emails:</b> waves go only to non-openers. 8 cr and −5 goodwill per wave.</span>
+            <span class="lbl"><b style="color:var(--ink)">Reminder emails:</b> waves go to everyone who has not completed yet. Non-openers get another chance to open; starters who dropped can resume and finish. 8 cr and −5 goodwill per wave.</span>
             <button class="segbtn" data-rem="0">0<small>FREE</small></button>
             <button class="segbtn" data-rem="1">1<small>−5 GW · 8 CR</small></button>
             <button class="segbtn" data-rem="2">2<small>−10 GW · 16 CR</small></button>
@@ -3486,6 +3487,33 @@ function buildRunStart(){
     invalidRate: invalidRate, reputation: reputation, dupF: dupF, cums: cums, gridSt: gridSt, bag: bag,
     respondents: [], wavesAdjust: 0, permissionLapsed: false, mid: Math.floor(seg.n / 2), firedWave: null };
 }
+function finalizeFinish(rc, sp, baseT, spread, rng){
+  var seg = rc.seg, inv = rc.inv, totalMin = rc.totalMin, gridSt = rc.gridSt, dupF = rc.dupF, keptDefects = rc.keptDefects;
+  sp.fate = sp.guessed ? "guessfinish" : "finish";
+  var pSpeed = Math.max(0, Math.min(0.30, 0.02 + Math.max(0, totalMin - 5) * 0.015 + Math.max(0, 1 - seg.relevance) * 0.18));
+  sp.qSpeed = rng() < pSpeed;
+  sp.qStraight = rng() < (gridSt === "keep" ? 0.18 : gridSt === "simplify" ? 0.06 : 0.01);
+  sp.qDup = dupF > 0 && rng() < 0.09 * dupF;
+  sp.qFwd = rng() < (0.02 + (seg.id === "blast" ? 0.05 : 0) + (inv.id === "generic" ? 0.03 : 0));
+  sp.qJunk = rng() < (keptDefects["BROKEN OPTIONS"] ? 0.16 : 0.02);
+  /* defect symptom flags: index-derived pseudo-rolls, so adding the
+     v1.4 symptom layer never shifts the deterministic run stream */
+  sp.qTopBox = keptDefects["LEADING"] ? ((sp.i * 53 + 7) % 100) < 22 : false;
+  sp.qMush = keptDefects["DOUBLE-BARRELED"] ? ((sp.i * 41 + 13) % 100) < 20 : false;
+  sp.qRefusal = keptDefects["SENSITIVE NO ASSURANCE"] ? ((sp.i * 29 + 3) % 100) < 15 : false;
+  sp.qInconsist = keptDefects["DOUBLE NEGATIVE"] ? ((sp.i * 67 + 19) % 100) < 18 : false;
+  sp.qEstimate = keptDefects["RECALL OVERLOAD"] ? ((sp.i * 59 + 23) % 100) < 22 : false;
+  sp.accountId = sp.qFwd ? null : "SIM-" + audienceGroup(seg) + "-" + sp.i;
+  sp.events.push({ t: baseT + spread + rng()*500, type:"finish" });
+}
+function resumeDropped(rc, sp, wave, rng){
+  var dropEv = null;
+  sp.events = sp.events.filter(function(e){ if (e.type === "drop" && !dropEv) dropEv = e; return e.type !== "drop"; });
+  var dropT = dropEv ? dropEv.t : sp.surveyStart + 3000;
+  sp.resumed = true; sp.resumeWave = wave;
+  sp.events.push({ t: dropT + 1600, type: "reminded", x: dropEv ? dropEv.x : GATE_X.started + 10 });
+  finalizeFinish(rc, sp, dropT, 2400, rng);
+}
 function simulateFromOpen(rc, sp, invSp, tOpen, rng){
   var kept = rc.kept, cums = rc.cums, gridSt = rc.gridSt, totalMin = rc.totalMin, seg = rc.seg, inv = rc.inv;
   var dupF = rc.dupF, keptDefects = rc.keptDefects;
@@ -3557,22 +3585,15 @@ function simulateFromOpen(rc, sp, invSp, tOpen, rng){
       }
     }
     if (alive){
-      sp.fate = sp.guessed ? "guessfinish" : "finish";
-      var pSpeed = Math.max(0, Math.min(0.30, 0.02 + Math.max(0, totalMin - 5) * 0.015 + Math.max(0, 1 - seg.relevance) * 0.18));
-      sp.qSpeed = rng() < pSpeed;
-      sp.qStraight = rng() < (gridSt === "keep" ? 0.18 : gridSt === "simplify" ? 0.06 : 0.01);
-      sp.qDup = dupF > 0 && rng() < 0.09 * dupF;
-      sp.qFwd = rng() < (0.02 + (seg.id === "blast" ? 0.05 : 0) + (inv.id === "generic" ? 0.03 : 0));
-      sp.qJunk = rng() < (keptDefects["BROKEN OPTIONS"] ? 0.16 : 0.02);
-      /* defect symptom flags: index-derived pseudo-rolls, so adding the
-         v1.4 symptom layer never shifts the deterministic run stream */
-      sp.qTopBox = keptDefects["LEADING"] ? ((sp.i * 53 + 7) % 100) < 22 : false;
-      sp.qMush = keptDefects["DOUBLE-BARRELED"] ? ((sp.i * 41 + 13) % 100) < 20 : false;
-      sp.qRefusal = keptDefects["SENSITIVE NO ASSURANCE"] ? ((sp.i * 29 + 3) % 100) < 15 : false;
-      sp.qInconsist = keptDefects["DOUBLE NEGATIVE"] ? ((sp.i * 67 + 19) % 100) < 18 : false;
-      sp.qEstimate = keptDefects["RECALL OVERLOAD"] ? ((sp.i * 59 + 23) % 100) < 22 : false;
-      sp.accountId = sp.qFwd ? null : "SIM-" + audienceGroup(seg) + "-" + sp.i;
-      sp.events.push({ t: tStart + 7600 + rng()*500, type:"finish" });
+      finalizeFinish(rc, sp, tStart, 7600, rng);
+    }
+    if (!alive && sp.fate === "drop"){
+      /* reminders go to non-completers: a dropped starter gets a
+         resume roll per bought wave (the funnel's resume path) */
+      var waveCount = Math.max(0, state.reminders + (rc.wavesAdjust || 0));
+      for (var rr = 1; rr <= waveCount; rr++){
+        if (rng() < 0.18){ resumeDropped(rc, sp, rr, rng); break; }
+      }
     }
 }
 function simulateRange(rc, from, to){
@@ -3642,6 +3663,15 @@ function finishRun(rc, animationTarget){
         return sp.events.some(function(e){ return e.type === "gate" && e.gate === gate && e.t <= BREAKER_STOP_T; });
       };
       sp.breakerStage = reached("started") ? "started" : reached("opened") ? "opened" : reached("delivered") ? "delivered" : "sent";
+      /* A resume whose reminded moment falls after the trip never
+         happened in the counted fieldwork: clear it, so neither the
+         tally nor the wave model reports a recovery that the breaker
+         erased. A resume at or before the trip stands. */
+      if (sp.resumed){
+        var remEv = null;
+        sp.events.forEach(function(e){ if (e.type === "reminded") remEv = e; });
+        if (!remEv || remEv.t > BREAKER_STOP_T){ sp.resumed = false; sp.resumeWave = 0; }
+      }
       sp.events = sp.events.filter(function(e){ return e.t <= BREAKER_STOP_T; });
       sp.escapedUsed = sp.events.some(function(e){ return e.type === "escape"; });
       sp.guessed = sp.events.some(function(e){ return e.type === "guess"; });
@@ -3667,7 +3697,7 @@ function groupRespondents(respondents, targetUnits){
   var buckets = new Map(), groups = [];
   /* Latent response flags stay in the data; splitting them here adds
      visual buckets without adding a distinct animated behavior. */
-  var visualFlags = ["guessed","escapedUsed","angry","dupEnv","qSpeed","qStraight","qDup"];
+  var visualFlags = ["guessed","escapedUsed","angry","dupEnv","qSpeed","qStraight","qDup","resumed"];
   respondents.forEach(function(person, index){
     var key = [person.persona, person.abGroup, person.fate, person.dropCause, person.dropQ,
       person.via, person.breakerStage, !!person.bounceHard].concat(visualFlags.map(function(flag){ return !!person[flag]; })).join("|");
@@ -4035,13 +4065,16 @@ function evidenceReportHTML(evidence, run, c){
     '<h3>CONTEXT NOTE</h3><p>' + contextNoteText(evidence, run) + '</p></div>' + brdAcceptanceHTML(evidence, run, c) + dispositionHTML(evidence, run, c) + findingsHTML(evidence, run, c);
 }
 function tally(run){
-  var c = { invited:0, sent:0, delivered:0, bouncedHard:0, bouncedSoft:0, angry:0, suppressed:0, dupEnv:0, qSpeed:0, qStraight:0, qDup:0, qFwd:0, qJunk:0, qTopBox:0, qMush:0, qRefusal:0, qInconsist:0, qEstimate:0, guessByQ:{}, opened:0, started:0, completed:0, guessed:0, guessedAny:0, escapesUsed:0,
+  var c = { invited:0, sent:0, delivered:0, bouncedHard:0, bouncedSoft:0, angry:0, suppressed:0, dupEnv:0, qSpeed:0, qStraight:0, qDup:0, qFwd:0, qJunk:0, qTopBox:0, qMush:0, qRefusal:0, qInconsist:0, qEstimate:0, guessByQ:{}, opened:0, started:0, completed:0, guessed:0, guessedAny:0, escapesUsed:0, resumed:0,
     drops:{ noopen:0, nostart:0, patience:0, knowledge:0, mobile:0, breaker:0 },
     dropPersona:{}, dropQ:{}, remRecovery:{ r1:0, r2:0 }, perPersona:{}, perAB:{A:{invited:0,completed:0},B:{invited:0,completed:0}}, perLang:{} };
   PKEYS.forEach(function(k){ c.perPersona[k] = { invited:0, opened:0, completed:0 }; });
   function countBreakerStop(sp){ c.drops.breaker++; bump(c.dropPersona, sp, "breaker"); }
   run.respondents.forEach(function(sp){
     c.invited++;
+    /* The report's resumed count backs the sentence "came back on a
+       reminder and finished", so it counts only resumed finishers. */
+    if (sp.resumed && (sp.fate === "finish" || sp.fate === "guessfinish")) c.resumed++;
     sp.events.forEach(function(e){ if (e.type === "guess" && e.qid) c.guessByQ[e.qid] = (c.guessByQ[e.qid]||0)+1; });
     if (sp.fate === "notsent") return;
     if (sp.fate === "suppressed"){ c.suppressed++; return; }
@@ -4089,9 +4122,10 @@ function tally(run){
    Presentation model for the run screen's two piles, read off the
    finished run without touching its math: the bounce pile is the
    tally's own hard + soft count, the unopened pile is delivered minus
-   opened, and each reminder wave's beat is the moment its first
-   recovered open (a sprite tagged via "r1"/"r2" in buildRun) passes
-   the OPENED gate. buildRun already delays reminder opens (+1800 /
+   opened, and each reminder wave's beat is the moment of its first
+   recovery: a recovered open (a sprite tagged via "r1"/"r2" in
+   buildRun) passing the OPENED gate, or a dropped starter resuming
+   on the wave (a "reminded" event), whichever comes first. buildRun already delays reminder opens (+1800 /
    +3400 on the open time), so the waves land as beats on their own;
    this model only names when. A wave that recovered nobody has
    at === null and gets no beat. */
@@ -4101,10 +4135,16 @@ function pileModel(run){
   for (var r = 1; r <= state.reminders; r++){
     var at = null, recovered = 0;
     run.respondents.forEach(function(sp){
-      if (sp.via !== "r" + r) return;
-      var openEv = null;
-      sp.events.forEach(function(e){ if (e.type === "gate" && e.gate === "opened") openEv = e; });
-      if (openEv){ recovered++; if (at === null || openEv.t < at) at = openEv.t; }
+      if (sp.via === "r" + r){
+        var openEv = null;
+        sp.events.forEach(function(e){ if (e.type === "gate" && e.gate === "opened") openEv = e; });
+        if (openEv){ recovered++; if (at === null || openEv.t < at) at = openEv.t; }
+      }
+      if (sp.resumed && sp.resumeWave === r){
+        var remEv = null;
+        sp.events.forEach(function(e){ if (e.type === "reminded") remEv = e; });
+        recovered++; if (remEv && (at === null || remEv.t < at)) at = remEv.t;
+      }
     });
     waves.push({ wave: r, at: at, recovered: recovered });
   }
@@ -4180,12 +4220,10 @@ function routeSpriteToPile(sp, cause){
   }
 }
 function fireRemBeat(beat){
-  var stamp = $("remStamp");
-  stamp.textContent = "REMINDER " + beat.wave + " SENT";
-  stamp.hidden = false;
-  logLine("REMINDER WAVE " + beat.wave + " SENT TO EVERYONE WHO HAD NOT OPENED YET.");
-  if (remStampTimer) clearTimeout(remStampTimer);
-  remStampTimer = setTimeout(function(){ stamp.hidden = true; }, 2000);
+  /* the reminder marker now sits on the recipients themselves
+     (a gold ring when a dropped starter resumes); the wave beat
+     only logs, it no longer stamps the unopened pile */
+  logLine("REMINDER WAVE " + beat.wave + " SENT TO EVERYONE WHO HAD NOT COMPLETED YET: NON-OPENERS GET ANOTHER CHANCE TO OPEN, DROPPED STARTERS GET A RESUME LINK.");
 }
 
 /* ================= MANAGER MOOD MACHINE =================
@@ -4511,6 +4549,10 @@ function fireReminderWave(rc){
       converted++;
     }
   });
+  rc.respondents.forEach(function(sp){
+    if (sp.fate !== "drop") return;
+    if (crng() < 0.18){ resumeDropped(rc, sp, Math.max(1, state.reminders), crng); converted++; }
+  });
   rc.wavesAdjust = -1;
   rc.firedWave = { converted: converted };
 }
@@ -4537,7 +4579,8 @@ function renderCheckpointCard(){
   h += '<p style="font-size:15.5px;margin:12px 0 4px"><b>ONE ACTION.</b></p><div style="display:flex;gap:8px;flex-wrap:wrap">' +
     '<button class="segbtn' + (cp.choice === 'hold' ? ' sel' : '') + '" data-choice="hold">HOLD<small>FIELD THE SECOND HALF AS PLANNED</small></button>';
   if (state.reminders > 0){
-    h += '<button class="segbtn' + (cp.choice === 'fire' ? ' sel' : '') + '" data-choice="fire">FIRE THE NEXT WAVE NOW<small>' + fmt(c1.drops.noopen) + ' FIRST-HALF INBOXES STILL UNOPENED \u00B7 THE SECOND HALF THEN GETS ONE FEWER WAVE</small></button>';
+    var droppedCount = c1.drops.patience + c1.drops.knowledge + c1.drops.mobile;
+    h += '<button class="segbtn' + (cp.choice === 'fire' ? ' sel' : '') + '" data-choice="fire">FIRE THE NEXT WAVE NOW<small>' + fmt(c1.drops.noopen) + ' UNOPENED INBOXES AND ' + fmt(droppedCount) + ' DROPPED STARTERS IN THE FIRST HALF \u00B7 THE SECOND HALF THEN GETS ONE FEWER WAVE</small></button>';
   }
   h += '</div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px"><button class="againbtn" id="checkpointContinue" style="background:var(--gold)">\u25B6 SEND THE SECOND HALF</button></div></div>';
   el.innerHTML = h;
@@ -4738,6 +4781,9 @@ function tick(now){
         logLine(e.cause === "bounce" ? DROP_LOG.bounce + "." : PERSONAS[sp.persona].name.toUpperCase() + " " + DROP_LOG[e.cause].toUpperCase() + ".");
         if (e.cause === "bounce"){ if (sfxGate("bounce", 120)) sndThud(); }
         else if (sfxGate("wander", 240)) sndWander();
+      } else if (e.type === "reminded"){
+        sp.el.classList.add("reminded");
+        logLine(PERSONAS[sp.persona].name.toUpperCase() + " CAME BACK ON THE REMINDER AND RESUMED.");
       } else if (e.type === "guess"){
         sp.el.classList.add("guessed", "shake");
         if (sfxGate("guess", 180)) sndWrong();
@@ -5319,11 +5365,11 @@ function showReport(){
     '<div class="simnote">What the mail system and the data itself did, priced against the prep you bought or skipped. This attempt cost <b>' + (state.launchCost || 0) + " credits</b>; level pool spent so far <b>" + spentAfter + " / " + BUDGET_TOTAL + "</b>, leaving <b>" + remainingAfter + " credits</b>.</div>" +
     "<p style='font-size:15.5px;margin:4px 0'><b>Delivered " + fmt(simDelivered) + " of " + fmt(simSent) + " sent.</b> Bounced " + fmt(simBounced) + " (" + fmt(c.bouncedHard) + " hard (dead addresses) and " + fmt(c.bouncedSoft) + " soft (full or failing mailboxes). Bounce rate <b>" + bounceRatePct + "%</b>, hard bounce rate <b>" + hardRatePct + "%</b>.</p>" +
     (hardRatePct >= 2 ? "<p style='font-size:15.5px;margin:4px 0'><b>Hard bounces at or above the 2% line (" + hardRatePct + "%).</b> The team funnel standard investigates list quality at 2% hard bounces, well before the reputation penalties at 5% and 10%. Check the list before the next send.</p>" : "") +
-    "<p style='font-size:15.5px;margin:4px 0'><b>UNOPENED \u00B7 " + fmt(c.delivered - c.opened) + "</b> sat in inboxes, never opened." + (state.reminders ? " The reminder wave" + (state.reminders > 1 ? "s" : "") + " you bought went out to exactly these inboxes." : " No reminder waves were bought to nudge them.") + "</p>" +
+    "<p style='font-size:15.5px;margin:4px 0'><b>UNOPENED \u00B7 " + fmt(c.delivered - c.opened) + "</b> sat in inboxes, never opened." + (state.reminders ? " The reminder wave" + (state.reminders > 1 ? "s" : "") + " you bought went out to everyone who had not completed: these inboxes, and the starters who had dropped." : " No reminder waves were bought to nudge them.") + (c.resumed ? " <b>" + fmt(c.resumed) + " starters who had dropped came back on a reminder and finished.</b>" : "") + "</p>" +
     "<p style='font-size:15.5px;margin:4px 0'><b>Sender reputation: " + rmR.before + " \u2192 " + repA + ".</b> " + openEffectTxt + "</p>" +
     "<p style='font-size:15.5px;margin:4px 0'><b>Validation verdict:</b> " + valVerdict + "</p>" +
     (c.angry ? "<p style='font-size:15.5px;margin:4px 0'><b>Suppression skipped:</b> " + fmt(c.angry) + " recipients who opted out or were surveyed recently were mailed anyway. Goodwill took the hit in the ledger above. <b>Fix:</b> buy the Suppression scrub (4 cr) in BUILD THE LIST.</p>" : "") +
-    (state.firedWaveInfo ? "<p style='font-size:15.5px;margin:4px 0'><b>Checkpoint \u00B7</b> At the mid-field checkpoint you fired a reminder wave early: it reopened " + fmt(state.firedWaveInfo.converted) + " of the first half's unopened inboxes, and the second half mailed with one fewer wave.</p>" : "") +
+    (state.firedWaveInfo ? "<p style='font-size:15.5px;margin:4px 0'><b>Checkpoint \u00B7</b> At the mid-field checkpoint you fired a reminder wave early: it brought back " + fmt(state.firedWaveInfo.converted) + " people from the first half (unopened inboxes reopened, dropped starters resumed), and the second half mailed with one fewer wave.</p>" : "") +
     (state.checkpointRecheck ? "<p style='font-size:15.5px;margin:4px 0'><b>Permission re-check \u00B7</b> Fieldwork ran " + fieldworkDays() + " days, past the 72 hours the setup permission check covers. You re-checked at the checkpoint (" + RECHECK_COST + " cr), so the second half mailed inside the window.</p>" : "") +
     (state.checkpointLapsed ? "<p style='font-size:15.5px;margin:4px 0'><b>Permission lapsed \u00B7</b> Fieldwork ran " + fieldworkDays() + " days, past the 72 hours the setup permission check covers, and no re-check was bought: people who opted out during fieldwork were mailed anyway.</p>" : "") +
     (c.dupEnv ? "<p style='font-size:15.5px;margin:4px 0'><b>Duplicates mailed:</b> duplicate envelopes went out during the run. <b>Fix:</b> buy DEDUPE and CONSOLIDATE in the Silver panel (4 cr each).</p>" : "") +

@@ -360,6 +360,26 @@ fresh opt-outs (an index-derived 5 percent from the daily
 refresh) as mailed-angry. Quick Challenges keep the one-shot
 path and never see the checkpoint.
 
+Reminder waves target non-completers, not just non-openers.
+At the end of `simulateFromOpen`, a recipient whose fate is a
+drop (patience, knowledge, or mobile; a nostart never
+started, so never resumes) rolls once per bought wave at
+0.18 to resume: `resumeDropped` removes the drop event,
+marks the respondent `resumed` with its `resumeWave`, and
+finishes through `finalizeFinish` (the finish block extracted
+from `simulateFromOpen`, called with a shorter spread). With
+no waves bought no rolls are drawn, so reminder-less runs are
+stream-identical to the pre-retargeting engine; with waves
+bought the inserted draws shift downstream outcomes, which
+is why the witness corpus was regenerated for this phase.
+The checkpoint's early wave applies the same two paths to
+the first half on the checkpoint stream (reopen at 0.22,
+resume at 0.18). The tally counts `resumed`; resumed
+finishers are ordinary completions in the dispositions. On
+screen the reminded state is a gold ring on the recipient's
+sprite wherever the recipient sits; the reminder beat no
+longer stamps the UNOPENED pile.
+
 BRD intake (`state.commission`, reset with the chain in
 `resetChainState`) commissions the study at Step 0
 (`renderIntake`): precision standard or extended, and at most

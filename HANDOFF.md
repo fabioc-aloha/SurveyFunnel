@@ -133,6 +133,26 @@
   reminder retargeting last (G27). Outside the program: G3,
   G10, G11 (needs the owner's design call), G25, and medallion
   phases 2-3.
+- Process-consistency Phase F (2026-11-14): G27 reminder
+  retargeting is live. Reminder waves go to everyone who
+  has not completed yet: non-openers reopen, and dropped
+  starters (patience, knowledge, mobile) roll 0.18 per
+  bought wave to resume and finish through the extracted
+  finalizeFinish; the checkpoint's early wave applies
+  both paths to the first half. The reminded state renders
+  as a gold ring on the recipient; the UNOPENED pile stamp
+  is retired. The closing gate caught a counting bug:
+  resumes scheduled after a breaker trip kept their flag
+  after the breaker erased their events, inflating the
+  tally and the wave model (917 of 934 in the pinned Blast
+  run); the breaker pass now clears post-stop resumes and
+  the tally counts resumed finishers only, pinned by a
+  regression test. Full witness regeneration (390 setups,
+  every seed won): fixed 62/66/62/63/72/87 for L1-L6.
+  Gates: Node suite 165/165, browser harness PASS 3/3 at
+  156/156 checks. Remaining in the program: Phase D
+  sampling (G4, rides on medallion phase 3 literal counts)
+  only.
 - Process-consistency Phase E (2026-11-13): G13 mid-field
   checkpoint and the G6 72-hour clock are live. The run
   engine is split at the median recipient (buildRunStart /

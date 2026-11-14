@@ -1329,6 +1329,35 @@ test('phase E: the launch flow pauses at the checkpoint card and continues on co
   assert.equal(g.runData.respondents.length, g.state.seg.n, 'the second half simulated after continue');
 });
 
+test('phase F: reminder waves resume dropped starters, and only when waves are bought', () => {
+  const { context: g } = game();
+  phaseESetup(g, 0);
+  const noWaves = g.buildRun();
+  assert.equal(g.tally(noWaves).resumed, 0, 'no waves bought, nobody resumes');
+  phaseESetup(g, 2);
+  const run = g.buildRun();
+  const t = g.tally(run);
+  assert.ok(t.resumed > 0, 'some dropped starters came back on a wave');
+  const resumed = run.respondents.filter(sp => sp.resumed);
+  assert.equal(resumed.length, t.resumed);
+  for (const sp of resumed) {
+    assert.ok(sp.fate === 'finish' || sp.fate === 'guessfinish', 'a resumed starter finishes');
+    assert.ok(sp.events.some(e => e.type === 'reminded'), 'the resume is marked in the event stream');
+    assert.ok(!sp.events.some(e => e.type === 'drop'), 'the drop event is replaced, not kept');
+    assert.ok(sp.resumeWave === 1 || sp.resumeWave === 2, 'the converting wave is recorded');
+  }
+});
+
+test('phase F: the report tells the resume story and the setup copy names non-completers', () => {
+  const { context: g, element } = game();
+  phaseESetup(g, 2);
+  g.startRun(); g.showReport();
+  const t = g.tally(g.runData);
+  assert.ok(t.resumed > 0);
+  assert.match(element('report').innerHTML, /starters who had dropped came back on a reminder and finished/);
+  assert.match(element('report').innerHTML, /went out to everyone who had not completed/);
+});
+
 test('report flags hard bounces at the 2 percent investigate line', () => {
   const hot = game();
   hot.context.selectLevel(1, false);
@@ -1970,7 +1999,7 @@ test('fallout piles reconcile with the tally: bounced total and delivered minus 
   }
 });
 
-test('reminder wave beats land on the first recovered open of each wave', () => {
+test('reminder wave beats land on the first recovery of each wave', () => {
   const { context: g } = game();
   g.selectLevel(1, false);
   g.state.seg = g.SEGMENTS.find(s => s.id === 'blast');
@@ -1981,19 +2010,57 @@ test('reminder wave beats land on the first recovered open of each wave', () => 
   const pm = g.pileModel(g.runData);
   assert.equal(pm.waves.length, 2);
   for (const w of pm.waves) {
-    /* Recount individual records, not representative groups. */
-    const opens = [];
+    /* Recount individual records, not representative groups. A wave
+       recovers two ways since reminder retargeting: a non-opener who
+       opens on the wave (via "rN" with an opened gate event) and a
+       dropped starter who resumes on the wave (resumed, resumeWave N).
+       The beat is the earliest of the wave's recovered opens and its
+       resumes' reminded moments. */
+    let recovered = 0;
+    const times = [];
     g.runData.respondents.forEach(sp => {
-      if (sp.via !== 'r' + w.wave) return;
-      sp.events.forEach(e => { if (e.type === 'gate' && e.gate === 'opened') opens.push(e.t); });
+      if (sp.via === 'r' + w.wave) {
+        const opens = sp.events.filter(e => e.type === 'gate' && e.gate === 'opened');
+        if (opens.length) { recovered++; opens.forEach(e => times.push(e.t)); }
+      }
+      if (sp.resumed && sp.resumeWave === w.wave) {
+        recovered++;
+        sp.events.forEach(e => { if (e.type === 'reminded') times.push(e.t); });
+      }
     });
-    assert.equal(w.recovered, opens.length, `wave ${w.wave} recovered count`);
-    assert.equal(w.at, opens.length ? Math.min.apply(null, opens) : null, `wave ${w.wave} beat time`);
+    assert.equal(w.recovered, recovered, `wave ${w.wave} recovered count`);
+    assert.equal(w.at, times.length ? Math.min.apply(null, times) : null, `wave ${w.wave} beat time`);
   }
   /* This pinned configuration recovers opens through both waves, so
      both beats exist and fire in order. */
   assert.ok(pm.waves[0].recovered > 0 && pm.waves[1].recovered > 0);
   assert.ok(pm.waves[0].at < pm.waves[1].at, 'wave 1 lands before wave 2');
+});
+
+test('a breaker trip erases resumes scheduled after the stop', () => {
+  const { context: g } = game();
+  g.selectLevel(1, false);
+  g.state.seg = g.SEGMENTS.find(s => s.id === 'blast');
+  g.state.validation = 'skip';
+  g.state.reminders = 2;
+  g.state.invite = g.INVITES.find(i => i.id === 'generic');
+  g.startRun();
+  assert.equal(g.runData.gm.trips, true, 'the pinned configuration trips the breaker');
+  const c = g.tally(g.runData);
+  /* The tally's resumed count backs the report sentence "came back on
+     a reminder and finished": it counts resumed finishers only. */
+  const resumedFinishers = g.runData.respondents.filter(sp =>
+    sp.resumed && (sp.fate === 'finish' || sp.fate === 'guessfinish')).length;
+  assert.equal(c.resumed, resumedFinishers);
+  assert.ok(resumedFinishers > 0, 'some starters genuinely resume and finish');
+  /* Anyone still flagged resumed was stopped at or before the trip:
+     their reminded event survived the breaker filter. A resume the
+     breaker erased carries no flag. */
+  for (const sp of g.runData.respondents) {
+    if (!sp.resumed) continue;
+    assert.ok(sp.events.some(e => e.type === 'reminded'),
+      'a surviving resume flag always has its reminded event');
+  }
 });
 
 test('reminder presentation cannot mutate full-population statistics', () => {
@@ -2031,10 +2098,10 @@ test('reminder presentation cannot mutate full-population statistics', () => {
   }
 });
 
-test('invite stage names the reminder as an email to non-openers, and the run screen carries both piles', () => {
+test('invite stage names the reminder as an email to non-completers, and the run screen carries both piles', () => {
   const html = readFileSync(join(root, 'site', 'index.html'), 'utf8');
   assert.match(html, /Reminder emails:/);
-  assert.match(html, /waves go only to non-openers/);
+  assert.match(html, /waves go to everyone who has not completed yet/);
   assert.match(html, /8 cr and −5 goodwill per wave/);
   assert.match(html, /data-rem="2">2<small>−10 GW · 16 CR<\/small>/);
   assert.match(html, /id="bouncePile"/);

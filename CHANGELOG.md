@@ -1,5 +1,61 @@
 # Changelog
 
+## 2026-11-14 - Process-consistency Phase F: reminders go to non-completers (G27)
+
+- Phase F of the approved process-consistency program
+  (docs/process-consistency-scope.md), completing the
+  FIELDWORK stage's reminder rule: reminder waves go to
+  everyone who has not completed yet, per the funnel
+  standard, not only to people who never opened.
+- Non-openers get another open chance, as before. Starters
+  who dropped partway (patience, knowledge, or mobile
+  causes; a recipient who never started cannot resume)
+  now roll 0.18 per bought wave to resume where they left
+  off and finish. The finish block was extracted as
+  finalizeFinish so a resumed recipient finishes through
+  the same path as a first-pass finisher. With no waves
+  bought, no resume rolls are drawn and runs are identical
+  to the pre-retargeting engine.
+- The mid-field checkpoint's early wave applies both
+  paths to the first half on the checkpoint stream
+  (reopen at 0.22, resume at 0.18).
+- On screen, the reminded state is a gold ring on the
+  recipient's sprite wherever the recipient sits; the
+  REMINDER SENT stamp no longer stamps the UNOPENED pile,
+  and the reminder beat log states the non-completer rule.
+  Setup copy and the report's unopened paragraph state
+  the same rule, and the report names how many dropped
+  starters came back on a reminder and finished.
+- Breaker correction found by the closing gate: in the
+  raw simulation a recipient can resume at a moment after
+  the goodwill breaker has already stopped the run; the
+  breaker pass then erases the resume's events but left
+  the resumed flag set, so the tally and the wave model
+  reported recoveries that never counted (917 of 934
+  flagged resumes in the pinned Executive Blast run). The
+  breaker pass now clears a resume whose reminded moment
+  falls after the stop, and the tally's resumed count
+  covers only resumed finishers, which is what the
+  report's sentence claims. A regression test pins both.
+- The witness corpus was fully regenerated for the new
+  mechanics (390 setups, every seed won; the program's
+  one full regeneration, decision 6): L1 fixed 62,
+  seeded 56-78, goodwill 59-72; L2 fixed 66, seeded
+  61-92, goodwill 49-70; L3 fixed 62, seeded 60-95,
+  goodwill 2-58; L4 fixed 63, seeded 62-77, goodwill
+  36-43; L5 fixed 72, seeded 66-100, goodwill 47-68;
+  L6 fixed 87, seeded 84-117, goodwill 23-44.
+- Gates at ship: node suite 165/165; browser harness
+  PASS 3/3, 156/156.
+- Five-surface pass: player guide and development notes
+  updated (the non-completer rule, the checkpoint's
+  dropped starters, the resume mechanic, the breaker
+  correction). The Fishbowl and MPOR overlays and the
+  level BRDs state no reminder targeting rule, so they
+  needed no text change. The program's only remaining
+  phase is Phase D (G4 sampling), riding on medallion
+  phase 3.
+
 ## 2026-11-13 - Process-consistency Phase E: the mid-field checkpoint (G13) and the 72-hour clock (G6)
 
 - Phase E of the approved process-consistency program

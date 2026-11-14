@@ -73,7 +73,10 @@ progress or spends the campaign's credits.
    validation (BriteVerify) at skip, partial, or full; suppression
    scrub (opt outs and recently surveyed); localization review.
    These are simulated preparation choices, not live service integrations.
-3. **INVITATION.** Pick a variant and a reminder count. Generic is
+3. **INVITATION.** Pick a variant and a reminder count. Reminder
+   waves go to everyone who has not completed yet: people who
+   never opened get another chance to open, and starters who
+   dropped partway get a resume link and can finish. Generic is
    free and weak. Honest Ask states a time promise you choose
    (3, 5, 8, or 10 minutes) and explains why the recipient was
    selected; keep the questionnaire within the printed promise.
@@ -160,8 +163,8 @@ funnel so far (sent, bounces with the hard-bounce rate,
 opens, starts, completes) and a projection if the second
 half behaves like the first. You get one action: hold, or
 fire the next reminder wave now, at the first half's
-unopened inboxes; the second half then mails with one fewer
-wave. The checkpoint also states the fieldwork day.
+unopened inboxes and dropped starters; the second half then
+mails with one fewer wave. The checkpoint also states the fieldwork day.
 Fieldwork runs two days plus a day per reminder wave, and
 the permission check stamped at setup covers 72 hours: if
 fieldwork would run past day 3, re-check the permission at
