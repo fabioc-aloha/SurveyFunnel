@@ -740,6 +740,7 @@
         <li><b>Repair vs validation:</b> repair fixes an address before promotion (a known typo pattern, a moved office). Validation checks deliverability at send time and removes what would bounce. Repair works on what the list knows; validation tests what the mail system will accept. They are not substitutes.</li>
         <li><b>Quarantine:</b> holding a record out of promotion without deleting it. An unfixable address is quarantined in Silver so it never reaches Gold; the record stays auditable instead of silently vanishing.</li>
         <li><b>Derived list health:</b> the invalid rate is computed from what the list actually contains and what work was done on it: stale records plus unrepaired broken addresses, divided by the records promoted. It is not a fixed property of a list; the same list is healthier after Silver work and worse after none.</li>
+        <li><b>Sampling:</b> the send is built from the promoted list, which is the frame. Mail the whole frame, or draw a sample sized for a precision target (about 384 / 1,067 / 9,604 completes for ±5 / ±3 / ±1), stratified on the audience mix and, on the global study, by language group. Sampling is free in credits; the mailed share of the pool is remembered as fatigue and costs goodwill on that pool's next send.</li>
       </ul>
       <h3>THE THREE SCORES</h3>
       <ul>
@@ -798,7 +799,7 @@
       <p>In the game: Step 2's three panels are this pipeline compressed into one step. The game skips the daily refresh and deals you the intake for the audience you chose.</p>
       <h3>SAMPLING</h3>
       <p>Sampling runs in a separate environment. It verifies a larger set of addresses than the sample needs, in bulk, then prepares the sample from the verified set, stratified by region and customer segment. Most addresses flagged "risky" are sent anyway; only invalid addresses are excluded. Excluded invalids and hard bounces are kept in tables, so they are not mailed again.</p>
-      <p>In the game: the validation choice in Step 2's Gold panel is this check, simplified to two tiers.</p>
+      <p>In the game: Step 2's SAMPLING row, under the Gold panel. The promoted list is the frame and the send base. Mail the whole list, or draw a sample sized for a precision target (about 384 / 1,067 / 9,604 completes for ±5 / ±3 / ±1), stratified by the audience mix and, on the global study, by language group. Sampling costs no credits; mailing more of the pool than the study needs costs goodwill on the pool's next send.</p>
       <h3>PERMISSION</h3>
       <p>Before the final sample is locked, a permission service is checked for every contact. It rules on opt-outs and returns a personalized unsubscribe link to put in the invite. The link is passed to the sending platform and is not stored. The send has to go out within 72 hours of the check; after that, the check no longer holds.</p>
       <p>In the game: this is the suppression scrub in Step 2. The check is stamped at setup and covers 72 hours of fieldwork; fieldwork runs two days plus a day per reminder wave, and a longer fielding is re-checked at the mid-field checkpoint.</p>
@@ -1807,7 +1808,7 @@ var state = {
   attempt: 1, spentBefore: 0, history: [], goodwillCarry: null, repCarry: 90,
   baseline: null, chainActive: false, bestAttemptRate: 0, launchCost: 0, launchedSnapshot: null,
   reportShown: false, instrument: null, instrumentSeed: "A001", randomMode: false, campaignSeed: null, addBankIds: [],
-  campaignBonus: {}, levelSeeds: {}, abDeclaredClose: false, abCloseNamed: false, commission: null,
+  campaignBonus: {}, levelSeeds: {}, abDeclaredClose: false, abCloseNamed: false, commission: null, sampling: "all",
   checkpoint: null, checkpointRecheck: false, checkpointLapsed: false, firedWaveInfo: null,
   musicOn: true, sfxOn: true, muted: false, musicVol: 0.5, sfxVol: 0.8,
   hints: true, touched: { seg: false, prep: false, invite: false },
@@ -1931,6 +1932,12 @@ function quickComplicationDraw(index, seedStr){
   var flavors = ["list", "late", "wave"];
   var flavor = flavors[Math.floor(rng() * flavors.length)];
   var comp = { flavor: flavor };
+  /* Dirty Gold splits the list family: a list-truth complication
+     whose provided prep, not whose rate, was misstated. Drawn only
+     on the list branch, so late and wave seeds keep their streams.
+     The split reads its own stream ("qcgold|..."), so seeds pinned
+     to LIST REALITY before the split existed keep their flavor. */
+  if (flavor === "list" && mulberry(hashStr("qcgold|" + index + "|" + seedStr))() < 0.5) comp.flavor = "gold";
   if (flavor === "late"){
     var dealt = QUICK_CHALLENGES[index].ids.concat(QUICK_CHALLENGES[index].extras);
     var pool = QUICK_LATE_POOL.filter(function(e){ return dealt.indexOf(e.qid) === -1; });
@@ -1954,6 +1961,7 @@ function quickComplicationTitle(comp){
   if (!comp) return "";
   if (comp.flavor === "list") return "THE LIST WAS OLDER THAN THE BRIEF";
   if (comp.flavor === "late") return "ONE MORE QUESTION, NON-NEGOTIABLE";
+  if (comp.flavor === "gold") return "THE GOLD LIST WAS NOT DEDUPED";
   return "THE SPONSOR WANTS A SECOND PUSH";
 }
 function quickComplicationCardHTML(){
@@ -1981,6 +1989,13 @@ function quickComplicationCardHTML(){
       (lv ? 'Repair it in the questionnaire step (' + lv + ' · ' + lc + ' cr) or carry it as written.' : 'There is no wording fix for ' + defectOf(lq) + ': carry it as written, or buy the DK/NA escapes (2 cr) so respondents can say they do not know instead of guessing.') +
       ' It can be cut, but the challenge cannot be won without fielding it.</p>' +
       buttons("ADD Q" + comp.qid + " · SET UP WAVE 2") + foot;
+  }
+  if (comp.flavor === "gold"){
+    return head +
+      '<div class="dialogue"><b>LIST OPS:</b> "Honest answer: the promotion ran before the dedupe job finished. The contact master wave 2 inherits still holds every duplicate the brief says was merged."</div>' +
+      '<p style="font-size:15.5px">Wave 1 mailed the list as briefed; its report stands. Wave 2\'s list was <b>never deduped</b>: duplicate addresses can answer twice, and the copies are removed at CLEAN, priced into Quality. Re-run the dedupe in list prep (<b>4 cr</b>, the book price) or mail it dirty and carry the duplicates.</p>' +
+      (remaining < 4 ? '<p style="font-size:15px;color:var(--gold)"><b>Pool check:</b> ' + remaining + ' credits left, so the dedupe re-run (4 cr) is out of reach. Accepting mails the list dirty.</p>' : '') +
+      buttons("SET UP WAVE 2 \u00B7 FACE THE UNDUPED LIST") + foot;
   }
   var canFund = remaining >= 8;
   return head +
@@ -2026,6 +2041,13 @@ function acceptQuickComplication(){
     state.seg = Object.assign({}, state.seg, { invalidPct: QUICK_TRUE_INVALID, lastCleaned: "Nine months old (revealed after wave 1)" });
     state.validation = "skip";
     state.baseline = Object.assign({}, state.baseline, { validation: "skip" });
+  }
+  if (comp.flavor === "gold"){
+    /* The provided dedupe turns out never to have run: it is void
+       for wave 2 (the baseline forgets it too), and re-running it
+       in prep charges the book price through budgetMath as usual. */
+    state.dedupe = false;
+    state.baseline = Object.assign({}, state.baseline, { dedupe: false });
   }
   if (comp.flavor === "late"){
     var lq = questionById(comp.qid);
@@ -2103,6 +2125,60 @@ function duplicateFactor(){
   if (state.quickChallenge || !state.seg || !state.seg.intake) return state.dedupe ? 0 : 1;
   var d = intakeDerived(currentIntake(), silverState());
   return d.totalDup > 0 ? d.remainingDup / d.totalDup : 0;
+}
+/* ---- Medallion phase 3 + SAMPLING (G4): the promoted count is the
+   send base, and the sample is drawn from it. The frame is the
+   promoted list; "mail the list" mails the whole frame and is the
+   default, so a level plays exactly as its promoted counts dictate
+   until the player chooses a precision target. A drawn sample is
+   built by constructing the run population at the drawn size with
+   the segment's persona mix (proportional allocation, the engine's
+   stratification) and, on the global segment, the same language
+   shares the engine already deals; the draw is deterministic
+   because the population is built from the run's seeded stream.
+   Sampling costs no credits: oversampling is priced in audience
+   health, as the share mailed becomes fatigue on the pool's next
+   send (goodwillStart reads the portfolio's share-weighted
+   mailings; recordAudienceRun writes them). ---- */
+var SAMPLE_TARGETS = { p5: 384, p3: 1067, p1: 9604 };
+function promotedCount(){
+  if (state.quickChallenge || !state.seg || !state.seg.intake) return state.seg ? state.seg.n : 0;
+  return Math.max(1, Math.round(state.seg.n * intakeDerived(currentIntake(), silverState()).promotedShare));
+}
+function expectedCompleteRate(){
+  var inv = state.invite || INVITES[0];
+  /* The post-validation invalid rate, mirrored from effInvalidRate()
+     (which lives in the simulation script block): base rate with the
+     validation tier's multiplier applied. */
+  var invalid = baseInvalidRate() * (state.validation === "full" ? 0.15 : state.validation === "partial" ? 0.45 : 1);
+  return Math.max(0.001, (1 - invalid) * inv.open * inv.start * 0.45);
+}
+function sampleCount(){
+  var frame = promotedCount();
+  var target = SAMPLE_TARGETS[state.sampling || "all"];
+  if (!target) return frame;
+  return Math.min(frame, Math.ceil(target / expectedCompleteRate()));
+}
+function samplingBtnsHTML(){
+  var frame = promotedCount(), cur = state.sampling || "all";
+  function btn(mode, label, sub){
+    return '<button class="segbtn' + (cur === mode ? " sel" : "") + '" data-sampling="' + mode + '">' + label + '<small>' + sub + '</small></button>';
+  }
+  function need(t){ return Math.min(frame, Math.ceil(t / expectedCompleteRate())); }
+  return btn("all", "MAIL THE LIST", fmt(frame) + " records") +
+    btn("p5", "\u00B15 \u00B7 \u2248384 COMPLETES", "\u2248" + fmt(need(384)) + " invites") +
+    btn("p3", "\u00B13 \u00B7 \u22481,067 COMPLETES", "\u2248" + fmt(need(1067)) + " invites") +
+    btn("p1", "\u00B11 \u00B7 \u22489,604 COMPLETES", "\u2248" + fmt(need(9604)) + " invites");
+}
+function samplingNoteHTML(){
+  var frame = promotedCount(), n = sampleCount();
+  var s = "The frame is the promoted list: " + fmt(frame) + " records. A drawn sample is stratified by the audience mix" + (state.level === 5 ? " and by language group" : "") + ", drawn deterministically from the run seed. Sampling costs no credits. Mailing more of the pool than the study needs is priced in audience health: the share mailed becomes fatigue on this pool's next send, taken in goodwill.";
+  s += (state.sampling && state.sampling !== "all")
+    ? " This draw mails about " + fmt(n) + " of " + fmt(frame) + " records, sized for about " + fmt(SAMPLE_TARGETS[state.sampling]) + " completes at this setup's expected rates (delivered \u00D7 open \u00D7 start \u00D7 a 45% finish assumption, the planning estimate the A/B panel also uses)."
+    : " Mailing the whole list leaves this pool fully fatigued for its next send.";
+  var h = audienceHistory();
+  if (h && h.lastShare !== undefined && h.lastShare !== null) s += " The last send on this pool mailed " + Math.round(h.lastShare * 100) + "% of its frame.";
+  return s;
 }
 /* ---- v1.3 random instrument generation (seeded, reproducible) ---- */
 function shuffleWith(rng, arr){ var a = arr.slice(); for (var i = a.length - 1; i > 0; i--){ var j = Math.floor(rng() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
@@ -2183,7 +2259,7 @@ function goodwillStart(seg){
   var base = same && state.goodwillCarry !== null && state.goodwillCarry !== undefined ? state.goodwillCarry :
     history ? Math.min(seg.goodwill, history.health) : seg.goodwill;
   var fatigue = same && state.chainActive && state.attempt >= 2 ? 4 :
-    history ? Math.min(8, history.contacts * (state.suppression ? 1 : 2)) : 0;
+    history ? Math.min(8, Math.round((history.mailings !== undefined ? history.mailings : history.contacts) * (state.suppression ? 1 : 2))) : 0;
   return { start: Math.max(0, base - fatigue), fatigue: fatigue, carry: base };
 }
 function recordAudienceRun(run, c){
@@ -2194,9 +2270,12 @@ function recordAudienceRun(run, c){
   if (instruments.indexOf(instrument) < 0) instruments.push(instrument);
   var responses = Object.assign({}, previous ? previous.responses : {});
   PKEYS.forEach(function(k){ responses[k] = (responses[k] || 0) + c.perPersona[k].completed; });
+  var mailedShare = run.frameN ? Math.max(0, Math.min(1, c.sent / run.frameN)) : 1;
   state.audiencePortfolio[key] = {
     health: Math.max(0, Math.min(100, run.gm.ending)),
     contacts: (previous ? previous.contacts : 0) + 1,
+    mailings: (previous ? (previous.mailings !== undefined ? previous.mailings : previous.contacts) : 0) + mailedShare,
+    lastShare: mailedShare,
     instruments: instruments, responses: responses,
     suppressionOverrides: (previous ? previous.suppressionOverrides : 0) + (previous && !state.suppression ? 1 : 0)
   };
@@ -2757,8 +2836,9 @@ function renderPrep(){
       '<div class="prow"><span class="pt">SILVER OUTPUT</span><div class="pe">' + fmt(Math.round(dNow.promotedShare * n)) + ' records after merges and quarantine.</div></div>' +
       '<div class="prow"><span class="pt">GOLD · CONTACT MASTER</span><div class="pe">List health after your list work: <b style="color:' + healthColor + '">' + healthPct + '% invalid</b>. Stale records and broken addresses you did not repair set this rate. Validation and the suppression check run on the promoted list below.</div></div>' +
       '<div class="prow"><span class="pt">Validate emails (BriteVerify)</span><div class="valbtns">' + valBtns + '</div><div class="pe">Full checks the whole list; Partial the riskiest half. Removes most invalid addresses — a small share always survives: catch-all domains cannot be verified.</div></div>' +
-      tog("suppression", state.suppression, 4, "Suppression scrub · GOLD CHECK", "Removes opt-outs and anyone surveyed in the last 30 days. Skip it: they get mailed anyway, \u22126 goodwill.") +
+      tog("suppression", state.suppression, 4, "Suppression scrub \u00B7 GOLD CHECK", "Removes opt-outs and anyone surveyed in the last 30 days. Skip it: they get mailed anyway, \u22126 goodwill.") +
       tog("localization", state.localization, 8, "Localization review", "Plain-language and locale check across the list\u2019s languages. +2 data quality.") +
+      '<div class="prow"><span class="pt">SAMPLING \u00B7 FROM GOLD</span><div class="valbtns">' + samplingBtnsHTML() + '</div><div class="pe">' + samplingNoteHTML() + '</div></div>' +
       '</div>';
   }
   Array.prototype.forEach.call(el.querySelectorAll("[data-val]"), function(btn){
@@ -2766,6 +2846,9 @@ function renderPrep(){
   });
   Array.prototype.forEach.call(el.querySelectorAll("[data-prep]"), function(btn){
     btn.addEventListener("click", function(){ state.touched.prep = true; var k = btn.getAttribute("data-prep"); var before = budgetMath().attemptCost; state[k] = !state[k]; if (state[k] && k === "dedupe") sndPops(); else if (state[k] && k === "suppression") sndSwipe(); else if (state[k]) sndSpend(); else sndRefund(); renderPrep(); renderReadout(); });
+  });
+  Array.prototype.forEach.call(el.querySelectorAll("[data-sampling]"), function(btn){
+    btn.addEventListener("click", function(){ state.touched.prep = true; state.sampling = btn.getAttribute("data-sampling"); sndClick(); renderPrep(); renderReadout(); });
   });
 }
 function curLevel(){
@@ -2828,7 +2911,7 @@ function chooseStakeholder(choice){
   sndClick(); renderStakeholder(); renderReadout(); return true;
 }
 function abPlanText(){
-  var armN = Math.round(state.seg.n * (state.suppression ? 0.95 : 1) / 2);
+  var armN = Math.round((state.quickChallenge ? state.seg.n : sampleCount()) * (state.suppression ? 0.95 : 1) / 2);
   var delivered = 1 - effInvalidRate();
   function pComp(iv){ return delivered * iv.open * iv.start * 0.45; }
   var ivB = INVITES.filter(function(x){ return x.id === state.abInvite; })[0] || state.invite;
@@ -2881,6 +2964,7 @@ function resetChainState(){
   state.stakeholder=null; state.abEnabled=false; state.reportBack=false; state.langChoice="en"; state.abVerdictChoice=null;
   state.validation="skip"; state.dedupe=false; state.consolidate=false; state.repair=false; state.suppression=false; state.localization=false; state.escapes=false; state.intake=null;
   state.commission = { precision: "standard", demoted: null };
+  state.sampling = "all";
   var eb=$("escBtn"); if(eb){ eb.textContent="ESCAPES: OFF"; eb.classList.remove("on"); }
   state.invite=INVITES[0]; state.reminders=0; state.added={}; state.promiseMinutes=5;
   QUESTION_BANK.forEach(function(q){ state.qstate[q.id]="keep"; });
@@ -2987,7 +3071,7 @@ function renderSegments(){
       '<div class="pxname">' + segDisplayName(sg).toUpperCase() + (sg.trap ? '<span class="trap">RISK</span>' : "") + '</div>' +
       "<p>" + segBlurb(sg) + "</p>" + segEligibilityNote(sg) +
       '<div class="rows">' +
-      "<span>Size: <b>" + sg.n.toLocaleString("en-US") + " invites</b></span>" +
+      "<span>" + (sg.intake ? "Records in" : "Size") + ": <b>" + sg.n.toLocaleString("en-US") + (sg.intake ? " records" : " invites") + "</b></span>" +
       "<span>Timing: <b>" + segTiming(sg) + "</b></span>" +
       "<span>Relevance: <b>" + sg.relevanceTxt + "</b></span>" +
       "<span>Contact history: <b>" + sg.history + "</b></span>" +
@@ -3264,6 +3348,7 @@ function renderChecklist(){
   var rows = [
     ["Segment chosen (Step 1)", !!(t.seg || state.chainActive)],
     ["List prep decided (Step 2)", !!prepDone],
+    ["Sampling decided (Step 2): mail the list or draw to a target", !!(prepDone || state.sampling !== "all")],
     ["Invite chosen (Step 3)", !!(t.invite || state.chainActive)],
     ["Defects reviewed (Step 4): one fix or cut", !!reviewDone],
     ["Agenda coverage seen (Step 4 panel)", !!(reviewDone || t.agenda)],
@@ -3351,7 +3436,8 @@ function openBRD(openerId){
       '<li><b>REPAIR ADDRESSES (Silver, 5 cr)</b> fixes fixable addresses and quarantines unfixable ones out of promotion. Skipping it: broken addresses promote and bounce.</li>' +
       '<li><b>Stale records</b> have no Silver fix: they promote and set the floor of the list\u2019s invalid rate. Validation (Gold) removes most of what remains, priced on the promoted list.</li>' +
       '</ul>' +
-      '<p>List health is derived, not stored: invalid records (stale plus unrepaired broken) divided by promoted records. This list runs <b>' + (bNone.invalid * 100).toFixed(1) + '% invalid with no Silver work</b>, <b>' + (bFull.invalid * 100).toFixed(1) + '% with the full Silver line</b>, and <b>' + (bNow.invalid * 100).toFixed(1) + '% as currently configured</b>, before validation.</p>';
+      '<p>List health is derived, not stored: invalid records (stale plus unrepaired broken) divided by promoted records. This list runs <b>' + (bNone.invalid * 100).toFixed(1) + '% invalid with no Silver work</b>, <b>' + (bFull.invalid * 100).toFixed(1) + '% with the full Silver line</b>, and <b>' + (bNow.invalid * 100).toFixed(1) + '% as currently configured</b>, before validation.</p>' +
+      '<p>The promoted list is the frame: the send draws from it, and the SAMPLING row in Step 2 either mails it whole or draws a sample sized for a precision target (about 384 / 1,067 / 9,604 completes for \u00B15 / \u00B13 / \u00B11). The mailed share of the pool is remembered as fatigue on the pool\u2019s next send.</p>';
   }
   if (quick){
     $("brdContent").innerHTML = '<h2>BRD</h2><p>Business Requirement Document</p><h3>'+L.name+'</h3><h3>STUDY PURPOSE</h3><p>Collect credible answers on the required business topics below. A high response rate alone does not establish useful evidence.</p><h3>REQUIRED TOPICS AND RESPONDENTS</h3><ul>'+agendaTopics().map(function(topic){
@@ -3470,6 +3556,8 @@ function buildRunStart(){
   kept.forEach(function(q){ if (state.qstate[q.id] === "keep" && defectOf(q) !== "CLEAN") keptDefects[defectOf(q)] = true; });
   var totalMin = estMinutes(), invalidRate = effInvalidRate(), reputation = repMath();
   var dupF = duplicateFactor();
+  var frameN = state.quickChallenge ? seg.n : promotedCount();
+  var popN = state.quickChallenge ? seg.n : sampleCount();
   var cums = [], runningMin = state.escapes ? 0.5 : 0;
   kept.forEach(function(q){ runningMin += effMin(q); cums.push(runningMin); });
   var gridQ = kept.filter(function(q){ return q.flag === "mobile"; })[0];
@@ -3477,15 +3565,15 @@ function buildRunStart(){
 
   /* persona assignment from mix */
   var bag = [];
-  PKEYS.forEach(function(k){ var c = Math.round(seg.mix[k] * seg.n); for (var i=0;i<c;i++) bag.push(k); });
-  while (bag.length > seg.n) bag.splice(Math.floor(rng()*bag.length), 1);
-  while (bag.length < seg.n) bag.push("end");
+  PKEYS.forEach(function(k){ var c = Math.round(seg.mix[k] * popN); for (var i=0;i<c;i++) bag.push(k); });
+  while (bag.length > popN) bag.splice(Math.floor(rng()*bag.length), 1);
+  while (bag.length < popN) bag.push("end");
   /* shuffle deterministically */
   for (var i = bag.length-1; i>0; i--){ var j = Math.floor(rng()*(i+1)); var t = bag[i]; bag[i]=bag[j]; bag[j]=t; }
 
   return { rng: rng, seg: seg, inv: inv, gm: gm, kept: kept, keptDefects: keptDefects, totalMin: totalMin,
     invalidRate: invalidRate, reputation: reputation, dupF: dupF, cums: cums, gridSt: gridSt, bag: bag,
-    respondents: [], wavesAdjust: 0, permissionLapsed: false, mid: Math.floor(seg.n / 2), firedWave: null };
+    respondents: [], wavesAdjust: 0, permissionLapsed: false, frameN: frameN, popN: popN, mid: Math.floor(popN / 2), firedWave: null };
 }
 function finalizeFinish(rc, sp, baseT, spread, rng){
   var seg = rc.seg, inv = rc.inv, totalMin = rc.totalMin, gridSt = rc.gridSt, dupF = rc.dupF, keptDefects = rc.keptDefects;
@@ -3606,11 +3694,11 @@ function simulateRange(rc, from, to){
     var langRoll = rng();
     var spLang = seg.id === "multi" ? (langRoll < 0.4 ? "en" : langRoll < 0.6 ? "es" : langRoll < 0.75 ? "pt" : langRoll < 0.88 ? "de" : "ja") : "en";
     var sp = { i:s, persona:pk, lang:spLang, abGroup:(state.abEnabled ? (s%2===0?"A":"B") : "A"), x:GATE_X.invited, top: 30 + rng()*62, state:"wait",
-      spawnAt: 400 + (s/seg.n)*spawnWindow + rng()*500, mobile: rng() < 0.6,
+      spawnAt: 400 + (s/rc.popN)*spawnWindow + rng()*500, mobile: rng() < 0.6,
       guessed:false, escapedUsed:false, fate:null, dropCause:null, dropQ:0, via:"base",
       events:[], done:false, counted:false, surveyStart:0, patienceTotal: P.patience };
     if (gm.trips && sp.spawnAt > BREAKER_STOP_T){ sp.fate = "notsent"; sp.done = true; respondents.push(sp); continue; }
-    var inSuppBlock = s < Math.round(seg.n * 0.05);
+    var inSuppBlock = s < Math.round(rc.popN * 0.05);
     var suppressedHere = state.suppression && !(rc.permissionLapsed && s >= rc.mid);
     if (suppressedHere && inSuppBlock){ sp.fate = "suppressed"; sp.done = true; respondents.push(sp); continue; }
     sp.angry = false; sp.dupEnv = false;
@@ -3680,12 +3768,12 @@ function finishRun(rc, animationTarget){
       sp.events.push({ t: BREAKER_STOP_T, type:"drop", cause:"breaker", x:GATE_X[stopGate] });
     });
   }
-  return { respondents:respondents, sprites:groupRespondents(respondents, animationTarget),
+  return { respondents:respondents, frameN: rc.frameN, popN: rc.popN, sprites:groupRespondents(respondents, animationTarget),
     timeline:buildProgressTimeline(respondents), gm:gm, kept:kept };
 }
 function buildRun(animationTarget){
   var rc = buildRunStart();
-  simulateRange(rc, 0, rc.seg.n);
+  simulateRange(rc, 0, rc.popN);
   return finishRun(rc, animationTarget);
 }
 
@@ -4568,7 +4656,7 @@ function renderCheckpointCard(){
   var c1 = tally({ respondents: rc.respondents });
   var days = fieldworkDays(), expires = clockExpires();
   var hardPct = c1.sent ? (100 * c1.bouncedHard / c1.sent) : 0;
-  var projected = Math.round(c1.completed * rc.seg.n / cp.mid);
+  var projected = Math.round(c1.completed * rc.popN / cp.mid);
   var canAffordRecheck = (BUDGET_TOTAL - state.spentBefore - state.launchCost) >= RECHECK_COST;
   var h = '<div class="reportcard"><h2>\u23F8 MID-FIELD CHECKPOINT \u00B7 DAY ' + Math.ceil(days / 2) + ' OF ' + days + '</h2>' +
     '<div class="simnote">Fieldwork pauses halfway through the list. What has landed so far is real; the second half has not mailed yet. Simulation only.</div>' +
@@ -4628,7 +4716,7 @@ function continueFromCheckpoint(){
     else { rc.permissionLapsed = true; state.checkpointLapsed = true; }
   }
   state.firedWaveInfo = rc.firedWave;
-  simulateRange(rc, rc.mid, rc.seg.n);
+  simulateRange(rc, rc.mid, rc.popN);
   runData = finishRun(rc);
   state.checkpoint = null;
   $("checkpointScreen").style.display = "none";
@@ -5187,7 +5275,7 @@ function showReport(){
   var run = runData, c = tally(run), seg = state.seg, gm = run.gm;
   renderPopulationProgress(run, Infinity);
   if (!run.bounceBacks) run.bounceBacks = computeBounceBacks(c);
-  var simInvites = seg.n;
+  var simInvites = run.popN || seg.n;
   var simSent = c.sent, simDelivered = c.delivered, simBounced = c.bouncedHard + c.bouncedSoft,
     simOpened = c.opened, simStarted = c.started, simCompleted = c.completed;
   var respRate = c.sent ? c.completed / c.sent : 0;
@@ -5370,6 +5458,8 @@ function showReport(){
       "<tr><td>Quarantined, never promoted</td><td>" + (lpSilver.repair ? fmt(Math.round(lpMix.brokenDead * seg.n)) : "not quarantined · the " + lpCnt("brokenDead") + " unfixable addresses promoted and joined the invalid pool") + "</td></tr>" +
       "<tr><td>Stale records promoted (no Silver fix exists)</td><td>" + lpCnt("stale") + "</td></tr>" +
       "<tr><td>Promoted to the contact master (Gold)</td><td>" + fmt(Math.round(lpD.promotedShare * seg.n)) + "</td></tr>" +
+      "<tr><td>Sampling frame</td><td>" + fmt(run.frameN || seg.n) + " promoted records</td></tr>" +
+      "<tr><td>Mailed from the frame</td><td>" + ((run.popN || seg.n) < (run.frameN || seg.n) ? fmt(run.popN) + " drawn (" + Math.round((run.popN / run.frameN) * 100) + "% of the frame), stratified by audience mix" + (state.level === 5 ? " and language group" : "") : "the whole promoted list") + "</td></tr>" +
       '<tr class="total"><td>List health at launch (before validation)</td><td>' + (lpD.invalid * 100).toFixed(1) + "% invalid</td></tr></table></div>";
   }
 
@@ -5378,12 +5468,12 @@ function showReport(){
   var hardRatePct = c.sent ? Math.round(c.bouncedHard / c.sent * 1000) / 10 : 0;
   var rmR = repMath();
   var repA = rmR.after;
-  var savedBounce = Math.max(0, Math.round((baseInvalidRate() - effInvalidRate()) * seg.n));
+  var savedBounce = Math.max(0, Math.round((baseInvalidRate() - effInvalidRate()) * (run.popN || seg.n)));
   var valVerdict;
   if (state.validation === "skip"){
-    valVerdict = "No validation bought. Full validation (" + validationCostFor(seg, "full") + " cr) would have removed most invalids and saved \u2248" + fmt(Math.round((baseInvalidRate() - baseInvalidRate() * 0.15) * seg.n)) + " bounces this round.";
+    valVerdict = "No validation bought. Full validation (" + validationCostFor(seg, "full") + " cr) would have removed most invalids and saved \u2248" + fmt(Math.round((baseInvalidRate() - baseInvalidRate() * 0.15) * (run.popN || seg.n))) + " bounces this round.";
   } else {
-    valVerdict = "Validation (" + state.validation + ", " + validationCostFor(seg, state.validation) + " cr) saved \u2248" + fmt(savedBounce) + " bounces. \u2248" + fmt(Math.round(effInvalidRate() * seg.n)) + " invalids still got through, " + (state.validation === "partial" ? "because partial validation scanned only the riskiest half, and catch-all domains cannot be verified at any tier." : "because catch-all domains cannot be verified.");
+    valVerdict = "Validation (" + state.validation + ", " + validationCostFor(seg, state.validation) + " cr) saved \u2248" + fmt(savedBounce) + " bounces. \u2248" + fmt(Math.round(effInvalidRate() * (run.popN || seg.n))) + " invalids still got through, " + (state.validation === "partial" ? "because partial validation scanned only the riskiest half, and catch-all domains cannot be verified at any tier." : "because catch-all domains cannot be verified.");
   }
   var openEffectTxt = rmR.openFactor === 1 ? "Hard bounces stayed at or under 5% of sends, so opens were not penalized." : (rmR.atRisk ? "Hard bounces ran over 10% of sends: reputation tanked and spam filters cut opens roughly in half." : "Hard bounces ran over 5% of sends: reputation slipped and opens were cut by about 15%.");
   if (!state.suppression) openEffectTxt += " Mailing opted-out and recently surveyed people cost 5 reputation on top.";

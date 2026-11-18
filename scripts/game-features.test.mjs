@@ -1040,8 +1040,9 @@ test('gap wave: topics, eligibility, and permission gates hold a send that used 
   calm.context.state.validation = 'full'; calm.context.state.dedupe = true; calm.context.state.suppression = true;
   calm.context.startRun();
   const c = calm.context.tally(calm.context.runData);
-  assert.equal(c.suppressed, 500);
-  assert.equal(c.sent, 9500);
+  assert.equal(c.suppressed, Math.round(calm.context.runData.popN * 0.05),
+    'the scrub removes the first 5% of the promoted base before the send');
+  assert.equal(c.sent, calm.context.runData.popN - c.suppressed);
 });
 
 test('gap wave: report carries BRD acceptance and final dispositions that sum to sent', () => {
@@ -1218,8 +1219,8 @@ test('phase C: extended precision raises the scored minimum and a standard-winni
   for (const id of [5, 7, 8, 10, 11, 12]) g.state.qstate[id] = 'cut';
   g.startRun(); g.showReport();
   const ev = g.state.lastRound.evidence;
-  assert.equal(ev.usableN, 894, 'the standard winning base is unchanged');
-  assert.equal(ev.checks.filter(x => x.id === 'fitness')[0].met, false, '894 usable no longer meets the commissioned 1,125');
+  assert.equal(ev.usableN, 853, 'the standard winning base under literal promoted counts');
+  assert.equal(ev.checks.filter(x => x.id === 'fitness')[0].met, false, '853 usable does not meet the commissioned 1,125');
 });
 
 test('phase C: a demoted topic is reported but does not hold the level', () => {
@@ -1267,7 +1268,7 @@ test('phase E: a checkpoint that changes nothing reproduces the one-shot run bit
   const full = g.buildRun();
   const rc = g.buildRunStart();
   g.simulateRange(rc, 0, rc.mid);
-  g.simulateRange(rc, rc.mid, rc.seg.n);
+  g.simulateRange(rc, rc.mid, rc.popN);
   const split = g.finishRun(rc);
   assert.equal(projection(split), projection(full), 'every respondent lands identically');
   assert.equal(JSON.stringify(g.tally(split)), JSON.stringify(g.tally(full)));
@@ -1277,13 +1278,13 @@ test('phase E: firing the next wave at the checkpoint reopens first-half inboxes
   const { context: g } = game();
   phaseESetup(g, 1);
   const rcHold = g.buildRunStart();
-  g.simulateRange(rcHold, 0, rcHold.mid); g.simulateRange(rcHold, rcHold.mid, rcHold.seg.n);
+  g.simulateRange(rcHold, 0, rcHold.mid); g.simulateRange(rcHold, rcHold.mid, rcHold.popN);
   const hold = g.finishRun(rcHold);
   const rcFire = g.buildRunStart();
   g.simulateRange(rcFire, 0, rcFire.mid);
   g.fireReminderWave(rcFire);
   assert.ok(rcFire.firedWave.converted > 0, 'the fired wave reopens some first-half inboxes');
-  g.simulateRange(rcFire, rcFire.mid, rcFire.seg.n);
+  g.simulateRange(rcFire, rcFire.mid, rcFire.popN);
   const fire = g.finishRun(rcFire);
   const openedPastGate = run => run.respondents.slice(0, run.respondents.length / 2)
     .filter(sp => ['finish', 'guessfinish', 'drop', 'nostart'].includes(sp.fate)).length;
@@ -1300,13 +1301,13 @@ test('phase E: the 72-hour clock binds only past day 3, and a lapse mails the op
   assert.equal(g.fieldworkDays(), 4);
   assert.equal(g.clockExpires(), true);
   const rcOk = g.buildRunStart();
-  g.simulateRange(rcOk, 0, rcOk.mid); g.simulateRange(rcOk, rcOk.mid, rcOk.seg.n);
+  g.simulateRange(rcOk, 0, rcOk.mid); g.simulateRange(rcOk, rcOk.mid, rcOk.popN);
   const okRun = g.finishRun(rcOk);
   assert.equal(g.tally(okRun).angry, 0, 'permission held: nobody opted out is mailed');
   const rcLapse = g.buildRunStart();
   g.simulateRange(rcLapse, 0, rcLapse.mid);
   rcLapse.permissionLapsed = true;
-  g.simulateRange(rcLapse, rcLapse.mid, rcLapse.seg.n);
+  g.simulateRange(rcLapse, rcLapse.mid, rcLapse.popN);
   const lapseRun = g.finishRun(rcLapse);
   const lt = g.tally(lapseRun);
   assert.ok(lt.angry > 0, 'the lapsed second half mails people who opted out during fieldwork');
@@ -1326,7 +1327,7 @@ test('phase E: the launch flow pauses at the checkpoint card and continues on co
   assert.equal(g.state.checkpoint, null);
   assert.equal(g.state.checkpointRecheck, true, 'the default at an affordable pool is to re-check');
   assert.equal(g.state.launchCost, costBefore + 4, 'the re-check charges the attempt');
-  assert.equal(g.runData.respondents.length, g.state.seg.n, 'the second half simulated after continue');
+  assert.equal(g.runData.respondents.length, g.runData.popN, 'the second half simulated after continue');
 });
 
 test('phase F: reminder waves resume dropped starters, and only when waves are bought', () => {
@@ -1515,12 +1516,14 @@ test('preparation and audience controls recover affordability without losing own
 });
 
 const winningSetups = JSON.parse(readFileSync(join(root, 'scripts', 'fixtures', 'winning-setups.json'), 'utf8'));
-/* The evidence-fitness corpus retains all 364 previously sampled instruments.
+/* The witness corpus holds 10 setups per level (trimmed from 65 on
+   2026-11-17 at Fabio's direction): the fixed campaign anchor plus seeded
+   winners picked for spread across cost, goodwill, and the seed range.
    Repairs, bank additions, invitation, reminders, and escapes were searched
-   again under the five independent checks. Every witness is replayed through
+   under the current rules. Every witness is replayed through
    the card handlers, startRun, and showReport below. Each is an independent
    campaign start; the separate continuous-campaign test checks carryover. */
-const LEGAL_WINNER_MINIMUMS = { 1: 65, 2: 65, 3: 65, 4: 65, 5: 65, 6: 65 };
+const LEGAL_WINNER_MINIMUMS = { 1: 10, 2: 10, 3: 10, 4: 10, 5: 10, 6: 10 };
 test('goodwill ledger identifies report-back rewards and stakeholder penalties', () => {
   const { context: g, element } = game();
   g.state.audiencePortfolio = { support: { contacts: 1, instruments: [], responses: {}, suppressionOverrides: 0, health: 99 } };
@@ -2247,7 +2250,7 @@ test('complication draw is deterministic per seed and reaches every flavor', () 
         assert.notEqual(g.defectOf(g.questionById(comp.qid)), 'CLEAN', 'the late card arrives defective');
       }
     }
-    assert.deepEqual([...seen].sort(), ['late', 'list', 'none', 'wave'],
+    assert.deepEqual([...seen].sort(), ['gold', 'late', 'list', 'none', 'wave'],
       `Challenge ${index} sweep must reach every flavor and clean runs`);
     assert.ok(sources.size >= 3, `Challenge ${index} late questions rotate their named source`);
   }
@@ -3425,6 +3428,87 @@ test('per-level surveys: Level 6 Insight credits only its own agenda topics', ()
      commercial specifics sit with administrator seats. */
   assert.deepEqual(Array.from(g.topicKeysFor('strategic alignment'), String), ['exec', 'itdm']);
   assert.deepEqual(Array.from(g.topicKeysFor('commercial process'), String), ['admin', 'itdm']);
+});
+
+/* ---- Medallion phase 3 + SAMPLING (G4): literal promoted counts ---- */
+
+test('phase 3: the run population is the promoted count, not the segment size', () => {
+  const { context: g } = game();
+  g.selectLevel(1, false);
+  /* No Silver work: nothing is merged or quarantined, so the promoted
+     count equals the records in and the base is unchanged. */
+  let rc = g.buildRunStart();
+  assert.equal(rc.frameN, g.state.seg.n);
+  assert.equal(rc.popN, g.state.seg.n);
+  assert.equal(rc.bag.length, g.state.seg.n);
+  /* Full Silver: merges and quarantine shrink the mailed base. */
+  g.state.dedupe = true; g.state.consolidate = true; g.state.repair = true;
+  rc = g.buildRunStart();
+  const expect = Math.round(g.state.seg.n * g.intakeDerived(g.currentIntake(), g.silverState()).promotedShare);
+  assert.equal(rc.frameN, expect);
+  assert.equal(rc.popN, expect);
+  assert.ok(rc.popN < g.state.seg.n, 'Silver work shrinks the mailed base');
+  const run = g.buildRun();
+  assert.equal(run.respondents.length, expect, 'the simulated population is the promoted count');
+  assert.equal(run.popN, expect);
+  assert.equal(run.frameN, expect);
+});
+
+test('sampling: mail-the-list is the default and a precision target draws a smaller stratified base', () => {
+  const { context: g } = game();
+  g.selectLevel(1, false);
+  g.state.dedupe = true; g.state.consolidate = true; g.state.repair = true;
+  g.state.validation = 'full';
+  assert.equal(g.state.sampling, 'all');
+  assert.equal(g.sampleCount(), g.promotedCount(), 'the default mails the whole frame');
+  g.state.sampling = 'p5';
+  const drawn = g.sampleCount();
+  assert.ok(drawn < g.promotedCount(), 'the \u00B15 draw mails less than the frame');
+  assert.ok(drawn > 2000 && drawn < 9000, 'the draw is sized from the 384-complete target at expected rates, got ' + drawn);
+  const rc = g.buildRunStart();
+  assert.equal(rc.popN, drawn);
+  assert.equal(rc.frameN, g.promotedCount());
+  /* Stratification: the drawn bag tracks the segment persona mix. */
+  const counts = {};
+  rc.bag.forEach(k => { counts[k] = (counts[k] || 0) + 1; });
+  for (const k of Object.keys(g.state.seg.mix)) {
+    assert.ok(Math.abs(counts[k] / rc.bag.length - g.state.seg.mix[k]) < 0.02, k + ' share tracks the mix');
+  }
+  g.state.sampling = 'p1';
+  assert.equal(g.sampleCount(), g.promotedCount(), 'a \u00B11 target on this frame needs the whole list');
+});
+
+test('sampling: the mailed share is recorded and prices the pool fatigue in goodwill', () => {
+  const { context: g } = game();
+  g.selectLevel(1, false);
+  g.state.validation = 'full'; g.state.suppression = true;
+  g.startRun(); g.showReport();
+  const h = g.state.audiencePortfolio.support;
+  assert.ok(h, 'the run recorded the pool');
+  assert.ok(h.lastShare > 0.9, 'a mail-the-list send mailed nearly the whole frame, got ' + h.lastShare);
+  assert.ok(Math.abs(h.mailings - h.lastShare) < 1e-9, 'mailings accumulate the mailed share');
+  const tired = g.SEGMENTS.find(s => s.id === 'tired');
+  assert.equal(g.goodwillStart(tired).fatigue, 1,
+    'one near-full mailing costs the pool 1 goodwill of fatigue on its next send (suppression bought: share-weighted x1)');
+});
+
+test('quick challenge: the dirty-Gold complication voids the provided dedupe until it is re-run', () => {
+  const { context: g, element } = game();
+  startQCWithComp(g, 0, null, 'gold');
+  assert.equal(g.quickComplicationTitle(g.state.quickChallenge.comp), 'THE GOLD LIST WAS NOT DEDUPED');
+  applyQuickLine(g, 0, 'intended');
+  g.startRun(); g.showReport();
+  assert.match(element('report').innerHTML, /THE GOLD LIST WAS NOT DEDUPED/);
+  assert.equal(g.state.dedupe, true, 'wave 1 ran on the provided dedupe');
+  assert.equal(g.duplicateFactor(), 0);
+  assert.equal(g.acceptQuickComplication(), true);
+  assert.equal(g.state.quickChallenge.wave, 2);
+  assert.equal(g.state.dedupe, false, 'accepting voids the provided dedupe: it never ran');
+  assert.equal(g.duplicateFactor(), 1, 'wave 2 faces the un-deduped list');
+  const before = g.budgetMath().attemptCost;
+  g.state.dedupe = true;
+  assert.equal(g.budgetMath().attemptCost - before, 4, 're-running the dedupe charges the book price');
+  assert.equal(g.duplicateFactor(), 0, 'the re-run dedupe cleans the wave 2 list');
 });
 
 test('medallion: campaign report carries the list preparation ledger; quick report does not', () => {

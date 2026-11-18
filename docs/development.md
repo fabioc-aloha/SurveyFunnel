@@ -79,10 +79,28 @@ the same starting state.
 ### Population and animation contracts
 
 `buildRun()` generates `run.respondents`: one record per member of the
-selected segment, including recipients stopped before sending by the
+mailed sample, including recipients stopped before sending by the
 breaker. `tally`, evidence processing, A/B/language reports, and portfolio
 response totals read these records. There is no `n / 40` result multiplier.
 Population sizes must be positive integers.
+
+The mailed sample is drawn from the promoted frame (medallion phase 3
+with G4 sampling). `buildRunStart` records `rc.frameN` =
+`promotedCount()` (segment size times the intake's promoted share for
+the current Silver state) and `rc.popN` = `sampleCount()`. Sampling
+state `state.sampling` is "all" (mail the promoted list, the default)
+or a precision target keyed by `SAMPLE_TARGETS` (p5 384, p3 1067,
+p1 9604 target completions); `sampleCount()` converts the target
+through the expected completion rate (post-validation invalid, the
+selected invite's open and start rates, and the 45%-of-starters
+planning assumption the A/B panel prints) and caps at the frame. The
+persona bag is built at `popN` with the segment mix, which is the
+stratification; Level 5 language shares are dealt by the engine as
+before. The mailed share of the frame is recorded on the audience
+portfolio and read back as goodwill fatigue on the pool's next send.
+Quick Challenges bypass both functions: their frame and population
+stay the provided segment size. The witness replay uses the default
+sampling state, so recorded setups need no sampling field.
 
 `run.sprites` is a separate display model. `groupRespondents()` groups
 matching personas, A/B arms, outcomes, drop causes/questions, reminder

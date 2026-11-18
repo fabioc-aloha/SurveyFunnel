@@ -132,7 +132,18 @@
   checkpoint with the 72-hour clock (G13, G6 remainder), and
   reminder retargeting last (G27). Outside the program: G3,
   G10, G11 (needs the owner's design call), G25, and medallion
-  phases 2-3.
+  phase 2 (phase 3 shipped with Phase D, see above).
+- Medallion phase 3 + process-consistency Phase D
+  (2026-11-17): the promoted count is the send base, and
+  sampling (G4) ships on the new counts (Step 2 SAMPLING
+  row: mail the list, or a precision-sized stratified
+  draw; fatigue priced in goodwill). The Quick Challenge
+  dirty-Gold complication ships with it. The witness
+  corpus was regenerated for the new denominators and
+  trimmed to 10 setups per level at the owner's
+  direction. The process-consistency program is now
+  complete (Phases A to F); medallion phase 2 (ATTACH
+  HISTORY) remains unbuilt by decision.
 - Animation performance pass (2026-11-14): the owner
   reported stutter on iPhone. Sprites now move by
   translate3d transforms, pile geometry is measured once

@@ -73,6 +73,17 @@ progress or spends the campaign's credits.
    validation (BriteVerify) at skip, partial, or full; suppression
    scrub (opt outs and recently surveyed); localization review.
    These are simulated preparation choices, not live service integrations.
+   The promoted count is the real frame: it is what a send can draw
+   from. Last in this step, sampling. Mail the whole promoted list,
+   or draw a sample sized for a precision target: about 384, 1,067,
+   or 9,604 completions for plus or minus 5, 3, or 1 points, converted
+   through the send's expected rates. The draw is stratified on the
+   segment's persona mix, and by language group on the global level.
+   Sampling is free in credits; its price is audience fatigue. The
+   share of the pool you mail is remembered, and mailing a tired pool
+   again costs goodwill on its next send. The report's list
+   preparation ledger shows the frame, the promoted count, and how
+   many were actually mailed.
 3. **INVITATION.** Pick a variant and a reminder count. Reminder
    waves go to everyone who has not completed yet: people who
    never opened get another chance to open, and starters who
@@ -88,7 +99,7 @@ progress or spends the campaign's credits.
    or cut each question. Watch the estimated
    minutes against each persona's patience. Add escapes (Don't know
    / Not applicable) to allow item nonresponse instead of forced answers.
-5. **LAUNCH.** Every recipient in the selected audience is simulated.
+5. **LAUNCH.** Every recipient in the mailed sample is simulated.
    Animated sprites represent groups with similar behavior, each
    labeled `×N`. There may be more than 40 groups. Counters show
    individual simulated recipients, not the number of visible sprites.

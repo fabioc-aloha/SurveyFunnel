@@ -103,6 +103,15 @@ the player is scored against is the document they signed.
 
 ### SAMPLING — G4: draw the sample from Gold
 
+**Status: shipped 2026-11-17, together with medallion phase 3.**
+The sampling panel sits at the end of Step 2's list preparation;
+the draw, stratification, fatigue pricing, and ledger lines are as
+designed below. One design assumption did not survive contact with
+phase 3: the plan below expected the promoted-list default to
+reproduce the old sends, but phase 3 moved every denominator, so
+the witness corpus was regenerated against the new counts (and
+trimmed to 10 setups per level at the owner's direction).
+
 Today the whole segment is mailed; the Fishbowl SAMPLING stage
 exists only as text. Sampling needs literal promoted counts,
 which is medallion phase 3, so this item rides on that work.
@@ -209,9 +218,10 @@ the honest kind for this act.
 - Phase C: G1 intake. Choices bind to existing gates; the
   default intake reproduces today’s missions exactly, so
   witnesses replay unchanged (an invariant test, like G13’s).
-- Phase D: G4 sampling, on medallion phase 3 counts. The
-  “mail the promoted list” default reproduces today’s sends;
-  witnesses stand.
+- Phase D: G4 sampling, on medallion phase 3 counts. SHIPPED
+  2026-11-17 with phase 3. The “mail the promoted list” default
+  reproduces the phase 3 sends; the corpus was regenerated for
+  phase 3’s denominators (trimmed to 10 per level).
 - Phase E: G13 checkpoint + the G6 clock. Default-hold
   invariant keeps witnesses valid.
 - Phase F: G27 reminder retargeting + the one full witness

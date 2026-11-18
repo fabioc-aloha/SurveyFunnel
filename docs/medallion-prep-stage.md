@@ -1,8 +1,11 @@
 # Medallion Prep Stage: Design Proposal
 
 Design proposal: 2026-11-10. Status: phase 1 implemented 2026-11-10
-(owner decisions recorded in section 8); phases 2 and 3 remain
-proposals. This document proposed a playable list-preparation stage modeled on
+(owner decisions recorded in section 8); phase 3 implemented
+2026-11-17 (literal promoted counts as the send base, with G4
+sampling from docs/process-consistency-scope.md riding on the new
+counts, and the Quick Challenge dirty-Gold complication); phase 2
+(ATTACH HISTORY) remains a proposal, unbuilt. This document proposed a playable list-preparation stage modeled on
 the medallion pipeline (Bronze, Silver, Gold) behind the real survey
 operation this game teaches. Phase 1 shipped as scoped below; anything
 that contradicts a shipped rule is flagged as a rule change with its

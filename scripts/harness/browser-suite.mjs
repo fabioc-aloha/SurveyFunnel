@@ -505,6 +505,10 @@ async function runViewport(browser, gameUrl, viewport, options) {
         event.type === 'finish' && event.t <= virtualT)).length;
       return {
         recipients: runData.respondents.length,
+        /* Medallion phase 3: the population is the promoted list,
+           not the raw segment size. The expected frame is read from
+           the game's own promotedCount() for the launched setup. */
+        expected: promotedCount(),
         groups: runData.sprites.length,
         groupedRecipients: runData.sprites.reduce((total, group) => total + group.count, 0),
         badges: document.querySelectorAll('#track .groupcount').length,
@@ -513,12 +517,12 @@ async function runViewport(browser, gameUrl, viewport, options) {
       };
     });
     await run.check('full recipient population is independent of the animation groups',
-      population.recipients === 10000 && population.groups > 40 &&
+      population.recipients === population.expected && population.groups > 40 &&
       population.groups < population.recipients && population.groupedRecipients === population.recipients, population);
     await run.check('live counters equal individual recipient events',
       population.displayedSent === population.sent && population.displayedCompleted === population.completed, population);
     await run.check('animation explains weighted groups instead of forty-person proxies',
-      population.badges > 0 && population.summary.includes('10,000 simulated recipients') &&
+      population.badges > 0 && population.summary.includes(population.expected.toLocaleString('en-US') + ' simulated recipients') &&
       population.summary.includes('group size'), population);
     await nameplateCheck(run, '#runStage', 'run');
     await checkOverflow(run, 'run screen');

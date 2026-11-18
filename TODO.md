@@ -57,13 +57,12 @@ The following features remain unimplemented:
   account hierarchies, and finer sampling/role-specific missions.
 - P2: Add causal decision review, rejected-alternative consequences,
   learning assessment, and optional local scorecard export.
-- Medallion prep stage phases 2 and 3 (design in
+- Medallion prep stage phase 2 (design in
   [docs/medallion-prep-stage.md](docs/medallion-prep-stage.md), phase 1
-  shipped 2026-11-10): phase 2 adds the missing-attributes intake
-  class, the ATTACH HISTORY Gold enhancement (matching/Insight only,
-  per the owner's 2026-11-10 decision), and a season quarantine line;
-  phase 3 (separately decided) would make promoted counts the literal
-  send base and add a Quick Challenge dirty-Gold complication.
+  shipped 2026-11-10, phase 3 shipped 2026-11-17 with G4 sampling):
+  phase 2 adds the missing-attributes intake class, the ATTACH HISTORY
+  Gold enhancement (matching/Insight only, per the owner's 2026-11-10
+  decision), and a season quarantine line. Still open.
 - Per-level surveys phase 5 (design in
   [docs/level-surveys-scope.md](docs/level-surveys-scope.md); all
   seven decisions approved as recommended 2026-11-11; phase 1 built

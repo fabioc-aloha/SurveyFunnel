@@ -1,5 +1,49 @@
 # Changelog
 
+## 2026-11-17 - Medallion phase 3 and Phase D sampling (G4): the promoted list is the send base
+
+- The promoted count is now the real send base (medallion
+  phase 3, lifting the 2026-11-10 deferral). A run's
+  population is the promoted list for the chosen audience
+  and Silver state; rates, prices, and win rules are
+  unchanged, volumes follow the list work.
+- Sampling (process-consistency Phase D, G4) rides on the
+  new counts. Step 2 gains a SAMPLING row under the Gold
+  panel: mail the promoted list (the default), or draw a
+  sample sized for a precision target (about 384 / 1,067 /
+  9,604 completes for ±5 / ±3 / ±1, converted through the
+  setup's expected rates and capped at the frame). The
+  draw is stratified on the segment's persona mix and, on
+  Level 5, by language group, and is deterministic from
+  the run seed. Sampling costs no credits; the mailed
+  share of the pool is recorded as fatigue and costs
+  goodwill on that pool's next send. The report's list
+  preparation ledger shows the frame and the mailed count.
+- Quick Challenges keep the provided list: no medallion
+  stage, frame and population stay the segment size.
+  The stage 3 complication family gains a fourth flavor,
+  THE GOLD LIST WAS NOT DEDUPED: the provided dedupe
+  turns out never to have run, wave 2 starts undeduped,
+  and re-running the dedupe charges the book price (4 cr)
+  or the duplicates ride into CLEAN and Quality. The
+  flavor split draws from its own seeded stream, so
+  complication seeds pinned before the split keep their
+  flavor.
+- Witness corpus regenerated for the new denominators
+  and trimmed to 10 setups per level (60 total) at the
+  owner's direction on 2026-11-17: the fixed campaign
+  anchor plus seeded winners picked for spread across
+  cost, goodwill, and the seed range. Fixed anchors:
+  L1 62, L2 66, L3 62, L4 63, L5 72, L6 89 credits.
+  Seeded cost ranges: L1 56-73, L2 71-90, L3 61-94,
+  L4 66-72, L5 74-92, L6 94-115.
+- Five-surface pass for the SAMPLING stage: Fishbowl
+  SAMPLING note rewritten, MPOR list section gained a
+  sampling entry, the BRD list preparation section names
+  the frame, and the player guide and development notes
+  describe the model. Medallion phase 2 (ATTACH HISTORY)
+  remains unbuilt, as decided.
+
 ## 2026-11-17 - Reference copy corrections (demo stability patch)
 
 - Two reference lines that predated shipped mechanics are
