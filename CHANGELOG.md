@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-11-17 - Reference copy corrections (demo stability patch)
+
+- Two reference lines that predated shipped mechanics are
+  corrected; no mechanics, prices, or outcomes change.
+- The Fishbowl PERMISSION note said the suppression scrub
+  runs "without the 72-hour clock". Since Phase E the
+  game runs the clock: the check is stamped at setup,
+  fieldwork runs two days plus a day per reminder wave,
+  and a longer fielding is re-checked at the mid-field
+  checkpoint. The note now says so, matching the BRD.
+- The field guide's Response rate entry said eligibility
+  and full case dispositions "are not modeled". Since
+  the gap-fix wave the report's disposition card works
+  out the full case dispositions and AAPOR RR3 and RR4
+  with the eligibility estimate stated. The entry now
+  says the headline rate is the simple measure and
+  points at the disposition card.
+
 ## 2026-11-14 - Run animation performance pass
 
 - The owner reported heavy stutter in the run animation
